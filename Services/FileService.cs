@@ -49,12 +49,12 @@ namespace WPF_LCD_Test.Services
                 if (!Directory.Exists(_baseFolderPath))
                 {
                     Directory.CreateDirectory(_baseFolderPath);
-                    StatusMessage?.Invoke(this, $"Создана рабочая папка: {_baseFolderPath}\r\n"); // Сообщение
+                    StatusMessage?.Invoke(this, $"Создана рабочая папка: {_baseFolderPath}"); // Сообщение
                 }
             }
             catch (Exception ex)
             {
-                StatusMessage?.Invoke(this, $"Ошибка при инициализации рабочих папок: {ex.Message}\r\n"); // Сообщение об ошибке
+                StatusMessage?.Invoke(this, $"Ошибка при инициализации рабочих папок: {ex.Message}"); // Сообщение об ошибке
                                                                                                           // Обработка ошибки инициализации - возможно, стоит бросить исключение или установить флаг
             }
         }
@@ -64,7 +64,7 @@ namespace WPF_LCD_Test.Services
         {
             if (device == null)
             {
-                StatusMessage?.Invoke(this, "Ошибка сохранения: Нет данных устройства.\r\n");
+                StatusMessage?.Invoke(this, "Ошибка сохранения: Нет данных устройства.");
                 SaveOperationCompleted?.Invoke(this, false);
                 return false;
             }
@@ -85,13 +85,13 @@ namespace WPF_LCD_Test.Services
                 // Асинхронно записываем JSON строку в файл
                 await File.WriteAllTextAsync(filePath, jsonString); // Используем асинхронный метод записи
 
-                StatusMessage?.Invoke(this, $"Данные для SN {device.SerialNumber} сохранены в JSON: {filePath}\r\n"); // Сообщение об успехе
+                StatusMessage?.Invoke(this, $"Данные для SN {device.SerialNumber} сохранены в JSON: {filePath}"); // Сообщение об успехе
                 SaveOperationCompleted?.Invoke(this, true);
                 return true; // Успех
             }
             catch (Exception ex)
             {
-                StatusMessage?.Invoke(this, $"Ошибка при сохранении в JSON для SN {device.SerialNumber}: {ex.Message}\r\n"); // Сообщение об ошибке
+                StatusMessage?.Invoke(this, $"Ошибка при сохранении в JSON для SN {device.SerialNumber}: {ex.Message}"); // Сообщение об ошибке
                 SaveOperationCompleted?.Invoke(this, false);
                 return false; // Ошибка
             }
@@ -102,18 +102,18 @@ namespace WPF_LCD_Test.Services
         {
             if (string.IsNullOrWhiteSpace(serialNumber))
             {
-                StatusMessage?.Invoke(this, "Ошибка сохранения CSV: Не указан серийный номер.\r\n");
+                StatusMessage?.Invoke(this, "Ошибка сохранения CSV: Не указан серийный номер.");
                 // OnSaveOperationCompleted?.Invoke(this, false); // Может быть, не нужно оповещать о завершении каждого CSV
                 return false;
             }
             if (string.IsNullOrWhiteSpace(measurementCsvString))
             {
-                StatusMessage?.Invoke(this, "Ошибка сохранения CSV: Нет данных для сохранения.\r\n");
+                StatusMessage?.Invoke(this, "Ошибка сохранения CSV: Нет данных для сохранения.");
                 return false;
             }
             if (string.IsNullOrWhiteSpace(measurementLocationName))
             {
-                StatusMessage?.Invoke(this, "Ошибка сохранения CSV: Не указано имя локации.\r\n");
+                StatusMessage?.Invoke(this, "Ошибка сохранения CSV: Не указано имя локации.");
                 return false;
             }
 
@@ -126,7 +126,7 @@ namespace WPF_LCD_Test.Services
                 if (!Directory.Exists(serialNumberFolderPath))
                 {
                     Directory.CreateDirectory(serialNumberFolderPath);
-                    StatusMessage?.Invoke(this, $"Создана папка для устройства: {serialNumberFolderPath}\r\n"); // Сообщение
+                    StatusMessage?.Invoke(this, $"Создана папка для устройства: {serialNumberFolderPath}"); // Сообщение
                 }
 
                 // Определяем путь к CSV файлу (используя имя локации)
@@ -136,13 +136,13 @@ namespace WPF_LCD_Test.Services
                 // Асинхронно записываем CSV строку в файл
                 await File.WriteAllTextAsync(filePath, measurementCsvString); // Сохраняем уже готовую CSV строку
 
-                // OnStatusMessage?.Invoke(this, $"Измерение '{measurementLocationName}' сохранено в CSV: {filePath}\r\n"); // Может быть слишком много сообщений для лога
+                // OnStatusMessage?.Invoke(this, $"Измерение '{measurementLocationName}' сохранено в CSV: {filePath}"); // Может быть слишком много сообщений для лога
                 // OnSaveOperationCompleted?.Invoke(this, true); // Может быть, не нужно оповещать о завершении каждого CSV
                 return true; // Успех
             }
             catch (Exception ex)
             {
-                StatusMessage?.Invoke(this, $"Ошибка при сохранении в CSV для '{measurementLocationName}' (SN {serialNumber}): {ex.Message}\r\n"); // Сообщение об ошибке
+                StatusMessage?.Invoke(this, $"Ошибка при сохранении в CSV для '{measurementLocationName}' (SN {serialNumber}): {ex.Message}"); // Сообщение об ошибке
                                                                                                                                                    // OnSaveOperationCompleted?.Invoke(this, false); // Может быть, не нужно оповещать о завершении каждого CSV
                 return false; // Ошибка
             }

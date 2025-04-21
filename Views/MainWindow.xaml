@@ -39,34 +39,37 @@
                 </Grid.RowDefinitions>
                 <StackPanel Orientation="Horizontal">
                     <Button Content="Zero Calibration" Command="{Binding ZeroCalibrationCommand}" Margin="5" />
-                    <Grid x:Name="ConnectionStatusGrid" Margin="10,10,10,10">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="50*" />
-                            <RowDefinition Height="50*" />
-                        </Grid.RowDefinitions>
-                        <TextBlock Text="{Binding IsDeviceConnected, StringFormat='Подключен: {0}'}"
-                                   Grid.Row="0"
-                                   VerticalAlignment="Center" Margin="5,0" />
-
+                    
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,20,10,10">
+                            <TextBlock Text="{Binding IsDeviceConnected, StringFormat='Подключен: {0}'}"
+                         VerticalAlignment="Center" Margin="5,0" />
+                            <TextBlock Text="{Binding IsDeviceCalibrated, StringFormat='Откалиброван: {0}'}"
+           VerticalAlignment="Center" Margin="5,0" />
+                        </StackPanel>
                         
-                        <TextBlock Text="{Binding IsDeviceCalibrated, StringFormat='Откалиброван: {0}'}"
-                                   Grid.Row="1"
-                                   VerticalAlignment="Center" Margin="5,0" />
-                    </Grid>
+                    
                     
                 </StackPanel>
                 <Grid Grid.Row="1">
                     <StackPanel Orientation="Horizontal">
                         <Label Content="Время измерения (сек):" VerticalAlignment="Center" />
                         <TextBox Margin="5,0" VerticalAlignment="Center" MinWidth="50"
-                 Text="{Binding MeasurementTime, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0}}" />
+                 Text="{Binding MeasurementTime, UpdateSourceTrigger=PropertyChanged, StringFormat={}{0}}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding DataContext.ApplyMeasurementTimeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Row="2">
                     <StackPanel Orientation="Horizontal">
                         <Label Content="Серийный номер:" VerticalAlignment="Center" />
                         <TextBox Margin="5,0" VerticalAlignment="Center" MinWidth="200"
-                                 Text="{Binding SerialNumber, UpdateSourceTrigger=PropertyChanged}" />
+                                 Text="{Binding SerialNumber, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding DataContext.ApplySerialNumberCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
                     </StackPanel>
                 </Grid>
             </Grid>
@@ -238,6 +241,7 @@
             </Grid>
         </Grid>
         <ListBox Grid.Row="2" Margin="0,5,5,5"
+                 x:Name="LogListBox"
                  ItemsSource="{Binding LogMessages}" />
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
             <Button Content="Save results" Command="{Binding SaveResultsCommand}" Margin="5" />

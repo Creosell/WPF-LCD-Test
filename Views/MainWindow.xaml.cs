@@ -26,15 +26,64 @@ namespace WPF_LCD_Test // Пространство имен твоего при�
             // Создаем экземпляр ViewModel, передавая ему зависимости (сервисы)
             MainWindowViewModel viewModel = new MainWindowViewModel(colorMeasurementService, fileService, dialogService);
 
+
             // Устанавливаем DataContext окна на созданный ViewModel
             this.DataContext = viewModel;
 
-            // Опционально: Если ViewModel реализует IDisposable, подписываемся на событие закрытия окна
-            // для корректной очистки ресурсов ViewModel при закрытии окна.
+            // --- Подписка на событие изменения коллекции лога для автопрокрутки ---
+            // Убедимся, что ViewModel и LogMessages не равны null
+            if (viewModel != null && viewModel.LogMessages != null)
+            {
+                viewModel.LogMessages.CollectionChanged += LogMessages_CollectionChanged;
+            }
+            // --- Конец подписки ---
+
+
+            // Опционально: Отписка при закрытии окна для предотвращения утечки памяти
             this.Closed += (sender, e) =>
             {
-                (this.DataContext as IDisposable)?.Dispose();
+                // Отписка от события CollectionChanged
+                if (viewModel != null && viewModel.LogMessages != null)
+                {
+                    viewModel.LogMessages.CollectionChanged -= LogMessages_CollectionChanged;
+                }
+                // Вызов Dispose у ViewModel, если он реализует IDisposable
+                (viewModel as IDisposable)?.Dispose();
             };
+
+
         }
+        // --- Обработчик события изменения коллекции лога ---
+        private void LogMessages_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            // Проверяем, что было добавлено новое сообщение
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                // Убеждаемся, что ListBox существует и есть добавленные элементы
+                if (LogListBox != null && e.NewItems != null && e.NewItems.Count > 0)
+                {
+                    // !!! ИСПРАВЛЕНИЕ ОШИБКИ: Откладываем вызов ScrollIntoView с помощью Dispatcher !!!
+                    // Используем Dispatcher.InvokeAsync (предпочтительнее в .NET Core/.NET 5+)
+                    // Или Dispatcher.BeginInvoke (для .NET Framework)
+                    // DispatcherPriority.ContextIdle - низкий приоритет, выполняется, когда Dispatcher свободен
+                    LogListBox.Dispatcher.InvokeAsync(() =>
+                    {
+                        // Этот код выполнится в UI-потоке после того, как ListBox обновится
+                        LogListBox.ScrollIntoView(e.NewItems[0]);
+                    }, System.Windows.Threading.DispatcherPriority.ContextIdle);
+
+                    // Если используешь .NET Framework, может потребоваться:
+                    // LogListBox.Dispatcher.BeginInvoke(
+                    //     System.Windows.Threading.DispatcherPriority.ContextIdle,
+                    //     new Action(() =>
+                    //     {
+                    //         LogListBox.ScrollIntoView(e.NewItems[0]);
+                    //     }));
+                }
+            }
+        }
+
     }
+
+
 }
