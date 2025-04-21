@@ -21,7 +21,7 @@ namespace WPF_LCD_Test.Services
             Task<bool> CalibrateZeroAsync(); // Асинхронная операция для калибровки
 
             // Метод для выполнения измерения
-            Task<Measurement> MeasureAsync(); // Асинхронная операция, возвращает объект Measurement
+            Task<Measurement> MeasureAsync(int measurmentTime); // Асинхронная операция, возвращает объект Measurement
 
             // События для оповещения ViewModel об изменении состояния или ходе выполнения
             // Например, чтобы обновить UI или лог

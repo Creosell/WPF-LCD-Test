@@ -13,8 +13,6 @@ namespace WPF_LCD_Test.Services
         private bool _isConnected = false;
         private bool _isCalibrated = false;
 
-        private long ErrorInterpretation = -2147221504;
-
         //Color analyzer constants
         //Remote modes
         private const int RemoteModeOFF = 0;
@@ -132,11 +130,6 @@ namespace WPF_LCD_Test.Services
             Dispose();
         }
 
-        private void Measure()
-        {
-            _objCa200.SingleCa.Measure();
-        }
-
         public async Task<bool> CalibrateZeroAsync()
         {
             bool success = false;
@@ -221,7 +214,7 @@ namespace WPF_LCD_Test.Services
             Dispose(false);
         }
 
-        public async Task<Measurement> MeasureAsync()
+        public async Task<Measurement> MeasureAsync(int measurmentTime)
         {
             // Переносим логику из твоих PerformMeasurements() и части ColorMeasure()
             // Делаем асинхронным!
@@ -245,8 +238,7 @@ namespace WPF_LCD_Test.Services
 
                     StatusMessage?.Invoke(this, "Выполнение измерений..."); // Сообщение
 
-                    // Переносим цикл измерений
-                    int measurmentTime = 2; // Это значение должно приходить из ViewModel!
+                    // Переносим цикл 
                     double[] xValues = new double[measurmentTime];
                     double[] yValues = new double[measurmentTime];
                     double[] LvValues = new double[measurmentTime];

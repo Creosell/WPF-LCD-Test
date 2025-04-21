@@ -54,18 +54,20 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
 
         // Список ожидаемых измерений по именам точек (из WinForms measurementButtons)
         // Этот список может быть загружен из конфигурации или констант
-        private readonly List<string> _requiredMeasurementNames = new List<string>
-        {
-            "TopLeft", "TopCenter", "TopRight",
-            "MiddleLeft", "Center", "MiddleRight",
-            "BottomLeft", "BottomCenter", "BottomRight",
-            "RedColor", "GreenColor", "BlueColor", "BlackColor"
-        };
+        private List<string> _requiredMeasurementNames;
+
+        //{
+        //    "TopLeft", "TopCenter", "TopRight",
+        //    "MiddleLeft", "Center", "MiddleRight",
+        //    "BottomLeft", "BottomCenter", "BottomRight",
+        //    "RedColor", "GreenColor", "BlueColor", "BlackColor"
+        //};
 
         // В классе MainWindowViewModel (рядом с другими свойствами)
 
         // Публичные свойства для статуса каждой точки измерения
         public MeasurementStatusViewModel TopLeftStatus { get; private set; }
+
         public MeasurementStatusViewModel TopCenterStatus { get; private set; }
         public MeasurementStatusViewModel TopRightStatus { get; private set; }
 
@@ -117,7 +119,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 // Базовая валидация времени
                 if (value <= 0)
                 {
-                    AddLogMessage("Внимание: Время измерения должно быть больше 0.");
                     // Не меняем _measurementTime, но уведомляем UI, чтобы поле могло сбросить невалидный ввод, если привязано в TwoWay
                     OnPropertyChanged();
                 }
@@ -125,7 +126,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 {
                     _measurementTime = value;
                     OnPropertyChanged(); // Уведомляем View
-                    AddLogMessage($"Текущее время измерения установлено: {MeasurementTime} сек."); // Лог
                 }
             }
         }
@@ -199,7 +199,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             }
         }
 
-        public ObservableCollection<MeasurementStatusViewModel> AllMeasurementButtonStatuses { get; set; } 
+        public ObservableCollection<MeasurementStatusViewModel> AllMeasurementButtonStatuses { get; set; }
 
         // Коллекция статусов для каждой точки измерения (для привязки к кнопкам или списку)
         // Каждый элемент MeasurementStatusViewModel уведомляет об изменении своего статуса/цвета
@@ -257,12 +257,12 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
 
             // Инициализация команд, связывая их с методами Execute/CanExecute
             // Используем RelayCommand, который находится в папке Commands
-            ConnectCommand = new RelayCommand(ExecuteConnectAsync, CanExecuteConnect); // Асинхронная команда
-            DisconnectCommand = new RelayCommand(ExecuteDisconnect, CanExecuteDisconnect); // Синхронная команда (операция быстрая)
+            //ConnectCommand = new RelayCommand(ExecuteConnectAsync, CanExecuteConnect); // Асинхронная команда
+            //DisconnectCommand = new RelayCommand(ExecuteDisconnect, CanExecuteDisconnect); // Синхронная команда (операция быстрая)
             ZeroCalibrationCommand = new RelayCommand(ExecuteZeroCalibrationAsync, CanExecuteZeroCalibration); // Асинхронная команда
             SaveResultsCommand = new RelayCommand(ExecuteSaveResultsAsync, CanExecuteSaveResults); // Асинхронная команда
             ClearFieldsCommand = new RelayCommand(ExecuteClearFields, CanExecuteClearFields); // Синхронная команда, с CanExecute
-            TestCommand = new RelayCommand(ExecuteTest, CanExecuteTest); // Синхронная команда, с CanExecute
+            //TestCommand = new RelayCommand(ExecuteTest, CanExecuteTest); // Синхронная команда, с CanExecute
             SwitchLanguageCommand = new RelayCommand(ExecuteSwitchLanguage, CanExecuteSwitchLanguage); // Синхронная команда, с CanExecute
 
             // Команда измерения - принимает string parameter (имя точки)
@@ -290,27 +290,27 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                     // (Вызовы OnPropertyChanged и UpdateCommandsCanExecute происходят из сеттера)
                 });
             };
-            _colorMeasurementService.CalibrationStatusChanged += (sender, isCalibrated) => {
+            _colorMeasurementService.CalibrationStatusChanged += (sender, isCalibrated) =>
+            {
                 _dispatcher.Invoke(() =>
                 {
                     IsDeviceCalibrated = isCalibrated;
                     // UpdateCommandsCanExecute(); // Если это вызывается из сеттера IsDeviceCalibrated, оно тоже будет в UI потоке
                 });
             };
-        
 
             // Инициализация начального состояния UI и команд
             //InitializeMeasurementStatuses(); // Создаем начальные статусы для всех точек измерения
-            ButtonsStatusInit(); // Инициализация статусов для каждой точки измерения
+            MeasurementButtonsStatusInit(); // Инициализация статусов для каждой точки измерения
+            RequieredMeasurementButtonsInit();
             UpdateCommandsCanExecute(); // Обновляем доступность всех команд при запуске
             UpdateMeasurementButtonsState(); // Обновляем доступность кнопок измерения при запуске
 
             AddLogMessage("Приложение запущено. Ожидание подключения..."); // Сообщение при старте
         }
 
-        private void ButtonsStatusInit()
+        private void MeasurementButtonsStatusInit()
         {
-
             // Инициализируем коллекцию
             AllMeasurementButtonStatuses = new ObservableCollection<MeasurementStatusViewModel>();
 
@@ -320,7 +320,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             var topRight = new MeasurementStatusViewModel("3. Top right");
             var middleLeft = new MeasurementStatusViewModel("4. Middle left");
             var center = new MeasurementStatusViewModel("5. Center");
-            var middleRight= new MeasurementStatusViewModel("6. Middle right");
+            var middleRight = new MeasurementStatusViewModel("6. Middle right");
             var bottomLeft = new MeasurementStatusViewModel("7. Bottom left");
             var bottomCenter = new MeasurementStatusViewModel("8. Bottom center");
             var bottomRight = new MeasurementStatusViewModel("9. Bottom right");
@@ -356,9 +356,15 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             GreenColorStatus = green;
             BlueColorStatus = blue;
             BlackColorStatus = black;
-
-            
         }
+
+        private void RequieredMeasurementButtonsInit()
+        {
+            _requiredMeasurementNames = AllMeasurementButtonStatuses
+            .Select(status => status.Location) // Выбираем только свойство Location из каждого объекта статуса
+            .ToList();                        // Преобразуем результат в List<string>
+        }
+
         // --- Методы ViewModel, реализующие логику команд (Execute...) ---
         // Эти методы содержат основную логику приложения, перенесенную из WinForms обработчиков событий.
         // Они вызывают методы Сервисов и Модели, обновляют свойства ViewModel и коллекции.
@@ -557,87 +563,87 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             }
         }
 
-        // Реализация синхронной команды тестирования (генерация тестовых данных)
-        private void ExecuteTest(object parameter)
-        {
-            if (!CanExecuteTest(parameter)) return; // Хотя обычно всегда true
+        //// Реализация синхронной команды тестирования (генерация тестовых данных)
+        //private void ExecuteTest(object parameter)
+        //{
+        //    if (!CanExecuteTest(parameter)) return; // Хотя обычно всегда true
 
-            AddLogMessage("Выполняется команда: Тест (генерация тестовых данных)");
+        //    AddLogMessage("Выполняется команда: Тест (генерация тестовых данных)");
 
-            try
-            {
-                // Логика генерации тестовых данных из старого метода Test()
-                // Убеждаемся, что есть объект DeviceUnderTest (создаем, если нет)
-                if (_currentDevice == null || string.IsNullOrWhiteSpace(_currentDevice.SerialNumber))
-                {
-                    // Если SN не введен, используем тестовый
-                    if (string.IsNullOrWhiteSpace(SerialNumber))
-                    {
-                        SerialNumber = "TEST_SN";
-                        AddLogMessage("Серийный номер не был указан, установлен тестовый SN: TEST_SN");
-                    }
-                    _currentDevice = new DeviceUnderTest(SerialNumber); // Создаем новый тестовый объект
-                    AddLogMessage($"Начата генерация тестовых данных для SN: {_currentDevice.SerialNumber}");
-                }
-                else
-                {
-                    // Если устройство уже есть, очищаем его старые измерения для нового теста
-                    _currentDevice.Measurements.Clear();
-                    ResetMeasurementStatuses(); // Сбрасываем статусы кнопок для чистого теста
-                    AddLogMessage($"Очищены старые данные устройства с SN: {_currentDevice.SerialNumber} для нового теста.");
-                }
+        //    try
+        //    {
+        //        // Логика генерации тестовых данных из старого метода Test()
+        //        // Убеждаемся, что есть объект DeviceUnderTest (создаем, если нет)
+        //        if (_currentDevice == null || string.IsNullOrWhiteSpace(_currentDevice.SerialNumber))
+        //        {
+        //            // Если SN не введен, используем тестовый
+        //            if (string.IsNullOrWhiteSpace(SerialNumber))
+        //            {
+        //                SerialNumber = "TEST_SN";
+        //                AddLogMessage("Серийный номер не был указан, установлен тестовый SN: TEST_SN");
+        //            }
+        //            _currentDevice = new DeviceUnderTest(SerialNumber); // Создаем новый тестовый объект
+        //            AddLogMessage($"Начата генерация тестовых данных для SN: {_currentDevice.SerialNumber}");
+        //        }
+        //        else
+        //        {
+        //            // Если устройство уже есть, очищаем его старые измерения для нового теста
+        //            _currentDevice.Measurements.Clear();
+        //            ResetMeasurementStatuses(); // Сбрасываем статусы кнопок для чистого теста
+        //            AddLogMessage($"Очищены старые данные устройства с SN: {_currentDevice.SerialNumber} для нового теста.");
+        //        }
 
-                // Генерируем тестовые измерения для каждой требуемой точки
-                var random = new Random();
-                foreach (var name in _requiredMeasurementNames)
-                {
-                    // Генерация случайных значений
-                    double testX = 0.3 + (random.NextDouble() * 0.1);
-                    double testY = 0.3 + (random.NextDouble() * 0.1);
-                    double testLv = 50 + (random.NextDouble() * 100); // Диапазон для Lv (кроме Black)
-                    double testT = 5000 + (random.NextDouble() * 1500);
+        //        // Генерируем тестовые измерения для каждой требуемой точки
+        //        var random = new Random();
+        //        foreach (var name in _requiredMeasurementNames)
+        //        {
+        //            // Генерация случайных значений
+        //            double testX = 0.3 + (random.NextDouble() * 0.1);
+        //            double testY = 0.3 + (random.NextDouble() * 0.1);
+        //            double testLv = 50 + (random.NextDouble() * 100); // Диапазон для Lv (кроме Black)
+        //            double testT = 5000 + (random.NextDouble() * 1500);
 
-                    // Специальные тестовые значения для BlackColor, если нужно
-                    if (name == "BlackColor")
-                    {
-                        testLv = random.NextDouble() * 5; // Lv < 10 для Black
-                        testT = 6500;
-                    }
+        //            // Специальные тестовые значения для BlackColor, если нужно
+        //            if (name == "BlackColor")
+        //            {
+        //                testLv = random.NextDouble() * 5; // Lv < 10 для Black
+        //                testT = 6500;
+        //            }
 
-                    // Создаем объект Модели Measurement с тестовыми данными
-                    var testMeasurement = new Measurement(name, testX, testY, testLv, testT);
-                    // Модель DeviceUnderTest.AddMeasurement заменит старое измерение с таким же Location
+        //            // Создаем объект Модели Measurement с тестовыми данными
+        //            var testMeasurement = new Measurement(name, testX, testY, testLv, testT);
+        //            // Модель DeviceUnderTest.AddMeasurement заменит старое измерение с таким же Location
 
-                    // Добавляем тестовое измерение в коллекцию Модели
-                    _currentDevice.AddMeasurement(testMeasurement);
+        //            // Добавляем тестовое измерение в коллекцию Модели
+        //            _currentDevice.AddMeasurement(testMeasurement);
 
-                    // Логика валидации Lv для определения статуса (как в ExecuteMeasureAsync)
-                    bool? isPassed = (name == BlackColorStatus.Location || testMeasurement.Lv >= 10); // Считаем успешным, если Lv >= 10 (кроме Black)
+        //            // Логика валидации Lv для определения статуса (как в ExecuteMeasureAsync)
+        //            bool? isPassed = (name == BlackColorStatus.Location || testMeasurement.Lv >= 10); // Считаем успешным, если Lv >= 10 (кроме Black)
 
-                    // Форматируем значения для отображения в логе/UI
-                    string LvFormatted = (name == BlackColorStatus.Location) ?
-                                        testMeasurement.Lv.ToString("F4", CultureInfo.InvariantCulture) :
-                                        testMeasurement.Lv.ToString("F1", CultureInfo.InvariantCulture);
-                    string TFormatted = testMeasurement.T.ToString("F0", CultureInfo.InvariantCulture);
-                    string testValuesString = $"x={testMeasurement.x:F3}, y={testMeasurement.y:F3}, Lv={LvFormatted}, T={TFormatted}";
+        //            // Форматируем значения для отображения в логе/UI
+        //            string LvFormatted = (name == BlackColorStatus.Location) ?
+        //                                testMeasurement.Lv.ToString("F4", CultureInfo.InvariantCulture) :
+        //                                testMeasurement.Lv.ToString("F1", CultureInfo.InvariantCulture);
+        //            string TFormatted = testMeasurement.T.ToString("F0", CultureInfo.InvariantCulture);
+        //            string testValuesString = $"x={testMeasurement.x:F3}, y={testMeasurement.y:F3}, Lv={LvFormatted}, T={TFormatted}";
 
-                    AddLogMessage($"Сгенерировано тестовое измерение '{name}': {testValuesString}");
+        //            AddLogMessage($"Сгенерировано тестовое измерение '{name}': {testValuesString}");
 
-                    // Обновляем статус точки в ViewModel (для UI)
-                    UpdateMeasurementStatus(name, isPassed, testValuesString);
-                }
+        //            // Обновляем статус точки в ViewModel (для UI)
+        //            UpdateMeasurementStatus(name, isPassed, testValuesString);
+        //        }
 
-                AddLogMessage("Генерация тестовых данных завершена.");
+        //        AddLogMessage("Генерация тестовых данных завершена.");
 
-                // После генерации теста, команда Сохранить становится доступной
-                UpdateCommandsCanExecute(); // Уведомляем команды, что их доступность могла измениться
-            }
-            catch (Exception ex)
-            {
-                AddLogMessage($"Непредвиденная ошибка при выполнении команды 'Тест': {ex.Message}");
-                _dialogService.ShowMessage($"Ошибка теста: {ex.Message}", "Ошибка");
-            }
-        }
+        //        // После генерации теста, команда Сохранить становится доступной
+        //        UpdateCommandsCanExecute(); // Уведомляем команды, что их доступность могла измениться
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        AddLogMessage($"Непредвиденная ошибка при выполнении команды 'Тест': {ex.Message}");
+        //        _dialogService.ShowMessage($"Ошибка теста: {ex.Message}", "Ошибка");
+        //    }
+        //}
 
         // Реализация синхронной команды смены языка
         private void ExecuteSwitchLanguage(object parameter)
@@ -733,7 +739,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 // 2. Вызываем асинхронный метод измерения у Сервиса
                 // Передаем время измерения из свойства ViewModel
                 // Сервис выполнит усреднение и вернет Measurement
-                Measurement resultMeasurement = await _colorMeasurementService.MeasureAsync();
+                Measurement resultMeasurement = await _colorMeasurementService.MeasureAsync(_measurementTime);
 
                 // 3. Обработка результата измерения, валидация, форматирование
                 bool isMeasurmentSuccess = false;
@@ -744,7 +750,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 {
                     // Логика валидации Lv < 10 (для всех, кроме BlackColor)
                     bool lvValidationPassed = true;
-                    if (measurementName != "BlackColor" && resultMeasurement.Lv < 10)
+                    if (measurementName != BlackColorStatus.Location && resultMeasurement.Lv < 10)
                     {
                         AddLogMessage($"Внимание: Яркость Lv ({resultMeasurement.Lv:F1}) < 10 для '{measurementName}'.");
                         lvValidationPassed = false; // Валидация по Lv не пройдена
@@ -754,7 +760,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                     if (lvValidationPassed) // Если валидация по Lv пройдена (и сервис вернул Valid=true)
                     {
                         // Логика форматирования для вывода в лог/UI
-                        string LvFormatted = (measurementName == "BlackColor") ?
+                        string LvFormatted = (measurementName == BlackColorStatus.Location) ?
                                             resultMeasurement.Lv.ToString("F4", CultureInfo.InvariantCulture) :
                                             resultMeasurement.Lv.ToString("F1", CultureInfo.InvariantCulture);
                         string TFormatted = resultMeasurement.T.ToString("F0", CultureInfo.InvariantCulture);
@@ -828,6 +834,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             // Здесь можно добавить более сложную логику, связанную с применением SN:
             // Например, создание или сброс объекта DeviceUnderTest
             // Убедимся, что _currentDevice соответствует SerialNumber из ViewModel
+
             if (_currentDevice == null || _currentDevice.SerialNumber != SerialNumber)
             {
                 // Если устройство еще не создано или SN изменился, создаем новое
@@ -1090,7 +1097,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             }
         }
 
-
         // Метод для инициализации коллекции статусов измерений
         // Создает MeasurementStatusViewModel для каждой ожидаемой точки измерения при старте ViewModel
         //private void InitializeMeasurementStatuses()
@@ -1108,7 +1114,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         // Вызывается из ExecuteMeasureAsync после получения результата
         private void UpdateMeasurementStatus(string location, bool? isPassed, string measuredValuesString = null)
         {
-
             // Вместо всего твоего switch оператора, используем следующий код:
 
             // 1. Ищем нужный объект MeasurementStatusViewModel в коллекции по его Location
@@ -1137,7 +1142,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
 
             // Больше не нужен break или default, потому что мы либо нашли и обновили, либо обработали ошибку поиска.
         }
-
 
         // Метод для сброса всех статусов измерений (например, при очистке полей)
 

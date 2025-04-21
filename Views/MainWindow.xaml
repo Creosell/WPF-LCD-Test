@@ -241,8 +241,28 @@
             </Grid>
         </Grid>
         <ListBox Grid.Row="2" Margin="0,5,5,5"
-                 x:Name="LogListBox"
-                 ItemsSource="{Binding LogMessages}" />
+         x:Name="LogListBox"
+         ItemsSource="{Binding LogMessages}">
+
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="MinHeight" Value="18"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
+
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBox 
+                        Text="{Binding Mode=OneWay}"
+                        IsReadOnly="True"
+                     BorderThickness="0"
+                     Focusable="False"
+                     Background ="Transparent"
+                     TextWrapping="Wrap"     
+                     Padding="-4,0,0,0"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
             <Button Content="Save results" Command="{Binding SaveResultsCommand}" Margin="5" />
             <Button Content="Clear fields" Command="{Binding ClearFieldsCommand}" Margin="5" />
