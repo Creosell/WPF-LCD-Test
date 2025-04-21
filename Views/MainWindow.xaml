@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:WPF_LCD_Test"
         xmlns:viewModels="clr-namespace:WPF_LCD_Test.ViewModels" d:DataContext="{d:DesignInstance Type=viewModels:MainWindowViewModel}"
         mc:Ignorable="d"
-        Title="LCD Test Application" Height="600" Width="800">
+        Title="LCD Test Application" Height="600" Width="800" UseLayoutRounding="False">
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -242,24 +242,35 @@
         </Grid>
         <ListBox Grid.Row="2" Margin="0,5,5,5"
          x:Name="LogListBox"
-         ItemsSource="{Binding LogMessages}">
-
+         ItemsSource="{Binding LogMessages}"
+         SelectionMode="Single">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
                     <Setter Property="MinHeight" Value="18"/>
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                 </Style>
             </ListBox.ItemContainerStyle>
-
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBox 
-                        Text="{Binding Mode=OneWay}"
-                        IsReadOnly="True"
-                     BorderThickness="0"
-                     Focusable="False"
-                     Background ="Transparent"
-                     TextWrapping="Wrap"     
-                     Padding="-4,0,0,0"/>
+                    <TextBox Text="{Binding Mode=OneWay}"
+                             IsReadOnly="True"
+                             Background="Transparent"
+                             TextWrapping="Wrap"
+                             Padding="0,0,0,0"
+                             FocusVisualStyle="{x:Null}">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsKeyboardFocused" Value="True">
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                        <Setter Property="BorderBrush" Value="Transparent"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

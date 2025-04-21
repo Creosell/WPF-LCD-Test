@@ -46,6 +46,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         private bool _isMeasurementButtonsEnabled; // Флаг доступности кнопок измерений (UI IsEnabled)
         private bool _isDeviceConnected; // Флаг статуса подключения прибора (UI индикатор)
         private bool _isDeviceCalibrated; // Флаг статуса калибровки прибора (UI индикатор)
+
         // private double _measurementProgress; // Если хотим показывать прогресс измерения (UI ProgressBar)
 
         // Коллекция статусов измерений для точек (для изменения цвета кнопок в UI)
@@ -86,6 +87,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
 
         // Константы валидации и значения по умолчанию
         private const string SerialNumberPattern = "^[a-zA-Z0-9]*$"; // Pattern for using only letters and digits
+        private bool _isSerialNumberConfirmed = false;
 
         private const int DefaultMeasurementTime = 2;
 
@@ -102,10 +104,26 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 {
                     _serialNumber = value;
                     OnPropertyChanged(); // Уведомляем View об изменении свойства
-
+                    IsSerialNumberConfirmed = false;
                     // При изменении серийного номера может измениться доступность команд и кнопок
                     UpdateMeasurementButtonsState(); // Обновляем доступность кнопок измерения
                     UpdateCommandsCanExecute(); // Обновляем доступность всех команд
+                }
+            }
+        }
+
+        public bool IsSerialNumberConfirmed
+        {
+            get => _isSerialNumberConfirmed;
+            set
+            {
+                if (_isSerialNumberConfirmed != value)
+                {
+                    _isSerialNumberConfirmed = value;
+                    OnPropertyChanged(nameof(IsSerialNumberConfirmed));
+                    // Важно: при изменении этого статуса нужно переоценить доступность команд!
+                    UpdateCommandsCanExecute();
+                    UpdateMeasurementButtonsState();
                 }
             }
         }
@@ -835,11 +853,12 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             // Например, создание или сброс объекта DeviceUnderTest
             // Убедимся, что _currentDevice соответствует SerialNumber из ViewModel
 
-            if (_currentDevice == null || _currentDevice.SerialNumber != SerialNumber)
+            if (_currentDevice == null || _currentDevice.SerialNumber != SerialNumber )
             {
                 // Если устройство еще не создано или SN изменился, создаем новое
                 try
                 {
+                    IsSerialNumberConfirmed = true;
                     _currentDevice = new DeviceUnderTest(SerialNumber);
                     AddLogMessage($"Создан новый объект DeviceUnderTest с SN: {_currentDevice.SerialNumber}");
                     // Сбрасываем все предыдущие измерения и статусы при смене устройства
@@ -848,6 +867,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 catch (ArgumentException ex)
                 {
                     // Ошибка валидации в конструкторе Модели
+                    IsSerialNumberConfirmed = false;
                     AddLogMessage($"Ошибка: {ex.Message}");
                     _dialogService.ShowMessage(ex.Message, "Ошибка серийного номера");
                     // Сбрасываем SerialNumber ViewModel на пустую строку, если он невалиден

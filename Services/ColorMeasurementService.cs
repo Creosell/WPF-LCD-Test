@@ -214,7 +214,7 @@ namespace WPF_LCD_Test.Services
             Dispose(false);
         }
 
-        public async Task<Measurement> MeasureAsync(int measurmentTime)
+        public async Task<Measurement> MeasureAsync(int measurementTime)
         {
             // Переносим логику из твоих PerformMeasurements() и части ColorMeasure()
             // Делаем асинхронным!
@@ -239,12 +239,12 @@ namespace WPF_LCD_Test.Services
                     StatusMessage?.Invoke(this, "Выполнение измерений..."); // Сообщение
 
                     // Переносим цикл 
-                    double[] xValues = new double[measurmentTime];
-                    double[] yValues = new double[measurmentTime];
-                    double[] LvValues = new double[measurmentTime];
-                    double[] TValues = new double[measurmentTime];
+                    double[] xValues = new double[measurementTime];
+                    double[] yValues = new double[measurementTime];
+                    double[] LvValues = new double[measurementTime];
+                    double[] TValues = new double[measurementTime];
 
-                    for (int i = 0; i < measurmentTime; i++)
+                    for (int i = 0; i < measurementTime; i++)
                     {
                         try
                         {
@@ -268,27 +268,17 @@ namespace WPF_LCD_Test.Services
                             continue;
                         }
 
-                        if (i < measurmentTime - 1)
+                        if (i < measurementTime - 1)
                         {
                             await Task.Delay(1000); // Асинхронная задержка между измерениями
                         }
                     }
 
-                    // Расчет средних значений
-                    double xAverage = xValues.Where(v => v != 0).DefaultIfEmpty(0).Average(); // Учет возможных ошибок, если измерение пропущено
-                    double yAverage = yValues.Where(v => v != 0).DefaultIfEmpty(0).Average();
-                    double LvAverage = LvValues.Where(v => v != 0).DefaultIfEmpty(0).Average();
-                    double TAverage = TValues.Where(v => v != 0).DefaultIfEmpty(0).Average();
 
-                    // Заполнение объекта Measurement - здесь только сырые средние значения
-                    // Форматирование для отображения или специфическая валидация (вроде Lv < 10)
-                    // лучше делать в ViewModel или методе ViewModel, который вызывает MeasureAsync
-                    // result.SetValues("Измерение", xAverage, yAverage, LvAverage, TAverage); // ЭТУ строку удаляем
-
-                    result.x = xAverage;          // Устанавливаем X
-                    result.y = yAverage;          // Устанавливаем Y
-                    result.Lv = LvAverage;        // Устанавливаем Lv
-                    result.T = TAverage;          // Устанавливаем T
+                    result.x = xValues.Average();           // Устанавливаем X
+                    result.y = yValues.Average();          // Устанавливаем Y
+                    result.Lv = LvValues.Average();     // Устанавливаем Lv
+                    result.T = TValues.Average();        // Устанавливаем T
                     result.IsValid = true;        // Помечаем как валидное (если выполнение дошло до сюда)
 
                     StatusMessage?.Invoke(this, "Измерения завершены."); // Сообщение
