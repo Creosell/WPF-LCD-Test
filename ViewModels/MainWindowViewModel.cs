@@ -20,7 +20,8 @@ using System.Windows.Media; // Для System.Windows.Media.Brush / Brushes (в M
 using System.Text.Json.Serialization;
 using MvvmHelpers;
 using System.Windows.Threading;
-using System.Windows; // Для атрибута JsonIgnore (в MeasurementStatusViewModel)
+using System.Windows;
+using System.Windows.Controls; // Для атрибута JsonIgnore (в MeasurementStatusViewModel)
 
 // Класс ViewModel для MainWindow. Наследует от BaseViewModel для уведомлений UI.
 // Реализует IDisposable для очистки ресурсов (отписка от событий).
@@ -41,9 +42,11 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         // --- Приватные поля для хранения данных и состояния UI (будут привязаны к View) ---
         private string _serialNumber;
         private bool _isSerialNumberConfirmed = false;
+        private string _lastConfirmedSerialNumber;
 
 
         private int _measurementTime;
+        private string _lastMeasurementTime; // Для хранения последнего введенного времени измерения (для валидации и отображения в UI)
         private ObservableCollection<string> _logMessages; // Коллекция сообщений для лога UI (UI ListBox/ListView)
         private bool _isMeasurementButtonsEnabled; // Флаг доступности кнопок измерений (UI IsEnabled)
         private bool _isDeviceConnected; // Флаг статуса подключения прибора (UI индикатор)
@@ -83,7 +86,8 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
 
         // Константы валидации и значения по умолчанию
         private const string SerialNumberPattern = "^[a-zA-Z0-9]*$"; // Pattern for using only letters and digits
-        
+        private const string MeasurementTimePattern = "^[0-9]*$"; // Pattern for using only digits
+
 
         private const int DefaultMeasurementTime = 2;
 
@@ -124,6 +128,8 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             }
         }
 
+       
+
         // Время измерения в секундах
         public int MeasurementTime
         {
@@ -131,15 +137,22 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             set
             {
                 // Базовая валидация времени
-                if (value <= 0)
+                try
                 {
-                    // Не меняем _measurementTime, но уведомляем UI, чтобы поле могло сбросить невалидный ввод, если привязано в TwoWay
-                    OnPropertyChanged();
+                    if (value <= 0)
+                    {
+                        // Не меняем _measurementTime, но уведомляем UI, чтобы поле могло сбросить невалидный ввод, если привязано в TwoWay
+                        OnPropertyChanged();
+                    }
+                    else if (_measurementTime != value)
+                    {
+                        _measurementTime = value;
+                        OnPropertyChanged(); // Уведомляем View
+                    }
                 }
-                else if (_measurementTime != value)
+                catch (FormatException ex)
                 {
-                    _measurementTime = value;
-                    OnPropertyChanged(); // Уведомляем View
+
                 }
             }
         }
@@ -852,7 +865,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 // Вместо этого, нам нужно было бы вызвать UpdateSource() если бы CommandParameter не передавал текст
                 // Но раз мы передаем текст, мы можем просто присвоить его свойству SerialNumber
                 SerialNumber = enteredSerialNumber; // <-- Присваиваем подтвержденное значение свойству ViewModel
-
                 IsSerialNumberConfirmed = true; // Устанавливаем флаг подтверждения
                 AddLogMessage($"Применен серийный номер: {SerialNumber}");
 
@@ -862,7 +874,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 // Если подтверждается пустое поле
                 //SerialNumber = string.Empty; // Очищаем свойство ViewModel
                 IsSerialNumberConfirmed = false; // Сбрасываем флаг
-                AddLogMessage($"Введите, пожалуйста, корректный серийный номер из латинских букв и цифр: {SerialNumber}");
+                _dialogService.ShowMessage($"Введите, пожалуйста, корректный серийный номер из латинских букв и цифр","Некорректный ввод");
                 return;
             }
 
@@ -910,22 +922,27 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         // Реализация команды для применения введенного Времени измерения (например, по Enter)
         private void ExecuteApplyMeasurementTime(object parameter)
         {
-            // Логика из TimeTextBox_KeyDown
-            if (!CanExecuteApplyMeasurementTime(parameter)) return;
-
-            // Значение уже должно быть в свойстве MeasurementTime благодаря привязке TwoWay
-            // Валидация уже выполняется в сеттере свойства MeasurementTime
-            // Если сеттер не изменил значение (из-за невалидного ввода), можно вывести доп. сообщение здесь
-            if (_measurementTime <= 0)
+            try
             {
-                // Сообщение уже было добавлено в сеттере, можно показать диалог
+                string enteredMeasurementTime = parameter as string;
+                int measurementTime = int.Parse(enteredMeasurementTime); // Пробуем преобразовать строку в число
+                if (measurementTime <= 0)
+                {
+                    // Сообщение уже было добавлено в сеттере, можно показать диалог
+                    _dialogService.ShowMessage("Введите корректное время измерения (больше 0).", "Некорректный ввод");
+                }
+                else
+                {
+                    MeasurementTime = measurementTime;
+                    // Время успешно применено, сообщение в логе уже есть из сеттера свойства
+                    AddLogMessage($"Время измерения подтверждено: {MeasurementTime} сек.");
+                }
+            }
+            catch
+            {
                 _dialogService.ShowMessage("Введите корректное время измерения (больше 0).", "Некорректный ввод");
             }
-            else
-            {
-                // Время успешно применено, сообщение в логе уже есть из сеттера свойства
-                AddLogMessage($"Время измерения подтверждено: {MeasurementTime} сек.");
-            }
+           
 
             // Применение времени измерения обычно не влияет на доступность команд,
             // но если влияет, нужно вызвать UpdateCommandsCanExecute();
@@ -1001,7 +1018,8 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         {
             // Команда доступна, если свойство MeasurementTime (которое привязано к TextBox) > 0
             // Валидация уже происходит в сеттере свойства.
-            return MeasurementTime > 0; // Используем публичное свойство
+            //return MeasurementTime > 0; // Используем публичное свойство
+            return true;
         }
 
         // --- Вспомогательные методы ViewModel (для внутренней логики ViewModel) ---
