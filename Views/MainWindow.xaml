@@ -65,11 +65,15 @@
                     <StackPanel Orientation="Horizontal">
                         <Label Content="Серийный номер:" VerticalAlignment="Center" />
                         <TextBox Margin="5,0" VerticalAlignment="Center" MinWidth="200"
-                                 Text="{Binding SerialNumber, UpdateSourceTrigger=PropertyChanged}">
+                                x:Name="SerialNumberTextBox"
+                                Text="{Binding SerialNumber, UpdateSourceTrigger=Explicit}">
                             <TextBox.InputBindings>
-                                <KeyBinding Key="Enter" Command="{Binding DataContext.ApplySerialNumberCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
+                                <KeyBinding Key="Enter"
+                                    Command="{Binding DataContext.ApplySerialNumberCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
+                                    CommandParameter="{Binding Text, ElementName=SerialNumberTextBox}"/>
                             </TextBox.InputBindings>
                         </TextBox>
+                        
                     </StackPanel>
                 </Grid>
             </Grid>

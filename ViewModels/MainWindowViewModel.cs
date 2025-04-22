@@ -40,6 +40,8 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
 
         // --- Приватные поля для хранения данных и состояния UI (будут привязаны к View) ---
         private string _serialNumber;
+        private bool _isSerialNumberConfirmed = false;
+
 
         private int _measurementTime;
         private ObservableCollection<string> _logMessages; // Коллекция сообщений для лога UI (UI ListBox/ListView)
@@ -57,12 +59,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         // Этот список может быть загружен из конфигурации или констант
         private List<string> _requiredMeasurementNames;
 
-        //{
-        //    "TopLeft", "TopCenter", "TopRight",
-        //    "MiddleLeft", "Center", "MiddleRight",
-        //    "BottomLeft", "BottomCenter", "BottomRight",
-        //    "RedColor", "GreenColor", "BlueColor", "BlackColor"
-        //};
 
         // В классе MainWindowViewModel (рядом с другими свойствами)
 
@@ -87,7 +83,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
 
         // Константы валидации и значения по умолчанию
         private const string SerialNumberPattern = "^[a-zA-Z0-9]*$"; // Pattern for using only letters and digits
-        private bool _isSerialNumberConfirmed = false;
+        
 
         private const int DefaultMeasurementTime = 2;
 
@@ -103,14 +99,14 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 if (_serialNumber != value)
                 {
                     _serialNumber = value;
-                    OnPropertyChanged(); // Уведомляем View об изменении свойства
-                    IsSerialNumberConfirmed = false;
+                    OnPropertyChanged(nameof(SerialNumber)); // Уведомляем View об изменении свойства
                     // При изменении серийного номера может измениться доступность команд и кнопок
                     UpdateMeasurementButtonsState(); // Обновляем доступность кнопок измерения
                     UpdateCommandsCanExecute(); // Обновляем доступность всех команд
                 }
             }
         }
+
 
         public bool IsSerialNumberConfirmed
         {
@@ -568,6 +564,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
 
                 // Сброс текущего объекта Модели DeviceUnderTest
                 _currentDevice = null;
+                IsSerialNumberConfirmed = false;
 
                 // Очистка коллекций ViewModel
                 LogMessages.Clear(); // ObservableCollection уведомит UI
@@ -844,10 +841,31 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         // Реализация команды для применения введенного Серийного номера (например, по Enter)
         private void ExecuteApplySerialNumber(object parameter)
         {
+            string enteredSerialNumber = parameter as string;
             // Логика из SerialNumberTextBox_KeyDown
             if (!CanExecuteApplySerialNumber(parameter)) return;
 
-            AddLogMessage($"Применен серийный номер: {SerialNumber}");
+            if (!string.IsNullOrWhiteSpace(enteredSerialNumber) && Regex.IsMatch(enteredSerialNumber, SerialNumberPattern))
+            {
+                // Если введен текст, обновляем свойство SerialNumber в ViewModel
+                // ЭТО НЕ вызовет сеттер SerialNumber, так как UpdateSourceTrigger=Explicit
+                // Вместо этого, нам нужно было бы вызвать UpdateSource() если бы CommandParameter не передавал текст
+                // Но раз мы передаем текст, мы можем просто присвоить его свойству SerialNumber
+                SerialNumber = enteredSerialNumber; // <-- Присваиваем подтвержденное значение свойству ViewModel
+
+                IsSerialNumberConfirmed = true; // Устанавливаем флаг подтверждения
+                AddLogMessage($"Применен серийный номер: {SerialNumber}");
+
+            }
+            else 
+            {
+                // Если подтверждается пустое поле
+                //SerialNumber = string.Empty; // Очищаем свойство ViewModel
+                IsSerialNumberConfirmed = false; // Сбрасываем флаг
+                AddLogMessage($"Введите, пожалуйста, корректный серийный номер из латинских букв и цифр: {SerialNumber}");
+                return;
+            }
+
 
             // Здесь можно добавить более сложную логику, связанную с применением SN:
             // Например, создание или сброс объекта DeviceUnderTest
@@ -951,12 +969,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             return true; // Команда очистки всегда доступна
         }
 
-        // Проверка доступности команды Тест: всегда доступна
-        private bool CanExecuteTest(object parameter)
-        {
-            return true; // Команда тестирования всегда доступна
-        }
-
         // Проверка доступности команды Смена языка: всегда доступна (или зависит от списка доступных языков)
         private bool CanExecuteSwitchLanguage(object parameter)
         {
@@ -968,20 +980,20 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         // Проверка доступности команды Измерение: указана точка, прибор ПОДКЛЮЧЕН, ОТКАЛИБРОВАН, введен SN
         private bool CanExecuteMeasure(object parameter)
         {
-            // Команда требует параметр - имя точки измерения.
-            bool hasMeasurementName = parameter is string measurementName && !string.IsNullOrWhiteSpace(measurementName);
+            // Проверка основных условий доступности
+            return IsDeviceConnected       // Прибор подключен
+                   && IsDeviceCalibrated   // Прибор откалиброван
+                   && IsSerialNumberConfirmed // Серийный номер подтвержден
+                   && (_measurementTime > 0);  // Время измерения больше нуля
 
-            // Команда Измерение доступна, если все условия истинны:
-            return hasMeasurementName && IsDeviceConnected && IsDeviceCalibrated && !string.IsNullOrWhiteSpace(SerialNumber);
+
         }
 
         // Проверка доступности команды ApplySerialNumber: доступна, если Серийный номер в поле не пустой
         private bool CanExecuteApplySerialNumber(object parameter)
         {
-            // Команда доступна, если свойство SerialNumber (которое привязано к TextBox) не пустое
-            return !string.IsNullOrWhiteSpace(SerialNumber);
-            // Можно добавить валидацию формата здесь, но лучше делать это в Execute или сеттере свойства
-            // return !string.IsNullOrWhiteSpace(SerialNumber) && Regex.IsMatch(SerialNumber, SerialNumberPattern);
+            return true;
+            //return !string.IsNullOrWhiteSpace(SerialNumber);
         }
 
         // Проверка доступности команды ApplyMeasurementTime: доступна, если время в поле валидно (например, > 0)
@@ -1016,11 +1028,14 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         // Вызывается, когда изменяются свойства, от которых зависит доступность (Connected, Calibrated, SerialNumber)
         private void UpdateMeasurementButtonsState()
         {
-            IsMeasurementButtonsEnabled = IsDeviceConnected && IsDeviceCalibrated && !string.IsNullOrWhiteSpace(SerialNumber);
+            IsMeasurementButtonsEnabled = IsDeviceConnected 
+                && IsDeviceCalibrated 
+                && !string.IsNullOrWhiteSpace(SerialNumber)
+                && IsSerialNumberConfirmed;
 
             // Важно: После обновления состояния кнопок, уведомляем команду MeasureCommand
             // о возможном изменении ее доступности, чтобы UI (кнопки) обновился.
-            (MeasureCommand as RelayCommand)?.RaiseCanExecuteChanged(); // Используем безопасное приведение и ?.
+           (MeasureCommand as RelayCommand)?.RaiseCanExecuteChanged(); // Используем безопасное приведение и ?.
         }
 
         // Метод для уведомления ВСЕХ команд о возможном изменении их состояния CanExecute
@@ -1029,8 +1044,8 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         {
             // Для каждой команды, у которой есть метод CanExecute, вызываем RaiseCanExecuteChanged
             // Это заставляет WPF перепроверить CanExecute для этих команд
-            ((RelayCommand)ConnectCommand)?.RaiseCanExecuteChanged();
-            ((RelayCommand)DisconnectCommand)?.RaiseCanExecuteChanged();
+            //((RelayCommand)ConnectCommand)?.RaiseCanExecuteChanged();
+            //((RelayCommand)DisconnectCommand)?.RaiseCanExecuteChanged();
             ((RelayCommand)ZeroCalibrationCommand)?.RaiseCanExecuteChanged();
             ((RelayCommand)MeasureCommand)?.RaiseCanExecuteChanged(); // Повторно, если MeasureButtonState не покрыл
             ((RelayCommand)SaveResultsCommand)?.RaiseCanExecuteChanged();
@@ -1134,7 +1149,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         // Вызывается из ExecuteMeasureAsync после получения результата
         private void UpdateMeasurementStatus(string location, bool? isPassed, string measuredValuesString = null)
         {
-            // Вместо всего твоего switch оператора, используем следующий код:
+       
 
             // 1. Ищем нужный объект MeasurementStatusViewModel в коллекции по его Location
             //    Используем LINQ FirstOrDefault(). Он вернет первый найденный элемент или null, если не найден.
@@ -1159,8 +1174,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 // Возможно, нужно показать диалог пользователю, если это критическая ошибка
                 // _dialogService.ShowMessage($"Получена неизвестная точка измерения: {location}", "Ошибка обновления статуса");
             }
-
-            // Больше не нужен break или default, потому что мы либо нашли и обновили, либо обработали ошибку поиска.
         }
 
         // Метод для сброса всех статусов измерений (например, при очистке полей)
@@ -1242,25 +1255,5 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
 
             AddLogMessage("Очистка ресурсов ViewModel завершена.");
         }
-
-        // Пример именованного метода-обработчика события (лучше использовать такой подход для подписки/отписки)
-        /*
-        private void OnColorMeasurementServiceStatusMessage(object sender, string message)
-        {
-            AddLogMessage(message); // Просто вызываем существующий вспомогательный метод ViewModel
-        }
-
-        private void OnColorMeasurementServiceConnectionStatusChanged(object sender, bool isConnected)
-        {
-            IsDeviceConnected = isConnected; // Обновляем свойство ViewModel
-        }
-
-        private void OnColorMeasurementServiceCalibrationStatusChanged(object sender, bool isCalibrated)
-        {
-            IsDeviceCalibrated = isCalibrated; // Обновляем свойство ViewModel
-        }
-
-        // Добавь подобные обработчики для всех событий, на которые подписываешься в конструкторе
-        */
     }
 }
