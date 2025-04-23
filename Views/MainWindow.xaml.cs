@@ -24,9 +24,10 @@ namespace WPF_LCD_Test // Пространство имен твоего при�
             IColorMeasurementService colorMeasurementService = new ColorMeasurementService(); // Реализация сервиса прибора
             IFileService fileService = new FileService(); // Реализация сервиса файлов
             IDialogService dialogService = new DialogService(); // Реализация сервиса диалогов
+            ILocalizationService localizationService = new LocalizationService(); // Реализация сервиса локализации
 
             // Создаем экземпляр ViewModel, передавая ему зависимости (сервисы)
-            _viewModel = new MainWindowViewModel(colorMeasurementService, fileService, dialogService);
+            _viewModel = new MainWindowViewModel(colorMeasurementService, fileService, dialogService, localizationService);
 
 
             // Устанавливаем DataContext окна на созданный ViewModel

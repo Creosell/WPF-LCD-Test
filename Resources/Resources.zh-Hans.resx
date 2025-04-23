@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -117,100 +117,163 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="BadConnection" xml:space="preserve">
+	<data name="BadConnection" xml:space="preserve">
     <value>连接不成功。尝试重启色彩分析仪</value>
   </data>
-  <data name="CalibratingZeroCA" xml:space="preserve">
+	<data name="CalibratingZeroCA" xml:space="preserve">
     <value>校准零点...</value>
   </data>
-  <data name="CheckConnectionCA" xml:space="preserve">
+	<data name="CheckConnectionCA" xml:space="preserve">
     <value>检查 CA-310 彩色分析仪的连接。尝试重新启动并再次运行零点校准</value>
   </data>
-  <data name="CheckProbe" xml:space="preserve">
+	<data name="CheckProbe" xml:space="preserve">
     <value>检查探头！可能需要将模式从 0-CAL 更改为 MEAS</value>
   </data>
-  <data name="CleanFieldWarning" xml:space="preserve">
+	<data name="CleanFieldWarning" xml:space="preserve">
     <value>您确定要清除所有字段？</value>
   </data>
-  <data name="ConnectedCA" xml:space="preserve">
+	<data name="ConnectedCA" xml:space="preserve">
     <value>已连接</value>
   </data>
-  <data name="ConnectingCA" xml:space="preserve">
+	<data name="ConnectingCA" xml:space="preserve">
     <value>连接至 CA-310...</value>
   </data>
-  <data name="ConnectionReleasedCA" xml:space="preserve">
+	<data name="ConnectionReleasedCA" xml:space="preserve">
     <value>与 CA-310 的连接已释放</value>
   </data>
-  <data name="CurrentMeasurementTime" xml:space="preserve">
+	<data name="CurrentMeasurementTime" xml:space="preserve">
     <value>当前测量时间为</value>
   </data>
-  <data name="CurrentSN" xml:space="preserve">
+	<data name="CurrentSN" xml:space="preserve">
     <value>目前的 SN 为</value>
   </data>
-  <data name="Err" xml:space="preserve">
+	<data name="Err" xml:space="preserve">
     <value>错误</value>
   </data>
-  <data name="ErrAtCalibration" xml:space="preserve">
+	<data name="ErrAtCalibration" xml:space="preserve">
     <value>校准过程中出现错误</value>
   </data>
-  <data name="ErrCSV" xml:space="preserve">
+	<data name="ErrCSV" xml:space="preserve">
     <value>保存为 CSV 时出错</value>
   </data>
-  <data name="ErrIn" xml:space="preserve">
+	<data name="ErrIn" xml:space="preserve">
     <value>错误</value>
   </data>
-  <data name="ErrMsgLangSwitchFailed" xml:space="preserve">
+	<data name="ErrMsgLangSwitchFailed" xml:space="preserve">
     <value>语言切换失败</value>
   </data>
-  <data name="ErrorAtMeasuringIteration" xml:space="preserve">
+	<data name="ErrorAtMeasuringIteration" xml:space="preserve">
     <value>迭代时的误差测量 </value>
   </data>
-  <data name="ErrReleaseConnectionCA" xml:space="preserve">
+	<data name="ErrReleaseConnectionCA" xml:space="preserve">
     <value>释放连接错误</value>
   </data>
-  <data name="ErrSavingJSON" xml:space="preserve">
+	<data name="ErrSavingJSON" xml:space="preserve">
     <value>尝试保存结果时出错。请检查文件路径并重试</value>
   </data>
-  <data name="ErrSerialNumberInput" xml:space="preserve">
+	<data name="ErrSerialNumberInput" xml:space="preserve">
     <value>输入无效，请输入不含特殊符号的有效 SN</value>
   </data>
-  <data name="ErrTimeInput" xml:space="preserve">
+	<data name="ErrTimeInput" xml:space="preserve">
     <value>输入无效，请输入数字。测量时间设置为默认值</value>
   </data>
-  <data name="ErrUnexpected" xml:space="preserve">
+	<data name="ErrUnexpected" xml:space="preserve">
     <value>发生意外错误</value>
   </data>
-  <data name="FillSN" xml:space="preserve">
+	<data name="FillSN" xml:space="preserve">
     <value>请先填写 SN！</value>
   </data>
-  <data name="MakeZeroCalibration" xml:space="preserve">
+	<data name="MakeZeroCalibration" xml:space="preserve">
     <value>请先进行零点校准 !</value>
   </data>
-  <data name="MeasuredValuesPrefix" xml:space="preserve">
+	<data name="MeasuredValuesPrefix" xml:space="preserve">
     <value>测量值</value>
   </data>
-  <data name="Measuring" xml:space="preserve">
+	<data name="Measuring" xml:space="preserve">
     <value>测量...</value>
   </data>
-  <data name="MsgLanguageSwitchedTo" xml:space="preserve">
+	<data name="MsgLanguageSwitchedTo" xml:space="preserve">
     <value>语言切换为</value>
   </data>
-  <data name="ResultsForSN" xml:space="preserve">
+	<data name="ResultsForSN" xml:space="preserve">
     <value>SN 的结果</value>
   </data>
-  <data name="SavedToJSON" xml:space="preserve">
+	<data name="SavedToJSON" xml:space="preserve">
     <value>中保存为 JSON 格式</value>
   </data>
-  <data name="SavingNotFullWarning" xml:space="preserve">
+	<data name="SavingNotFullWarning" xml:space="preserve">
     <value>尚未完成所有测量，您确定要保存结果吗？</value>
   </data>
-  <data name="Seconds" xml:space="preserve">
+	<data name="Seconds" xml:space="preserve">
     <value>秒钟</value>
   </data>
-  <data name="Warning" xml:space="preserve">
+	<data name="Warning" xml:space="preserve">
     <value>警告</value>
   </data>
-  <data name="ZeroCalibratedCA" xml:space="preserve">
+	<data name="ZeroCalibratedCA" xml:space="preserve">
     <value>零点已校准</value>
+  </data>
+	<data name="English" xml:space="preserve">
+    <value>English</value>
+  </data>
+	<data name="Chinese" xml:space="preserve">
+    <value />
+  </data>
+	<data name="ZeroCalibration" xml:space="preserve">
+    <value />
+  </data>
+	<data name="MeasurementTimeSec" xml:space="preserve">
+    <value />
+  </data>
+	<data name="SerialNumber" xml:space="preserve">
+    <value />
+  </data>
+	<data name="TopLeftPoint" xml:space="preserve">
+    <value />
+  </data>
+	<data name="TopCenterPoint" xml:space="preserve">
+    <value />
+  </data>
+	<data name="TopRightPoint" xml:space="preserve">
+    <value />
+  </data>
+	<data name="MiddleLeftPoint" xml:space="preserve">
+    <value />
+  </data>
+	<data name="CenterPoint" xml:space="preserve">
+    <value />
+  </data>
+	<data name="MiddleRightPoint" xml:space="preserve">
+    <value />
+  </data>
+	<data name="BottomLeftPoint" xml:space="preserve">
+    <value />
+  </data>
+	<data name="BottomCenterPoint" xml:space="preserve">
+    <value />
+  </data>
+	<data name="BottomRightPoint" xml:space="preserve">
+    <value />
+  </data>
+	<data name="LanguageMenu" xml:space="preserve">
+    <value>Language</value>
+  </data>
+	<data name="RedPoint" xml:space="preserve">
+    <value />
+  </data>
+	<data name="GreenPoint" xml:space="preserve">
+    <value />
+  </data>
+	<data name="BluePoint" xml:space="preserve">
+    <value />
+  </data>
+	<data name="BlackPoint" xml:space="preserve">
+    <value />
+  </data>
+	<data name="SaveResultsButton" xml:space="preserve">
+    <value />
+  </data>
+	<data name="ClearFieldsButton" xml:space="preserve">
+    <value />
   </data>
 </root>

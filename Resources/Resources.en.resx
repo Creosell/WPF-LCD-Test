@@ -250,7 +250,7 @@
     <value>7. Bottom left</value>
   </data>
   <data name="BottomCenterPoint" xml:space="preserve">
-    <value>8. Bottom center</value>
+    <value>0. Black</value>
   </data>
   <data name="BottomRightPoint" xml:space="preserve">
     <value>9. Bottom right</value>

@@ -31,9 +31,9 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
     {
         // --- Приватные поля для хранения экземпляров Сервисов и Модели ---
         private readonly IColorMeasurementService _colorMeasurementService; // Сервис для работы с прибором (зависимость)
-
         private readonly IFileService _fileService; // Сервис для работы с файлами (зависимость)
         private readonly IDialogService _dialogService; // Сервис для показа диалогов (зависимость)
+        private readonly ILocalizationService _localizationService; // Сервис для локализации (зависимость)
 
         private DeviceUnderTest _currentDevice; // Текущее устройство под тестированием (объект Модели)
 
@@ -221,6 +221,20 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             }
         }
 
+        private string _deviceConnectionStatusText;
+        public string DeviceConnectionStatusText
+        {
+            get => _deviceConnectionStatusText;
+            set { if (_deviceConnectionStatusText != value) { _deviceConnectionStatusText = value; OnPropertyChanged(); } }
+        }
+
+        private string _deviceCalibrationStatusText;
+        public string DeviceCalibrationStatusText
+        {
+            get => _deviceCalibrationStatusText;
+            set { if (_deviceCalibrationStatusText != value) { _deviceCalibrationStatusText = value; OnPropertyChanged(); } }
+        }
+
         public ObservableCollection<MeasurementStatusViewModel> AllMeasurementButtonStatuses { get; set; }
 
         // Коллекция статусов для каждой точки измерения (для привязки к кнопкам или списку)
@@ -259,12 +273,14 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
 
         // --- Конструктор ViewModel ---
         // Получает экземпляры всех необходимых сервисов через параметры (Инъекция Зависимостей)
-        public MainWindowViewModel(IColorMeasurementService colorMeasurementService, IFileService fileService, IDialogService dialogService)
+        public MainWindowViewModel(IColorMeasurementService colorMeasurementService, IFileService fileService, IDialogService dialogService, ILocalizationService localizationService)
         {
             // Проверяем, что сервисы были корректно предоставлены
             _colorMeasurementService = colorMeasurementService ?? throw new ArgumentNullException(nameof(colorMeasurementService));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+
 
             // Инициализация коллекций
             LogMessages = new ObservableCollection<string>();
@@ -298,6 +314,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             // и обновлять UI/состояние через свойства ViewModel или лог
             _colorMeasurementService.StatusMessage += (sender, message) => AddLogMessage(message); // Получаем сообщения от сервиса прибора
             _fileService.StatusMessage += (sender, message) => AddLogMessage(message); // Получаем сообщения от сервиса файлов
+            _localizationService.LanguageChanged += _localizationService_LanguageChanged; // Получаем сообщения от сервиса локализации
 
             // Обновляем свойства статуса ViewModel при изменении статуса в Сервисе
             _colorMeasurementService.ConnectionStatusChanged += (sender, isConnected) =>
@@ -329,6 +346,42 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             UpdateMeasurementButtonsState(); // Обновляем доступность кнопок измерения при запуске
 
             AddLogMessage("Приложение запущено. Ожидание подключения..."); // Сообщение при старте
+        }
+
+        private void _localizationService_LanguageChanged(object? sender, EventArgs e)
+        {
+            // Когда язык меняется, обновляем все свойства ViewModel,
+            // которые отображают локализованный текст.
+            UpdateLocalizedTexts();
+
+            // Также нужно обновить CanExecute для команд, т.к. текст кнопок мог измениться
+            // (хотя это обычно не влияет на CanExecute, но для полноты можно вызвать)
+            UpdateCommandsCanExecute();
+
+            // Если Location или ToolTip кнопок измерений локализуются через ViewModel,
+            // нужно вызвать OnPropertyChanged для каждого MeasurementPointStatusViewModel
+            // или обновить их свойства, если они используют локализуемые строки из ViewModel.
+            // Например, если Location или MeasuredValuesString в MeasurementPointStatusViewModel
+            // привязаны к ресурсам через сервис, нужно уведомить UI об их изменении.
+            // Простой способ: вызвать OnPropertyChanged для каждого статусного свойства.
+            // Или, если MeasurementPointStatusViewModel также получает сервис,
+            // он может сам реагировать на LanguageChanged и вызывать OnPropertyChanged для своих свойств.
+
+            // Пока просто обновим текстовые статусы:
+            OnPropertyChanged(nameof(DeviceConnectionStatusText));
+            OnPropertyChanged(nameof(DeviceCalibrationStatusText));
+            // Нужно также обновить все тексты кнопок, если их Content - это Location,
+            // а Location локализуется. Или если ToolTip локализуется.
+            // В твоем случае Content - это просто Location (TL, TC и т.д.), а ToolTip - MeasuredValuesString.
+            // MeasuredValuesString формируется в ViewModel.
+            // MeasurementPointStatusViewModel должен получать сервис локализации
+            // и использовать его для формирования MeasuredValuesString,
+            // и вызывать OnPropertyChanged при LanguageChanged.
+            // Или, как временное решение, вызвать OnPropertyChanged для всех свойств статусов здесь:
+            //OnPropertyChanged(nameof(TopLeftStatus)); // Это не обновит свойства внутри, нужно обновить свойства внутри
+                                                      // Вместо этого, если MeasuredValuesString в MeasurementPointStatusViewModel использует сервис:
+            //TopLeftStatus.UpdateLocalizedProperties(); // Нужно добавить такой метод в MeasurementPointStatusViewModel
+            //TopCenterStatus.UpdateLocalizedProperties();
         }
 
         private void MeasurementButtonsStatusInit()
@@ -670,26 +723,22 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         {
             if (!CanExecuteSwitchLanguage(parameter)) return;
 
-            string languageCode = parameter as string; // Получаем код языка из параметра команды
+            string? languageCode = parameter as string; // Получаем код языка из параметра команды
             if (string.IsNullOrWhiteSpace(languageCode))
             {
                 AddLogMessage("Ошибка смены языка: Не указан код языка.");
                 return;
             }
 
-            AddLogMessage($"Попытка переключения языка на '{languageCode}'...");
-
             try
             {
-                // Здесь должна быть логика вызова Сервиса Локализации
-                // ILocalizationService _localizationService; // Нужно добавить зависимость и инициализировать в конструкторе
-                // _localizationService.SetLanguage(languageCode);
+                 _localizationService.SetLanguage(languageCode);
 
                 // Обновление UI после смены языка происходит автоматически в WPF при правильной реализации локализации (через ResourceDictionary и CultureInfo)
                 // Если ViewModel содержит строки, не привязанные к ресурсам, их нужно обновить вручную или через событие сервиса локализации.
 
                 AddLogMessage($"Язык переключен на '{languageCode}'.");
-                _dialogService.ShowMessage($"Язык переключен на {languageCode}.", "Информация");
+                
 
                 // Если смена языка влияет на логику доступности команд (редко), вызвать UpdateCommandsCanExecute();
             }
@@ -1190,6 +1239,30 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 measurementStatusViewModel.MeasuredValuesString = null;
             }
             AddLogMessage("Статусы измерений сброшены.");
+        }
+
+        // --- Метод для обновления всех локализуемых текстов в ViewModel ---
+        private void UpdateLocalizedTexts()
+        {
+            // Обновляем тексты статусов подключения/калибровки
+            // Используем GetString с форматированием для строк с подстановками
+            DeviceConnectionStatusText = _localizationService.GetString("ConnectedStatusText", IsDeviceConnected);
+            DeviceCalibrationStatusText = _localizationService.GetString("CalibratedStatusText", IsDeviceCalibrated);
+
+            // Обновляем другие локализуемые строки ViewModel (например, шаблоны лог-сообщений)
+            // Если шаблоны лог-сообщений хранятся в ViewModel, нужно получить их переводы
+            // и обновить соответствующие поля/свойства ViewModel.
+            // Пример:
+            // _logMessageTemplates["Connecting"] = _localizationService.GetString("LogMessageConnecting");
+            // _logMessageTemplates["ConnectedSuccess"] = _localizationService.GetString("LogMessageConnectedSuccess");
+            // ... и так далее для всех лог-сообщений
+            // Затем, при добавлении нового лог-сообщения, использовать уже переведенный шаблон.
+
+            // В твоем текущем коде лог-сообщения, кажется, добавляются напрямую строками в AddLogMessage.
+            // Нужно будет изменить AddLogMessage, чтобы он получал ключ ресурса
+            // и использовал GetString для получения локализованного текста перед добавлением в LogMessages.
+            // Например: AddLogMessageByKey("LogMessageConnecting");
+            // Или: AddLogMessageByKey("LogMessageConnectionError", errorMessage);
         }
 
         // --- Реализация IDisposable для очистки ресурсов ---

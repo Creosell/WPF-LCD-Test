@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace LCD_Test_Tool.Resources {
+namespace WPF_LCD_Test.Resources {
     using System;
     
     
@@ -22,7 +22,7 @@ namespace LCD_Test_Tool.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,10 +36,10 @@ namespace LCD_Test_Tool.Resources {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("LCD_Test_Tool.Resources.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WPF_LCD_Test.Resources.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -51,7 +51,7 @@ namespace LCD_Test_Tool.Resources {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,25 +63,79 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Unsuccessful connection. Try to restart color analyzer.
         /// </summary>
-        internal static string BadConnection {
+        public static string BadConnection {
             get {
                 return ResourceManager.GetString("BadConnection", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 0. Black.
+        /// </summary>
+        public static string BlackPoint {
+            get {
+                return ResourceManager.GetString("BlackPoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to B. Blue.
+        /// </summary>
+        public static string BluePoint {
+            get {
+                return ResourceManager.GetString("BluePoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 8. Bottom center.
+        /// </summary>
+        public static string BottomCenterPoint {
+            get {
+                return ResourceManager.GetString("BottomCenterPoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 7. Bottom left.
+        /// </summary>
+        public static string BottomLeftPoint {
+            get {
+                return ResourceManager.GetString("BottomLeftPoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 9. Bottom right.
+        /// </summary>
+        public static string BottomRightPoint {
+            get {
+                return ResourceManager.GetString("BottomRightPoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Calibrating zero....
         /// </summary>
-        internal static string CalibratingZeroCA {
+        public static string CalibratingZeroCA {
             get {
                 return ResourceManager.GetString("CalibratingZeroCA", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 5. Center.
+        /// </summary>
+        public static string CenterPoint {
+            get {
+                return ResourceManager.GetString("CenterPoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Check the connection of the CA-310 color analyzer. Try reboot it and run zero calibration again.
         /// </summary>
-        internal static string CheckConnectionCA {
+        public static string CheckConnectionCA {
             get {
                 return ResourceManager.GetString("CheckConnectionCA", resourceCulture);
             }
@@ -90,25 +144,43 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Check probe! Maybe need to change mode from 0-CAL to MEAS.
         /// </summary>
-        internal static string CheckProbe {
+        public static string CheckProbe {
             get {
                 return ResourceManager.GetString("CheckProbe", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 中文.
+        /// </summary>
+        public static string Chinese {
+            get {
+                return ResourceManager.GetString("Chinese", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Are you sure you want to clear all fields?.
         /// </summary>
-        internal static string CleanFieldWarning {
+        public static string CleanFieldWarning {
             get {
                 return ResourceManager.GetString("CleanFieldWarning", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Clear fields.
+        /// </summary>
+        public static string ClearFieldsButton {
+            get {
+                return ResourceManager.GetString("ClearFieldsButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Connected.
         /// </summary>
-        internal static string ConnectedCA {
+        public static string ConnectedCA {
             get {
                 return ResourceManager.GetString("ConnectedCA", resourceCulture);
             }
@@ -117,7 +189,7 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Connecting to CA-310....
         /// </summary>
-        internal static string ConnectingCA {
+        public static string ConnectingCA {
             get {
                 return ResourceManager.GetString("ConnectingCA", resourceCulture);
             }
@@ -126,7 +198,7 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Connection to CA-310 released.
         /// </summary>
-        internal static string ConnectionReleasedCA {
+        public static string ConnectionReleasedCA {
             get {
                 return ResourceManager.GetString("ConnectionReleasedCA", resourceCulture);
             }
@@ -135,7 +207,7 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Current measurement time is.
         /// </summary>
-        internal static string CurrentMeasurementTime {
+        public static string CurrentMeasurementTime {
             get {
                 return ResourceManager.GetString("CurrentMeasurementTime", resourceCulture);
             }
@@ -144,16 +216,25 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Current SN is.
         /// </summary>
-        internal static string CurrentSN {
+        public static string CurrentSN {
             get {
                 return ResourceManager.GetString("CurrentSN", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to English.
+        /// </summary>
+        public static string English {
+            get {
+                return ResourceManager.GetString("English", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
-        internal static string Err {
+        public static string Err {
             get {
                 return ResourceManager.GetString("Err", resourceCulture);
             }
@@ -162,7 +243,7 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Error during calibration.
         /// </summary>
-        internal static string ErrAtCalibration {
+        public static string ErrAtCalibration {
             get {
                 return ResourceManager.GetString("ErrAtCalibration", resourceCulture);
             }
@@ -171,7 +252,7 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Error saving to CSV.
         /// </summary>
-        internal static string ErrCSV {
+        public static string ErrCSV {
             get {
                 return ResourceManager.GetString("ErrCSV", resourceCulture);
             }
@@ -180,7 +261,7 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Error in.
         /// </summary>
-        internal static string ErrIn {
+        public static string ErrIn {
             get {
                 return ResourceManager.GetString("ErrIn", resourceCulture);
             }
@@ -189,7 +270,7 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Failed to switch language.
         /// </summary>
-        internal static string ErrMsgLangSwitchFailed {
+        public static string ErrMsgLangSwitchFailed {
             get {
                 return ResourceManager.GetString("ErrMsgLangSwitchFailed", resourceCulture);
             }
@@ -198,7 +279,7 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Error measuring at iteration .
         /// </summary>
-        internal static string ErrorAtMeasuringIteration {
+        public static string ErrorAtMeasuringIteration {
             get {
                 return ResourceManager.GetString("ErrorAtMeasuringIteration", resourceCulture);
             }
@@ -207,7 +288,7 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Error releasing connection.
         /// </summary>
-        internal static string ErrReleaseConnectionCA {
+        public static string ErrReleaseConnectionCA {
             get {
                 return ResourceManager.GetString("ErrReleaseConnectionCA", resourceCulture);
             }
@@ -216,7 +297,7 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Error while trying to save results. Please, check file path and try again.
         /// </summary>
-        internal static string ErrSavingJSON {
+        public static string ErrSavingJSON {
             get {
                 return ResourceManager.GetString("ErrSavingJSON", resourceCulture);
             }
@@ -225,7 +306,7 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Invalid input, please a valid SN without special symbols.
         /// </summary>
-        internal static string ErrSerialNumberInput {
+        public static string ErrSerialNumberInput {
             get {
                 return ResourceManager.GetString("ErrSerialNumberInput", resourceCulture);
             }
@@ -234,7 +315,7 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Invalid input, please enter a number. Measurement time set to default.
         /// </summary>
-        internal static string ErrTimeInput {
+        public static string ErrTimeInput {
             get {
                 return ResourceManager.GetString("ErrTimeInput", resourceCulture);
             }
@@ -243,7 +324,7 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to An unexpected error occurred.
         /// </summary>
-        internal static string ErrUnexpected {
+        public static string ErrUnexpected {
             get {
                 return ResourceManager.GetString("ErrUnexpected", resourceCulture);
             }
@@ -252,16 +333,34 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Please fill the SN first!.
         /// </summary>
-        internal static string FillSN {
+        public static string FillSN {
             get {
                 return ResourceManager.GetString("FillSN", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to G. Green.
+        /// </summary>
+        public static string GreenPoint {
+            get {
+                return ResourceManager.GetString("GreenPoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Language.
+        /// </summary>
+        public static string LanguageMenu {
+            get {
+                return ResourceManager.GetString("LanguageMenu", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please make zero calibration first!.
         /// </summary>
-        internal static string MakeZeroCalibration {
+        public static string MakeZeroCalibration {
             get {
                 return ResourceManager.GetString("MakeZeroCalibration", resourceCulture);
             }
@@ -270,34 +369,70 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Measured values.
         /// </summary>
-        internal static string MeasuredValuesPrefix {
+        public static string MeasuredValuesPrefix {
             get {
                 return ResourceManager.GetString("MeasuredValuesPrefix", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Measurement time (s):.
+        /// </summary>
+        public static string MeasurementTimeSec {
+            get {
+                return ResourceManager.GetString("MeasurementTimeSec", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Measuring....
         /// </summary>
-        internal static string Measuring {
+        public static string Measuring {
             get {
                 return ResourceManager.GetString("Measuring", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 4. Middle left.
+        /// </summary>
+        public static string MiddleLeftPoint {
+            get {
+                return ResourceManager.GetString("MiddleLeftPoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 6. Middle right.
+        /// </summary>
+        public static string MiddleRightPoint {
+            get {
+                return ResourceManager.GetString("MiddleRightPoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Language is switched to.
         /// </summary>
-        internal static string MsgLanguageSwitchedTo {
+        public static string MsgLanguageSwitchedTo {
             get {
                 return ResourceManager.GetString("MsgLanguageSwitchedTo", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to R. Red.
+        /// </summary>
+        public static string RedPoint {
+            get {
+                return ResourceManager.GetString("RedPoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Results for SN.
         /// </summary>
-        internal static string ResultsForSN {
+        public static string ResultsForSN {
             get {
                 return ResourceManager.GetString("ResultsForSN", resourceCulture);
             }
@@ -306,16 +441,25 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to saved to JSON in.
         /// </summary>
-        internal static string SavedToJSON {
+        public static string SavedToJSON {
             get {
                 return ResourceManager.GetString("SavedToJSON", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Save results.
+        /// </summary>
+        public static string SaveResultsButton {
+            get {
+                return ResourceManager.GetString("SaveResultsButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Not all measurements have been taken, are you sure you want to save the result?.
         /// </summary>
-        internal static string SavingNotFullWarning {
+        public static string SavingNotFullWarning {
             get {
                 return ResourceManager.GetString("SavingNotFullWarning", resourceCulture);
             }
@@ -324,16 +468,52 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to seconds.
         /// </summary>
-        internal static string Seconds {
+        public static string Seconds {
             get {
                 return ResourceManager.GetString("Seconds", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Serial number:.
+        /// </summary>
+        public static string SerialNumber {
+            get {
+                return ResourceManager.GetString("SerialNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 2. Top center.
+        /// </summary>
+        public static string TopCenterPoint {
+            get {
+                return ResourceManager.GetString("TopCenterPoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 1. Top left.
+        /// </summary>
+        public static string TopLeftPoint {
+            get {
+                return ResourceManager.GetString("TopLeftPoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 3. Top right.
+        /// </summary>
+        public static string TopRightPoint {
+            get {
+                return ResourceManager.GetString("TopRightPoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Warning.
         /// </summary>
-        internal static string Warning {
+        public static string Warning {
             get {
                 return ResourceManager.GetString("Warning", resourceCulture);
             }
@@ -342,9 +522,18 @@ namespace LCD_Test_Tool.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Zero is calibrated.
         /// </summary>
-        internal static string ZeroCalibratedCA {
+        public static string ZeroCalibratedCA {
             get {
                 return ResourceManager.GetString("ZeroCalibratedCA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Zero Calibration.
+        /// </summary>
+        public static string ZeroCalibration {
+            get {
+                return ResourceManager.GetString("ZeroCalibration", resourceCulture);
             }
         }
     }
