@@ -20,9 +20,9 @@
             <Menu>
                 <MenuItem Header="{x:Static res:Resources.LanguageMenu}" Height="20" Background="#00000000">
                     <MenuItem Header="{x:Static res:Resources.English}" Command="{Binding SwitchLanguageCommand}"
-                              CommandParameter="English"/>
+                              CommandParameter="en"/>
                     <MenuItem Header="{x:Static res:Resources.Chinese}" Command="{Binding SwitchLanguageCommand}" 
-                              CommandParameter="Chinese"/>
+                              CommandParameter="zn-Hans"/>
                 </MenuItem>
             </Menu>
         </StackPanel>
@@ -42,9 +42,9 @@
                     <Button Content="{x:Static res:Resources.ZeroCalibration}" Command="{Binding ZeroCalibrationCommand}" Margin="5" />
                     
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,20,10,10">
-                            <TextBlock Text="{Binding IsDeviceConnected, StringFormat='Подключен: {0}'}"
+                                    <TextBlock Text="{Binding DeviceConnectionStatusText}"
                          VerticalAlignment="Center" Margin="5,0" />
-                            <TextBlock Text="{Binding IsDeviceCalibrated, StringFormat='Откалиброван: {0}'}"
+                                    <TextBlock Text="{Binding DeviceCalibrationStatusText}"
            VerticalAlignment="Center" Margin="5,0" />
                         </StackPanel>
                         
