@@ -197,7 +197,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 if (_isDeviceConnected != value)
                 {
                     _isDeviceConnected = value;
-                    OnPropertyChanged(nameof(IsDeviceConnected)); // Уведомляем View
+                    OnPropertyChanged(); // Уведомляем View
 
                     // При изменении статуса подключения, потенциально меняется доступность многих команд и кнопок
                     UpdateCommandsCanExecute(); // Уведомляем все команды о необходимости перепроверки CanExecute
@@ -412,28 +412,17 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 if (success)
                 {
                     AddLogMessage("Прибор успешно подключен!");
-
-                    // После успешного подключения, возможно, сразу выполняем калибровку нуля
-                    // Проверяем доступность команды калибровки
-                    if (CanExecuteZeroCalibration(null))
-                    {
-                        AddLogMessage("Автоматическая калибровка нуля...");
-                        // Вызываем метод команды калибровки (или напрямую сервис, если логика простая)
-                        await ExecuteZeroCalibrationAsync(null);
-                    }
-                    else if (!IsDeviceCalibrated) // Если прибор подключен, но не откалиброван
-                    {
-                        AddLogMessage("Прибор подключен, но не откалиброван. Выполните калибровку нуля.");
-                    }
                 }
                 else
                 {
+                    ExecuteDisconnect(parameter);
                     AddLogMessage("Подключение не выполнено или завершилось ошибкой.");
                 }
             }
             catch (Exception ex)
             {
-                // Обработка непредвиденных ошибок
+                // Обработка непредвиденных
+                ExecuteDisconnect(parameter);
                 AddLogMessage($"Непредвиденная ошибка при выполнении команды 'Подключить': {ex.Message}");
                 _dialogService.ShowMessage($"Ошибка подключения: {ex.Message}", "Ошибка"); // Показать сообщение пользователю
             }
@@ -452,11 +441,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             try
             {
                 _colorMeasurementService.Disconnect(); // Вызываем метод Сервиса
-
-                // После отключения сбрасываем статус калибровки в ViewModel
-                IsDeviceCalibrated = false; // При отключении прибора калибровка сбрасывается
-                // IsDeviceConnected обновится через подписку на событие сервиса
-
                 AddLogMessage("Прибор отключен.");
             }
             catch (Exception ex)
@@ -473,14 +457,28 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         // Реализация асинхронной команды калибровки нуля
         private async Task ExecuteZeroCalibrationAsync(object parameter) // Возвращаем Task
         {
-            if (!CanExecuteZeroCalibration(parameter)) return;
+            bool success = false;
 
-            AddLogMessage("Выполняется калибровка нуля...");
+            if (!CanExecuteZeroCalibration(parameter))
+            {
+                AddLogMessage("Невозможно провести калибровку");
+                return;
+            }
 
             try
             {
-                // Вызываем асинхронный метод Сервиса
-                bool success = await _colorMeasurementService.CalibrateZeroAsync();
+
+                if (!IsDeviceConnected)
+                {
+                    await ExecuteConnectAsync(parameter);
+                }
+
+
+                if (IsDeviceConnected)
+                {
+                    success = await _colorMeasurementService.CalibrateZeroAsync();
+                }
+
 
                 if (success)
                 {
@@ -489,6 +487,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 }
                 else
                 {
+                    ExecuteDisconnect(parameter); //Если калибровка была неуспешной, отключаем прибор
                     AddLogMessage("Калибровка нуля не выполнена или завершилась ошибкой.");
                     _dialogService.ShowMessage("Калибровка нуля не выполнена.", "Ошибка калибровки");
                     // IsDeviceCalibrated обновится через подписку
@@ -496,6 +495,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             }
             catch (Exception ex)
             {
+                ExecuteDisconnect(parameter); //Если калибровка была неуспешной, отключаем прибор
                 AddLogMessage($"Непредвиденная ошибка при выполнении команды 'Калибровка нуля': {ex.Message}");
                 _dialogService.ShowMessage($"Ошибка калибровки: {ex.Message}", "Ошибка");
             }
@@ -962,7 +962,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         // Проверка доступности команды Отключить: доступна, если прибор ПОДКЛЮЧЕН
         private bool CanExecuteDisconnect(object parameter)
         {
-            return IsDeviceConnected; // Используем публичное свойство
+            return true; // Используем публичное свойство
         }
 
         // Проверка доступности команды Калибровка нуля: доступна, если прибор ПОДКЛЮЧЕН И НЕ КАЛИБРОВАН
@@ -1001,7 +1001,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             return IsDeviceConnected       // Прибор подключен
                    && IsDeviceCalibrated   // Прибор откалиброван
                    && IsSerialNumberConfirmed // Серийный номер подтвержден
-                   && (_measurementTime > 0);  // Время измерения больше нуля
+                   && (MeasurementTime > 0);  // Время измерения больше нуля
 
 
         }

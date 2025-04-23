@@ -137,17 +137,17 @@ namespace WPF_LCD_Test.Services
             {
                 try
                 {
-                    if (!_isConnected)
-                    {
-                        // Попытка подключения синхронно или вызвать ConnectAsync().Wait() (осторожно!)
-                        // Лучше убедиться в ViewModel, что подключен, прежде чем вызывать калибровку
-                        StatusMessage?.Invoke(this, "Попытка калибровки без подключения. Подключение...");
-                        if (!ConnectAsync().Result) // Осторожно: .Result блокирует! Лучше обрабатывать в ViewModel последовательность
-                        {
-                            StatusMessage?.Invoke(this, "Не удалось подключиться для калибровки.");
-                            return; // Выходим из лямбды Task.Run
-                        }
-                    }
+                    //if (!_isConnected)
+                    //{
+                    //    // Попытка подключения синхронно или вызвать ConnectAsync().Wait() (осторожно!)
+                    //    // Лучше убедиться в ViewModel, что подключен, прежде чем вызывать калибровку
+                    //    StatusMessage?.Invoke(this, "Попытка калибровки без подключения. Подключение...");
+                    //    if (!ConnectAsync().Result) // Осторожно: .Result блокирует! Лучше обрабатывать в ViewModel последовательность
+                    //    {
+                    //        StatusMessage?.Invoke(this, "Не удалось подключиться для калибровки.");
+                    //        return; // Выходим из лямбды Task.Run
+                    //    }
+                    //}
 
                     StatusMessage?.Invoke(this, "Выполнение нулевой калибровки..."); // Сообщение
                     _objCa200.SingleCa.CalZero(); // Блокирующий вызов COM
@@ -170,8 +170,8 @@ namespace WPF_LCD_Test.Services
                     CalibrationStatusChanged?.Invoke(this, _isCalibrated); // Оповещаем
                                                                            // Не пробрасываем исключение, обрабатываем внутри сервиса
                 }
-                catch (Exception ex) // Ловим другие ошибки
-                {
+                catch (Exception ex) {  // Ловим другие ошибки
+                
                     StatusMessage?.Invoke(this, $"Неожиданная ошибка при калибровке: {ex.Message}");
                     _isCalibrated = false;
                     CalibrationStatusChanged?.Invoke(this, _isCalibrated);
@@ -205,7 +205,9 @@ namespace WPF_LCD_Test.Services
                 }
 
                 _isConnected = false;
+                ConnectionStatusChanged?.Invoke(this, _isConnected); // Оповещаем
                 _isCalibrated = false;
+                CalibrationStatusChanged?.Invoke(this, _isCalibrated); // Оповещаем
             }
         }
 
