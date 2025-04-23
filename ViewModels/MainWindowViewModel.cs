@@ -41,9 +41,9 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
 
         // --- Приватные поля для хранения данных и состояния UI (будут привязаны к View) ---
         private string _serialNumber;
+
         private bool _isSerialNumberConfirmed = false;
         private string _lastConfirmedSerialNumber;
-
 
         private int _measurementTime;
         private string _lastMeasurementTime; // Для хранения последнего введенного времени измерения (для валидации и отображения в UI)
@@ -61,7 +61,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         // Список ожидаемых измерений по именам точек (из WinForms measurementButtons)
         // Этот список может быть загружен из конфигурации или констант
         private List<string> _requiredMeasurementNames;
-
 
         // В классе MainWindowViewModel (рядом с другими свойствами)
 
@@ -86,8 +85,8 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
 
         // Константы валидации и значения по умолчанию
         private const string SerialNumberPattern = "^[a-zA-Z0-9]*$"; // Pattern for using only letters and digits
-        private const string MeasurementTimePattern = "^[0-9]*$"; // Pattern for using only digits
 
+        private const string MeasurementTimePattern = "^[0-9]*$"; // Pattern for using only digits
 
         private const int DefaultMeasurementTime = 2;
 
@@ -111,7 +110,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             }
         }
 
-
         public bool IsSerialNumberConfirmed
         {
             get => _isSerialNumberConfirmed;
@@ -127,8 +125,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 }
             }
         }
-
-       
 
         // Время измерения в секундах
         public int MeasurementTime
@@ -152,7 +148,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 }
                 catch (FormatException ex)
                 {
-
                 }
             }
         }
@@ -467,18 +462,15 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
 
             try
             {
-
                 if (!IsDeviceConnected)
                 {
                     await ExecuteConnectAsync(parameter);
                 }
 
-
                 if (IsDeviceConnected)
                 {
                     success = await _colorMeasurementService.CalibrateZeroAsync();
                 }
-
 
                 if (success)
                 {
@@ -867,23 +859,21 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 SerialNumber = enteredSerialNumber; // <-- Присваиваем подтвержденное значение свойству ViewModel
                 IsSerialNumberConfirmed = true; // Устанавливаем флаг подтверждения
                 AddLogMessage($"Применен серийный номер: {SerialNumber}");
-
             }
-            else 
+            else
             {
                 // Если подтверждается пустое поле
                 //SerialNumber = string.Empty; // Очищаем свойство ViewModel
                 IsSerialNumberConfirmed = false; // Сбрасываем флаг
-                _dialogService.ShowMessage($"Введите, пожалуйста, корректный серийный номер из латинских букв и цифр","Некорректный ввод");
+                _dialogService.ShowMessage($"Введите, пожалуйста, корректный серийный номер из латинских букв и цифр", "Некорректный ввод");
                 return;
             }
-
 
             // Здесь можно добавить более сложную логику, связанную с применением SN:
             // Например, создание или сброс объекта DeviceUnderTest
             // Убедимся, что _currentDevice соответствует SerialNumber из ViewModel
 
-            if (_currentDevice == null || _currentDevice.SerialNumber != SerialNumber )
+            if (_currentDevice == null || _currentDevice.SerialNumber != SerialNumber)
             {
                 // Если устройство еще не создано или SN изменился, создаем новое
                 try
@@ -942,7 +932,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             {
                 _dialogService.ShowMessage("Введите корректное время измерения (больше 0).", "Некорректный ввод");
             }
-           
 
             // Применение времени измерения обычно не влияет на доступность команд,
             // но если влияет, нужно вызвать UpdateCommandsCanExecute();
@@ -1002,8 +991,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                    && IsDeviceCalibrated   // Прибор откалиброван
                    && IsSerialNumberConfirmed // Серийный номер подтвержден
                    && (MeasurementTime > 0);  // Время измерения больше нуля
-
-
         }
 
         // Проверка доступности команды ApplySerialNumber: доступна, если Серийный номер в поле не пустой
@@ -1046,14 +1033,14 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         // Вызывается, когда изменяются свойства, от которых зависит доступность (Connected, Calibrated, SerialNumber)
         private void UpdateMeasurementButtonsState()
         {
-            IsMeasurementButtonsEnabled = IsDeviceConnected 
-                && IsDeviceCalibrated 
+            IsMeasurementButtonsEnabled = IsDeviceConnected
+                && IsDeviceCalibrated
                 && !string.IsNullOrWhiteSpace(SerialNumber)
                 && IsSerialNumberConfirmed;
 
             // Важно: После обновления состояния кнопок, уведомляем команду MeasureCommand
             // о возможном изменении ее доступности, чтобы UI (кнопки) обновился.
-           (MeasureCommand as RelayCommand)?.RaiseCanExecuteChanged(); // Используем безопасное приведение и ?.
+            (MeasureCommand as RelayCommand)?.RaiseCanExecuteChanged(); // Используем безопасное приведение и ?.
         }
 
         // Метод для уведомления ВСЕХ команд о возможном изменении их состояния CanExecute
@@ -1167,8 +1154,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         // Вызывается из ExecuteMeasureAsync после получения результата
         private void UpdateMeasurementStatus(string location, bool? isPassed, string measuredValuesString = null)
         {
-       
-
             // 1. Ищем нужный объект MeasurementStatusViewModel в коллекции по его Location
             //    Используем LINQ FirstOrDefault(). Он вернет первый найденный элемент или null, если не найден.
             MeasurementStatusViewModel statusToUpdate = AllMeasurementButtonStatuses.FirstOrDefault(s => s.Location == location);
