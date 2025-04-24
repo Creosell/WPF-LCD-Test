@@ -11,47 +11,32 @@ namespace WPF_LCD_Test.Services
 {
     public class LocalizationService : ILocalizationService
     {
-        // --- Ручная реализация Синглтона (потокобезопасная) ---
+        // --- Реализация Синглтона с использованием Lazy<T> (Рекомендуемый, Потокобезопасный) ---
 
-        // Приватное статическое поле для хранения единственного экземпляра
-        private static ILocalizationService _instance;
+        // Приватное статическое поле, использующее Lazy<T> для хранения единственного экземпляра
+        // Фабричная функция () => new LocalizationService() будет вызвана только при первом обращении к .Value
+        private static readonly Lazy<ILocalizationService> _lazyInstance =
+            new Lazy<ILocalizationService>(() => new LocalizationService());
 
-        // Объект для синхронизации потоков при создании экземпляра
-        private static readonly object _lock = new object();
-
-        // Приватный конструктор, чтобы нельзя было создать экземпляр напрямую
+        // Приватный конструктор, чтобы экземпляры могли быть созданы только фабрикой Lazy<T>
         private LocalizationService()
         {
-            // Этот код выполнится только один раз, при первом создании экземпляра
-            Console.WriteLine("LocalizationService: Конструктор экземпляра выполняется (вручную)."); // <-- Добавь для отладки
+            // Этот код выполнится только один раз, когда Lazy<T> создаст экземпляр
+            Console.WriteLine("LocalizationService: Конструктор экземпляра выполняется (через Lazy)."); // <-- Добавь для отладки
             // Установка начального языка при создании экземпляра
             // Это вызовет SetLanguage, который вызовет LanguageChanged
+            // !!! Блок проверки в SetLanguage закомментирован, как вы сделали для решения проблемы !!!
             SetLanguage("en"); // Устанавливаем язык по умолчанию при старте
         }
 
         // Публичное статическое свойство для получения единственного экземпляра
-        // Используется техника "double-checked locking" для потокобезопасности
+        // Обращение к _lazyInstance.Value запускает создание экземпляра при первом вызове
         public static ILocalizationService Instance
         {
             get
             {
-                // Первая быстрая проверка без блокировки
-                if (_instance == null)
-                {
-                    // Блокировка потоков только если экземпляр еще не создан
-                    lock (_lock)
-                    {
-                        // Вторая проверка внутри блокировки (на случай, если другой поток создал экземпляр, пока мы ждали блокировку)
-                        if (_instance == null)
-                        {
-                            // Создание единственного экземпляра сервиса
-                            _instance = new LocalizationService();
-                            Console.WriteLine("LocalizationService: Экземпляр синглтона создан (через Instance)."); // <-- Добавь для отладки
-                        }
-                    }
-                }
-                // Возвращаем единственный экземпляр
-                return _instance;
+                Console.WriteLine("LocalizationService: Получение экземпляра синглтона (через Lazy.Instance)."); // <-- Добавь для отладки
+                return _lazyInstance.Value;
             }
         }
 
@@ -107,7 +92,8 @@ namespace WPF_LCD_Test.Services
             // return Resources.Resources.ResourceManager.GetString(key, CurrentCulture) ?? $"!{key}!"; // Возвращаем ключ в восклицательных знаках для отладки
 
             // Дополнительная проверка на null для ResourceManager (на всякий случай)
-            if (WPF_LCD_Test.Resources.Resources.ResourceManager == null)
+            
+            if (Resources.Resources.ResourceManager == null)
             {
                 Console.WriteLine($"LocalizationService Ошибка: ResourceManager для ключа '{key}' равен null!");
                 return $"!{key}!";
@@ -128,7 +114,7 @@ namespace WPF_LCD_Test.Services
             // Получаем шаблон строки из .resx, а затем форматируем его
             string format = GetString(key);
             // Проверяем, был ли формат найден (не вернулся ли ключ для отладки)
-            if (string.IsNullOrEmpty(format) || format.StartsWith("!{") && format.EndsWith("}!") && format.Contains(key))
+            if (string.IsNullOrEmpty(format) || (format.StartsWith("!{") && format.EndsWith("}!") && format.Contains(key)))
             {
                 // Если ресурс не найден или вернулся ключ для отладки, просто возвращаем ключ или шаблон
                 return format;
@@ -150,6 +136,7 @@ namespace WPF_LCD_Test.Services
         protected virtual void OnLanguageChanged()
         {
             // Проверка на null перед вызовом события
+            Console.WriteLine($"LocalizationService: Вызов OnLanguageChanged()."); // <-- Добавь для отладки
             LanguageChanged?.Invoke(this, EventArgs.Empty);
         }
     }
