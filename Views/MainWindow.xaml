@@ -18,11 +18,11 @@
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
             <Menu>
-                <MenuItem Header="{x:Static res:Resources.LanguageMenu}" Height="20" Background="#00000000">
-                    <MenuItem Header="{x:Static res:Resources.English}" Command="{Binding SwitchLanguageCommand}"
+                <MenuItem Header="{DynamicResource LanguageMenu}" Height="20" Background="#00000000">
+                    <MenuItem Header="{DynamicResource English}" Command="{Binding SwitchLanguageCommand}"
                               CommandParameter="en"/>
-                    <MenuItem Header="{x:Static res:Resources.Chinese}" Command="{Binding SwitchLanguageCommand}" 
-                              CommandParameter="zn-Hans"/>
+                    <MenuItem Header="{DynamicResource Chinese}" Command="{Binding SwitchLanguageCommand}" 
+                              CommandParameter="zh-Hans"/>
                 </MenuItem>
             </Menu>
         </StackPanel>
@@ -39,21 +39,22 @@
                     <RowDefinition Height="30*" />
                 </Grid.RowDefinitions>
                 <StackPanel Orientation="Horizontal">
-                    <Button Content="{x:Static res:Resources.ZeroCalibration}" Command="{Binding ZeroCalibrationCommand}" Margin="5" />
+                    <Button Content="{DynamicResource ZeroCalibration}" Command="{Binding ZeroCalibrationCommand}" Margin="5" />
                     
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,20,10,10">
-                                    <TextBlock Text="{Binding DeviceConnectionStatusText}"
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,20,10,10" >
+                                    <!--<TextBlock Text="{Binding DeviceConnectionStatusText}"
+                                               
                          VerticalAlignment="Center" Margin="5,0" />
-                                    <TextBlock Text="{Binding DeviceCalibrationStatusText}"
-           VerticalAlignment="Center" Margin="5,0" />
-                        </StackPanel>
+                        <TextBlock Text="{Binding DeviceCalibrationStatusText}"
+           VerticalAlignment="Center" Margin="5,0" />-->
+                    </StackPanel>
                         
                     
                     
                 </StackPanel>
                 <Grid Grid.Row="1">
                     <StackPanel Orientation="Horizontal">
-                        <Label Content="{x:Static res:Resources.MeasurementTimeSec}" VerticalAlignment="Center" />
+                        <Label Content="{DynamicResource MeasurementTimeSec}" VerticalAlignment="Center" />
                         <TextBox Margin="5,0" VerticalAlignment="Center" MinWidth="50"
                                  x:Name="MeasurementTimeTextBox"
                             Text="{Binding MeasurementTime, UpdateSourceTrigger=Explicit, 
@@ -72,7 +73,7 @@
                 </Grid>
                 <Grid Grid.Row="2">
                     <StackPanel Orientation="Horizontal">
-                        <Label Content="{x:Static res:Resources.SerialNumber}" VerticalAlignment="Center" />
+                        <Label Content="{DynamicResource SerialNumber}" VerticalAlignment="Center" />
                         <TextBox Margin="5,0" VerticalAlignment="Center" MinWidth="200"
                                 x:Name="SerialNumberTextBox"
                                 Text="{Binding SerialNumber, UpdateSourceTrigger=Explicit}"
@@ -106,7 +107,7 @@
                             <ColumnDefinition Width="30*" />
                             <ColumnDefinition Width="30*" />
                         </Grid.ColumnDefinitions>
-                        <Button Content="{x:Static res:Resources.TopLeftPoint}"
+                        <Button Content="{DynamicResource TopLeftPoint}"
                                 Command="{Binding MeasureCommand}"
                                 CommandParameter="{Binding TopLeftStatus.Location}"
                                 Grid.Row="0" Grid.Column="0" Margin="5">
@@ -117,7 +118,7 @@
                                 <Binding Path="TopLeftStatus.MeasuredValuesString" />
                             </Button.ToolTip>
                         </Button>
-                        <Button Content="{x:Static res:Resources.TopCenterPoint}"
+                        <Button Content="{DynamicResource TopCenterPoint}"
                                 Command="{Binding MeasureCommand}"
                                 CommandParameter="{Binding TopCenterStatus.Location}"
                                 Grid.Row="0" Grid.Column="1" Margin="5">
@@ -128,7 +129,7 @@
                                 <Binding Path="TopCenterStatus.MeasuredValuesString" />
                             </Button.ToolTip>
                         </Button>
-                        <Button Content="{x:Static res:Resources.TopRightPoint}"
+                        <Button Content="{DynamicResource TopRightPoint}"
                                 Command="{Binding MeasureCommand}"
                                 CommandParameter="{Binding TopRightStatus.Location}"
                                 Grid.Row="0" Grid.Column="2" Margin="5">
@@ -139,7 +140,7 @@
                                 <Binding Path="TopRightStatus.MeasuredValuesString" />
                             </Button.ToolTip>
                         </Button>
-                        <Button Content="{x:Static res:Resources.MiddleLeftPoint}"
+                        <Button Content="{DynamicResource MiddleLeftPoint}"
                                 Command="{Binding MeasureCommand}"
                                 CommandParameter="{Binding MiddleLeftStatus.Location}"
                                 Grid.Row="1" Grid.Column="0" Margin="5">
@@ -150,7 +151,7 @@
                                 <Binding Path="MiddleLeftStatus.MeasuredValuesString" />
                             </Button.ToolTip>
                         </Button>
-                        <Button Content="{x:Static res:Resources.CenterPoint}"
+                        <Button Content="{DynamicResource CenterPoint}"
                                 Command="{Binding MeasureCommand}"
                                 CommandParameter="{Binding CenterStatus.Location}"
                                 Grid.Row="1" Grid.Column="1" Margin="5">
@@ -161,7 +162,7 @@
                                 <Binding Path="CenterStatus.MeasuredValuesString" />
                             </Button.ToolTip>
                         </Button>
-                        <Button Content="{x:Static res:Resources.MiddleRightPoint}"
+                        <Button Content="{DynamicResource MiddleRightPoint}"
                                 Command="{Binding MeasureCommand}"
                                 CommandParameter="{Binding MiddleRightStatus.Location}"
                                 Grid.Row="1" Grid.Column="2" Margin="5">
@@ -172,7 +173,7 @@
                                 <Binding Path="MiddleRightStatus.MeasuredValuesString" />
                             </Button.ToolTip>
                         </Button>
-                        <Button Content="{x:Static res:Resources.BottomLeftPoint}"
+                        <Button Content="{DynamicResource BottomLeftPoint}"
                                 Command="{Binding MeasureCommand}"
                                 CommandParameter="{Binding BottomLeftStatus.Location}"
                                 Grid.Row="2" Grid.Column="0" Margin="5">
@@ -183,7 +184,7 @@
                                 <Binding Path="BottomLeftStatus.MeasuredValuesString" />
                             </Button.ToolTip>
                         </Button>
-                        <Button Content="{x:Static res:Resources.BottomCenterPoint}"
+                        <Button Content="{DynamicResource BottomCenterPoint}"
                                 Command="{Binding MeasureCommand}"
                                 CommandParameter="{Binding BottomCenterStatus.Location}"
                                 Grid.Row="2" Grid.Column="1" Margin="5">
@@ -194,7 +195,7 @@
                                 <Binding Path="BottomCenterStatus.MeasuredValuesString" />
                             </Button.ToolTip>
                         </Button>
-                        <Button Content="{x:Static res:Resources.BottomRightPoint}"
+                        <Button Content="{DynamicResource BottomRightPoint}"
                                 Command="{Binding MeasureCommand}"
                                 CommandParameter="{Binding BottomRightStatus.Location}"
                                 Grid.Row="2" Grid.Column="2" Margin="5">
@@ -208,7 +209,7 @@
                     </Grid>
                     <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
                                 Margin="5,0,0,0">
-                        <Button Content="{x:Static res:Resources.RedPoint}"
+                        <Button Content="{DynamicResource RedPoint}"
                                 Command="{Binding MeasureCommand}"
                                 CommandParameter="{Binding RedColorStatus.Location}"
                                 Margin="5">
@@ -219,7 +220,7 @@
                                 <Binding Path="RedColorStatus.MeasuredValuesString" />
                             </Button.ToolTip>
                        </Button>
-                        <Button Content="{x:Static res:Resources.GreenPoint}"
+                        <Button Content="{DynamicResource GreenPoint}"
                                 Command="{Binding MeasureCommand}"
                                 CommandParameter="{Binding GreenColorStatus.Location}"
                                 Margin="5">
@@ -230,7 +231,7 @@
                                 <Binding Path="GreenColorStatus.MeasuredValuesString" />
                             </Button.ToolTip>
                         </Button>
-                        <Button Content="{x:Static res:Resources.BluePoint}"
+                        <Button Content="{DynamicResource BluePoint}"
                                 Command="{Binding MeasureCommand}"
                                 CommandParameter="{Binding BlueColorStatus.Location}"
                                 Margin="5">
@@ -241,7 +242,7 @@
                                 <Binding Path="BlueColorStatus.MeasuredValuesString" />
                             </Button.ToolTip>
                         </Button>
-                        <Button Content="{x:Static res:Resources.BlackPoint}"
+                        <Button Content="{DynamicResource BlackPoint}"
                                 Command="{Binding MeasureCommand}"
                                  CommandParameter="{Binding BlackColorStatus.Location}"
                                  Margin="5">
@@ -291,8 +292,8 @@
             </ListBox.ItemTemplate>
         </ListBox>
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-            <Button Content="{x:Static res:Resources.SaveResultsButton}" Command="{Binding SaveResultsCommand}" Margin="5" />
-            <Button Content="{x:Static res:Resources.ClearFieldsButton}" Command="{Binding ClearFieldsCommand}" Margin="5" />
+            <Button Content="{DynamicResource SaveResultsButton}" Command="{Binding SaveResultsCommand}" Margin="5" />
+            <Button Content="{DynamicResource ClearFieldsButton}" Command="{Binding ClearFieldsCommand}" Margin="5" />
         </StackPanel>
     </Grid>
 </Window>

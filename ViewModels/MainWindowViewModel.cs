@@ -1242,27 +1242,27 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         }
 
         // --- Метод для обновления всех локализуемых текстов в ViewModel ---
+        // Пример правильного обновления статусов в UpdateLocalizedTexts() или в обработчиках событий сервиса
         private void UpdateLocalizedTexts()
         {
-            // Обновляем тексты статусов подключения/калибровки
-            // Используем GetString с форматированием для строк с подстановками
-            DeviceConnectionStatusText = _localizationService.GetString("ConnectedStatusText", IsDeviceConnected);
-            DeviceCalibrationStatusText = _localizationService.GetString("CalibratedStatusText", IsDeviceCalibrated);
+            // Получаем локализованные строки в зависимости от текущего статуса
+            DeviceConnectionStatusText = IsDeviceConnected
+                ? _localizationService.GetString("ConnectedCA") // Получаем локализованное "Подключено"
+                : _localizationService.GetString("CheckConnectionCA"); // Получаем локализованное "Проверьте подключение" (или другой текст для отключенного состояния)
 
-            // Обновляем другие локализуемые строки ViewModel (например, шаблоны лог-сообщений)
-            // Если шаблоны лог-сообщений хранятся в ViewModel, нужно получить их переводы
-            // и обновить соответствующие поля/свойства ViewModel.
-            // Пример:
-            // _logMessageTemplates["Connecting"] = _localizationService.GetString("LogMessageConnecting");
-            // _logMessageTemplates["ConnectedSuccess"] = _localizationService.GetString("LogMessageConnectedSuccess");
-            // ... и так далее для всех лог-сообщений
-            // Затем, при добавлении нового лог-сообщения, использовать уже переведенный шаблон.
+            DeviceCalibrationStatusText = IsDeviceCalibrated
+                ? _localizationService.GetString("ZeroCalibratedCA") // Получаем локализованное "Калибровка нуля завершена"
+                : _localizationService.GetString("MakeZeroCalibration"); // Получаем локализованное "Выполните калибровку нуля" (или другой текст)
 
-            // В твоем текущем коде лог-сообщения, кажется, добавляются напрямую строками в AddLogMessage.
-            // Нужно будет изменить AddLogMessage, чтобы он получал ключ ресурса
-            // и использовал GetString для получения локализованного текста перед добавлением в LogMessages.
-            // Например: AddLogMessageByKey("LogMessageConnecting");
-            // Или: AddLogMessageByKey("LogMessageConnectionError", errorMessage);
+            // ... Логика обновления других локализуемых текстов ViewModel ...
+            // Например, если MeasurementStatusViewModel имеет свойства, которые нужно локализовать,
+            // нужно получить экземпляр LocalizationService в MeasurementStatusViewModel
+            // и вызывать OnPropertyChanged для этих свойств при LanguageChanged.
+            // Или ViewModel может вызывать публичные методы на MeasurementStatusViewModel для обновления их текстов.
+
+            // Важно: после обновления свойств ViewModel необходимо вызвать OnPropertyChanged для каждого измененного свойства,
+            // чтобы UI обновился. Но так как ты присваиваешь значения свойствам (DeviceConnectionStatusText, DeviceCalibrationStatusText),
+            // а их сеттеры уже вызывают OnPropertyChanged, это, вероятно, работает.
         }
 
         // --- Реализация IDisposable для очистки ресурсов ---
