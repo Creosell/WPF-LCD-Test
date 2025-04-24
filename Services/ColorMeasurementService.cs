@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using CA200SRVRLib;
-using WPF_LCD_Test.Services;
 using WPF_LCD_Test.Models;
+using static WPF_LCD_Test.Resources.Resources;
 
 namespace WPF_LCD_Test.Services
 {
@@ -12,8 +12,7 @@ namespace WPF_LCD_Test.Services
         private string? _portID = null;
         private bool _isConnected = false;
         private bool _isCalibrated = false;
-        private readonly ILocalizationService _localizationService; // Сервис для локализации (зависимость)
-        
+
 
         //Color analyzer constants
         //Remote modes
@@ -72,9 +71,9 @@ namespace WPF_LCD_Test.Services
 
         public string PortID => _portID;
 
-        public ColorMeasurementService(ILocalizationService localizationService)
+        public ColorMeasurementService()
         {
-            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+
         }
 
         private double GetMeasuredSx() => _objCa200.SingleCa.SingleProbe.sx;
@@ -100,18 +99,19 @@ namespace WPF_LCD_Test.Services
 
                     if (!_isConnected)
                     {
-                        StatusMessage?.Invoke(this, _localizationService.GetString("ConnectingCA")); // Отправляем сообщение в лог ViewModel через событие
+                        StatusMessage?.Invoke(this, ConnectingCA);
+
                         _objCa200.AutoConnect(); // Блокирующий вызов COM
                         _objCa = _objCa200.SingleCa;
                         _portID = _objCa.PortID;
                         _isConnected = true;
                         ConnectionStatusChanged?.Invoke(this, _isConnected); // Оповещаем ViewModel об изменении статуса
-                        StatusMessage?.Invoke(this, _localizationService.GetString("ConnectedCA")); // Отправляем сообщение
+                        StatusMessage?.Invoke(this, ConnectedCA); // Отправляем сообщение
                     }
                 }
                 catch (COMException ex)
                 {
-                    StatusMessage?.Invoke(this, _localizationService.GetString("ConnectionError")  + $":    {ex.Message}"); // Отправляем ошибку
+                    StatusMessage?.Invoke(this, $"{ConnectionError}:    {ex.Message}"); // Отправляем ошибку
                     _isConnected = false; // Обновляем статус
                     ConnectionStatusChanged?.Invoke(this, _isConnected); // Оповещаем ViewModel
                                                                          // Здесь не пробрасываем исключение, Сервис сам обрабатывает ошибку подключения
@@ -119,7 +119,7 @@ namespace WPF_LCD_Test.Services
                 }
                 catch (Exception ex) // Ловим другие возможные исключения
                 {
-                    StatusMessage?.Invoke(this, _localizationService.GetString("ConnectionError") + $": {ex.Message}");
+                    StatusMessage?.Invoke(this, $"{ConnectionError}: {ex.Message}");
                     _isConnected = false;
                     ConnectionStatusChanged?.Invoke(this, _isConnected);
                 }
@@ -151,7 +151,7 @@ namespace WPF_LCD_Test.Services
                     //    }
                     //}
 
-                    StatusMessage?.Invoke(this, _localizationService.GetString("CalibratingZeroCA")); // Сообщение
+                    StatusMessage?.Invoke(this, (CalibratingZeroCA)); // Сообщение
                     _objCa200.SingleCa.CalZero(); // Блокирующий вызов COM
 
                     _objCa200.SingleCa.SyncMode = (int)UniverslaSyncMode;
@@ -162,19 +162,20 @@ namespace WPF_LCD_Test.Services
 
                     _isCalibrated = true; // Обновляем статус
                     CalibrationStatusChanged?.Invoke(this, _isCalibrated); // Оповещаем
-                    StatusMessage?.Invoke(this, _localizationService.GetString("ZeroCalibratedCA")); // Сообщение
+                    StatusMessage?.Invoke(this, (ZeroCalibratedCA)); // Сообщение
                     success = true; // Успех
                 }
                 catch (COMException ex) // Ловим ошибки COM
                 {
-                    StatusMessage?.Invoke(this, _localizationService.GetString("CheckConnectionCA") + $": {ex.Message}");
+                    StatusMessage?.Invoke(this, (CheckConnectionCA) + $": {ex.Message}");
                     _isCalibrated = false; // Обновляем статус
                     CalibrationStatusChanged?.Invoke(this, _isCalibrated); // Оповещаем
                                                                            // Не пробрасываем исключение, обрабатываем внутри сервиса
                 }
-                catch (Exception ex) {  // Ловим другие ошибки
-                
-                    StatusMessage?.Invoke(this, _localizationService.GetString("ErrAtCalibration") + $": {ex.Message}");
+                catch (Exception ex)
+                {  // Ловим другие ошибки
+
+                    StatusMessage?.Invoke(this, (ErrAtCalibration) + $": {ex.Message}");
                     _isCalibrated = false;
                     CalibrationStatusChanged?.Invoke(this, _isCalibrated);
                 }
@@ -192,7 +193,7 @@ namespace WPF_LCD_Test.Services
         {
             if (disposing)
             {
-                StatusMessage?.Invoke(this, _localizationService.GetString("DisconnectingCA")); // Сообщение
+                StatusMessage?.Invoke(this, (DisconnectingCA)); // Сообщение
                 if (_objCa != null)
                 {
                     try { Marshal.ReleaseComObject(_objCa); } catch { }
@@ -211,7 +212,7 @@ namespace WPF_LCD_Test.Services
                 ConnectionStatusChanged?.Invoke(this, _isConnected); // Оповещаем
                 _isCalibrated = false;
                 CalibrationStatusChanged?.Invoke(this, _isCalibrated); // Оповещаем
-                StatusMessage?.Invoke(this, _localizationService.GetString("DisconnectedCA")); // Сообщение
+                StatusMessage?.Invoke(this, (DisconnectedCA)); // Сообщение
             }
         }
 
@@ -231,18 +232,18 @@ namespace WPF_LCD_Test.Services
                 {
                     if (!_isConnected)
                     {
-                        StatusMessage?.Invoke(this, _localizationService.GetString("MeasureWihoutConnectionError"));
+                        StatusMessage?.Invoke(this, (MeasureWihoutConnectionError));
                         result.IsValid = false; // Отмечаем результат как невалидный
                         return; // Выходим из лямбды
                     }
                     if (!_isCalibrated) // Проверяем калибровку
                     {
-                        StatusMessage?.Invoke(this, _localizationService.GetString("MakeZeroCalibration"));
+                        StatusMessage?.Invoke(this, (MakeZeroCalibration));
                         result.IsValid = false; // Отмечаем результат как невалидный
                         return; // Выходим из лямбды
                     }
 
-                    StatusMessage?.Invoke(this, _localizationService.GetString("Measuring")); // Сообщение
+                    StatusMessage?.Invoke(this, (Measuring)); // Сообщение
 
                     // Переносим цикл 
                     double[] xValues = new double[measurementTime];
@@ -265,12 +266,12 @@ namespace WPF_LCD_Test.Services
                         }
                         catch (COMException measureEx)
                         {
-                            StatusMessage?.Invoke(this, _localizationService.GetString("ErrorAtMeasuringIteration") + $"{ i}: {measureEx.Message}");
+                            StatusMessage?.Invoke(this, (ErrorAtMeasuringIteration) + $"{i}: {measureEx.Message}");
                             continue;
                         }
                         catch (Exception measureEx)
                         {
-                            StatusMessage?.Invoke(this, _localizationService.GetString("ErrorAtMeasuringIteration") + $"{i}: {measureEx.Message}");
+                            StatusMessage?.Invoke(this, (ErrorAtMeasuringIteration) + $"{i}: {measureEx.Message}");
                             continue;
                         }
 
@@ -291,7 +292,7 @@ namespace WPF_LCD_Test.Services
                 }
                 catch (Exception ex)
                 {
-                    StatusMessage?.Invoke(this, _localizationService.GetString("ErrUnexpected") + $": {ex.Message}");
+                    StatusMessage?.Invoke(this, (ErrUnexpected) + $": {ex.Message}");
                     result.IsValid = false;
                 }
             });

@@ -282,4 +282,10 @@
   <data name="DisconnectingCA" xml:space="preserve">
     <value />
   </data>
+  <data name="DisconnectedCA" xml:space="preserve">
+    <value />
+  </data>
+  <data name="MeasureWihoutConnectionError" xml:space="preserve">
+    <value />
+  </data>
 </root>

@@ -282,4 +282,10 @@
   <data name="DisconnectingCA" xml:space="preserve">
     <value>Disconnecting CA-310...</value>
   </data>
+  <data name="DisconnectedCA" xml:space="preserve">
+    <value>Disconnected</value>
+  </data>
+  <data name="MeasureWihoutConnectionError" xml:space="preserve">
+    <value>Please, connect CA-310 first</value>
+  </data>
 </root>

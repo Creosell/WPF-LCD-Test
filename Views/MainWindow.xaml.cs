@@ -1,9 +1,9 @@
 ﻿// В файле MainWindow.xaml.cs (код позади MainWindow.xaml)
 
 using System.Windows;
-using WPF_LCD_Test.ViewModels; // Убедись, что используешь пространство имен твоего ViewModel
-using WPF_LCD_Test.Services;
 using System.Windows.Controls; // Нужно для создания экземпляров сервисов
+using WPF_LCD_Test.Services;
+using WPF_LCD_Test.ViewModels; // Убедись, что используешь пространство имен твоего ViewModel
 
 namespace WPF_LCD_Test // Пространство имен твоего приложения
 {
@@ -21,10 +21,10 @@ namespace WPF_LCD_Test // Пространство имен твоего при�
 
             // Создаем экземпляры сервисов
             // Убедись, что у тебя есть классы ColorMeasurementService, FileService, DialogService
+            IColorMeasurementService colorMeasurementService = new ColorMeasurementService(); // Реализация сервиса прибора
             IFileService fileService = new FileService(); // Реализация сервиса файлов
             IDialogService dialogService = new DialogService(); // Реализация сервиса диалогов
             ILocalizationService localizationService = LocalizationService.Instance; // Реализация сервиса локализации
-            IColorMeasurementService colorMeasurementService = new ColorMeasurementService(localizationService); // Реализация сервиса прибора
 
             // Создаем экземпляр ViewModel, передавая ему зависимости (сервисы)
             _viewModel = new MainWindowViewModel(colorMeasurementService, fileService, dialogService, localizationService);
@@ -63,7 +63,7 @@ namespace WPF_LCD_Test // Пространство имен твоего при�
 
             if (serialNumberTextBox != null && _viewModel != null)
             {
-                serialNumberTextBox.Text = _viewModel.SerialNumber; 
+                serialNumberTextBox.Text = _viewModel.SerialNumber;
             }
         }
 
@@ -108,7 +108,7 @@ namespace WPF_LCD_Test // Пространство имен твоего при�
             }
         }
 
-        
+
     }
 
 

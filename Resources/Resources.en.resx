@@ -277,9 +277,15 @@
     <value>Clear fields</value>
   </data>
   <data name="ConnectionError" xml:space="preserve">
-    <value />
+    <value>Connection failed or ended with an error</value>
   </data>
   <data name="DisconnectingCA" xml:space="preserve">
-    <value />
+    <value>Disconnecting CA-310...</value>
+  </data>
+  <data name="DisconnectedCA" xml:space="preserve">
+    <value>Disconnected</value>
+  </data>
+  <data name="MeasureWihoutConnectionError" xml:space="preserve">
+    <value>Please, connect CA-310 first</value>
   </data>
 </root>

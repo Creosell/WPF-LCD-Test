@@ -232,6 +232,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Disconnected.
+        /// </summary>
+        public static string DisconnectedCA {
+            get {
+                return ResourceManager.GetString("DisconnectedCA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Disconnecting CA-310....
         /// </summary>
         public static string DisconnectingCA {
@@ -399,6 +408,15 @@ namespace WPF_LCD_Test.Resources {
         public static string MeasurementTimeSec {
             get {
                 return ResourceManager.GetString("MeasurementTimeSec", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please, connect CA-310 first.
+        /// </summary>
+        public static string MeasureWihoutConnectionError {
+            get {
+                return ResourceManager.GetString("MeasureWihoutConnectionError", resourceCulture);
             }
         }
         

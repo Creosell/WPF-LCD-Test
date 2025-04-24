@@ -2,19 +2,19 @@
 // Файл MainWindowViewModel.cs
 
 // --- Usings для доступа к другим частям проекта и библиотекам ---
+using System.Collections.ObjectModel; // Для ObservableCollection (для логов, статусов)
+using System.Globalization; // Для CultureInfo (если нужно для форматирования в VM)
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions; // Для валидации серийного номера
+using System.Windows;
+using System.Windows.Input; // Для интерфейса ICommand
+using System.Windows.Media; // Для System.Windows.Media.Brush / Brushes (в MeasurementStatusViewModel)
+using System.Windows.Threading;
+using MvvmHelpers;
+using WPF_LCD_Test.Commands; // Для класса RelayCommand и BaseViewModel
 using WPF_LCD_Test.Models; // Для классов Model (Measurement, DeviceUnderTest)
 using WPF_LCD_Test.Services; // Для интерфейсов Services (IColorMeasurementService, IFileService, IDialogService)
-using WPF_LCD_Test.Commands; // Для класса RelayCommand и BaseViewModel
-using System.Collections.ObjectModel; // Для ObservableCollection (для логов, статусов)
-using System.Windows.Input; // Для интерфейса ICommand
-using System.Globalization; // Для CultureInfo (если нужно для форматирования в VM)
-using System.Text.RegularExpressions; // Для валидации серийного номера
-using System.Windows.Media; // Для System.Windows.Media.Brush / Brushes (в MeasurementStatusViewModel)
-using System.Text.Json.Serialization;
-using MvvmHelpers;
-using System.Windows.Threading;
-using System.Windows;
-using WPF_LCD_Test.Resources;
+using static WPF_LCD_Test.Resources.Resources;
 
 // Класс ViewModel для MainWindow. Наследует от BaseViewModel для уведомлений UI.
 // Реализует IDisposable для очистки ресурсов (отписка от событий).
@@ -410,7 +410,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             AllMeasurementButtonStatuses.Add(BlueColorStatus);
             AllMeasurementButtonStatuses.Add(BlackColorStatus);
 
-           
+
         }
 
         private void RequieredMeasurementButtonsInit()
@@ -425,27 +425,15 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         {
             if (!CanExecuteConnect(parameter)) return; // Проверка доступности
 
-
             try
             {
                 // Вызываем асинхронный метод Сервиса. Результат и статус придут через события.
-                bool success = await _colorMeasurementService.ConnectAsync();
-
-                if (success)
-                {
-                    //AddLogMessage(_localizationService.GetString("ConnectedCA"));
-                }
-                else
-                {
-                    ExecuteDisconnect(parameter);
-                   // AddLogMessage(_localizationService.GetString("ConnectionError"));
-                }
+                await _colorMeasurementService.ConnectAsync();
             }
             catch (Exception ex)
             {
                 // Обработка непредвиденных
                 ExecuteDisconnect(parameter);
-                //AddLogMessage(_localizationService.GetString("ConnectionError") + ": {ex.Message}");
 
             }
         }
@@ -455,17 +443,14 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         {
             if (!CanExecuteDisconnect(parameter)) return;
 
-            AddLogMessage(_localizationService.GetString("DisconnectingCA"));
-
             try
             {
                 _colorMeasurementService.Disconnect(); // Вызываем метод Сервиса
-                AddLogMessage("Прибор отключен.");
             }
             catch (Exception ex)
             {
-                AddLogMessage($"Непредвиденная ошибка при выполнении команды 'Отключить': {ex.Message}");
-                _dialogService.ShowMessage($"Ошибка отключения: {ex.Message}", "Ошибка");
+
+                _dialogService.ShowMessage($"{ErrUnexpected}: {ex.Message}", $"{Err}");
             }
 
             // Обновляем доступность команд и кнопок
@@ -476,45 +461,29 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         // Реализация асинхронной команды калибровки нуля
         private async Task ExecuteZeroCalibrationAsync(object parameter) // Возвращаем Task
         {
-            bool success = false;
-
             try
             {
                 if (!IsDeviceConnected)
-                {
+                { 
+                    // Если прибор не подключен, то сначала подключаем его
                     await ExecuteConnectAsync(parameter);
                 }
 
                 if (IsDeviceConnected)
                 {
-                    success = await _colorMeasurementService.CalibrateZeroAsync();
-                }
-
-                if (success)
-                {
-                    //AddLogMessage("Калибровка нуля завершена успешно!");
-                    // IsDeviceCalibrated обновится через подписку
-                }
-                else
-                {
-                    ExecuteDisconnect(parameter); //Если калибровка была неуспешной, отключаем прибор
-                    //AddLogMessage("Калибровка нуля не выполнена или завершилась ошибкой.");
-                    _dialogService.ShowMessage(_localizationService.GetString("ErrAtCalibration"), _localizationService.GetString("Err"));
-                    // IsDeviceCalibrated обновится через подписку
+                    await _colorMeasurementService.CalibrateZeroAsync();
                 }
             }
             catch (Exception ex)
             {
                 ExecuteDisconnect(parameter); //Если калибровка была неуспешной, отключаем прибор
-                                              //AddLogMessage("Калибровка нуля не выполнена или завершилась ошибкой.");
-                _dialogService.ShowMessage(_localizationService.GetString("ErrAtCalibration"), _localizationService.GetString("Err"));
+                _dialogService.ShowMessage($"{ErrAtCalibration}", $"{Err}");
             }
 
             // Обновляем доступность команд и кнопок (непосредственно после завершения калибровки)
             UpdateCommandsCanExecute();
             UpdateMeasurementButtonsState();
 
-            // Поскольку метод теперь async Task, его можно ожидать (await)
         }
 
         // Реализация асинхронной команды сохранения результатов

@@ -11,6 +11,9 @@ using WPF_LCD_Test.Services; // Добавь using для твоего серв�
 
 namespace WPF_LCD_Test
 {
+    /// <summary>
+    /// Interaction logic for App.xaml
+    /// </summary>
     public partial class App : Application
     {
         // Удали переопределение protected override void OnStartup(...)
@@ -35,7 +38,7 @@ namespace WPF_LCD_Test
             mainWindow.Show();
 
             // === Конец перенесенной логики ===
-        }
+    }
 
         // Оставь этот метод обработчика события как есть (он теперь будет вызываться)
         private void LocalizationService_LanguageChanged(object sender, EventArgs e)
@@ -61,7 +64,7 @@ namespace WPF_LCD_Test
             else if (cultureCode == "zh-Hans") // Пример для китайского упрощенного, если твой файл назван "StringResources.zh-Hans.xaml"
             {
                 resourcePath = $"/Resources/StringResources.zh-Hans.xaml";
-            }
+}
             // ... добавь else if для других языков
 
             Console.WriteLine($"App: Попытка загрузить словарь: {resourcePath}"); // Для отладки в Output
