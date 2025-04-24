@@ -12,6 +12,8 @@ namespace WPF_LCD_Test.Services
         private string? _portID = null;
         private bool _isConnected = false;
         private bool _isCalibrated = false;
+        private readonly ILocalizationService _localizationService; // Сервис для локализации (зависимость)
+        
 
         //Color analyzer constants
         //Remote modes
@@ -70,9 +72,9 @@ namespace WPF_LCD_Test.Services
 
         public string PortID => _portID;
 
-        public ColorMeasurementService()
+        public ColorMeasurementService(ILocalizationService localizationService)
         {
-            //_objCa200 = new Ca200();
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         }
 
         private double GetMeasuredSx() => _objCa200.SingleCa.SingleProbe.sx;
@@ -98,18 +100,18 @@ namespace WPF_LCD_Test.Services
 
                     if (!_isConnected)
                     {
-                        StatusMessage?.Invoke(this, "Подключение к CA-310..."); // Отправляем сообщение в лог ViewModel через событие
+                        StatusMessage?.Invoke(this, _localizationService.GetString("ConnectingCA")); // Отправляем сообщение в лог ViewModel через событие
                         _objCa200.AutoConnect(); // Блокирующий вызов COM
                         _objCa = _objCa200.SingleCa;
                         _portID = _objCa.PortID;
                         _isConnected = true;
                         ConnectionStatusChanged?.Invoke(this, _isConnected); // Оповещаем ViewModel об изменении статуса
-                        StatusMessage?.Invoke(this, "CA-310 подключен успешно."); // Отправляем сообщение
+                        StatusMessage?.Invoke(this, _localizationService.GetString("ConnectedCA")); // Отправляем сообщение
                     }
                 }
                 catch (COMException ex)
                 {
-                    StatusMessage?.Invoke(this, $"Ошибка подключения к CA-310: {ex.Message}"); // Отправляем ошибку
+                    StatusMessage?.Invoke(this, _localizationService.GetString("ConnectionError")  + $":    {ex.Message}"); // Отправляем ошибку
                     _isConnected = false; // Обновляем статус
                     ConnectionStatusChanged?.Invoke(this, _isConnected); // Оповещаем ViewModel
                                                                          // Здесь не пробрасываем исключение, Сервис сам обрабатывает ошибку подключения
@@ -117,7 +119,7 @@ namespace WPF_LCD_Test.Services
                 }
                 catch (Exception ex) // Ловим другие возможные исключения
                 {
-                    StatusMessage?.Invoke(this, $"Неожиданная ошибка при подключении: {ex.Message}");
+                    StatusMessage?.Invoke(this, _localizationService.GetString("ConnectionError") + $": {ex.Message}");
                     _isConnected = false;
                     ConnectionStatusChanged?.Invoke(this, _isConnected);
                 }
@@ -149,7 +151,7 @@ namespace WPF_LCD_Test.Services
                     //    }
                     //}
 
-                    StatusMessage?.Invoke(this, "Выполнение нулевой калибровки..."); // Сообщение
+                    StatusMessage?.Invoke(this, _localizationService.GetString("CalibratingZeroCA")); // Сообщение
                     _objCa200.SingleCa.CalZero(); // Блокирующий вызов COM
 
                     _objCa200.SingleCa.SyncMode = (int)UniverslaSyncMode;
@@ -160,19 +162,19 @@ namespace WPF_LCD_Test.Services
 
                     _isCalibrated = true; // Обновляем статус
                     CalibrationStatusChanged?.Invoke(this, _isCalibrated); // Оповещаем
-                    StatusMessage?.Invoke(this, "Нулевая калибровка выполнена."); // Сообщение
+                    StatusMessage?.Invoke(this, _localizationService.GetString("ZeroCalibratedCA")); // Сообщение
                     success = true; // Успех
                 }
                 catch (COMException ex) // Ловим ошибки COM
                 {
-                    StatusMessage?.Invoke(this, $"Ошибка COM при калибровке: {ex.Message}");
+                    StatusMessage?.Invoke(this, _localizationService.GetString("CheckConnectionCA") + $": {ex.Message}");
                     _isCalibrated = false; // Обновляем статус
                     CalibrationStatusChanged?.Invoke(this, _isCalibrated); // Оповещаем
                                                                            // Не пробрасываем исключение, обрабатываем внутри сервиса
                 }
                 catch (Exception ex) {  // Ловим другие ошибки
                 
-                    StatusMessage?.Invoke(this, $"Неожиданная ошибка при калибровке: {ex.Message}");
+                    StatusMessage?.Invoke(this, _localizationService.GetString("ErrAtCalibration") + $": {ex.Message}");
                     _isCalibrated = false;
                     CalibrationStatusChanged?.Invoke(this, _isCalibrated);
                 }
@@ -190,6 +192,7 @@ namespace WPF_LCD_Test.Services
         {
             if (disposing)
             {
+                StatusMessage?.Invoke(this, _localizationService.GetString("DisconnectingCA")); // Сообщение
                 if (_objCa != null)
                 {
                     try { Marshal.ReleaseComObject(_objCa); } catch { }
@@ -208,6 +211,7 @@ namespace WPF_LCD_Test.Services
                 ConnectionStatusChanged?.Invoke(this, _isConnected); // Оповещаем
                 _isCalibrated = false;
                 CalibrationStatusChanged?.Invoke(this, _isCalibrated); // Оповещаем
+                StatusMessage?.Invoke(this, _localizationService.GetString("DisconnectedCA")); // Сообщение
             }
         }
 
@@ -227,18 +231,18 @@ namespace WPF_LCD_Test.Services
                 {
                     if (!_isConnected)
                     {
-                        StatusMessage?.Invoke(this, "Ошибка: Попытка измерения без подключения.");
+                        StatusMessage?.Invoke(this, _localizationService.GetString("MeasureWihoutConnectionError"));
                         result.IsValid = false; // Отмечаем результат как невалидный
                         return; // Выходим из лямбды
                     }
                     if (!_isCalibrated) // Проверяем калибровку
                     {
-                        StatusMessage?.Invoke(this, "Ошибка: Попытка измерения без калибровки.");
+                        StatusMessage?.Invoke(this, _localizationService.GetString("MakeZeroCalibration"));
                         result.IsValid = false; // Отмечаем результат как невалидный
                         return; // Выходим из лямбды
                     }
 
-                    StatusMessage?.Invoke(this, "Выполнение измерений..."); // Сообщение
+                    StatusMessage?.Invoke(this, _localizationService.GetString("Measuring")); // Сообщение
 
                     // Переносим цикл 
                     double[] xValues = new double[measurementTime];
@@ -261,12 +265,12 @@ namespace WPF_LCD_Test.Services
                         }
                         catch (COMException measureEx)
                         {
-                            StatusMessage?.Invoke(this, $"Ошибка COM при измерении {i}: {measureEx.Message}");
+                            StatusMessage?.Invoke(this, _localizationService.GetString("ErrorAtMeasuringIteration") + $"{ i}: {measureEx.Message}");
                             continue;
                         }
                         catch (Exception measureEx)
                         {
-                            StatusMessage?.Invoke(this, $"Неожиданная ошибка при измерении {i}: {measureEx.Message}");
+                            StatusMessage?.Invoke(this, _localizationService.GetString("ErrorAtMeasuringIteration") + $"{i}: {measureEx.Message}");
                             continue;
                         }
 
@@ -283,16 +287,11 @@ namespace WPF_LCD_Test.Services
                     result.T = TValues.Average();        // Устанавливаем T
                     result.IsValid = true;        // Помечаем как валидное (если выполнение дошло до сюда)
 
-                    StatusMessage?.Invoke(this, "Измерения завершены."); // Сообщение
-                }
-                catch (COMException ex)
-                {
-                    StatusMessage?.Invoke(this, $"Глобальная ошибка COM при выполнении измерений: {ex.Message}");
-                    result.IsValid = false;
+                    //StatusMessage?.Invoke(this, "Измерения завершены."); // Сообщение
                 }
                 catch (Exception ex)
                 {
-                    StatusMessage?.Invoke(this, $"Неожиданная ошибка при выполнении измерений: {ex.Message}");
+                    StatusMessage?.Invoke(this, _localizationService.GetString("ErrUnexpected") + $": {ex.Message}");
                     result.IsValid = false;
                 }
             });

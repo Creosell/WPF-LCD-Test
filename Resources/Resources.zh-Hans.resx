@@ -276,4 +276,10 @@
   <data name="ClearFieldsButton" xml:space="preserve">
     <value>清除字段</value>
   </data>
+  <data name="ConnectionError" xml:space="preserve">
+    <value />
+  </data>
+  <data name="DisconnectingCA" xml:space="preserve">
+    <value />
+  </data>
 </root>

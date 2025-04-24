@@ -17,7 +17,7 @@
             <RowDefinition Height="10*" />
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
-            <Menu>
+            <Menu FontSize="14">
                 <MenuItem Header="{DynamicResource LanguageMenu}" Height="20" Background="#00000000">
                     <MenuItem Header="{DynamicResource English}" Command="{Binding SwitchLanguageCommand}"
                               CommandParameter="en"/>

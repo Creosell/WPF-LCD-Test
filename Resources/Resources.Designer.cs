@@ -196,6 +196,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Connection failed or ended with an error.
+        /// </summary>
+        public static string ConnectionError {
+            get {
+                return ResourceManager.GetString("ConnectionError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Connection to CA-310 released.
         /// </summary>
         public static string ConnectionReleasedCA {
@@ -219,6 +228,15 @@ namespace WPF_LCD_Test.Resources {
         public static string CurrentSN {
             get {
                 return ResourceManager.GetString("CurrentSN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disconnecting CA-310....
+        /// </summary>
+        public static string DisconnectingCA {
+            get {
+                return ResourceManager.GetString("DisconnectingCA", resourceCulture);
             }
         }
         

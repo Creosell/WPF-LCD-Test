@@ -5,23 +5,16 @@
 using WPF_LCD_Test.Models; // Для классов Model (Measurement, DeviceUnderTest)
 using WPF_LCD_Test.Services; // Для интерфейсов Services (IColorMeasurementService, IFileService, IDialogService)
 using WPF_LCD_Test.Commands; // Для класса RelayCommand и BaseViewModel
-
-using System; // Для DateTime, Exception и т.п.
-using System.Collections.Generic; // Для List
 using System.Collections.ObjectModel; // Для ObservableCollection (для логов, статусов)
-using System.Linq; // Для LINQ (расчеты, фильтрация)
-using System.Threading.Tasks; // Для работы с асинхронными операциями
 using System.Windows.Input; // Для интерфейса ICommand
 using System.Globalization; // Для CultureInfo (если нужно для форматирования в VM)
 using System.Text.RegularExpressions; // Для валидации серийного номера
-using System.ComponentModel; // Для INotifyPropertyChanged (хотя BaseViewModel уже его реализует)
-using System.Runtime.CompilerServices; // Для CallerMemberName (хотя BaseViewModel уже его использует)
 using System.Windows.Media; // Для System.Windows.Media.Brush / Brushes (в MeasurementStatusViewModel)
 using System.Text.Json.Serialization;
 using MvvmHelpers;
 using System.Windows.Threading;
 using System.Windows;
-using System.Windows.Controls; // Для атрибута JsonIgnore (в MeasurementStatusViewModel)
+using WPF_LCD_Test.Resources;
 
 // Класс ViewModel для MainWindow. Наследует от BaseViewModel для уведомлений UI.
 // Реализует IDisposable для очистки ресурсов (отписка от событий).
@@ -31,6 +24,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
     {
         // --- Приватные поля для хранения экземпляров Сервисов и Модели ---
         private readonly IColorMeasurementService _colorMeasurementService; // Сервис для работы с прибором (зависимость)
+
         private readonly IFileService _fileService; // Сервис для работы с файлами (зависимость)
         private readonly IDialogService _dialogService; // Сервис для показа диалогов (зависимость)
         private readonly ILocalizationService _localizationService; // Сервис для локализации (зависимость)
@@ -85,8 +79,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
 
         // Константы валидации и значения по умолчанию
         private const string SerialNumberPattern = "^[a-zA-Z0-9]*$"; // Pattern for using only letters and digits
-
-        private const string MeasurementTimePattern = "^[0-9]*$"; // Pattern for using only digits
 
         private const int DefaultMeasurementTime = 2;
 
@@ -222,6 +214,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         }
 
         private string _deviceConnectionStatusText;
+
         public string DeviceConnectionStatusText
         {
             get => _deviceConnectionStatusText;
@@ -229,6 +222,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         }
 
         private string _deviceCalibrationStatusText;
+
         public string DeviceCalibrationStatusText
         {
             get => _deviceCalibrationStatusText;
@@ -280,7 +274,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
-
 
             // Инициализация коллекций
             LogMessages = new ObservableCollection<string>();
@@ -345,7 +338,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             UpdateCommandsCanExecute(); // Обновляем доступность всех команд при запуске
             UpdateMeasurementButtonsState(); // Обновляем доступность кнопок измерения при запуске
 
-            AddLogMessage("Приложение запущено. Ожидание подключения..."); // Сообщение при старте
         }
 
         private void _localizationService_LanguageChanged(object? sender, EventArgs e)
@@ -379,7 +371,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             // и вызывать OnPropertyChanged при LanguageChanged.
             // Или, как временное решение, вызвать OnPropertyChanged для всех свойств статусов здесь:
             //OnPropertyChanged(nameof(TopLeftStatus)); // Это не обновит свойства внутри, нужно обновить свойства внутри
-                                                      // Вместо этого, если MeasuredValuesString в MeasurementPointStatusViewModel использует сервис:
+            // Вместо этого, если MeasuredValuesString в MeasurementPointStatusViewModel использует сервис:
             //TopLeftStatus.UpdateLocalizedProperties(); // Нужно добавить такой метод в MeasurementPointStatusViewModel
             //TopCenterStatus.UpdateLocalizedProperties();
         }
@@ -390,47 +382,35 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             AllMeasurementButtonStatuses = new ObservableCollection<MeasurementStatusViewModel>();
 
             // Создаем объекты и добавляем ИХ в коллекцию
-            var topLeft = new MeasurementStatusViewModel("1. Top left");
-            var topCenter = new MeasurementStatusViewModel("2. Top center");
-            var topRight = new MeasurementStatusViewModel("3. Top right");
-            var middleLeft = new MeasurementStatusViewModel("4. Middle left");
-            var center = new MeasurementStatusViewModel("5. Center");
-            var middleRight = new MeasurementStatusViewModel("6. Middle right");
-            var bottomLeft = new MeasurementStatusViewModel("7. Bottom left");
-            var bottomCenter = new MeasurementStatusViewModel("8. Bottom center");
-            var bottomRight = new MeasurementStatusViewModel("9. Bottom right");
-            var red = new MeasurementStatusViewModel("R. Red");
-            var green = new MeasurementStatusViewModel("G. Green");
-            var blue = new MeasurementStatusViewModel("B. Blue");
-            var black = new MeasurementStatusViewModel("0. Black");
+            TopLeftStatus = new MeasurementStatusViewModel("Top left");
+            TopCenterStatus = new MeasurementStatusViewModel("Top center");
+            TopRightStatus = new MeasurementStatusViewModel("Top right");
+            MiddleLeftStatus = new MeasurementStatusViewModel("Middle left");
+            CenterStatus = new MeasurementStatusViewModel("Center");
+            MiddleRightStatus = new MeasurementStatusViewModel("Middle right");
+            BottomLeftStatus = new MeasurementStatusViewModel("Bottom left");
+            BottomCenterStatus = new MeasurementStatusViewModel("Bottom center");
+            BottomRightStatus = new MeasurementStatusViewModel("Bottom right");
+            RedColorStatus = new MeasurementStatusViewModel("Red");
+            GreenColorStatus = new MeasurementStatusViewModel("Green");
+            BlueColorStatus = new MeasurementStatusViewModel("Blue");
+            BlackColorStatus = new MeasurementStatusViewModel("Black");
 
-            AllMeasurementButtonStatuses.Add(topLeft);
-            AllMeasurementButtonStatuses.Add(topCenter);
-            AllMeasurementButtonStatuses.Add(topRight);
-            AllMeasurementButtonStatuses.Add(middleLeft);
-            AllMeasurementButtonStatuses.Add(center);
-            AllMeasurementButtonStatuses.Add(middleRight);
-            AllMeasurementButtonStatuses.Add(bottomLeft);
-            AllMeasurementButtonStatuses.Add(bottomCenter);
-            AllMeasurementButtonStatuses.Add(bottomRight);
-            AllMeasurementButtonStatuses.Add(red);
-            AllMeasurementButtonStatuses.Add(green);
-            AllMeasurementButtonStatuses.Add(blue);
-            AllMeasurementButtonStatuses.Add(black);
+            AllMeasurementButtonStatuses.Add(TopLeftStatus);
+            AllMeasurementButtonStatuses.Add(TopCenterStatus);
+            AllMeasurementButtonStatuses.Add(TopRightStatus);
+            AllMeasurementButtonStatuses.Add(MiddleLeftStatus);
+            AllMeasurementButtonStatuses.Add(CenterStatus);
+            AllMeasurementButtonStatuses.Add(MiddleRightStatus);
+            AllMeasurementButtonStatuses.Add(BottomLeftStatus);
+            AllMeasurementButtonStatuses.Add(BottomCenterStatus);
+            AllMeasurementButtonStatuses.Add(BottomRightStatus);
+            AllMeasurementButtonStatuses.Add(RedColorStatus);
+            AllMeasurementButtonStatuses.Add(GreenColorStatus);
+            AllMeasurementButtonStatuses.Add(BlueColorStatus);
+            AllMeasurementButtonStatuses.Add(BlackColorStatus);
 
-            TopLeftStatus = topLeft;
-            TopCenterStatus = topCenter;
-            TopRightStatus = topRight;
-            MiddleLeftStatus = middleLeft;
-            CenterStatus = center;
-            MiddleRightStatus = middleRight;
-            BottomLeftStatus = bottomLeft;
-            BottomCenterStatus = bottomCenter;
-            BottomRightStatus = bottomRight;
-            RedColorStatus = red;
-            GreenColorStatus = green;
-            BlueColorStatus = blue;
-            BlackColorStatus = black;
+           
         }
 
         private void RequieredMeasurementButtonsInit()
@@ -440,17 +420,11 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             .ToList();                        // Преобразуем результат в List<string>
         }
 
-        // --- Методы ViewModel, реализующие логику команд (Execute...) ---
-        // Эти методы содержат основную логику приложения, перенесенную из WinForms обработчиков событий.
-        // Они вызывают методы Сервисов и Модели, обновляют свойства ViewModel и коллекции.
-        // Имеют параметр object parameter, который может передавать данные из View (например, имя кнопки).
-
-        // Пример реализации асинхронной команды подключения
+        // Асинхронная команда подключения
         private async Task ExecuteConnectAsync(object parameter)
         {
             if (!CanExecuteConnect(parameter)) return; // Проверка доступности
 
-            AddLogMessage("Попытка подключения к прибору...");
 
             try
             {
@@ -459,24 +433,21 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
 
                 if (success)
                 {
-                    AddLogMessage("Прибор успешно подключен!");
+                    //AddLogMessage(_localizationService.GetString("ConnectedCA"));
                 }
                 else
                 {
                     ExecuteDisconnect(parameter);
-                    AddLogMessage("Подключение не выполнено или завершилось ошибкой.");
+                   // AddLogMessage(_localizationService.GetString("ConnectionError"));
                 }
             }
             catch (Exception ex)
             {
                 // Обработка непредвиденных
                 ExecuteDisconnect(parameter);
-                AddLogMessage($"Непредвиденная ошибка при выполнении команды 'Подключить': {ex.Message}");
-                _dialogService.ShowMessage($"Ошибка подключения: {ex.Message}", "Ошибка"); // Показать сообщение пользователю
-            }
+                //AddLogMessage(_localizationService.GetString("ConnectionError") + ": {ex.Message}");
 
-            // Доступность команд и кнопок обновится автоматически через подписки на события сервиса
-            // UpdateCommandsCanExecute(); // Можно вызвать явно, если нужно гарантировать немедленное обновление
+            }
         }
 
         // Реализация синхронной команды отключения
@@ -484,7 +455,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         {
             if (!CanExecuteDisconnect(parameter)) return;
 
-            AddLogMessage("Отключение прибора...");
+            AddLogMessage(_localizationService.GetString("DisconnectingCA"));
 
             try
             {
@@ -507,12 +478,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         {
             bool success = false;
 
-            if (!CanExecuteZeroCalibration(parameter))
-            {
-                AddLogMessage("Невозможно провести калибровку");
-                return;
-            }
-
             try
             {
                 if (!IsDeviceConnected)
@@ -527,22 +492,22 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
 
                 if (success)
                 {
-                    AddLogMessage("Калибровка нуля завершена успешно!");
+                    //AddLogMessage("Калибровка нуля завершена успешно!");
                     // IsDeviceCalibrated обновится через подписку
                 }
                 else
                 {
                     ExecuteDisconnect(parameter); //Если калибровка была неуспешной, отключаем прибор
-                    AddLogMessage("Калибровка нуля не выполнена или завершилась ошибкой.");
-                    _dialogService.ShowMessage("Калибровка нуля не выполнена.", "Ошибка калибровки");
+                    //AddLogMessage("Калибровка нуля не выполнена или завершилась ошибкой.");
+                    _dialogService.ShowMessage(_localizationService.GetString("ErrAtCalibration"), _localizationService.GetString("Err"));
                     // IsDeviceCalibrated обновится через подписку
                 }
             }
             catch (Exception ex)
             {
                 ExecuteDisconnect(parameter); //Если калибровка была неуспешной, отключаем прибор
-                AddLogMessage($"Непредвиденная ошибка при выполнении команды 'Калибровка нуля': {ex.Message}");
-                _dialogService.ShowMessage($"Ошибка калибровки: {ex.Message}", "Ошибка");
+                                              //AddLogMessage("Калибровка нуля не выполнена или завершилась ошибкой.");
+                _dialogService.ShowMessage(_localizationService.GetString("ErrAtCalibration"), _localizationService.GetString("Err"));
             }
 
             // Обновляем доступность команд и кнопок (непосредственно после завершения калибровки)
@@ -732,15 +697,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
 
             try
             {
-                 _localizationService.SetLanguage(languageCode);
-
-                // Обновление UI после смены языка происходит автоматически в WPF при правильной реализации локализации (через ResourceDictionary и CultureInfo)
-                // Если ViewModel содержит строки, не привязанные к ресурсам, их нужно обновить вручную или через событие сервиса локализации.
-
-                AddLogMessage($"Язык переключен на '{languageCode}'.");
-                
-
-                // Если смена языка влияет на логику доступности команд (редко), вызвать UpdateCommandsCanExecute();
+                _localizationService.SetLanguage(languageCode);
             }
             catch (Exception ex)
             {
@@ -756,7 +713,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             string measurementName = parameter as string;
             if (string.IsNullOrWhiteSpace(measurementName))
             {
-                AddLogMessage("Ошибка измерения: Не указана точка измерения (параметр команды отсутствует).");
+                AddLogMessage(_localizationService.GetString("MeasurementLocationError"));
                 return;
             }
 
@@ -764,11 +721,11 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             {
                 // Если команда недоступна, но ее попытались вызвать (например, кнопка не была отключена),
                 // можно вывести сообщение или просто выйти.
-                AddLogMessage($"Измерение '{measurementName}' не может быть выполнено сейчас (прибор не готов или нет SN).");
+                AddLogMessage(_localizationService.GetString("MeasurementNotReady"));
                 return;
             }
 
-            AddLogMessage($"Выполняется измерение '{measurementName}'...");
+            //AddLogMessage($"Выполняется измерение '{measurementName}'...");
 
             // Обновляем статус этой точки в UI на "измерение в процессе" (опционально)
             UpdateMeasurementStatus(measurementName, null, "Измерение..."); // null или кастомный статус
