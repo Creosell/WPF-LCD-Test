@@ -277,15 +277,114 @@
     <value>清除字段</value>
   </data>
   <data name="ConnectionError" xml:space="preserve">
-    <value />
+    <value>连接失败或结束了错误</value>
   </data>
   <data name="DisconnectingCA" xml:space="preserve">
-    <value />
+    <value>断开CA-310 ...</value>
   </data>
   <data name="DisconnectedCA" xml:space="preserve">
-    <value />
+    <value>断开连接</value>
   </data>
   <data name="MeasureWihoutConnectionError" xml:space="preserve">
-    <value />
+    <value>请首先连接CA-310</value>
+  </data>
+  <data name="LocalizationServiceKeyErr" xml:space="preserve">
+    <value>LocalisationService错误：键的ResourceManager</value>
+  </data>
+  <data name="LocalizationServiceResErr" xml:space="preserve">
+    <value>Loctisationservice警告：在.resx中未找到的钥匙的资源用于文化</value>
+  </data>
+  <data name="LocalizationServiceFormatErr" xml:space="preserve">
+    <value>lotisationservice错误：格式化键字符串</value>
+  </data>
+  <data name="CultureNotFoundErr" xml:space="preserve">
+    <value>本地化服务错误：未找到语言的文化</value>
+  </data>
+  <data name="WorkFolderCreated" xml:space="preserve">
+    <value>已经创建了一个工作文件夹来存储结果</value>
+  </data>
+  <data name="WorkingFolderInitErr" xml:space="preserve">
+    <value>在工作文件夹初始化期间的错误</value>
+  </data>
+  <data name="SaveJSONErrDeviceIsEmpty" xml:space="preserve">
+    <value>保存错误：没有设备数据</value>
+  </data>
+  <data name="SaveJSONErrForSN" xml:space="preserve">
+    <value>保存到JSON的错误</value>
+  </data>
+  <data name="CsvSnErr" xml:space="preserve">
+    <value>CSV保存错误：未指定序列号。</value>
+  </data>
+  <data name="CsvDataErr" xml:space="preserve">
+    <value>CSV节省错误：无数据保存</value>
+  </data>
+  <data name="CsvLocationErr" xml:space="preserve">
+    <value>CSV保存错误：未指定位置名称</value>
+  </data>
+  <data name="WorkFolderCreatedForSN" xml:space="preserve">
+    <value>已经为带有SN的设备创建了一个文件夹</value>
+  </data>
+  <data name="TestStartInfo" xml:space="preserve">
+    <value>用SN对设备进行测试已经开始</value>
+  </data>
+  <data name="NoSNErr" xml:space="preserve">
+    <value>没有sn</value>
+  </data>
+  <data name="NoData" xml:space="preserve">
+    <value>没有数据</value>
+  </data>
+  <data name="LvIsTooLow" xml:space="preserve">
+    <value>注意：测得的亮度LV太低。</value>
+  </data>
+  <data name="Result" xml:space="preserve">
+    <value>结果</value>
+  </data>
+  <data name="InvalidResultErr" xml:space="preserve">
+    <value>结果无效</value>
+  </data>
+  <data name="ColorServiceErr" xml:space="preserve">
+    <value>错误：该服务未返回测量结果</value>
+  </data>
+  <data name="ColorAnalyzerErr" xml:space="preserve">
+    <value>颜色分析仪错误:(</value>
+  </data>
+  <data name="UnexpectedMeasurementErr" xml:space="preserve">
+    <value>意外的测量误差</value>
+  </data>
+  <data name="IncorrectFormatForSNErr" xml:space="preserve">
+    <value>请从拉丁字母和数字中输入正确的序列号</value>
+  </data>
+  <data name="AlreadyActivated" xml:space="preserve">
+    <value>已经激活了</value>
+  </data>
+  <data name="IncorrectMeasTimeFormat" xml:space="preserve">
+    <value>输入正确的测量时间（大于0）</value>
+  </data>
+  <data name="MeasButStatusErr" xml:space="preserve">
+    <value>错误：无法找到用于更新的测量点的状态</value>
+  </data>
+  <data name="ClearFieldsDone" xml:space="preserve">
+    <value>田地和测量结果已清除</value>
+  </data>
+  <data name="ViewModelClearing" xml:space="preserve">
+    <value>ViewModel资源正在清除...</value>
+  </data>
+  <data name="ViewModelCleared" xml:space="preserve">
+    <value>ViewModel资源清理已完成</value>
+  </data>
+  <data name="ResultsSaved" xml:space="preserve">
+    <value>结果成功保存</value>
+  </data>
+  <data name="Saved" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="SaveCanceled" xml:space="preserve">
+    <value>保存已被用户取消</value>
+  </data>
+  <data name="Saving" xml:space="preserve">
+    <value>保存...</value>
+  </data>
+  <data name="SnCantBeEmpty" xml:space="preserve">
+    <value>序列号不能为空</value>
   </data>
 </root>

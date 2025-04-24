@@ -27,6 +27,8 @@ namespace WPF_LCD_Test.Services // Пространство имен должн�
             MessageBox.Show(message, caption, MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
+
+
         // Реализация других методов интерфейса, если ты их добавил в IDialogService
         // Например:
         /*

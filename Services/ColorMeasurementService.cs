@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Globalization;
+using System.Runtime.InteropServices;
 using CA200SRVRLib;
 using WPF_LCD_Test.Models;
 using static WPF_LCD_Test.Resources.Resources;
@@ -73,7 +74,7 @@ namespace WPF_LCD_Test.Services
 
         public ColorMeasurementService()
         {
-
+           
         }
 
         private double GetMeasuredSx() => _objCa200.SingleCa.SingleProbe.sx;
@@ -85,11 +86,13 @@ namespace WPF_LCD_Test.Services
         private double GetMeasuredT() => _objCa200.SingleCa.SingleProbe.T;
 
         public async Task<bool> ConnectAsync()
+
         {
-            // Переносим логику из твоих MinoltaConnection() и ColorAnalyzer() конструктора сюда
-            // Делаем асинхронным!
             await Task.Run(() => // Выполняем потенциально блокирующий COM вызов в фоновом потоке
             {
+
+                CheckCurrentAppLanguage(); // Проверяем текущую культуру приложения
+
                 try
                 {
                     if (_objCa200 == null)
@@ -114,8 +117,6 @@ namespace WPF_LCD_Test.Services
                     StatusMessage?.Invoke(this, $"{ConnectionError}:    {ex.Message}"); // Отправляем ошибку
                     _isConnected = false; // Обновляем статус
                     ConnectionStatusChanged?.Invoke(this, _isConnected); // Оповещаем ViewModel
-                                                                         // Здесь не пробрасываем исключение, Сервис сам обрабатывает ошибку подключения
-                                                                         // ViewModel может проверить IsConnected после вызова ConnectAsync
                 }
                 catch (Exception ex) // Ловим другие возможные исключения
                 {
@@ -132,25 +133,23 @@ namespace WPF_LCD_Test.Services
             Dispose();
         }
 
+        private void CheckCurrentAppLanguage()
+        {
+            CultureInfo culture = LocalizationService.Instance.CurrentCulture; // Получаем текущую культуру из сервиса локализации
+
+            // Устанавливаем эту культуру для текущего потока из пула
+            Thread.CurrentThread.CurrentCulture = culture;
+            Thread.CurrentThread.CurrentUICulture = culture;
+        }
+
         public async Task<bool> CalibrateZeroAsync()
         {
             bool success = false;
             await Task.Run(() =>
             {
+                CheckCurrentAppLanguage(); // Проверяем текущую культуру приложения
                 try
                 {
-                    //if (!_isConnected)
-                    //{
-                    //    // Попытка подключения синхронно или вызвать ConnectAsync().Wait() (осторожно!)
-                    //    // Лучше убедиться в ViewModel, что подключен, прежде чем вызывать калибровку
-                    //    StatusMessage?.Invoke(this, "Попытка калибровки без подключения. Подключение...");
-                    //    if (!ConnectAsync().Result) // Осторожно: .Result блокирует! Лучше обрабатывать в ViewModel последовательность
-                    //    {
-                    //        StatusMessage?.Invoke(this, "Не удалось подключиться для калибровки.");
-                    //        return; // Выходим из лямбды Task.Run
-                    //    }
-                    //}
-
                     StatusMessage?.Invoke(this, (CalibratingZeroCA)); // Сообщение
                     _objCa200.SingleCa.CalZero(); // Блокирующий вызов COM
 
@@ -223,11 +222,10 @@ namespace WPF_LCD_Test.Services
 
         public async Task<Measurement> MeasureAsync(int measurementTime)
         {
-            // Переносим логику из твоих PerformMeasurements() и части ColorMeasure()
-            // Делаем асинхронным!
             Measurement result = new Measurement(); // Создаем объект результата
             await Task.Run(async () => // Выполняем в фоновом потоке
             {
+                CheckCurrentAppLanguage(); // Проверяем текущую культуру приложения
                 try
                 {
                     if (!_isConnected)
@@ -280,7 +278,6 @@ namespace WPF_LCD_Test.Services
                             await Task.Delay(1000); // Асинхронная задержка между измерениями
                         }
                     }
-
 
                     result.x = xValues.Average();           // Устанавливаем X
                     result.y = yValues.Average();          // Устанавливаем Y

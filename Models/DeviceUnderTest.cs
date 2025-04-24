@@ -3,6 +3,7 @@ using System.Text.Json.Serialization; // Используется для атр�
 using System.Collections.Generic; // Для List
 using System; // Для DateTime, Environment, Path
 using System.Linq; // Для LINQ (OrderBy, Select, Any)
+using static WPF_LCD_Test.Resources.Resources; 
 // using System.Windows.Forms; // Этот using понадобится только для IsContainsAllMeasurements в текущем виде
 
 namespace WPF_LCD_Test.Models // Пространство имен должно быть в папке Models
@@ -15,7 +16,6 @@ namespace WPF_LCD_Test.Models // Пространство имен должно 
 
         public string SerialNumber { get; set; } // Серийный номер - данные устройства
 
-        // Время измерения - сейчас строка. Лучше хранить как DateTime и форматировать для отображения/сохранения.
         public DateTime MeasurementDateTime { get; set; } 
 
         // Список измерений. Это основная коллекция данных.
@@ -27,7 +27,7 @@ namespace WPF_LCD_Test.Models // Пространство имен должно 
             if (string.IsNullOrWhiteSpace(serialNumber))
             {
                 // В Модели лучше выбрасывать исключение при некорректных входных данных
-                throw new ArgumentException("Серийный номер не может быть пустым.", nameof(serialNumber));
+                throw new ArgumentException($"{SnCantBeEmpty}", nameof(serialNumber));
             }
             SerialNumber = serialNumber;
             MeasurementDateTime = DateTime.Now;
@@ -51,25 +51,8 @@ namespace WPF_LCD_Test.Models // Пространство имен должно 
             }
 
             Measurements.Add(newMeasurement);
-
-            // Возможно, если UI должен обновляться сразу при добавлении,
-            // коллекция Measurements должна быть ObservableCollection<Measurement> в ViewModel,
-            // а этот метод будет вызван ViewModel, которая добавит в свою ObservableCollection.
-            // Но логика *замены* по Location остается здесь. ViewModel вызовет этот метод.
         }
 
-        // Метод сохранения в JSON
-        // ЭТА ЛОГИКА ДОЛЖНА БЫТЬ ПЕРЕНЕСЕНА В СЕРВИС ФАЙЛОВ (IFileService)
-        /*
-        public bool SaveToJson(string baseFolderPath)
-        {
-             // ... (твой код сохранения в файл) ...
-             // Console.WriteLine - это вывод в консоль/отладку, не в лог UI.
-             // Логику обработки ошибок (try-catch) и сообщения об ошибках
-             // должен обрабатывать Сервис и/или ViewModel.
-             throw new NotImplementedException("Логика сохранения в JSON должна быть в FileService.");
-        }
-        */
 
 
         // Предложение: Перегрузка или изменение метода, чтобы принимать список имен (string)

@@ -226,7 +226,7 @@
     <value>Measurement time (s):</value>
   </data>
   <data name="SerialNumber" xml:space="preserve">
-    <value>Serial number:</value>
+    <value>Serial number</value>
   </data>
   <data name="TopLeftPoint" xml:space="preserve">
     <value>1. Top left</value>
@@ -287,5 +287,104 @@
   </data>
   <data name="MeasureWihoutConnectionError" xml:space="preserve">
     <value>Please, connect CA-310 first</value>
+  </data>
+  <data name="LocalizationServiceKeyErr" xml:space="preserve">
+    <value>LocalisationService Error: ResourceManager for key</value>
+  </data>
+  <data name="LocalizationServiceResErr" xml:space="preserve">
+    <value>LocalisationService Warning: Resource with key not found in .resx for culture</value>
+  </data>
+  <data name="LocalizationServiceFormatErr" xml:space="preserve">
+    <value>LocalisationService Error: Formatting string for key</value>
+  </data>
+  <data name="CultureNotFoundErr" xml:space="preserve">
+    <value>LocalizationService Error: Culture for language not found</value>
+  </data>
+  <data name="WorkFolderCreated" xml:space="preserve">
+    <value>A working folder has been created to store the results</value>
+  </data>
+  <data name="WorkingFolderInitErr" xml:space="preserve">
+    <value>Error during initialisation of working folders</value>
+  </data>
+  <data name="SaveJSONErrDeviceIsEmpty" xml:space="preserve">
+    <value>Save error: No device data</value>
+  </data>
+  <data name="SaveJSONErrForSN" xml:space="preserve">
+    <value>Error when saving to JSON for SN</value>
+  </data>
+  <data name="CsvSnErr" xml:space="preserve">
+    <value>CSV saving error: No serial number specified.</value>
+  </data>
+  <data name="CsvDataErr" xml:space="preserve">
+    <value>CSV saving error: No data to save</value>
+  </data>
+  <data name="CsvLocationErr" xml:space="preserve">
+    <value>CSV saving error: Location name not specified</value>
+  </data>
+  <data name="WorkFolderCreatedForSN" xml:space="preserve">
+    <value>A folder has been created for the device with SN</value>
+  </data>
+  <data name="TestStartInfo" xml:space="preserve">
+    <value>Testing of the device with SN has begun</value>
+  </data>
+  <data name="NoSNErr" xml:space="preserve">
+    <value>No SN</value>
+  </data>
+  <data name="NoData" xml:space="preserve">
+    <value>No data</value>
+  </data>
+  <data name="LvIsTooLow" xml:space="preserve">
+    <value>Caution: The measured brightness Lv is too low.</value>
+  </data>
+  <data name="Result" xml:space="preserve">
+    <value>Result</value>
+  </data>
+  <data name="InvalidResultErr" xml:space="preserve">
+    <value>Invalid result</value>
+  </data>
+  <data name="ColorServiceErr" xml:space="preserve">
+    <value>Error: The service did not return a measurement result for</value>
+  </data>
+  <data name="ColorAnalyzerErr" xml:space="preserve">
+    <value>Color analyzer error :(</value>
+  </data>
+  <data name="UnexpectedMeasurementErr" xml:space="preserve">
+    <value>Unexpected measurement error</value>
+  </data>
+  <data name="IncorrectFormatForSNErr" xml:space="preserve">
+    <value>Please enter the correct serial number from Latin letters and digits</value>
+  </data>
+  <data name="AlreadyActivated" xml:space="preserve">
+    <value>already activated</value>
+  </data>
+  <data name="IncorrectMeasTimeFormat" xml:space="preserve">
+    <value>Enter the correct measurement time (greater than 0)</value>
+  </data>
+  <data name="MeasButStatusErr" xml:space="preserve">
+    <value>Error: Failed to find a status for a measurement point to update</value>
+  </data>
+  <data name="ClearFieldsDone" xml:space="preserve">
+    <value>Fields and measurement results are cleared</value>
+  </data>
+  <data name="ViewModelClearing" xml:space="preserve">
+    <value>ViewModel resources are being cleared...</value>
+  </data>
+  <data name="ViewModelCleared" xml:space="preserve">
+    <value>ViewModel resource cleanup is complete</value>
+  </data>
+  <data name="ResultsSaved" xml:space="preserve">
+    <value>Results successfully saved</value>
+  </data>
+  <data name="Saved" xml:space="preserve">
+    <value>Saved</value>
+  </data>
+  <data name="SaveCanceled" xml:space="preserve">
+    <value>The save has been canceled by the user</value>
+  </data>
+  <data name="Saving" xml:space="preserve">
+    <value>Saving...</value>
+  </data>
+  <data name="SnCantBeEmpty" xml:space="preserve">
+    <value>The serial number cannot be empty</value>
   </data>
 </root>

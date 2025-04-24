@@ -61,6 +61,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to already activated.
+        /// </summary>
+        public static string AlreadyActivated {
+            get {
+                return ResourceManager.GetString("AlreadyActivated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unsuccessful connection. Try to restart color analyzer.
         /// </summary>
         public static string BadConnection {
@@ -178,6 +187,33 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Fields and measurement results are cleared.
+        /// </summary>
+        public static string ClearFieldsDone {
+            get {
+                return ResourceManager.GetString("ClearFieldsDone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Color analyzer error :(.
+        /// </summary>
+        public static string ColorAnalyzerErr {
+            get {
+                return ResourceManager.GetString("ColorAnalyzerErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: The service did not return a measurement result for.
+        /// </summary>
+        public static string ColorServiceErr {
+            get {
+                return ResourceManager.GetString("ColorServiceErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Connected.
         /// </summary>
         public static string ConnectedCA {
@@ -210,6 +246,42 @@ namespace WPF_LCD_Test.Resources {
         public static string ConnectionReleasedCA {
             get {
                 return ResourceManager.GetString("ConnectionReleasedCA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CSV saving error: No data to save.
+        /// </summary>
+        public static string CsvDataErr {
+            get {
+                return ResourceManager.GetString("CsvDataErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CSV saving error: Location name not specified.
+        /// </summary>
+        public static string CsvLocationErr {
+            get {
+                return ResourceManager.GetString("CsvLocationErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CSV saving error: No serial number specified..
+        /// </summary>
+        public static string CsvSnErr {
+            get {
+                return ResourceManager.GetString("CsvSnErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LocalizationService Error: Culture for language not found.
+        /// </summary>
+        public static string CultureNotFoundErr {
+            get {
+                return ResourceManager.GetString("CultureNotFoundErr", resourceCulture);
             }
         }
         
@@ -376,6 +448,33 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please enter the correct serial number from Latin letters and digits.
+        /// </summary>
+        public static string IncorrectFormatForSNErr {
+            get {
+                return ResourceManager.GetString("IncorrectFormatForSNErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the correct measurement time (greater than 0).
+        /// </summary>
+        public static string IncorrectMeasTimeFormat {
+            get {
+                return ResourceManager.GetString("IncorrectMeasTimeFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid result.
+        /// </summary>
+        public static string InvalidResultErr {
+            get {
+                return ResourceManager.GetString("InvalidResultErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Language.
         /// </summary>
         public static string LanguageMenu {
@@ -385,11 +484,56 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to LocalisationService Error: Formatting string for key.
+        /// </summary>
+        public static string LocalizationServiceFormatErr {
+            get {
+                return ResourceManager.GetString("LocalizationServiceFormatErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LocalisationService Error: ResourceManager for key.
+        /// </summary>
+        public static string LocalizationServiceKeyErr {
+            get {
+                return ResourceManager.GetString("LocalizationServiceKeyErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LocalisationService Warning: Resource with key not found in .resx for culture.
+        /// </summary>
+        public static string LocalizationServiceResErr {
+            get {
+                return ResourceManager.GetString("LocalizationServiceResErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Caution: The measured brightness Lv is too low..
+        /// </summary>
+        public static string LvIsTooLow {
+            get {
+                return ResourceManager.GetString("LvIsTooLow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please make zero calibration first!.
         /// </summary>
         public static string MakeZeroCalibration {
             get {
                 return ResourceManager.GetString("MakeZeroCalibration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: Failed to find a status for a measurement point to update.
+        /// </summary>
+        public static string MeasButStatusErr {
+            get {
+                return ResourceManager.GetString("MeasButStatusErr", resourceCulture);
             }
         }
         
@@ -457,11 +601,38 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No data.
+        /// </summary>
+        public static string NoData {
+            get {
+                return ResourceManager.GetString("NoData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No SN.
+        /// </summary>
+        public static string NoSNErr {
+            get {
+                return ResourceManager.GetString("NoSNErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to R. Red.
         /// </summary>
         public static string RedPoint {
             get {
                 return ResourceManager.GetString("RedPoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Result.
+        /// </summary>
+        public static string Result {
+            get {
+                return ResourceManager.GetString("Result", resourceCulture);
             }
         }
         
@@ -475,6 +646,33 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Results successfully saved.
+        /// </summary>
+        public static string ResultsSaved {
+            get {
+                return ResourceManager.GetString("ResultsSaved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The save has been canceled by the user.
+        /// </summary>
+        public static string SaveCanceled {
+            get {
+                return ResourceManager.GetString("SaveCanceled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Saved.
+        /// </summary>
+        public static string Saved {
+            get {
+                return ResourceManager.GetString("Saved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to saved to JSON in.
         /// </summary>
         public static string SavedToJSON {
@@ -484,11 +682,38 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Save error: No device data.
+        /// </summary>
+        public static string SaveJSONErrDeviceIsEmpty {
+            get {
+                return ResourceManager.GetString("SaveJSONErrDeviceIsEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error when saving to JSON for SN.
+        /// </summary>
+        public static string SaveJSONErrForSN {
+            get {
+                return ResourceManager.GetString("SaveJSONErrForSN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Save results.
         /// </summary>
         public static string SaveResultsButton {
             get {
                 return ResourceManager.GetString("SaveResultsButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Saving....
+        /// </summary>
+        public static string Saving {
+            get {
+                return ResourceManager.GetString("Saving", resourceCulture);
             }
         }
         
@@ -511,11 +736,29 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Serial number:.
+        ///   Looks up a localized string similar to Serial number.
         /// </summary>
         public static string SerialNumber {
             get {
                 return ResourceManager.GetString("SerialNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The serial number cannot be empty.
+        /// </summary>
+        public static string SnCantBeEmpty {
+            get {
+                return ResourceManager.GetString("SnCantBeEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Testing of the device with SN has begun.
+        /// </summary>
+        public static string TestStartInfo {
+            get {
+                return ResourceManager.GetString("TestStartInfo", resourceCulture);
             }
         }
         
@@ -547,11 +790,65 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unexpected measurement error.
+        /// </summary>
+        public static string UnexpectedMeasurementErr {
+            get {
+                return ResourceManager.GetString("UnexpectedMeasurementErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ViewModel resource cleanup is complete.
+        /// </summary>
+        public static string ViewModelCleared {
+            get {
+                return ResourceManager.GetString("ViewModelCleared", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ViewModel resources are being cleared....
+        /// </summary>
+        public static string ViewModelClearing {
+            get {
+                return ResourceManager.GetString("ViewModelClearing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Warning.
         /// </summary>
         public static string Warning {
             get {
                 return ResourceManager.GetString("Warning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A working folder has been created to store the results.
+        /// </summary>
+        public static string WorkFolderCreated {
+            get {
+                return ResourceManager.GetString("WorkFolderCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A folder has been created for the device with SN.
+        /// </summary>
+        public static string WorkFolderCreatedForSN {
+            get {
+                return ResourceManager.GetString("WorkFolderCreatedForSN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error during initialisation of working folders.
+        /// </summary>
+        public static string WorkingFolderInitErr {
+            get {
+                return ResourceManager.GetString("WorkingFolderInitErr", resourceCulture);
             }
         }
         

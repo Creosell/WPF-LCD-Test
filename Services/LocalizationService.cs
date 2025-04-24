@@ -3,132 +3,143 @@
 using System;
 using System.Globalization;
 using System.Threading;
-using WPF_LCD_Test.Resources; // Убедись, что это пространство имен соответствует твоим .resx файлам
-using System.Windows; // Добавляем для доступа к Application.Current.Resources (хотя в этой версии сервиса это не используется, но для полноты)
+using static WPF_LCD_Test.Resources.Resources; // Убедись, что это пространство имен соответствует твоим .resx файлам
+using System.Windows;
+// Добавьте using для ResourceManager, если его нет
+using System.Resources;
 
+// Возможно, вам все еще нужен using static для Resources.Resources для StatusMessage?.Invoke внутри этого класса, если вы там их используете.
+// using static WPF_LCD_Test.Resources.Resources;
 
 namespace WPF_LCD_Test.Services
 {
     public class LocalizationService : ILocalizationService
     {
+        // Оставьте StatusMessage event, если он используется для ошибок сервиса
+        public event EventHandler<string> StatusMessage; // Событие для передачи сообщений об ошибках и статусах
+
         // --- Реализация Синглтона с использованием Lazy<T> (Рекомендуемый, Потокобезопасный) ---
 
-        // Приватное статическое поле, использующее Lazy<T> для хранения единственного экземпляра
-        // Фабричная функция () => new LocalizationService() будет вызвана только при первом обращении к .Value
+        // Приватное статическое поле, использующее Lazy<T>
         private static readonly Lazy<ILocalizationService> _lazyInstance =
             new Lazy<ILocalizationService>(() => new LocalizationService());
 
-        // Приватный конструктор, чтобы экземпляры могли быть созданы только фабрикой Lazy<T>
+        // !!! ДОБАВЬТЕ ЭТО ПРИВАТНОЕ ПОЛЕ ДЛЯ ХРАНЕНИЯ ТЕКУЩЕЙ КУЛЬТУРЫ ПРИЛОЖЕНИЯ !!!
+        private CultureInfo _applicationCulture;
+
+        // Приватный конструктор
         private LocalizationService()
         {
-            // Этот код выполнится только один раз, когда Lazy<T> создаст экземпляр
-            Console.WriteLine("LocalizationService: Конструктор экземпляра выполняется (через Lazy)."); // <-- Добавь для отладки
-            // Установка начального языка при создании экземпляра
-            // Это вызовет SetLanguage, который вызовет LanguageChanged
-            // !!! Блок проверки в SetLanguage закомментирован, как вы сделали для решения проблемы !!!
+            // !!! Установите начальную культуру И сохраните ее в поле при создании сервиса !!!
+            // Это вызовет SetLanguage, который установит культуру потока и сохранит ее в _applicationCulture
             SetLanguage("en"); // Устанавливаем язык по умолчанию при старте
         }
 
         // Публичное статическое свойство для получения единственного экземпляра
-        // Обращение к _lazyInstance.Value запускает создание экземпляра при первом вызове
         public static ILocalizationService Instance
         {
             get
             {
-                Console.WriteLine("LocalizationService: Получение экземпляра синглтона (через Lazy.Instance)."); // <-- Добавь для отладки
                 return _lazyInstance.Value;
             }
         }
 
-        // --- Реализация интерфейса ILocalizationService ---
-
         // Событие, которое будет срабатывать при смене языка
         public event EventHandler LanguageChanged;
 
-        // Свойство для получения текущей культуры (языка) приложения
-        public CultureInfo CurrentCulture => Thread.CurrentThread.CurrentUICulture;
+        // !!! ИЗМЕНИТЕ ЭТО СВОЙСТВО, ЧТОБЫ ОНО ВОЗВРАЩАЛО ХРАНИМУЮ В СЕРВИСЕ КУЛЬТУРУ !!!
+        // Оно ДОЛЖНО возвращать значение поля _applicationCulture, а не культуру текущего потока.
+        public CultureInfo CurrentCulture => _applicationCulture; // <-- ВОЗВРАЩАЕМ ХРАНИМУЮ КУЛЬТУРУ
 
-        // Метод для установки нового языка по его коду (например, "en", "zh-Hans")
+        // Метод для установки нового языка
         public void SetLanguage(string cultureCode)
         {
-            Console.WriteLine($"LocalizationService: Попытка установки языка на {cultureCode}"); // <-- Добавь для отладки
+            // Keep the try-catch blocks and Console.WriteLine if desired for debugging
+            // Console.WriteLine($"LocalizationService: Попытка установки языка на {cultureCode}");
             try
             {
-                // Создаем объект CultureInfo по коду языка
                 CultureInfo culture = new CultureInfo(cultureCode);
 
-                // Устанавливаем культуру для текущего потока.
-                // CurrentCulture влияет на форматирование дат, чисел и т.д.
+                // !!! ОПЦИОНАЛЬНО: Оставьте проверку, но УБЕДИТЕСЬ, что OnLanguageChanged() вызывается,
+                // !!! даже если культура не изменилась, если вам нужно перезагрузить ресурсы (как было в вашем рабочем варианте).
+                // !!! Проще всего удалить этот if блок или вынести OnLanguageChanged() за его пределы.
+                // if (Equals(Thread.CurrentThread.CurrentUICulture, culture))
+                // {
+                //     Console.WriteLine($"LocalizationService: Язык уже установлен на {cultureCode}. Пропускаем.");
+                //     // Если язык уже установлен, мы все равно можем захотеть вызвать OnLanguageChanged
+                //     // чтобы UI обновился, если ресурсы были изменены или добавлены.
+                //     // Если возвращаете здесь, OnLanguageChanged() будет пропущен!
+                //     // Если вам нужно, чтобы SetLanguage("en") при старте всегда приводил к вызову OnLanguageChanged,
+                //     // даже если культура ОС уже "en", то не возвращайте здесь!
+                // }
+
+                // Устанавливаем культуру для ТЕКУЩЕГО потока (это важно для UI привязок DynamicResource)
                 Thread.CurrentThread.CurrentCulture = culture;
-                // CurrentUICulture влияет на выбор строковых ресурсов (из .resx файлов и XAML словарей)
                 Thread.CurrentThread.CurrentUICulture = culture;
 
-                // Опционально: Сохранить выбранный язык в настройках пользователя
-                // Properties.Settings.Default.DefaultLanguage = cultureCode;
-                // Properties.Settings.Default.Save();
+                // !!! СОХРАНЯЕМ УСТАНОВЛЕННУЮ КУЛЬТУРУ В ПОЛЕ СЕРВИСА !!!
+                _applicationCulture = culture; // Сохраняем культуру, которую установили
 
-                Console.WriteLine($"LocalizationService: Язык успешно изменен на: {cultureCode}"); // <-- Добавь для отладки
-                // Уведомляем всех подписчиков о смене языка
+                // Console.WriteLine($"LocalizationService: Язык успешно изменен на: {cultureCode}");
+
+                // Вызываем событие смены языка.
+                // !!! УБЕДИТЕСЬ, что этот вызов происходит ВСЕГДА, когда язык должен "смениться"
+                // !!! (т.е., когда вызывается SetLanguage и культура успешно создана).
                 OnLanguageChanged();
 
             }
             catch (CultureNotFoundException ex)
             {
-                // Обработка ошибки: культура не найдена.
-                Console.WriteLine($"LocalizationService Ошибка: Культура '{cultureCode}' не найдена. {ex.Message}"); // <-- Добавь для отладки
+                StatusMessage?.Invoke(this, $"{CultureNotFoundErr}: {ex.Message}"); // Предполагая, что CultureNotFoundErr из Resources.Resources
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"LocalizationService Ошибка: При установке языка '{cultureCode}'. {ex.Message}"); // <-- Добавь для отладки
+                StatusMessage?.Invoke(this, $"{ErrUnexpected}: {ex.Message}"); // Предполагая, что ErrUnexpected из Resources.Resources
             }
         }
 
-        // Метод для получения локализованной строки по ключу из .resx
-        // Этот метод больше не нужен для строк в XAML словарях, но может использоваться для строк ViewModel из .resx
+        // Метод для получения локализованной строки из .resx
+        // !!! ИЗМЕНИТЕ ЭТОТ МЕТОД, ЧТОБЫ ОН ИСПОЛЬЗОВАЛ ХРАНИМУЮ _applicationCulture !!!
         public string GetString(string key)
         {
-            // Получаем строку из ресурсов .resx для текущей CultureInfo потока
-            // Убедись, что пространство имен WPF_LCD_Test.Resources правильное для твоего Resources.resx
-            // return Resources.Resources.ResourceManager.GetString(key, CurrentCulture) ?? $"!{key}!"; // Возвращаем ключ в восклицательных знаках для отладки
-
-            // Дополнительная проверка на null для ResourceManager (на всякий случай)
-            
-            if (Resources.Resources.ResourceManager == null)
+            // Предполагая, что ResourceManager доступен через using или это WPF_LCD_Test.Resources.Resources.ResourceManager
+            if (Resources.Resources.ResourceManager == null) // Или WPF_LCD_Test.Resources.Resources.ResourceManager == null
             {
-                Console.WriteLine($"LocalizationService Ошибка: ResourceManager для ключа '{key}' равен null!");
+                StatusMessage?.Invoke(this, $"{ErrUnexpected}:  null!"); // Предполагая, что ErrUnexpected из Resources.Resources
                 return $"!{key}!";
             }
 
-            string result = Resources.Resources.ResourceManager.GetString(key, CurrentCulture);
+            // !!! Используем ХРАНИМУЮ в сервисе культуру для поиска ресурса !!!
+            string result = Resources.Resources.ResourceManager.GetString(key, _applicationCulture); // <-- ИСПОЛЬЗУЕМ _applicationCulture
+
             if (result == null)
             {
-                Console.WriteLine($"LocalizationService Предупреждение: Ресурс с ключом '{key}' не найден в .resx для культуры {CurrentCulture.Name}");
+                // Предполагая, что LocalizationServiceResErr и Err из Resources.Resources
+                StatusMessage?.Invoke(this, $"{LocalizationServiceResErr} {_applicationCulture?.Name} : {key}"); // Используем _applicationCulture?.Name
                 return $"!{key}!";
             }
             return result;
         }
 
         // Метод для получения локализованной строки с форматированием из .resx
+        // !!! ИЗМЕНИТЕ ЭТОТ МЕТОД, ЧТОБЫ ОН ИСПОЛЬЗОВАЛ ХРАНИМУЮ _applicationCulture !!!
         public string GetString(string key, params object[] args)
         {
-            // Получаем шаблон строки из .resx, а затем форматируем его
-            string format = GetString(key);
-            // Проверяем, был ли формат найден (не вернулся ли ключ для отладки)
+            string format = GetString(key); // Этот вызов уже использует обновленный GetString
             if (string.IsNullOrEmpty(format) || (format.StartsWith("!{") && format.EndsWith("}!") && format.Contains(key)))
             {
-                // Если ресурс не найден или вернулся ключ для отладки, просто возвращаем ключ или шаблон
                 return format;
             }
             try
             {
-                // Используем CultureInfo для правильного форматирования чисел, дат и т.д.
-                return string.Format(CurrentCulture, format, args);
+                // !!! Используем ХРАНИМУЮ в сервисе культуру для форматирования !!!
+                return string.Format(_applicationCulture, format, args); // <-- ИСПОЛЬЗУЕМ _applicationCulture
             }
             catch (FormatException ex)
             {
-                // Обработка ошибки форматирования (например, несоответствие числа аргументов)
-                Console.WriteLine($"LocalizationService Ошибка: Форматирования строки для ключа '{key}'. Ошибка: {ex.Message}"); // <-- Добавь для отладки
-                return format; // Возвращаем неформатированную строку
+                // Предполагая, что LocalizationServiceFormatErr, key, и Err из Resources.Resources
+                StatusMessage?.Invoke(this, $"{LocalizationServiceFormatErr} {key} {Err}: {ex.Message}");
+                return format;
             }
         }
 
@@ -136,7 +147,6 @@ namespace WPF_LCD_Test.Services
         protected virtual void OnLanguageChanged()
         {
             // Проверка на null перед вызовом события
-            Console.WriteLine($"LocalizationService: Вызов OnLanguageChanged()."); // <-- Добавь для отладки
             LanguageChanged?.Invoke(this, EventArgs.Empty);
         }
     }

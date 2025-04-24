@@ -43,7 +43,6 @@ namespace WPF_LCD_Test
         // Оставь этот метод обработчика события как есть (он теперь будет вызываться)
         private void LocalizationService_LanguageChanged(object sender, EventArgs e)
         {
-            Console.WriteLine("App: LocalizationService_LanguageChanged событие сработало."); // Оставляем для отладки
 
             string defaultResourcePath = "/Resources/StringResources.xaml";
             // Получаем текущую культуру из сервиса (это новая выбранная культура)
@@ -67,8 +66,6 @@ namespace WPF_LCD_Test
 }
             // ... добавь else if для других языков
 
-            Console.WriteLine($"App: Попытка загрузить словарь: {resourcePath}"); // Для отладки в Output
-
             try
             {
                 // Находим старый словарь языка и удаляем его (если он есть)
@@ -81,7 +78,6 @@ namespace WPF_LCD_Test
 
                 foreach (var oldDict in oldDictionaries)
                 {
-                    Console.WriteLine($"App: Удаление старого словаря: {oldDict.Source?.OriginalString}"); // Для отладки
                     Application.Current.Resources.MergedDictionaries.Remove(oldDict);
                 }
 
@@ -92,7 +88,6 @@ namespace WPF_LCD_Test
                 // Добавляем новый словарь в MergedDictionaries приложения
                 Application.Current.Resources.MergedDictionaries.Add(newLanguageDictionary);
 
-                Console.WriteLine($"App: Добавлен новый словарь: {newLanguageDictionary.Source?.OriginalString}"); // Для отладки
 
                 // Опционально: Обновить привязки, если они не обновляются автоматически.
                 // Обычно DynamicResource должен автоматически обновиться после изменения MergedDictionaries,

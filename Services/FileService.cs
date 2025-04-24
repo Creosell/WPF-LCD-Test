@@ -2,11 +2,13 @@
 // Файл FileService.cs (реализация IFileService)
 
 using System;
+using System.Globalization;
 using System.IO; // Для работы с файлами и папками
 using System.Text.Json; // Для сериализации в JSON
 using System.Threading.Tasks; // Для асинхронных операций
 using WPF_LCD_Test.Models;
 using WPF_LCD_Test.Services;
+using static WPF_LCD_Test.Resources.Resources; 
 
 // using System.Globalization; // Если потребуется для форматирования чисел при сохранении CSV
 namespace WPF_LCD_Test.Services
@@ -18,7 +20,7 @@ namespace WPF_LCD_Test.Services
         private string _desktopPath;
 
         private string _baseFolderPath;
-        private readonly string _workFolerName = "Color measurement data"; // Константа лучше здесь или в Helpers
+        private readonly string _workFolerName = "Color measurement data";
 
         // Публичные свойства из интерфейса
         public string BaseFolderPath => _baseFolderPath;
@@ -49,22 +51,32 @@ namespace WPF_LCD_Test.Services
                 if (!Directory.Exists(_baseFolderPath))
                 {
                     Directory.CreateDirectory(_baseFolderPath);
-                    StatusMessage?.Invoke(this, $"Создана рабочая папка: {_baseFolderPath}"); // Сообщение
+                    StatusMessage?.Invoke(this, $"{WorkFolderCreated}: {_baseFolderPath}"); // Сообщение
                 }
             }
             catch (Exception ex)
             {
-                StatusMessage?.Invoke(this, $"Ошибка при инициализации рабочих папок: {ex.Message}"); // Сообщение об ошибке
+                StatusMessage?.Invoke(this, $"{WorkingFolderInitErr}: {ex.Message}"); // Сообщение об ошибке
                                                                                                           // Обработка ошибки инициализации - возможно, стоит бросить исключение или установить флаг
             }
+        }
+
+        private void CheckCurrentAppLanguage()
+        {
+            CultureInfo culture = LocalizationService.Instance.CurrentCulture; // Получаем текущую культуру из сервиса локализации
+
+            // Устанавливаем эту культуру для текущего потока из пула
+            Thread.CurrentThread.CurrentCulture = culture;
+            Thread.CurrentThread.CurrentUICulture = culture;
         }
 
         // Метод сохранения данных устройства в JSON (реализация)
         public async Task<bool> SaveDeviceDataToJsonAsync(DeviceUnderTest device)
         {
+            CheckCurrentAppLanguage(); // Проверяем текущий язык приложения
             if (device == null)
             {
-                StatusMessage?.Invoke(this, "Ошибка сохранения: Нет данных устройства.");
+                StatusMessage?.Invoke(this, $"{SaveJSONErrDeviceIsEmpty}");
                 SaveOperationCompleted?.Invoke(this, false);
                 return false;
             }
@@ -85,13 +97,13 @@ namespace WPF_LCD_Test.Services
                 // Асинхронно записываем JSON строку в файл
                 await File.WriteAllTextAsync(filePath, jsonString); // Используем асинхронный метод записи
 
-                StatusMessage?.Invoke(this, $"Данные для SN {device.SerialNumber} сохранены в JSON: {filePath}"); // Сообщение об успехе
+                StatusMessage?.Invoke(this, $"{ResultsForSN} {device.SerialNumber} {SavedToJSON}: {filePath}"); // Сообщение об успехе
                 SaveOperationCompleted?.Invoke(this, true);
                 return true; // Успех
             }
             catch (Exception ex)
             {
-                StatusMessage?.Invoke(this, $"Ошибка при сохранении в JSON для SN {device.SerialNumber}: {ex.Message}"); // Сообщение об ошибке
+                StatusMessage?.Invoke(this, $"{SaveJSONErrForSN} {device.SerialNumber}: {ex.Message}"); // Сообщение об ошибке
                 SaveOperationCompleted?.Invoke(this, false);
                 return false; // Ошибка
             }
@@ -100,20 +112,22 @@ namespace WPF_LCD_Test.Services
         // Метод сохранения отдельного измерения в CSV (реализация)
         public async Task<bool> SaveMeasurementToCsvAsync(string measurementCsvString, string measurementLocationName, string serialNumber)
         {
+            CheckCurrentAppLanguage(); // Проверяем текущий язык приложения
+
             if (string.IsNullOrWhiteSpace(serialNumber))
             {
-                StatusMessage?.Invoke(this, "Ошибка сохранения CSV: Не указан серийный номер.");
+                StatusMessage?.Invoke(this, $"{CsvSnErr}");
                 // OnSaveOperationCompleted?.Invoke(this, false); // Может быть, не нужно оповещать о завершении каждого CSV
                 return false;
             }
             if (string.IsNullOrWhiteSpace(measurementCsvString))
             {
-                StatusMessage?.Invoke(this, "Ошибка сохранения CSV: Нет данных для сохранения.");
+                StatusMessage?.Invoke(this, $"{CsvDataErr}");
                 return false;
             }
             if (string.IsNullOrWhiteSpace(measurementLocationName))
             {
-                StatusMessage?.Invoke(this, "Ошибка сохранения CSV: Не указано имя локации.");
+                StatusMessage?.Invoke(this, $"{CsvLocationErr}");
                 return false;
             }
 
@@ -126,7 +140,7 @@ namespace WPF_LCD_Test.Services
                 if (!Directory.Exists(serialNumberFolderPath))
                 {
                     Directory.CreateDirectory(serialNumberFolderPath);
-                    StatusMessage?.Invoke(this, $"Создана папка для устройства: {serialNumberFolderPath}"); // Сообщение
+                    StatusMessage?.Invoke(this, $"{WorkFolderCreatedForSN}: {serialNumberFolderPath}"); // Сообщение
                 }
 
                 // Определяем путь к CSV файлу (используя имя локации)
@@ -142,7 +156,7 @@ namespace WPF_LCD_Test.Services
             }
             catch (Exception ex)
             {
-                StatusMessage?.Invoke(this, $"Ошибка при сохранении в CSV для '{measurementLocationName}' (SN {serialNumber}): {ex.Message}"); // Сообщение об ошибке
+                StatusMessage?.Invoke(this, $"{ErrCSV} '{measurementLocationName}' (SN {serialNumber}): {ex.Message}"); // Сообщение об ошибке
                                                                                                                                                    // OnSaveOperationCompleted?.Invoke(this, false); // Может быть, не нужно оповещать о завершении каждого CSV
                 return false; // Ошибка
             }
