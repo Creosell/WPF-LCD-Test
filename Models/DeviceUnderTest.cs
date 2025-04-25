@@ -1,4 +1,6 @@
-﻿using static WPF_LCD_Test.Resources.Resources;
+﻿using System.Text.Json.Serialization;
+using WPF_LCD_Test.Converters;
+using static WPF_LCD_Test.Resources.Resources;
 
 // using System.Windows.Forms; // Этот using понадобится только для IsContainsAllMeasurements в текущем виде
 
@@ -12,6 +14,7 @@ namespace WPF_LCD_Test.Models // Пространство имен должно 
 
         public string SerialNumber { get; set; } // Серийный номер - данные устройства
 
+        [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime MeasurementDateTime { get; set; }
 
         // Список измерений. Это основная коллекция данных.

@@ -79,7 +79,7 @@ namespace WPF_LCD_Test.Converters // Используй соответствую
             string LvFormat = "F1"; // Формат по умолчанию для Lv (2 знака)
 
             // Проверяем значение Location
-            if (value.Location == "0. Black") // Или "K. Black", зависит от того, как ты его инициализируешь
+            if (value.Location == "Black") // Или "K. Black", зависит от того, как ты его инициализируешь
             {
                 LvFormat = "F4"; // Устанавливаем формат 4 знака для Black
             }
