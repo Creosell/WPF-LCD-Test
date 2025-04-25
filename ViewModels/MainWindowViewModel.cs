@@ -37,10 +37,9 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         private string _serialNumber;
 
         private bool _isSerialNumberConfirmed = false;
-        private string _lastConfirmedSerialNumber;
+
 
         private int _measurementTime;
-        private string _lastMeasurementTime; // Для хранения последнего введенного времени измерения (для валидации и отображения в UI)
         private ObservableCollection<string> _logMessages; // Коллекция сообщений для лога UI (UI ListBox/ListView)
         private bool _isMeasurementButtonsEnabled; // Флаг доступности кнопок измерений (UI IsEnabled)
         private bool _isDeviceConnected; // Флаг статуса подключения прибора (UI индикатор)
@@ -397,7 +396,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 // Вызываем асинхронный метод Сервиса. Результат и статус придут через события.
                 await _colorMeasurementService.ConnectAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Обработка непредвиденных
                 ExecuteDisconnect(parameter);
@@ -428,6 +427,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         // Реализация асинхронной команды калибровки нуля
         private async Task ExecuteZeroCalibrationAsync(object parameter) // Возвращаем Task
         {
+            CheckCurrentAppLanguage();
             try
             {
                 if (!IsDeviceConnected)
@@ -441,7 +441,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                     await _colorMeasurementService.CalibrateZeroAsync();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 ExecuteDisconnect(parameter); //Если калибровка была неуспешной, отключаем прибор
                 _dialogService.ShowMessage($"{ErrAtCalibration}", $"{Err}");
@@ -456,6 +456,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         // Реализация асинхронной команды сохранения результатов
         private async Task ExecuteSaveResultsAsync(object parameter)
         {
+            CheckCurrentAppLanguage();
             if (!CanExecuteSaveResults(parameter)) return;
 
             AddLogMessage($"{Saving}");
@@ -506,6 +507,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         // Реализация синхронной команды очистки полей
         private void ExecuteClearFields(object parameter)
         {
+            CheckCurrentAppLanguage();
             if (!CanExecuteClearFields(parameter)) return; // Хотя обычно всегда true
 
             // Запрашиваем подтверждение очистки
@@ -567,6 +569,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         // Реализация асинхронной команды измерения (вызывается для каждой точки измерения)
         private async Task ExecuteMeasureAsync(object parameter)
         {
+            CheckCurrentAppLanguage();
             // Получаем имя точки измерения из параметра команды
             string measurementName = parameter as string;
             if (string.IsNullOrWhiteSpace(measurementName))
@@ -690,9 +693,11 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             }
         }
 
+
         // Реализация команды для применения введенного Серийного номера (например, по Enter)
         private void ExecuteApplySerialNumber(object parameter)
         {
+            CheckCurrentAppLanguage();
             string enteredSerialNumber = parameter as string;
             // Логика из SerialNumberTextBox_KeyDown
             if (!CanExecuteApplySerialNumber(parameter)) return;
@@ -739,7 +744,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                     // Сбрасываем SerialNumber ViewModel на пустую строку, если он невалиден
                     SerialNumber = ""; // Это вызовет OnPropertyChanged и обновит UI
                     _currentDevice = null; // Сбрасываем объект Модели
-                    ResetMeasurementStatuses(); // Сбрасываем статусы
+                    UpdateMeasurementButtonsState(); // Сбрасываем статусы
                 }
             }
             else
@@ -758,10 +763,11 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
         // Реализация команды для применения введенного Времени измерения (например, по Enter)
         private void ExecuteApplyMeasurementTime(object parameter)
         {
+            CheckCurrentAppLanguage();
             try
             {
                 string enteredMeasurementTime = parameter as string;
-                int measurementTime = int.Parse(enteredMeasurementTime); // Пробуем преобразовать строку в число
+                int measurementTime = int.Parse(s: enteredMeasurementTime); // Пробуем преобразовать строку в число
                 if (measurementTime <= 0)
                 {
                     // Сообщение уже было добавлено в сеттере, можно показать диалог
@@ -835,7 +841,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             // Проверка основных условий доступности
             return IsDeviceConnected       // Прибор подключен
                    && IsDeviceCalibrated   // Прибор откалиброван
-                   && IsSerialNumberConfirmed // Серийный номер подтвержден
+                   && SerialNumber!="" // Серийный номер подтвержден
                    && (MeasurementTime > 0);  // Время измерения больше нуля
         }
 
@@ -882,7 +888,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             IsMeasurementButtonsEnabled = IsDeviceConnected
                 && IsDeviceCalibrated
                 && !string.IsNullOrWhiteSpace(SerialNumber)
-                && IsSerialNumberConfirmed;
+                && SerialNumber!="";
 
             // Важно: После обновления состояния кнопок, уведомляем команду MeasureCommand
             // о возможном изменении ее доступности, чтобы UI (кнопки) обновился.

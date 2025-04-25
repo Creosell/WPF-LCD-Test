@@ -511,7 +511,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Caution: The measured brightness Lv is too low..
+        ///   Looks up a localized string similar to Caution: The measured brightness Lv is too low.
         /// </summary>
         public static string LvIsTooLow {
             get {
@@ -736,7 +736,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Serial number.
+        ///   Looks up a localized string similar to Serial number:.
         /// </summary>
         public static string SerialNumber {
             get {

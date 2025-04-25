@@ -226,7 +226,7 @@
     <value>Measurement time (s):</value>
   </data>
   <data name="SerialNumber" xml:space="preserve">
-    <value>Serial number</value>
+    <value>Serial number:</value>
   </data>
   <data name="TopLeftPoint" xml:space="preserve">
     <value>1. Top left</value>
@@ -334,7 +334,7 @@
     <value>No data</value>
   </data>
   <data name="LvIsTooLow" xml:space="preserve">
-    <value>Caution: The measured brightness Lv is too low.</value>
+    <value>Caution: The measured brightness Lv is too low</value>
   </data>
   <data name="Result" xml:space="preserve">
     <value>Result</value>

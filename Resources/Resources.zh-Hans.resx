@@ -334,7 +334,7 @@
     <value>没有数据</value>
   </data>
   <data name="LvIsTooLow" xml:space="preserve">
-    <value>注意：测得的亮度LV太低。</value>
+    <value>注意：测得的亮度LV太低</value>
   </data>
   <data name="Result" xml:space="preserve">
     <value>结果</value>
