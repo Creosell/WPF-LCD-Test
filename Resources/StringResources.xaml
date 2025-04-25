@@ -4,7 +4,6 @@
     <system:String x:Key="BadConnection">
         Unsuccessful connection. Try to restart color analyzer</system:String>
 
-
     <system:String x:Key="English">
         English</system:String>
 

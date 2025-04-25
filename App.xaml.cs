@@ -1,12 +1,6 @@
 ﻿// В файле App.xaml.cs
 
-using System;
-using System.Globalization;
-using System.Threading;
 using System.Windows;
-using System.Windows.Markup; // Для XmlLanguage
-using System.Collections.Generic; // Для List
-using System.Linq; // Для Linq
 using WPF_LCD_Test.Services; // Добавь using для твоего сервиса
 
 namespace WPF_LCD_Test
@@ -38,12 +32,11 @@ namespace WPF_LCD_Test
             mainWindow.Show();
 
             // === Конец перенесенной логики ===
-    }
+        }
 
         // Оставь этот метод обработчика события как есть (он теперь будет вызываться)
         private void LocalizationService_LanguageChanged(object sender, EventArgs e)
         {
-
             string defaultResourcePath = "/Resources/StringResources.xaml";
             // Получаем текущую культуру из сервиса (это новая выбранная культура)
             ILocalizationService localizationService = LocalizationService.Instance; // Можно использовать _instance напрямую в сервисе, но Instance тоже работает
@@ -63,7 +56,7 @@ namespace WPF_LCD_Test
             else if (cultureCode == "zh-Hans") // Пример для китайского упрощенного, если твой файл назван "StringResources.zh-Hans.xaml"
             {
                 resourcePath = $"/Resources/StringResources.zh-Hans.xaml";
-}
+            }
             // ... добавь else if для других языков
 
             try
@@ -88,12 +81,10 @@ namespace WPF_LCD_Test
                 // Добавляем новый словарь в MergedDictionaries приложения
                 Application.Current.Resources.MergedDictionaries.Add(newLanguageDictionary);
 
-
                 // Опционально: Обновить привязки, если они не обновляются автоматически.
                 // Обычно DynamicResource должен автоматически обновиться после изменения MergedDictionaries,
                 // но если есть проблемы, может потребоваться принудительное обновление,
                 // например, через событие LanguageChanged в ViewModel и OnPropertyChanged.
-
             }
             catch (Exception ex)
             {
@@ -105,6 +96,7 @@ namespace WPF_LCD_Test
             // ViewModel уже подписан в MainWindowViewModel.cs, поэтому это сработает
             // Console.WriteLine("App: Событие LanguageChanged завершено."); // Для отладки
         }
+
         // ... другие методы App.xaml.cs ...
     }
 }

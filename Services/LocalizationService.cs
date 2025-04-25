@@ -1,12 +1,9 @@
 ﻿// В файле Services/LocalizationService.cs
 
-using System;
 using System.Globalization;
-using System.Threading;
 using static WPF_LCD_Test.Resources.Resources; // Убедись, что это пространство имен соответствует твоим .resx файлам
-using System.Windows;
+
 // Добавьте using для ResourceManager, если его нет
-using System.Resources;
 
 // Возможно, вам все еще нужен using static для Resources.Resources для StatusMessage?.Invoke внутри этого класса, если вы там их используете.
 // using static WPF_LCD_Test.Resources.Resources;
@@ -86,7 +83,6 @@ namespace WPF_LCD_Test.Services
                 // !!! УБЕДИТЕСЬ, что этот вызов происходит ВСЕГДА, когда язык должен "смениться"
                 // !!! (т.е., когда вызывается SetLanguage и культура успешно создана).
                 OnLanguageChanged();
-
             }
             catch (CultureNotFoundException ex)
             {

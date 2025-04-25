@@ -1,7 +1,6 @@
 ﻿// В папке Models
 // Файл Measurement.cs
 
-using System;
 using System.Globalization; // Для InvariantCulture
 using System.Text.Json.Serialization;
 using WPF_LCD_Test.Converters;
@@ -16,15 +15,10 @@ namespace WPF_LCD_Test.Models
         public double x { get; set; }
         public double y { get; set; }
         public double Lv { get; set; }
-        public double T { get; set; } 
-
-    
-        
+        public double T { get; set; }
 
         [JsonIgnore]
         public bool IsValid { get; set; } = true; // Устанавливаем по умолчанию true
-
-
 
         public Measurement(string location, double x, double y, double Lv, double T)
         {
@@ -35,7 +29,6 @@ namespace WPF_LCD_Test.Models
             this.T = T;
             IsValid = true; // По умолчанию считаем валидным при создании через этот конструктор
         }
-
 
         public Measurement()
         {

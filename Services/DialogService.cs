@@ -3,7 +3,6 @@
 
 // Нужно для использования MessageBox в реализации
 using System.Windows;
-using WPF_LCD_Test.Services; // Пространство имен интерфейса
 
 namespace WPF_LCD_Test.Services // Пространство имен должно соответствовать папке Services
 {
@@ -26,8 +25,6 @@ namespace WPF_LCD_Test.Services // Пространство имен должн�
             // Используем стандартный WPF MessageBox.Show
             MessageBox.Show(message, caption, MessageBoxButton.OK, MessageBoxImage.Information);
         }
-
-
 
         // Реализация других методов интерфейса, если ты их добавил в IDialogService
         // Например:

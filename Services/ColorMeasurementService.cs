@@ -14,7 +14,6 @@ namespace WPF_LCD_Test.Services
         private bool _isConnected = false;
         private bool _isCalibrated = false;
 
-
         //Color analyzer constants
         //Remote modes
         private const int RemoteModeOFF = 0;
@@ -74,7 +73,6 @@ namespace WPF_LCD_Test.Services
 
         public ColorMeasurementService()
         {
-           
         }
 
         private double GetMeasuredSx() => _objCa200.SingleCa.SingleProbe.sx;
@@ -90,7 +88,6 @@ namespace WPF_LCD_Test.Services
         {
             await Task.Run(() => // Выполняем потенциально блокирующий COM вызов в фоновом потоке
             {
-
                 CheckCurrentAppLanguage(); // Проверяем текущую культуру приложения
 
                 try
@@ -173,7 +170,6 @@ namespace WPF_LCD_Test.Services
                 }
                 catch (Exception ex)
                 {  // Ловим другие ошибки
-
                     StatusMessage?.Invoke(this, (ErrAtCalibration) + $": {ex.Message}");
                     _isCalibrated = false;
                     CalibrationStatusChanged?.Invoke(this, _isCalibrated);
@@ -243,7 +239,7 @@ namespace WPF_LCD_Test.Services
 
                     StatusMessage?.Invoke(this, (Measuring)); // Сообщение
 
-                    // Переносим цикл 
+                    // Переносим цикл
                     double[] xValues = new double[measurementTime];
                     double[] yValues = new double[measurementTime];
                     double[] LvValues = new double[measurementTime];

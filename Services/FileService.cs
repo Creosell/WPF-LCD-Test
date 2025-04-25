@@ -1,14 +1,11 @@
 ﻿// В папке Services
 // Файл FileService.cs (реализация IFileService)
 
-using System;
 using System.Globalization;
 using System.IO; // Для работы с файлами и папками
 using System.Text.Json; // Для сериализации в JSON
-using System.Threading.Tasks; // Для асинхронных операций
 using WPF_LCD_Test.Models;
-using WPF_LCD_Test.Services;
-using static WPF_LCD_Test.Resources.Resources; 
+using static WPF_LCD_Test.Resources.Resources;
 
 // using System.Globalization; // Если потребуется для форматирования чисел при сохранении CSV
 namespace WPF_LCD_Test.Services
@@ -57,7 +54,7 @@ namespace WPF_LCD_Test.Services
             catch (Exception ex)
             {
                 StatusMessage?.Invoke(this, $"{WorkingFolderInitErr}: {ex.Message}"); // Сообщение об ошибке
-                                                                                                          // Обработка ошибки инициализации - возможно, стоит бросить исключение или установить флаг
+                                                                                      // Обработка ошибки инициализации - возможно, стоит бросить исключение или установить флаг
             }
         }
 
@@ -157,7 +154,7 @@ namespace WPF_LCD_Test.Services
             catch (Exception ex)
             {
                 StatusMessage?.Invoke(this, $"{ErrCSV} '{measurementLocationName}' (SN {serialNumber}): {ex.Message}"); // Сообщение об ошибке
-                                                                                                                                                   // OnSaveOperationCompleted?.Invoke(this, false); // Может быть, не нужно оповещать о завершении каждого CSV
+                                                                                                                        // OnSaveOperationCompleted?.Invoke(this, false); // Может быть, не нужно оповещать о завершении каждого CSV
                 return false; // Ошибка
             }
         }

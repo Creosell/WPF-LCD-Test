@@ -1,6 +1,4 @@
-﻿
-using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using WPF_LCD_Test.Models; // Убедись, что пространство имен класса Measurement доступно
 
@@ -73,7 +71,7 @@ namespace WPF_LCD_Test.Converters // Используй соответствую
             // Если ты хочешь форматирование для x и y одинаково, можно использовать DoubleJsonConverter
             // Примененный к свойству x и y в классе Measurement, если этот конвертер НЕ применен к самому классу Measurement.
             // Но если этот конвертер применяется к классу Measurement, то логика форматирования x и y должна быть здесь.
-            writer.WriteString("x", value.x.ToString("F3")); 
+            writer.WriteString("x", value.x.ToString("F3"));
             // Записываем свойство y
             writer.WriteString("y", value.y.ToString("F3"));
 

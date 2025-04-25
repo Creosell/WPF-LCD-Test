@@ -13,6 +13,7 @@ namespace WPF_LCD_Test // Пространство имен твоего при�
     public partial class MainWindow : Window
     {
         private MainWindowViewModel _viewModel;
+
         public MainWindow()
         {
             InitializeComponent(); // Инициализирует элементы UI, описанные в XAML
@@ -33,7 +34,6 @@ namespace WPF_LCD_Test // Пространство имен твоего при�
             // Создаем экземпляр ViewModel, передавая ему зависимости (сервисы)
             _viewModel = new MainWindowViewModel(colorMeasurementService, fileService, dialogService, localizationService);
 
-
             // Устанавливаем DataContext окна на созданный ViewModel
             this.DataContext = _viewModel;
 
@@ -44,7 +44,6 @@ namespace WPF_LCD_Test // Пространство имен твоего при�
                 _viewModel.LogMessages.CollectionChanged += LogMessages_CollectionChanged;
             }
             // --- Конец подписки ---
-
 
             // Опционально: Отписка при закрытии окна для предотвращения утечки памяти
             this.Closed += (sender, e) =>
@@ -57,10 +56,8 @@ namespace WPF_LCD_Test // Пространство имен твоего при�
                 // Вызов Dispose у ViewModel, если он реализует IDisposable
                 (_viewModel as IDisposable)?.Dispose();
             };
-
-
-
         }
+
         private void SerialNumberTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             TextBox serialNumberTextBox = sender as TextBox;
@@ -142,9 +139,9 @@ namespace WPF_LCD_Test // Пространство имен твоего при�
                         current is RadioButton || // Переключатель
                         current is Slider ||     // Слайдер
                         current is ScrollBar  // Полоса прокрутки
-                        // Можете добавить другие типы контролов, если это необходимо
-                        // Например: current is DataGrid, current is TabControl и т.д.
-                        // Более общий, но потенциально агрессивный вариант: current is Control && ((Control)current).Focusable
+                                              // Можете добавить другие типы контролов, если это необходимо
+                                              // Например: current is DataGrid, current is TabControl и т.д.
+                                              // Более общий, но потенциально агрессивный вариант: current is Control && ((Control)current).Focusable
                        )
                     {
                         clickedOnFocusableControl = true;
@@ -208,7 +205,7 @@ namespace WPF_LCD_Test // Пространство имен твоего при�
                 // WPF использует перечисление Key.
                 switch (e.Key)
                 {
-                    case Key.D1: measurementPointName = "Top left"; break; 
+                    case Key.D1: measurementPointName = "Top left"; break;
                     case Key.D2: measurementPointName = "Top center"; break;
                     case Key.D3: measurementPointName = "Top right"; break;
                     case Key.D4: measurementPointName = "Middle left"; break;
@@ -217,10 +214,10 @@ namespace WPF_LCD_Test // Пространство имен твоего при�
                     case Key.D7: measurementPointName = "Bottom left"; break;
                     case Key.D8: measurementPointName = "Bottom center"; break;
                     case Key.D9: measurementPointName = "Bottom right"; break;
-                    case Key.D0: measurementPointName = "Black"; break; 
+                    case Key.D0: measurementPointName = "Black"; break;
 
-                    case Key.R: measurementPointName = "Red"; break;   
-                    case Key.G: measurementPointName = "Green"; break; 
+                    case Key.R: measurementPointName = "Red"; break;
+                    case Key.G: measurementPointName = "Green"; break;
                     case Key.B: measurementPointName = "Blue"; break;
 
                     case Key.NumPad1: measurementPointName = "Top left"; break;
@@ -232,7 +229,7 @@ namespace WPF_LCD_Test // Пространство имен твоего при�
                     case Key.NumPad7: measurementPointName = "Bottom left"; break;
                     case Key.NumPad8: measurementPointName = "Bottom center"; break;
                     case Key.NumPad9: measurementPointName = "Bottom right"; break;
-                    case Key.NumPad0: measurementPointName = "Black"; break;             
+                    case Key.NumPad0: measurementPointName = "Black"; break;
                 }
 
                 // Если нажатая клавиша соответствует одной из точек измерения (т.е. measurementPointName != null)
@@ -240,7 +237,6 @@ namespace WPF_LCD_Test // Пространство имен твоего при�
                 {
                     // Получаем команду MeasureCommand из ViewModel
                     ICommand measureCommand = viewModel.MeasureCommand;
-
 
                     if (measureCommand != null && measureCommand.CanExecute(measurementPointName))
                     {
@@ -257,8 +253,3 @@ namespace WPF_LCD_Test // Пространство имен твоего при�
         }
     }
 }
-
-
-
-
-

@@ -38,7 +38,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
 
         private bool _isSerialNumberConfirmed = false;
 
-
         private int _measurementTime;
         private ObservableCollection<string> _logMessages; // Коллекция сообщений для лога UI (UI ListBox/ListView)
         private bool _isMeasurementButtonsEnabled; // Флаг доступности кнопок измерений (UI IsEnabled)
@@ -274,7 +273,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
 
-
             // Инициализация коллекций
             LogMessages = new ObservableCollection<string>();
             //MeasurementStatuses = new ObservableCollection<MeasurementStatusViewModel>();
@@ -309,7 +307,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             _fileService.StatusMessage += (sender, message) => AddLogMessage(message); // Получаем сообщения от сервиса файлов
             //_localizationService.LanguageChanged += LocalizationService_LanguageChanged; // <-- Эта строка должна быть
 
-
             // Обновляем свойства статуса ViewModel при изменении статуса в Сервисе
             _colorMeasurementService.ConnectionStatusChanged += (sender, isConnected) =>
             {
@@ -338,9 +335,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             RequieredMeasurementButtonsInit();
             UpdateCommandsCanExecute(); // Обновляем доступность всех команд при запуске
             UpdateMeasurementButtonsState(); // Обновляем доступность кнопок измерения при запуске
-
         }
-
 
         private void MeasurementButtonsStatusInit()
         {
@@ -375,8 +370,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             AllMeasurementButtonStatuses.Add(GreenColorStatus);
             AllMeasurementButtonStatuses.Add(BlueColorStatus);
             AllMeasurementButtonStatuses.Add(BlackColorStatus);
-
-
         }
 
         private void RequieredMeasurementButtonsInit()
@@ -400,7 +393,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             {
                 // Обработка непредвиденных
                 ExecuteDisconnect(parameter);
-
             }
         }
 
@@ -415,7 +407,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             }
             catch (Exception ex)
             {
-
                 _dialogService.ShowMessage($"{ErrUnexpected}: {ex.Message}", $"{Err}");
             }
 
@@ -431,7 +422,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             try
             {
                 if (!IsDeviceConnected)
-                { 
+                {
                     // Если прибор не подключен, то сначала подключаем его
                     await ExecuteConnectAsync(parameter);
                 }
@@ -450,7 +441,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             // Обновляем доступность команд и кнопок (непосредственно после завершения калибровки)
             UpdateCommandsCanExecute();
             UpdateMeasurementButtonsState();
-
         }
 
         // Реализация асинхронной команды сохранения результатов
@@ -466,7 +456,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 // Проверяем, есть ли данные для сохранения и SN
                 if (_currentDevice == null || string.IsNullOrWhiteSpace(_currentDevice.SerialNumber) || _currentDevice.Measurements.Count == 0)
                 {
-    
                     _dialogService.ShowMessage($"{SaveJSONErrDeviceIsEmpty}", $"{Err}");
                     return;
                 }
@@ -493,7 +482,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 else
                 {
                     _dialogService.ShowMessage($"{SaveJSONErrForSN}", $"{Err}");
-                    
                 }
             }
             catch (Exception ex)
@@ -693,7 +681,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             }
         }
 
-
         // Реализация команды для применения введенного Серийного номера (например, по Enter)
         private void ExecuteApplySerialNumber(object parameter)
         {
@@ -841,7 +828,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             // Проверка основных условий доступности
             return IsDeviceConnected       // Прибор подключен
                    && IsDeviceCalibrated   // Прибор откалиброван
-                   && SerialNumber!="" // Серийный номер подтвержден
+                   && SerialNumber != "" // Серийный номер подтвержден
                    && (MeasurementTime > 0);  // Время измерения больше нуля
         }
 
@@ -888,7 +875,7 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             IsMeasurementButtonsEnabled = IsDeviceConnected
                 && IsDeviceCalibrated
                 && !string.IsNullOrWhiteSpace(SerialNumber)
-                && SerialNumber!="";
+                && SerialNumber != "";
 
             // Важно: После обновления состояния кнопок, уведомляем команду MeasureCommand
             // о возможном изменении ее доступности, чтобы UI (кнопки) обновился.
@@ -1018,8 +1005,6 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
             }
         }
 
-
-
         // Метод для сброса всех статусов измерений (например, при очистке полей
         private void ResetMeasurementStatuses()
         {
@@ -1029,12 +1014,11 @@ namespace WPF_LCD_Test.ViewModels // Пространство имен для Vi
                 measurementStatusViewModel.IsPassed = null;
                 measurementStatusViewModel.MeasuredValuesString = null;
             }
-            
         }
 
         // --- Метод для обновления всех локализуемых текстов в ViewModel ---
         // Пример правильного обновления статусов в UpdateLocalizedTexts() или в обработчиках событий сервиса
-        
+
         public void Dispose()
         {
             AddLogMessage($"{ViewModelClearing}");

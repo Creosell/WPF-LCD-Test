@@ -1,9 +1,5 @@
-﻿using System.Text.Json; // Используется для сериализации в JSON
-using System.Text.Json.Serialization; // Используется для атрибута JsonIgnore
-using System.Collections.Generic; // Для List
-using System; // Для DateTime, Environment, Path
-using System.Linq; // Для LINQ (OrderBy, Select, Any)
-using static WPF_LCD_Test.Resources.Resources; 
+﻿using static WPF_LCD_Test.Resources.Resources;
+
 // using System.Windows.Forms; // Этот using понадобится только для IsContainsAllMeasurements в текущем виде
 
 namespace WPF_LCD_Test.Models // Пространство имен должно быть в папке Models
@@ -16,7 +12,7 @@ namespace WPF_LCD_Test.Models // Пространство имен должно 
 
         public string SerialNumber { get; set; } // Серийный номер - данные устройства
 
-        public DateTime MeasurementDateTime { get; set; } 
+        public DateTime MeasurementDateTime { get; set; }
 
         // Список измерений. Это основная коллекция данных.
         public List<Measurement> Measurements { get; set; }
@@ -52,8 +48,6 @@ namespace WPF_LCD_Test.Models // Пространство имен должно 
 
             Measurements.Add(newMeasurement);
         }
-
-
 
         // Предложение: Перегрузка или изменение метода, чтобы принимать список имен (string)
         public bool IsContainsAllMeasurements(List<string> requiredMeasurementNames)

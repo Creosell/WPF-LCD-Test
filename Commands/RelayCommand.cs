@@ -1,9 +1,7 @@
 ﻿// В папке Commands
 // Файл RelayCommand.cs
 
-using System;
 using System.Windows.Input;
-using System.Threading.Tasks; // Добавляем using для Task
 
 namespace WPF_LCD_Test.Commands
 {
@@ -11,6 +9,7 @@ namespace WPF_LCD_Test.Commands
     {
         // Меняем поля для поддержки как синхронных (Action), так и асинхронных (Func<Task>) execute методов
         private readonly Action<object> _execute; // Для синхронных методов
+
         private readonly Func<object, Task> _executeAsync; // Для асинхронных методов
 
         private readonly Func<object, bool> _canExecute;
@@ -20,7 +19,6 @@ namespace WPF_LCD_Test.Commands
 
         // Событие CanExecuteChanged
         public event EventHandler CanExecuteChanged;
-
 
         // --- Добавляем новые конструкторы для асинхронных команд ---
 
@@ -39,7 +37,6 @@ namespace WPF_LCD_Test.Commands
             if (executeAsync == null) throw new ArgumentNullException(nameof(executeAsync));
         }
 
-
         // --- Оставляем старые конструкторы для синхронных команд ---
 
         // Конструктор для синхронной команды с параметром
@@ -56,7 +53,6 @@ namespace WPF_LCD_Test.Commands
         {
             if (execute == null) throw new ArgumentNullException(nameof(execute));
         }
-
 
         // --- Методы из интерфейса ICommand ---
 

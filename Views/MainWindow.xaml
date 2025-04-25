@@ -20,9 +20,9 @@
             <Menu FontSize="14">
                 <MenuItem Header="{DynamicResource LanguageMenu}" Height="20" Background="#00000000">
                     <MenuItem Header="{DynamicResource English}" Command="{Binding SwitchLanguageCommand}"
-                              CommandParameter="en"/>
-                    <MenuItem Header="{DynamicResource Chinese}" Command="{Binding SwitchLanguageCommand}" 
-                              CommandParameter="zh-Hans"/>
+                              CommandParameter="en" />
+                    <MenuItem Header="{DynamicResource Chinese}" Command="{Binding SwitchLanguageCommand}"
+                              CommandParameter="zh-Hans" />
                 </MenuItem>
             </Menu>
         </StackPanel>
@@ -40,36 +40,32 @@
                 </Grid.RowDefinitions>
                 <StackPanel Orientation="Horizontal">
                     <Button Content="{DynamicResource ZeroCalibration}" Command="{Binding ZeroCalibrationCommand}" Margin="5" />
-                    
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,20,10,10" >
+
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,20,10,10">
                                     <!--<TextBlock Text="{Binding DeviceConnectionStatusText}"
-                                               
+
                          VerticalAlignment="Center" Margin="5,0" />
                         <TextBlock Text="{Binding DeviceCalibrationStatusText}"
            VerticalAlignment="Center" Margin="5,0" />-->
                     </StackPanel>
-                        
-                    
-                    
                 </StackPanel>
                 <Grid Grid.Row="1">
                     <StackPanel Orientation="Horizontal">
                         <Label Content="{DynamicResource MeasurementTimeSec}" VerticalAlignment="Center" />
                         <TextBox Margin="5,0" VerticalAlignment="Center" MinWidth="50"
                                  x:Name="MeasurementTimeTextBox"
-                            Text="{Binding MeasurementTime, UpdateSourceTrigger=Explicit, 
+                            Text="{Binding MeasurementTime, UpdateSourceTrigger=Explicit,
                             StringFormat={}{0}}"
                             LostFocus="MeasurementTimeTextBox_LostFocus">
                             <TextBox.InputBindings>
-                                <KeyBinding Key="Enter" 
-                                    Command="{Binding DataContext.ApplyMeasurementTimeCommand, 
-                                    RelativeSource={RelativeSource FindAncestor, 
+                                <KeyBinding Key="Enter"
+                                    Command="{Binding DataContext.ApplyMeasurementTimeCommand,
+                                    RelativeSource={RelativeSource FindAncestor,
                                     AncestorType={x:Type Window}}}"
-                                    CommandParameter="{Binding Text, ElementName=MeasurementTimeTextBox}"/>
+                                    CommandParameter="{Binding Text, ElementName=MeasurementTimeTextBox}" />
                             </TextBox.InputBindings>
                         </TextBox>
                     </StackPanel>
-                    
                 </Grid>
                 <Grid Grid.Row="2">
                     <StackPanel Orientation="Horizontal">
@@ -80,13 +76,12 @@
                                  LostFocus="SerialNumberTextBox_LostFocus">
                             <TextBox.InputBindings>
                                 <KeyBinding Key="Enter"
-                                    Command="{Binding DataContext.ApplySerialNumberCommand, 
-                                    RelativeSource={RelativeSource 
+                                    Command="{Binding DataContext.ApplySerialNumberCommand,
+                                    RelativeSource={RelativeSource
                                     FindAncestor, AncestorType={x:Type Window}}}"
-                                    CommandParameter="{Binding Text, ElementName=SerialNumberTextBox}"/>
+                                    CommandParameter="{Binding Text, ElementName=SerialNumberTextBox}" />
                             </TextBox.InputBindings>
                         </TextBox>
-                        
                     </StackPanel>
                 </Grid>
             </Grid>
@@ -263,8 +258,8 @@
          SelectionMode="Single" MinHeight="200">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
-                    <Setter Property="MinHeight" Value="18"/>
-                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                    <Setter Property="MinHeight" Value="18" />
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
                 </Style>
             </ListBox.ItemContainerStyle>
             <ListBox.ItemTemplate>
@@ -277,12 +272,12 @@
                              FocusVisualStyle="{x:Null}">
                         <TextBox.Style>
                             <Style TargetType="TextBox">
-                                <Setter Property="BorderThickness" Value="0"/>
-                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="BorderBrush" Value="Transparent" />
                                 <Style.Triggers>
                                     <Trigger Property="IsKeyboardFocused" Value="True">
-                                        <Setter Property="BorderThickness" Value="0"/>
-                                        <Setter Property="BorderBrush" Value="Transparent"/>
+                                        <Setter Property="BorderThickness" Value="0" />
+                                        <Setter Property="BorderBrush" Value="Transparent" />
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>

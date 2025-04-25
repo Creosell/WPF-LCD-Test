@@ -1,10 +1,7 @@
 ﻿// В папке Services
 // Файл IFileService.cs
 
-using System;
-using System.Threading.Tasks; // Для асинхронных операций
 using WPF_LCD_Test.Models;
-
 
 namespace WPF_LCD_Test.Services
 {
@@ -17,6 +14,7 @@ namespace WPF_LCD_Test.Services
 
         // Свойства для получения путей, если они нужны ViewModel
         string BaseFolderPath { get; }
+
         string WorkFolderName { get; } // Возможно, тоже нужно
 
         // Метод для сохранения данных устройства в JSON
@@ -26,11 +24,12 @@ namespace WPF_LCD_Test.Services
         // Метод для сохранения отдельных измерений в CSV
         // Принимает строковое представление измерения (CSV формат) и имя точки измерения
         Task<bool> SaveMeasurementToCsvAsync(string measurementCsvString, string measurementLocationName, string serialNumber);
-        // Альтернативно: Task<bool> SaveMeasurementToCsvAsync(Measurement measurement, string serialNumber); // Если сервис сам формирует CSV строку
 
+        // Альтернативно: Task<bool> SaveMeasurementToCsvAsync(Measurement measurement, string serialNumber); // Если сервис сам формирует CSV строку
 
         // Метод для оповещения ViewModel о ходе выполнения или ошибках
         event EventHandler<string> StatusMessage; // Для отправки сообщений о сохранении/ошибках в лог UI
+
         event EventHandler<bool> SaveOperationCompleted; // Оповещение о завершении сохранения
 
         // Возможно, методы для загрузки данных, если они нужны
