@@ -13,7 +13,7 @@ namespace WPF_LCD_Test.Views
     /// </summary>
     public partial class MeasurementView : UserControl
     {
-        private MeasurementWindowViewModel _viewModel;
+        private MeasurementViewModel _viewModel;
         public MeasurementView()
         {
             InitializeComponent(); // Инициализирует элементы UI, описанные в XAML
@@ -32,7 +32,7 @@ namespace WPF_LCD_Test.Views
             ILocalizationService localizationService = LocalizationService.Instance; // Реализация сервиса локализации
 
             // Создаем экземпляр ViewModel, передавая ему зависимости (сервисы)
-            _viewModel = new MeasurementWindowViewModel(colorMeasurementService, fileService, dialogService, localizationService);
+            _viewModel = new MeasurementViewModel(colorMeasurementService, fileService, dialogService, localizationService);
 
             // Устанавливаем DataContext окна на созданный ViewModel
             this.DataContext = _viewModel;
@@ -196,7 +196,7 @@ namespace WPF_LCD_Test.Views
             // чтобы запустить соответствующую команду измерения.
             // Нам нужен доступ к ViewModel. Предполагаем, что ViewModel установлен
             // как DataContext окна (this.DataContext).
-            if (this.DataContext is MeasurementWindowViewModel viewModel)
+            if (this.DataContext is MeasurementViewModel viewModel)
             {
                 string measurementPointName = null; // Переменная для хранения имени точки измерения (параметра команды)
 

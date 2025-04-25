@@ -3,50 +3,65 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:WPF_LCD_Test.Views"
+             xmlns:local="clr-namespace:WPF_LCD_Test"
+             xmlns:v="clr-namespace:WPF_LCD_Test.Views"
              xmlns:vm="clr-namespace:WPF_LCD_Test.ViewModels"
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance vm:MeasurementWindowViewModel}">
-
-
+             xmlns:res="clr-namespace:WPF_LCD_Test.Resources">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/> <RowDefinition Height="*" /> <RowDefinition Height="Auto" /> <RowDefinition Height="Auto" /> </Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0">
             <Menu FontSize="14">
                 <MenuItem Header="{DynamicResource LanguageMenu}" Height="20" Background="#00000000">
-                    <MenuItem Header="{DynamicResource English}" Command="{Binding SwitchLanguageCommand}" CommandParameter="en" />
-                    <MenuItem Header="{DynamicResource Chinese}" Command="{Binding SwitchLanguageCommand}" CommandParameter="zh-Hans" />
+                    <MenuItem Header="{DynamicResource English}"
+                              Command="{Binding DataContext.SwitchLanguageCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              CommandParameter="en" />
+                    <MenuItem Header="{DynamicResource Chinese}"
+                              Command="{Binding DataContext.SwitchLanguageCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              CommandParameter="zh-Hans" />
                 </MenuItem>
             </Menu>
         </StackPanel>
 
-
-        <Grid Grid.Row="1"> <Grid.ColumnDefinitions>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="45*" />
                 <ColumnDefinition Width="55*" />
             </Grid.ColumnDefinitions>
+
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" /> <RowDefinition Height="Auto" /> <RowDefinition Height="Auto" /> <RowDefinition Height="Auto" /> </Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0" Orientation="Horizontal">
-                    <Button Content="{DynamicResource ZeroCalibration}" Command="{Binding CalibrateZeroCommand}" Margin="5" /> </StackPanel>
-                <Grid Grid.Row="1"> <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0,10,0">
-                       <TextBlock Text="{Binding DeviceConnectionStatusText}" VerticalAlignment="Center" Margin="5,0" />
-                       <TextBlock Text="{Binding DeviceCalibrationStatusText}" VerticalAlignment="Center" Margin="5,0" />
+                    <Button Content="{DynamicResource ZeroCalibration}"
+                            Command="{Binding DataContext.ZeroCalibrationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            Margin="5" />
+                </StackPanel>
+                <Grid Grid.Row="1">
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0,10,0">
+                        <TextBlock Text="{Binding DeviceConnectionStatusText}" VerticalAlignment="Center" Margin="5,0" />
+                        <TextBlock Text="{Binding DeviceCalibrationStatusText}" VerticalAlignment="Center" Margin="5,0" />
                     </StackPanel>
                 </Grid>
 
-                <Grid Grid.Row="2"> <StackPanel Orientation="Horizontal">
+                <Grid Grid.Row="2">
+                    <StackPanel Orientation="Horizontal">
                         <Label Content="{DynamicResource MeasurementTimeSec}" VerticalAlignment="Center" />
                         <TextBox Margin="5,0" VerticalAlignment="Center" MinWidth="50"
                                  x:Name="MeasurementTimeTextBox"
                                  Text="{Binding MeasurementTime, UpdateSourceTrigger=Explicit}">
-
-                            <!--LostFocus="MeasurementTimeTextBox_LostFocus">-->
                             <TextBox.InputBindings>
                                 <KeyBinding Key="Enter"
                                             Command="{Binding DataContext.ApplyMeasurementTimeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
@@ -56,11 +71,13 @@
                     </StackPanel>
                 </Grid>
 
-                <Grid Grid.Row="3"> <StackPanel Orientation="Horizontal">
+                <Grid Grid.Row="3">
+                    <StackPanel Orientation="Horizontal">
                         <Label Content="{DynamicResource SerialNumber}" VerticalAlignment="Center" />
                         <TextBox Margin="5,0" VerticalAlignment="Center" MinWidth="200"
                                  x:Name="SerialNumberTextBox"
-                                 Text="{Binding SerialNumber, UpdateSourceTrigger=Explicit}" LostFocus="SerialNumberTextBox_LostFocus">
+                                 Text="{Binding SerialNumber, UpdateSourceTrigger=Explicit}"
+                                 LostFocus="SerialNumberTextBox_LostFocus">
                             <TextBox.InputBindings>
                                 <KeyBinding Key="Enter"
                                             Command="{Binding DataContext.ApplySerialNumberCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
@@ -71,7 +88,8 @@
                 </Grid>
             </Grid>
 
-            <Grid Grid.Column="1"> <Grid>
+            <Grid Grid.Column="1">
+                <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="70*" />
                         <RowDefinition Height="30*" />
@@ -102,84 +120,132 @@
                                 Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                 CommandParameter="{Binding TopCenterStatus.Location}"
                                 Grid.Row="0" Grid.Column="1" Margin="5">
-                             <Button.Background><Binding Path="TopCenterStatus.StatusColor" /></Button.Background>
-                             <Button.ToolTip><Binding Path="TopCenterStatus.MeasuredValuesString" /></Button.ToolTip>
-                         </Button>
-                         <Button Content="{DynamicResource TopRightPoint}"
+                            <Button.Background>
+                                <Binding Path="TopCenterStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="TopCenterStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                        </Button>
+                        <Button Content="{DynamicResource TopRightPoint}"
                                 Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                 CommandParameter="{Binding TopRightStatus.Location}"
                                 Grid.Row="0" Grid.Column="2" Margin="5">
-                             <Button.Background><Binding Path="TopRightStatus.StatusColor" /></Button.Background>
-                             <Button.ToolTip><Binding Path="TopRightStatus.MeasuredValuesString" /></Button.ToolTip>
-                         </Button>
-                         <Button Content="{DynamicResource MiddleLeftPoint}"
+                            <Button.Background>
+                                <Binding Path="TopRightStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="TopRightStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                        </Button>
+                        <Button Content="{DynamicResource MiddleLeftPoint}"
                                 Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                 CommandParameter="{Binding MiddleLeftStatus.Location}"
                                 Grid.Row="1" Grid.Column="0" Margin="5">
-                             <Button.Background><Binding Path="MiddleLeftStatus.StatusColor" /></Button.Background>
-                             <Button.ToolTip><Binding Path="MiddleLeftStatus.MeasuredValuesString" /></Button.ToolTip>
-                         </Button>
-                         <Button Content="{DynamicResource CenterPoint}"
+                            <Button.Background>
+                                <Binding Path="MiddleLeftStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="MiddleLeftStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                        </Button>
+                        <Button Content="{DynamicResource CenterPoint}"
                                 Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                 CommandParameter="{Binding CenterStatus.Location}"
                                 Grid.Row="1" Grid.Column="1" Margin="5">
-                             <Button.Background><Binding Path="CenterStatus.StatusColor" /></Button.Background>
-                             <Button.ToolTip><Binding Path="CenterStatus.MeasuredValuesString" /></Button.ToolTip>
-                         </Button>
-                         <Button Content="{DynamicResource MiddleRightPoint}"
+                            <Button.Background>
+                                <Binding Path="CenterStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="CenterStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                        </Button>
+                        <Button Content="{DynamicResource MiddleRightPoint}"
                                 Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                 CommandParameter="{Binding MiddleRightStatus.Location}"
                                 Grid.Row="1" Grid.Column="2" Margin="5">
-                             <Button.Background><Binding Path="MiddleRightStatus.StatusColor" /></Button.Background>
-                             <Button.ToolTip><Binding Path="MiddleRightStatus.MeasuredValuesString" /></Button.ToolTip>
-                         </Button>
-                         <Button Content="{DynamicResource BottomLeftPoint}"
+                            <Button.Background>
+                                <Binding Path="MiddleRightStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="MiddleRightStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                        </Button>
+                        <Button Content="{DynamicResource BottomLeftPoint}"
                                 Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                 CommandParameter="{Binding BottomLeftStatus.Location}"
                                 Grid.Row="2" Grid.Column="0" Margin="5">
-                             <Button.Background><Binding Path="BottomLeftStatus.StatusColor" /></Button.Background>
-                             <Button.ToolTip><Binding Path="BottomLeftStatus.MeasuredValuesString" /></Button.ToolTip>
-                         </Button>
-                         <Button Content="{DynamicResource BottomCenterPoint}"
+                            <Button.Background>
+                                <Binding Path="BottomLeftStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="BottomLeftStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                        </Button>
+                        <Button Content="{DynamicResource BottomCenterPoint}"
                                 Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                 CommandParameter="{Binding BottomCenterStatus.Location}"
                                 Grid.Row="2" Grid.Column="1" Margin="5">
-                             <Button.Background><Binding Path="BottomCenterStatus.StatusColor" /></Button.Background>
-                             <Button.ToolTip><Binding Path="BottomCenterStatus.MeasuredValuesString" /></Button.ToolTip>
-                         </Button>
-                         <Button Content="{DynamicResource BottomRightPoint}"
+                            <Button.Background>
+                                <Binding Path="BottomCenterStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="BottomCenterStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                        </Button>
+                        <Button Content="{DynamicResource BottomRightPoint}"
                                 Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                 CommandParameter="{Binding BottomRightStatus.Location}"
                                 Grid.Row="2" Grid.Column="2" Margin="5">
-                             <Button.Background><Binding Path="BottomRightStatus.StatusColor" /></Button.Background>
-                             <Button.ToolTip><Binding Path="BottomRightStatus.MeasuredValuesString" /></Button.ToolTip>
-                         </Button>
+                            <Button.Background>
+                                <Binding Path="BottomRightStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="BottomRightStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                        </Button>
                     </Grid>
                     <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
                                 Margin="5,0,0,0">
-                         <Button Content="{DynamicResource RedPoint}"
+                        <Button Content="{DynamicResource RedPoint}"
                                 Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                 CommandParameter="{Binding RedColorStatus.Location}" Margin="5">
-                            <Button.Background><Binding Path="RedColorStatus.StatusColor" /></Button.Background>
-                            <Button.ToolTip><Binding Path="RedColorStatus.MeasuredValuesString" /></Button.ToolTip>
+                            <Button.Background>
+                                <Binding Path="RedColorStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="RedColorStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
                         </Button>
                         <Button Content="{DynamicResource GreenPoint}"
                                 Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                 CommandParameter="{Binding GreenColorStatus.Location}" Margin="5">
-                            <Button.Background><Binding Path="GreenColorStatus.StatusColor" /></Button.Background>
-                            <Button.ToolTip><Binding Path="GreenColorStatus.MeasuredValuesString" /></Button.ToolTip>
+                            <Button.Background>
+                                <Binding Path="GreenColorStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="GreenColorStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
                         </Button>
                         <Button Content="{DynamicResource BluePoint}"
                                 Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                 CommandParameter="{Binding BlueColorStatus.Location}" Margin="5">
-                            <Button.Background><Binding Path="BlueColorStatus.StatusColor" /></Button.Background>
-                            <Button.ToolTip><Binding Path="BlueColorStatus.MeasuredValuesString" /></Button.ToolTip>
+                            <Button.Background>
+                                <Binding Path="BlueColorStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="BlueColorStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
                         </Button>
                         <Button Content="{DynamicResource BlackPoint}"
                                 Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                 CommandParameter="{Binding BlackColorStatus.Location}" Margin="5">
-                            <Button.Background><Binding Path="BlackColorStatus.StatusColor" /></Button.Background>
-                            <Button.ToolTip><Binding Path="BlackColorStatus.MeasuredValuesString" /></Button.ToolTip>
+                            <Button.Background>
+                                <Binding Path="BlackColorStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="BlackColorStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
                         </Button>
                     </StackPanel>
                 </Grid>
@@ -222,8 +288,12 @@
         </ListBox>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-            <Button Content="{DynamicResource SaveResultsButton}" Command="{Binding SaveResultsCommand}" Margin="5" />
-            <Button Content="{DynamicResource ClearFieldsButton}" Command="{Binding ClearFieldsCommand}" Margin="5" />
+            <Button Content="{DynamicResource SaveResultsButton}"
+                    Command="{Binding DataContext.SaveResultsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    Margin="5" />
+            <Button Content="{DynamicResource ClearFieldsButton}"
+                    Command="{Binding DataContext.ClearFieldsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    Margin="5" />
         </StackPanel>
 
 

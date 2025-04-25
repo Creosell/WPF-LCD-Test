@@ -12,7 +12,7 @@ namespace WPF_LCD_Test // Пространство имен твоего при�
 {
     public partial class MeasurementWindow : Window
     {
-        private MeasurementWindowViewModel _viewModel;
+        private MeasurementViewModel _viewModel;
 
         public MeasurementWindow()
         {
@@ -32,7 +32,7 @@ namespace WPF_LCD_Test // Пространство имен твоего при�
             ILocalizationService localizationService = LocalizationService.Instance; // Реализация сервиса локализации
 
             // Создаем экземпляр ViewModel, передавая ему зависимости (сервисы)
-            _viewModel = new MeasurementWindowViewModel(colorMeasurementService, fileService, dialogService, localizationService);
+            _viewModel = new MeasurementViewModel(colorMeasurementService, fileService, dialogService, localizationService);
 
             // Устанавливаем DataContext окна на созданный ViewModel
             this.DataContext = _viewModel;
@@ -197,7 +197,7 @@ namespace WPF_LCD_Test // Пространство имен твоего при�
             // чтобы запустить соответствующую команду измерения.
             // Нам нужен доступ к ViewModel. Предполагаем, что ViewModel установлен
             // как DataContext окна (this.DataContext).
-            if (this.DataContext is MeasurementWindowViewModel viewModel)
+            if (this.DataContext is MeasurementViewModel viewModel)
             {
                 string measurementPointName = null; // Переменная для хранения имени точки измерения (параметра команды)
 

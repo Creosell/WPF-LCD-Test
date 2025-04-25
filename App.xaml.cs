@@ -1,104 +1,118 @@
 ﻿// В файле App.xaml.cs
 
+
 using System.Windows;
 using WPF_LCD_Test.Services;
 using WPF_LCD_Test.Views;
 using WPF_LCD_Test.ViewModels;
 
+
 namespace WPF_LCD_Test
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
-        // Удали переопределение protected override void OnStartup(...)
+        // Объявите приватные поля для сервисов, если они нужны на уровне App (например, LocalizationService)
+        private ILocalizationService _localizationService;
+        IColorMeasurementService colorMeasurementService = new ColorMeasurementService(); // Реализация сервиса прибора
+        IFileService fileService = new FileService(); // Реализация сервиса файлов
+        IDialogService dialogService = new DialogService(); // Реализация сервиса диалогов
+        ILocalizationService localizationService = LocalizationService.Instance; // Получаем синглтон сервиса локализации (если он синглтон)
 
-        // Добавь обработчик события Startup приложения
+
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            // === Эта логика перенесена из старого OnStartup ===
+            // === КОМПОЗИЦИОННЫЙ КОРЕНЬ: Здесь создаются все сервисы и главный ViewModel ===
 
-            // 1. Получаем экземпляр сервиса локализации (первое обращение, создает синглтон)
-            ILocalizationService localizationService = LocalizationService.Instance;
+            // 1. Создаем экземпляры всех сервисов
+            
 
-            // 2. Подписываемся на событие смены языка сервиса локализации
-            localizationService.LanguageChanged += LocalizationService_LanguageChanged;
+            // 2. Создаем экземпляр ГЛАВНОГО ViewModel приложения (оболочки)
+            MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(
+                colorMeasurementService,
+                fileService,
+                dialogService,
+                localizationService
+            );
 
-            // 3. Устанавливаем язык по умолчанию (это вызовет SetLanguage в сервисе,
-            //    который вызовет OnLanguageChanged, который вызовет наш обработчик)
+            // 3. Создаем экземпляр главного окна (View оболочки)
+            MainWindow mainWindow = new MainWindow();
+
+            // 4. Устанавливаем DataContext окна на созданный ViewModel оболочки
+            mainWindow.DataContext = mainWindowViewModel;
+
+            // 5. Опционально: Подписываемся на событие закрытия окна, чтобы очистить ГЛАВНЫЙ ViewModel при закрытии приложения
+            mainWindow.Closed += (s, args) =>
+            {
+                // Вызываем Dispose у главного ViewModel при закрытии окна
+                (mainWindow.DataContext as IDisposable)?.Dispose();
+            };
+
+            // 6. Инициализация локализации (после создания сервиса локализации)
+            localizationService.LanguageChanged += LocalizationService_LanguageChanged; // Если App сам обрабатывает смену словаря, подписка здесь
+
+            // Устанавливаем язык по умолчанию (это вызовет SetLanguage в сервисе,
             localizationService.SetLanguage("en"); // Или другой язык по умолчанию
 
-            // 4. Явно создаем и показываем главное окно, т.к. убрали StartupUri
-            MeasurementWindow mainWindow = new MeasurementWindow();
+            // 7. Показываем главное окно
             mainWindow.Show();
-
-            // === Конец перенесенной логики ===
         }
 
-        // Оставь этот метод обработчика события как есть (он теперь будет вызываться)
+        // Обработчик события смены языка сервиса локализации
         private void LocalizationService_LanguageChanged(object sender, EventArgs e)
         {
-            string defaultResourcePath = "/Resources/StringResources.xaml";
-            // Получаем текущую культуру из сервиса (это новая выбранная культура)
-            ILocalizationService localizationService = LocalizationService.Instance; // Можно использовать _instance напрямую в сервисе, но Instance тоже работает
-            string cultureCode = localizationService.CurrentCulture.Name; // Например, "en" или "zh-Hans"
+            // Этот код подмены словаря ресурсов
+            string defaultResourcePath = "/Resources/StringResources.xaml"; // Базовый словарь по умолчанию
 
-            // Формируем URI к файлу словаря ресурсов для данного языка
-            // Убедись, что имена файлов ресурсов соответствуют культурам
-            string resourceFileName = $"StringResources.{cultureCode}.xaml";
-            string resourcePath = $"/Resources/{resourceFileName}";
+            ILocalizationService localizationService = LocalizationService.Instance;
+            string cultureCode = localizationService.CurrentCulture.Name;
 
-            // Если нужен английский (или язык по умолчанию), используем базовый файл без кода культуры
-            if (cultureCode == "en") // Замени "en" на твой язык по умолчанию, если он другой
+            string resourcePathToLoad = defaultResourcePath;
+
+            // Логика выбора пути к словарю в зависимости от cultureCode
+            if (cultureCode == "en")
             {
-                resourcePath = defaultResourcePath; // "/Resources/StringResources.xaml"
-                                                    // Дополнительная проверка для китайского упрощенного, если файл назван по-другому
+                resourcePathToLoad = "/Resources/StringResources.en.xaml"; // Или просто defaultResourcePath, если базовый - английский
             }
-            else if (cultureCode == "zh-Hans") // Пример для китайского упрощенного, если твой файл назван "StringResources.zh-Hans.xaml"
+            else if (cultureCode == "zh-Hans")
             {
-                resourcePath = $"/Resources/StringResources.zh-Hans.xaml";
+                resourcePathToLoad = "/Resources/StringResources.zh-Hans.xaml";
             }
-            // ... добавь else if для других языков
+            // ... другие языки ...
 
             try
             {
-                // Находим старый словарь языка и удаляем его (если он есть)
-                // Ищем словари, которые не являются Material Design или базовым (defaultResourcePath)
+                // Логика удаления старого словаря и добавления нового
+                // Ищем словари, которые *не* Material Design и *не* базовый (defaultResourcePath)
                 var oldDictionaries = Application.Current.Resources.MergedDictionaries
                     .Where(d => d.Source != null &&
-                                !d.Source.OriginalString.Contains("MaterialDesignThemes.Wpf") &&
-                                !d.Source.OriginalString.EndsWith(defaultResourcePath, StringComparison.OrdinalIgnoreCase)) // Исключаем базовый словарь
-                    .ToList(); // Копируем в список, чтобы можно было удалять из оригинальной коллекции
+                                 !d.Source.OriginalString.Contains("MaterialDesignThemes.Wpf") &&
+                                 !d.Source.OriginalString.Equals(new Uri(defaultResourcePath, UriKind.RelativeOrAbsolute).OriginalString, StringComparison.OrdinalIgnoreCase)) // Сравниваем URI
+                    .ToList();
 
                 foreach (var oldDict in oldDictionaries)
                 {
                     Application.Current.Resources.MergedDictionaries.Remove(oldDict);
                 }
 
-                // Создаем и загружаем новый словарь ресурсов
-                // Используем UriKind.Relative для ресурсов в сборке приложения
-                ResourceDictionary newLanguageDictionary = new ResourceDictionary() { Source = new Uri(resourcePath, UriKind.RelativeOrAbsolute) }; // UriKind.Relative обычно достаточно
-
-                // Добавляем новый словарь в MergedDictionaries приложения
+                ResourceDictionary newLanguageDictionary = new ResourceDictionary() { Source = new Uri(resourcePathToLoad, UriKind.RelativeOrAbsolute) };
                 Application.Current.Resources.MergedDictionaries.Add(newLanguageDictionary);
 
-                // Опционально: Обновить привязки, если они не обновляются автоматически.
-                // Обычно DynamicResource должен автоматически обновиться после изменения MergedDictionaries,
-                // но если есть проблемы, может потребоваться принудительное обновление,
-                // например, через событие LanguageChanged в ViewModel и OnPropertyChanged.
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"App Ошибка: Не удалось загрузить или применить словарь ресурсов '{resourcePath}'. Ошибка: {ex.Message}"); // Для отладки
-                // Возможно, стоит использовать CultureInfo.InvariantCulture или другой fallback язык/словарь в случае ошибки
+                Console.WriteLine($"App Ошибка: Не удалось загрузить или применить словарь ресурсов '{resourcePathToLoad}'. Ошибка: {ex.Message}");
             }
-
-            // Уведомляем ViewModel (если он подписан и нужно обновить свойства)
-            // ViewModel уже подписан в MainWindowViewModel.cs, поэтому это сработает
-            // Console.WriteLine("App: Событие LanguageChanged завершено."); // Для отладки
         }
 
-        // ... другие методы App.xaml.cs ...
+         protected override void OnExit(ExitEventArgs e)
+        {
+            // Очистка сервисов, если они Disposable и создаются здесь
+            (colorMeasurementService as IDisposable)?.Dispose();
+            (fileService as IDisposable)?.Dispose();
+            (dialogService as IDisposable)?.Dispose();
+            (localizationService as IDisposable)?.Dispose();
+            // ...
+            base.OnExit(e);
+        }
     }
 }

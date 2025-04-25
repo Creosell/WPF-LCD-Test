@@ -18,10 +18,10 @@ using static WPF_LCD_Test.Resources.Resources;
 
 // Класс ViewModel для MainWindow. Наследует от BaseViewModel для уведомлений UI.
 // Реализует IDisposable для очистки ресурсов (отписка от событий).
-namespace WPF_LCD_Test.ViewModels// Пространство имен для ViewModel
+namespace WPF_LCD_Test.ViewModels
 {
-    public class MeasurementWindowViewModel : BaseViewModel, IDisposable
-    {
+    public class MeasurementViewModel : BaseViewModel, IDisposable
+    {   
         // --- Приватные поля для хранения экземпляров Сервисов и Модели ---
         private readonly IColorMeasurementService _colorMeasurementService; // Сервис для работы с прибором (зависимость)
 
@@ -229,25 +229,6 @@ namespace WPF_LCD_Test.ViewModels// Пространство имен для Vie
 
         public ObservableCollection<MeasurementStatusViewModel> AllMeasurementButtonStatuses { get; set; }
 
-        // Коллекция статусов для каждой точки измерения (для привязки к кнопкам или списку)
-        // Каждый элемент MeasurementStatusViewModel уведомляет об изменении своего статуса/цвета
-        //public ObservableCollection<MeasurementStatusViewModel> MeasurementStatuses
-        //{
-        //    get => _measurementStatuses;
-        //    // Сеттер приватный, коллекция заполняется в InitializeMeasurementStatuses
-        //    private set
-        //    {
-        //        if (_measurementStatuses != value)
-        //        {
-        //            _measurementStatuses = value;
-        //            OnPropertyChanged();
-        //        }
-        //    }
-        //}
-
-        // --- Команды ViewModel (для привязки к действиям в View) ---
-        // Используем get; private set; чтобы команды можно было установить только в конструкторе ViewModel
-
         public ICommand ConnectCommand { get; private set; }
         public ICommand DisconnectCommand { get; private set; }
         public ICommand ZeroCalibrationCommand { get; private set; }
@@ -265,7 +246,7 @@ namespace WPF_LCD_Test.ViewModels// Пространство имен для Vie
 
         // --- Конструктор ViewModel ---
         // Получает экземпляры всех необходимых сервисов через параметры (Инъекция Зависимостей)
-        public MeasurementWindowViewModel(IColorMeasurementService colorMeasurementService, IFileService fileService, IDialogService dialogService, ILocalizationService localizationService)
+        public MeasurementViewModel(IColorMeasurementService colorMeasurementService, IFileService fileService, IDialogService dialogService, ILocalizationService localizationService)
         {
             // Проверяем, что сервисы были корректно предоставлены
             _colorMeasurementService = colorMeasurementService ?? throw new ArgumentNullException(nameof(colorMeasurementService));

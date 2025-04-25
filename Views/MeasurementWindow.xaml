@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WPF_LCD_Test"
-        xmlns:viewModels="clr-namespace:WPF_LCD_Test.ViewModels"  d:DataContext="{d:DesignInstance Type=viewModels:MeasurementWindowViewModel}"
+        xmlns:local="clr-namespace:WPF_LCD_Test"    
+        xmlns:viewModels="clr-namespace:WPF_LCD_Test.ViewModels"  d:DataContext="{d:DesignInstance Type=viewModels:MeasurementViewModel}"
         xmlns:res="clr-namespace:WPF_LCD_Test.Resources"
         mc:Ignorable="d"
         Title="LCD Test Application" Height="600" Width="800" UseLayoutRounding="False" Icon="/Views/color_slurp_macos_bigsur_icon_190278.ico" MinWidth="800" MinHeight="600" WindowStartupLocation="CenterScreen" PreviewMouseDown="Window_PreviewMouseDown" PreviewKeyDown="Window_PreviewKeyDown">

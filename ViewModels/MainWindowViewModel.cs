@@ -128,7 +128,7 @@ namespace WPF_LCD_Test.ViewModels
                     // Создаем экземпляр MeasurementWindowViewModel (ваш переименованный ViewModel)
                     // и передаем ему сервисы, которые он требует в своем конструкторе.
                     // Убедитесь, что конструктор MeasurementWindowViewModel принимает эти сервисы.
-                    CurrentPageViewModel = new MeasurementWindowViewModel( // Используем ваше новое имя ViewModel
+                    CurrentPageViewModel = new MeasurementViewModel( // Используем ваше новое имя ViewModel
                         _colorMeasurementService,
                         _fileService,
                         _dialogService, // Если этот сервис нужен в MeasurementWindowViewModel
@@ -144,7 +144,7 @@ namespace WPF_LCD_Test.ViewModels
                 default:
                     // Опционально: обрабатываем неизвестные имена страниц или переходим на страницу по умолчанию
                     // Например, переходим на главную страницу измерений при неизвестном параметре.
-                    CurrentPageViewModel = new MeasurementWindowViewModel( // Переходим на MeasurementWindowViewModel по умолчанию
+                    CurrentPageViewModel = new MeasurementViewModel( // Переходим на MeasurementWindowViewModel по умолчанию
                          _colorMeasurementService, _fileService, _dialogService, _localizationService);
                     break;
             }
