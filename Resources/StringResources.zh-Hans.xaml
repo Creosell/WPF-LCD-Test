@@ -18,31 +18,31 @@
 >序列号：</system:String>
  
     <system:String x:Key="TopLeftPoint"
->1。左上</system:String>
+>1. 左上</system:String>
  
     <system:String x:Key="TopCenterPoint"
->2。顶中</system:String>
+>2. 顶中</system:String>
  
     <system:String x:Key="TopRightPoint"
->3。右上</system:String>
+>3. 右上</system:String>
  
     <system:String x:Key="MiddleLeftPoint"
->4。左中</system:String>
+>4. 左中</system:String>
  
     <system:String x:Key="CenterPoint"
->5。中心</system:String>
+>5. 中心</system:String>
  
     <system:String x:Key="MiddleRightPoint"
->6。右中</system:String>
+>6. 右中</system:String>
  
     <system:String x:Key="BottomLeftPoint"
->7。左下</system:String>
+>7. 左下</system:String>
  
     <system:String x:Key="BottomCenterPoint"
->8。底部中心</system:String>
+>8. 底部中心</system:String>
  
     <system:String x:Key="BottomRightPoint"
->9。右下</system:String>
+>9. 右下</system:String>
  
     <system:String x:Key="LanguageMenu"
 >Language</system:String>
@@ -57,7 +57,7 @@
 >B.蓝色</system:String>
  
     <system:String x:Key="BlackPoint"
->0。黑色</system:String>
+>0. 黑色</system:String>
  
     <system:String x:Key="SaveResultsButton"
 >保存结果</system:String>

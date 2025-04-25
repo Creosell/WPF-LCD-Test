@@ -7,7 +7,7 @@
         xmlns:viewModels="clr-namespace:WPF_LCD_Test.ViewModels"  d:DataContext="{d:DesignInstance Type=viewModels:MainWindowViewModel}"
         xmlns:res="clr-namespace:WPF_LCD_Test.Resources"
         mc:Ignorable="d"
-        Title="LCD Test Application" Height="600" Width="800" UseLayoutRounding="False" Icon="/Views/color_slurp_macos_bigsur_icon_190278.ico" MinWidth="800" MinHeight="600" WindowStartupLocation="CenterScreen">
+        Title="LCD Test Application" Height="600" Width="800" UseLayoutRounding="False" Icon="/Views/color_slurp_macos_bigsur_icon_190278.ico" MinWidth="800" MinHeight="600" WindowStartupLocation="CenterScreen" PreviewMouseDown="Window_PreviewMouseDown" PreviewKeyDown="Window_PreviewKeyDown">
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
