@@ -1,0 +1,294 @@
+﻿<Window x:Class="WPF_LCD_Test.MeasurementWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WPF_LCD_Test"
+        xmlns:viewModels="clr-namespace:WPF_LCD_Test.ViewModels"  d:DataContext="{d:DesignInstance Type=viewModels:MeasurementWindowViewModel}"
+        xmlns:res="clr-namespace:WPF_LCD_Test.Resources"
+        mc:Ignorable="d"
+        Title="LCD Test Application" Height="600" Width="800" UseLayoutRounding="False" Icon="/Views/color_slurp_macos_bigsur_icon_190278.ico" MinWidth="800" MinHeight="600" WindowStartupLocation="CenterScreen" PreviewMouseDown="Window_PreviewMouseDown" PreviewKeyDown="Window_PreviewKeyDown">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20" />
+            <RowDefinition Height="45*" />
+            <RowDefinition Height="45*" />
+            <RowDefinition Height="10*" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0">
+            <Menu FontSize="14">
+                <MenuItem Header="{DynamicResource LanguageMenu}" Height="20" Background="#00000000">
+                    <MenuItem Header="{DynamicResource English}" Command="{Binding SwitchLanguageCommand}"
+                              CommandParameter="en" />
+                    <MenuItem Header="{DynamicResource Chinese}" Command="{Binding SwitchLanguageCommand}"
+                              CommandParameter="zh-Hans" />
+                </MenuItem>
+            </Menu>
+        </StackPanel>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="45*" />
+                <ColumnDefinition Width="55*" />
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30*" />
+                    <RowDefinition Height="30*" />
+                    <RowDefinition Height="30*" />
+                    <RowDefinition Height="30*" />
+                </Grid.RowDefinitions>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="{DynamicResource ZeroCalibration}" Command="{Binding ZeroCalibrationCommand}" Margin="5" />
+
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,20,10,10">
+                                    <!--<TextBlock Text="{Binding DeviceConnectionStatusText}"
+
+                         VerticalAlignment="Center" Margin="5,0" />
+                        <TextBlock Text="{Binding DeviceCalibrationStatusText}"
+           VerticalAlignment="Center" Margin="5,0" />-->
+                    </StackPanel>
+                </StackPanel>
+                <Grid Grid.Row="1">
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="{DynamicResource MeasurementTimeSec}" VerticalAlignment="Center" />
+                        <TextBox Margin="5,0" VerticalAlignment="Center" MinWidth="50"
+                                 x:Name="MeasurementTimeTextBox"
+                            Text="{Binding MeasurementTime, UpdateSourceTrigger=Explicit,
+                            StringFormat={}{0}}"
+                            LostFocus="MeasurementTimeTextBox_LostFocus">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter"
+                                    Command="{Binding DataContext.ApplyMeasurementTimeCommand,
+                                    RelativeSource={RelativeSource FindAncestor,
+                                    AncestorType={x:Type Window}}}"
+                                    CommandParameter="{Binding Text, ElementName=MeasurementTimeTextBox}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Row="2">
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="{DynamicResource SerialNumber}" VerticalAlignment="Center" />
+                        <TextBox Margin="5,0" VerticalAlignment="Center" MinWidth="200"
+                                x:Name="SerialNumberTextBox"
+                                Text="{Binding SerialNumber, UpdateSourceTrigger=Explicit}"
+                                 LostFocus="SerialNumberTextBox_LostFocus">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter"
+                                    Command="{Binding DataContext.ApplySerialNumberCommand,
+                                    RelativeSource={RelativeSource
+                                    FindAncestor, AncestorType={x:Type Window}}}"
+                                    CommandParameter="{Binding Text, ElementName=SerialNumberTextBox}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+            <Grid Grid.Column="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="70*" />
+                        <RowDefinition Height="30*" />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30*" />
+                            <RowDefinition Height="30*" />
+                            <RowDefinition Height="30*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="30*" />
+                            <ColumnDefinition Width="30*" />
+                            <ColumnDefinition Width="30*" />
+                        </Grid.ColumnDefinitions>
+                        <Button Content="{DynamicResource TopLeftPoint}"
+                                Command="{Binding MeasureCommand}"
+                                CommandParameter="{Binding TopLeftStatus.Location}"
+                                Grid.Row="0" Grid.Column="0" Margin="5">
+                            <Button.Background>
+                                <Binding Path="TopLeftStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="TopLeftStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                        </Button>
+                        <Button Content="{DynamicResource TopCenterPoint}"
+                                Command="{Binding MeasureCommand}"
+                                CommandParameter="{Binding TopCenterStatus.Location}"
+                                Grid.Row="0" Grid.Column="1" Margin="5">
+                            <Button.Background>
+                                <Binding Path="TopCenterStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="TopCenterStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                        </Button>
+                        <Button Content="{DynamicResource TopRightPoint}"
+                                Command="{Binding MeasureCommand}"
+                                CommandParameter="{Binding TopRightStatus.Location}"
+                                Grid.Row="0" Grid.Column="2" Margin="5">
+                            <Button.Background>
+                                <Binding Path="TopRightStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="TopRightStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                        </Button>
+                        <Button Content="{DynamicResource MiddleLeftPoint}"
+                                Command="{Binding MeasureCommand}"
+                                CommandParameter="{Binding MiddleLeftStatus.Location}"
+                                Grid.Row="1" Grid.Column="0" Margin="5">
+                            <Button.Background>
+                                <Binding Path="MiddleLeftStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="MiddleLeftStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                        </Button>
+                        <Button Content="{DynamicResource CenterPoint}"
+                                Command="{Binding MeasureCommand}"
+                                CommandParameter="{Binding CenterStatus.Location}"
+                                Grid.Row="1" Grid.Column="1" Margin="5">
+                            <Button.Background>
+                                <Binding Path="CenterStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="CenterStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                        </Button>
+                        <Button Content="{DynamicResource MiddleRightPoint}"
+                                Command="{Binding MeasureCommand}"
+                                CommandParameter="{Binding MiddleRightStatus.Location}"
+                                Grid.Row="1" Grid.Column="2" Margin="5">
+                            <Button.Background>
+                                <Binding Path="MiddleRightStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="MiddleRightStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                        </Button>
+                        <Button Content="{DynamicResource BottomLeftPoint}"
+                                Command="{Binding MeasureCommand}"
+                                CommandParameter="{Binding BottomLeftStatus.Location}"
+                                Grid.Row="2" Grid.Column="0" Margin="5">
+                            <Button.Background>
+                                <Binding Path="BottomLeftStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="BottomLeftStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                        </Button>
+                        <Button Content="{DynamicResource BottomCenterPoint}"
+                                Command="{Binding MeasureCommand}"
+                                CommandParameter="{Binding BottomCenterStatus.Location}"
+                                Grid.Row="2" Grid.Column="1" Margin="5">
+                            <Button.Background>
+                                <Binding Path="BottomCenterStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="BottomCenterStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                        </Button>
+                        <Button Content="{DynamicResource BottomRightPoint}"
+                                Command="{Binding MeasureCommand}"
+                                CommandParameter="{Binding BottomRightStatus.Location}"
+                                Grid.Row="2" Grid.Column="2" Margin="5">
+                            <Button.Background>
+                                <Binding Path="BottomRightStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="BottomRightStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                        </Button>
+                    </Grid>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Margin="5,0,0,0">
+                        <Button Content="{DynamicResource RedPoint}"
+                                Command="{Binding MeasureCommand}"
+                                CommandParameter="{Binding RedColorStatus.Location}"
+                                Margin="5">
+                            <Button.Background>
+                                <Binding Path="RedColorStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="RedColorStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                       </Button>
+                        <Button Content="{DynamicResource GreenPoint}"
+                                Command="{Binding MeasureCommand}"
+                                CommandParameter="{Binding GreenColorStatus.Location}"
+                                Margin="5">
+                            <Button.Background>
+                                <Binding Path="GreenColorStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="GreenColorStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                        </Button>
+                        <Button Content="{DynamicResource BluePoint}"
+                                Command="{Binding MeasureCommand}"
+                                CommandParameter="{Binding BlueColorStatus.Location}"
+                                Margin="5">
+                            <Button.Background>
+                                <Binding Path="BlueColorStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="BlueColorStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                        </Button>
+                        <Button Content="{DynamicResource BlackPoint}"
+                                Command="{Binding MeasureCommand}"
+                                 CommandParameter="{Binding BlackColorStatus.Location}"
+                                 Margin="5">
+                            <Button.Background>
+                                <Binding Path="BlackColorStatus.StatusColor" />
+                            </Button.Background>
+                            <Button.ToolTip>
+                                <Binding Path="BlackColorStatus.MeasuredValuesString" />
+                            </Button.ToolTip>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Grid>
+        <ListBox Grid.Row="2" Margin="0,5,5,5"
+         x:Name="LogListBox"
+         ItemsSource="{Binding LogMessages}"
+         SelectionMode="Single" MinHeight="200">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="MinHeight" Value="18" />
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBox x:Name="LogTextBox" Text="{Binding Mode=OneWay}"
+                             IsReadOnly="True"
+                             Background="Transparent"
+                             TextWrapping="Wrap"
+                             Padding="0,0,0,0"
+                             FocusVisualStyle="{x:Null}">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="BorderBrush" Value="Transparent" />
+                                <Style.Triggers>
+                                    <Trigger Property="IsKeyboardFocused" Value="True">
+                                        <Setter Property="BorderThickness" Value="0" />
+                                        <Setter Property="BorderBrush" Value="Transparent" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+            <Button Content="{DynamicResource SaveResultsButton}" Command="{Binding SaveResultsCommand}" Margin="5" />
+            <Button Content="{DynamicResource ClearFieldsButton}" Command="{Binding ClearFieldsCommand}" Margin="5" />
+        </StackPanel>
+    </Grid>
+</Window>

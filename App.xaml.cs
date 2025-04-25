@@ -1,7 +1,9 @@
 ﻿// В файле App.xaml.cs
 
 using System.Windows;
-using WPF_LCD_Test.Services; // Добавь using для твоего сервиса
+using WPF_LCD_Test.Services;
+using WPF_LCD_Test.Views;
+using WPF_LCD_Test.ViewModels;
 
 namespace WPF_LCD_Test
 {
@@ -28,7 +30,7 @@ namespace WPF_LCD_Test
             localizationService.SetLanguage("en"); // Или другой язык по умолчанию
 
             // 4. Явно создаем и показываем главное окно, т.к. убрали StartupUri
-            MainWindow mainWindow = new MainWindow();
+            MeasurementWindow mainWindow = new MeasurementWindow();
             mainWindow.Show();
 
             // === Конец перенесенной логики ===
