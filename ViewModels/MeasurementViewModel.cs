@@ -256,7 +256,7 @@ namespace WPF_LCD_Test.ViewModels
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
 
             // Инициализация коллекций
-            LogMessages = new ObservableCollection<string>();
+            LogMessages = [];
             //MeasurementStatuses = new ObservableCollection<MeasurementStatusViewModel>();
 
             // Инициализация свойств по умолчанию (как при старте приложения)
@@ -304,7 +304,7 @@ namespace WPF_LCD_Test.ViewModels
         private void MeasurementButtonsStatusInit()
         {
             // Инициализируем коллекцию
-            AllMeasurementButtonStatuses = new ObservableCollection<MeasurementStatusViewModel>();
+            AllMeasurementButtonStatuses = [];
 
             // Создаем объекты и добавляем ИХ в коллекцию
             TopLeftStatus = new MeasurementStatusViewModel("Top left");
@@ -338,9 +338,7 @@ namespace WPF_LCD_Test.ViewModels
 
         private void RequieredMeasurementButtonsInit()
         {
-            _requiredMeasurementNames = AllMeasurementButtonStatuses
-            .Select(status => status.Location) // Выбираем только свойство Location из каждого объекта статуса
-            .ToList();                        // Преобразуем результат в List<string>
+            _requiredMeasurementNames = [.. AllMeasurementButtonStatuses.Select(status => status.Location)];  // Преобразуем результат в List<string>
         }
 
         // Асинхронная команда подключения
@@ -836,7 +834,7 @@ namespace WPF_LCD_Test.ViewModels
             // App.Current.Dispatcher.Invoke выполнит действие в UI потоке
             App.Current.Dispatcher.Invoke(() =>
             {
-                LogMessages.Add($"{DateTime.Now.ToString("HH:mm:ss")} - {message}");
+                LogMessages.Add($"{DateTime.Now:HH:mm:ss} - {message}");
                 // Опционально: ограничить количество сообщений в логе
                 if (LogMessages.Count > 500) // Например, держать не более 500 сообщений
                 {
@@ -1074,7 +1072,7 @@ namespace WPF_LCD_Test.ViewModels
             // Ссылки на сервисы, если они были инжектированы, обычно не сбрасываются здесь,
             // их жизненным циклом управляет контейнер DI.
             // Если ViewModel сам создавал сервисы (что не рекомендуется), тогда их нужно сбросить.
-
+            GC.SuppressFinalize(this);
             AddLogMessage($"{ViewModelCleared}");
         }
 

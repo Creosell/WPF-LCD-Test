@@ -60,6 +60,12 @@ namespace WPF_LCD_Test
             // 7. Показываем главное окно
             mainWindow.Show();
         }
+        public static void CheckCurrentAppLanguage()
+        {
+            // Устанавливаем эту культуру для текущего потока из пула
+            Thread.CurrentThread.CurrentCulture = LocalizationService.Instance.CurrentCulture; ;
+            Thread.CurrentThread.CurrentUICulture = LocalizationService.Instance.CurrentCulture; ;
+        }
 
         // Обработчик события смены языка сервиса локализации
         private void LocalizationService_LanguageChanged(object sender, EventArgs e)

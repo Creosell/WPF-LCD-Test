@@ -1,48 +1,160 @@
-﻿<Window x:Class="WPF_LCD_Test.Views.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WPF_LCD_Test" 
-        xmlns:viewmodel="clr-namespace:WPF_LCD_Test.ViewModels" 
-        xmlns:view="clr-namespace:WPF_LCD_Test.Views"
-        mc:Ignorable="d"
-        Title="LCD Test Tool" 
-        Height="600" Width="900" Icon="/Views/color_slurp_macos_bigsur_icon_190278.ico"
-        d:DataContext="{d:DesignInstance Type=viewmodel:SettingsViewModel}">
+﻿<Window
+    x:Class="WPF_LCD_Test.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:WPF_LCD_Test"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:resources="clr-namespace:WPF_LCD_Test.Resources"
+    xmlns:view="clr-namespace:WPF_LCD_Test.Views"
+    xmlns:viewmodel="clr-namespace:WPF_LCD_Test.ViewModels"
+    Title="LCD Test Tool"
+    Width="900"
+    Height="600"
+    d:DataContext="{d:DesignInstance Type=viewmodel:SettingsViewModel}"
+    Icon="/Views/color_slurp_macos_bigsur_icon_190278.ico"
+    mc:Ignorable="d">
+
+
+    <Window.Resources>
+        <Style x:Key="NavigationButtonStyle" TargetType="RadioButton">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="MinHeight" Value="50" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border
+                            Margin="{TemplateBinding Margin}"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                RecognizesAccessKey="True" />
+                            <Border.Name>Border</Border.Name>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#3A3838" />
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#999999" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#4A4848" />
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#BBBBBB" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#A0A0A0" />
+                            </Trigger>
+
+                        </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource Self}}" Value="True">
+                    <Setter Property="Background" Value="Purple" />
+                    <Setter Property="Foreground" Value="White" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
 
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" Background="#F0F0F0" BorderBrush="#CCCCCC" BorderThickness="0,0,1,0">
-            <StackPanel Orientation="Vertical" Margin="10" MinWidth="150">
-                <StackPanel Orientation="Horizontal" >
-                    
-                    <Button Content="{DynamicResource MeasurementTitle}"
-                            Margin="0,0,0,5" Padding="30,5,5,5"
-                            
-                            HorizontalAlignment="Stretch"
-                            Command="{Binding NavigateCommand}"
-                            CommandParameter="Measurement">
-                       
-                    </Button>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Width="Auto">
-                    <Button Content="{DynamicResource SettingsTitle}" Margin="0,0,0,5" Padding="5"
-                HorizontalAlignment="Stretch"
-                Command="{Binding NavigateCommand}"
-                CommandParameter="Settings"/>
-                </StackPanel>
-                
-            </StackPanel>
+        <Border
+            Grid.Column="0"
+            MinWidth="150"
+            Background="#FF2A2828"
+            BorderBrush="#CCCCCC"
+            BorderThickness="0,0,0,0">
+            <Grid
+                MinWidth="200"
+                MinHeight="150"
+                Margin="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <RadioButton
+                    Grid.Row="0"
+                    MinHeight="50"
+                    Padding="0"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Command="{Binding NavigateCommand}"
+                    CommandParameter="Measurement"
+                    IsChecked="True"
+                    Style="{StaticResource NavigationButtonStyle}">
+                    <RadioButton.Content>
+                        <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                            <Image
+                                Width="30"
+                                Height="30"
+                                Source="/Images/ButtonsIcons/MeasurementViewIcon.png"
+                                Stretch="Fill" />
+                            <TextBlock
+                                Margin="5,0,0,0"
+                                VerticalAlignment="Center"
+                                Text="{DynamicResource MeasurementTitle}" />
+                        </StackPanel>
+                    </RadioButton.Content>
+                </RadioButton>
+
+                <RadioButton
+                    Grid.Row="1"
+                    MinHeight="50"
+                    Padding="0"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Stretch"
+                    Command="{Binding NavigateCommand}"
+                    CommandParameter="Settings"
+                    Style="{StaticResource NavigationButtonStyle}">
+                    <RadioButton.Content>
+                        <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                            <Image
+                                Width="30"
+                                Height="30"
+                                Source="/Images/ButtonsIcons/SettingsViewIcon.png"
+                                Stretch="Fill" />
+                            <TextBlock
+                                Margin="5,0,0,0"
+                                VerticalAlignment="Center"
+                                Text="{DynamicResource SettingsTitle}" />
+                        </StackPanel>
+                    </RadioButton.Content>
+                </RadioButton>
+
+            </Grid>
         </Border>
 
-
-        <ContentControl Grid.Column="1" Content="{Binding CurrentPageViewModel}"/>
+        <ContentControl Grid.Column="1" Content="{Binding CurrentPageViewModel}" />
 
     </Grid>
 </Window>

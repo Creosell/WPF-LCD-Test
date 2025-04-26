@@ -30,13 +30,17 @@ namespace WPF_LCD_Test.ViewModels
         private readonly IDialogService _dialogService; // Возможно, нужен для общеприложениевых диалогов
         private readonly ILocalizationService _localizationService; // Нужен для смены языка и подписки
         private readonly ISettingsService _settingService;
+        private BaseViewModel _currentPageViewModel;
+        private string _currentPageIdentifier;
+
+        // Геттеры и сеттеры для текущей страницы
+        public string CurrentPageIdentifier
+        {
+            get => _currentPageIdentifier;
+            private set => SetProperty(ref _currentPageIdentifier, value); // Используем SetProperty для уведомления UI
+        }
 
 
-        // --- СВОЙСТВО НАВИГАЦИИ: Это свойство будет содержать текущий ViewModel отображаемой страницы !!! ---
-        // ContentControl в MainWindow.xaml будет привязан к этому свойству.
-        // Тип может быть PageViewModelBase, если вы его создали, или просто object.
-        private BaseViewModel _currentPageViewModel; // Используйте PageViewModelBase, если он создан
-        // private object _currentPageViewModel; // Или используйте object
         public BaseViewModel CurrentPageViewModel // Используйте PageViewModelBase, если он создан
         // public object CurrentPageViewModel // Или используйте object
         {
@@ -122,9 +126,9 @@ namespace WPF_LCD_Test.ViewModels
         private void ExecuteNavigate(object parameter)
         {
             string? pageName = parameter as string; // Получаем имя страницы из параметра команды
+            CurrentPageIdentifier = pageName; // Сохраняем идентификатор текущей страницы (если нужно)
 
             // Создаем соответствующий ViewModel для выбранной страницы.
-            // !!! ВАЖНО: ПЕРЕДАЕМ НУЖНЫЕ СЕРВИСЫ В КОНСТРУКТОРЫ ViewModel СТРАНИЦ !!!
             switch (pageName)
             {
                 case "Measurement":
@@ -172,6 +176,7 @@ namespace WPF_LCD_Test.ViewModels
         // Если все локализуемые свойства перенесены в ViewModel страниц,
         // и ViewModel страниц сами подписаны на LanguageChanged, то этот обработчик в оболочке может быть пустым
         // или удален.
+
         private void LocalizationService_LanguageChanged(object sender, EventArgs e)
         {
             // Если в этом ViewModel (оболочки) есть локализуемые свойства, обновите их здесь.

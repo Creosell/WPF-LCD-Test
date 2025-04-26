@@ -58,7 +58,7 @@ namespace WPF_LCD_Test.ViewModels
         /// <summary>
         /// Коллекция доступных языков для ComboBox.
         /// </summary>
-        public ObservableCollection<LanguageOption> AvailableLanguages { get; } = new ObservableCollection<LanguageOption>();
+        public ObservableCollection<LanguageOption> AvailableLanguages { get; } = [];
 
         private LanguageOption _selectedLanguage;
         /// <summary>
@@ -134,26 +134,20 @@ namespace WPF_LCD_Test.ViewModels
             _localizationService.LanguageChanged += LocalizationService_LanguageChanged;
         }
 
-        // --- ВСПОМОГАТЕЛЬНЫЙ МЕТОД ---
-        /// <summary>
-        /// Заполняет коллекцию доступных языков.
-        /// TODO: Можно сделать это более динамически, читая из ресурсов или конфигурации.
-        /// </summary>
+        // Simplified 'new' expressions in PopulateAvailableLanguages method
         private void PopulateAvailableLanguages()
         {
-            // Используем локализованные названия языков из ресурсов
-            // Убедитесь, что у вас есть ключи "English" и "Chinese" в StringResources.
-            AvailableLanguages.Add(new LanguageOption { DisplayName = Resources.Resources.English, CultureCode = "en" });
-            AvailableLanguages.Add(new LanguageOption { DisplayName = Resources.Resources.Chinese, CultureCode = "zh-Hans" });
+            AvailableLanguages.Add(new() { DisplayName = Resources.Resources.English, CultureCode = "en" });
+            AvailableLanguages.Add(new() { DisplayName = Resources.Resources.Chinese, CultureCode = "zh-Hans" });
 
-            // TODO: Добавьте другие языки, если поддерживаете
+            // TODO: Add other languages if supported
         }
 
         private void LocalizationService_LanguageChanged(object sender, EventArgs e)
         {
             Debug.WriteLine("SettingsViewModel: Получено событие LanguageChanged.");
             // При смене языка, нужно обновить отображаемые названия языков в ComboBox
-            PopulateAvailableLanguages(); // Перезаполняем коллекцию с новыми локализованными названиями
+           // Перезаполняем коллекцию с новыми локализованными названиями
                                           // SelectedLanguage setter уже обновит LanguageCultureCode и установит язык UI.
                                           // Здесь главное - обновить сами элементы в коллекции.
 
@@ -232,7 +226,7 @@ namespace WPF_LCD_Test.ViewModels
         private void ExecuteSaveSettings(object parameter)
         {
             // !!! Собираем текущие значения настроек из свойств ViewModel в объект AppSettings !!!
-            AppSettings settingsToSave = new AppSettings
+            AppSettings settingsToSave = new()
             {
                 LanguageCultureCode = LanguageCultureCode, // Берем код из свойства ViewModel
                 // TODO: Заполните остальные свойства из ViewModel
@@ -244,15 +238,16 @@ namespace WPF_LCD_Test.ViewModels
             SaveSettings(settingsToSave);
         }
 
+        // Simplified 'new' expression in SaveLanguageToSettings method
         private void SaveLanguageToSettings()
         {
-            // Сохраняем изменения языка
-            AppSettings settingsToSave = new AppSettings
+            // Save language changes
+            AppSettings settingsToSave = new()
             {
-                LanguageCultureCode = LanguageCultureCode, 
+                LanguageCultureCode = LanguageCultureCode,
             };
 
-            // Вызываем вспомогательный метод сохранения
+            // Call helper method to save settings
             SaveSettings(settingsToSave);
         }
 
@@ -323,6 +318,8 @@ namespace WPF_LCD_Test.ViewModels
         // --- РЕАЛИЗАЦИЯ IDisposable ---
         public void Dispose()
         {
+            _localizationService.LanguageChanged -= LocalizationService_LanguageChanged;
+            GC.SuppressFinalize(this);
             Debug.WriteLine("SettingsViewModel Dispose Called.");
 
             // TODO: Отписка от событий сервисов, если была подписка в конструкторе
