@@ -125,28 +125,38 @@ namespace WPF_LCD_Test.ViewModels
             switch (pageName)
             {
                 case "Measurement":
-                    // Создаем экземпляр MeasurementWindowViewModel (ваш переименованный ViewModel)
-                    // и передаем ему сервисы, которые он требует в своем конструкторе.
-                    // Убедитесь, что конструктор MeasurementWindowViewModel принимает эти сервисы.
-                    CurrentPageViewModel = new MeasurementViewModel( // Используем ваше новое имя ViewModel
-                        _colorMeasurementService,
-                        _fileService,
-                        _dialogService, // Если этот сервис нужен в MeasurementWindowViewModel
-                        _localizationService); // Если этот сервис нужен в MeasurementWindowViewModel
+
+                    if (!(CurrentPageViewModel is MeasurementViewModel))
+                    {
+                        // Перед созданием нового ViewModel, очищаем предыдущий, если он IDisposable
+                        (CurrentPageViewModel as IDisposable)?.Dispose();
+
+                        // !!! Здесь создается НОВЫЙ экземпляр MeasurementViewModel !!!
+                        CurrentPageViewModel = new MeasurementViewModel(
+                            _colorMeasurementService,
+                            _fileService,
+                            _dialogService,
+                            _localizationService // Передаем сервисы
+                        );
+                    }
                     break;
                 case "Settings":
-                    // TODO: Создайте SettingsViewModel и SettingsView (UserControl)
-                    // CurrentPageViewModel = new SettingsViewModel(); // Создаем экземпляр ViewModel для страницы настроек
-                    // Если SettingsViewModel требует сервисы: CurrentPageViewModel = new SettingsViewModel(_someService);
+                    if (!(CurrentPageViewModel is SettingsViewModel))
+                    {
+                        (CurrentPageViewModel as IDisposable)?.Dispose();
+                        CurrentPageViewModel = new SettingsViewModel(); // Создаем экземпляр SettingsViewModel
+                    }
                     break;
                 // TODO: Добавьте case для других страниц (например, About, Help и т.д.)
 
                 default:
-                    // Опционально: обрабатываем неизвестные имена страниц или переходим на страницу по умолчанию
-                    // Например, переходим на главную страницу измерений при неизвестном параметре.
-                    CurrentPageViewModel = new MeasurementViewModel( // Переходим на MeasurementWindowViewModel по умолчанию
+                    if (!(CurrentPageViewModel is MeasurementViewModel))
+                    {
+                        CurrentPageViewModel = new MeasurementViewModel( // Переходим на MeasurementWindowViewModel по умолчанию
                          _colorMeasurementService, _fileService, _dialogService, _localizationService);
+                    }
                     break;
+
             }
             // Свойство CurrentPageViewModel вызывает SetProperty и OnPropertyChanged (из BaseViewModel),
             // что заставляет ContentControl в MainWindow.xaml обновить свое содержимое,

@@ -10,12 +10,12 @@
              d:DesignHeight="600" d:DesignWidth="800"
              xmlns:res="clr-namespace:WPF_LCD_Test.Resources">
 
-    <Grid>
+    <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="40*" />
+            <RowDefinition Height="50*" />
+            <RowDefinition Height="10*" />
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0">

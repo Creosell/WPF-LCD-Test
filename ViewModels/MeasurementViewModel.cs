@@ -21,7 +21,7 @@ using static WPF_LCD_Test.Resources.Resources;
 namespace WPF_LCD_Test.ViewModels
 {
     public class MeasurementViewModel : BaseViewModel, IDisposable
-    {   
+    {
         // --- Приватные поля для хранения экземпляров Сервисов и Модели ---
         private readonly IColorMeasurementService _colorMeasurementService; // Сервис для работы с прибором (зависимость)
 
@@ -30,8 +30,6 @@ namespace WPF_LCD_Test.ViewModels
         private readonly ILocalizationService _localizationService; // Сервис для локализации (зависимость)
 
         private DeviceUnderTest _currentDevice; // Текущее устройство под тестированием (объект Модели)
-
-        private Dispatcher _dispatcher; //Диспетчер UI-потока
 
         // --- Приватные поля для хранения данных и состояния UI (будут привязаны к View) ---
         private string _serialNumber;
@@ -43,6 +41,8 @@ namespace WPF_LCD_Test.ViewModels
         private bool _isMeasurementButtonsEnabled; // Флаг доступности кнопок измерений (UI IsEnabled)
         private bool _isDeviceConnected; // Флаг статуса подключения прибора (UI индикатор)
         private bool _isDeviceCalibrated; // Флаг статуса калибровки прибора (UI индикатор)
+        private bool _isDeviceConnecting;
+        private bool _isDeviceCalibrating;
 
         // private double _measurementProgress; // Если хотим показывать прогресс измерения (UI ProgressBar)
 
@@ -284,31 +284,13 @@ namespace WPF_LCD_Test.ViewModels
 
             // Подписка на события сервисов, чтобы ViewModel мог реагировать на их активность
             // и обновлять UI/состояние через свойства ViewModel или лог
-            _colorMeasurementService.StatusMessage += (sender, message) => AddLogMessage(message); // Получаем сообщения от сервиса прибора
-            _fileService.StatusMessage += (sender, message) => AddLogMessage(message); // Получаем сообщения от сервиса файлов
-            //_localizationService.LanguageChanged += LocalizationService_LanguageChanged; // <-- Эта строка должна быть
 
-            // Обновляем свойства статуса ViewModel при изменении статуса в Сервисе
-            _colorMeasurementService.ConnectionStatusChanged += (sender, isConnected) =>
-            {
-                // Маршалируем вызов обратно в UI-поток
-                _dispatcher.Invoke(() =>
-                {
-                    // Этот код теперь будет выполнен в UI-потоке
-                    IsDeviceConnected = isConnected;
-                    // Все, что должно происходить в UI-потоке при изменении IsDeviceConnected,
-                    // должно быть внутри этого блока Dispatcher.Invoke
-                    // (Вызовы OnPropertyChanged и UpdateCommandsCanExecute происходят из сеттера)
-                });
-            };
-            _colorMeasurementService.CalibrationStatusChanged += (sender, isCalibrated) =>
-            {
-                _dispatcher.Invoke(() =>
-                {
-                    IsDeviceCalibrated = isCalibrated;
-                    // UpdateCommandsCanExecute(); // Если это вызывается из сеттера IsDeviceCalibrated, оно тоже будет в UI потоке
-                });
-            };
+            // Подписка на события сервисов с использованием именованных методов
+            _colorMeasurementService.StatusMessage += ColorMeasurementService_StatusMessage;
+            _fileService.StatusMessage += FileService_StatusMessage;
+            _colorMeasurementService.ConnectionStatusChanged += (sender, isConnected) => ColorMeasurementService_ConnectionStatusChanged(sender, isConnected); // Подписка на событие подключения
+            _colorMeasurementService.CalibrationStatusChanged += (sender, isCalibrated) => ColorMeasurementService_CalibrationStatusChanged(sender, isCalibrated); // Подписка на событие калибровки
+            //_localizationService.LanguageChanged += LocalizationService_LanguageChanged; // <-- Эта строка должна быть
 
             // Инициализация начального состояния UI и команд
             //InitializeMeasurementStatuses(); // Создаем начальные статусы для всех точек измерения
@@ -367,6 +349,7 @@ namespace WPF_LCD_Test.ViewModels
 
             try
             {
+                _isDeviceConnecting = true;
                 // Вызываем асинхронный метод Сервиса. Результат и статус придут через события.
                 await _colorMeasurementService.ConnectAsync();
             }
@@ -374,6 +357,10 @@ namespace WPF_LCD_Test.ViewModels
             {
                 // Обработка непредвиденных
                 ExecuteDisconnect(parameter);
+            }
+            finally
+            {
+                _isDeviceConnecting = false;
             }
         }
 
@@ -410,6 +397,7 @@ namespace WPF_LCD_Test.ViewModels
 
                 if (IsDeviceConnected)
                 {
+                    _isDeviceCalibrating = true;
                     await _colorMeasurementService.CalibrateZeroAsync();
                 }
             }
@@ -417,6 +405,10 @@ namespace WPF_LCD_Test.ViewModels
             {
                 ExecuteDisconnect(parameter); //Если калибровка была неуспешной, отключаем прибор
                 _dialogService.ShowMessage($"{ErrAtCalibration}", $"{Err}");
+            }
+            finally
+            {
+                _isDeviceCalibrating = false;
             }
 
             // Обновляем доступность команд и кнопок (непосредственно после завершения калибровки)
@@ -765,19 +757,21 @@ namespace WPF_LCD_Test.ViewModels
         // Проверка доступности команды Подключить: доступна, если прибор НЕ подключен
         private bool CanExecuteConnect(object parameter)
         {
-            return !IsDeviceConnected; // Используем публичное свойство
+            return !IsDeviceConnected
+                && !_isDeviceCalibrating
+                && !_isDeviceConnecting;
         }
 
         // Проверка доступности команды Отключить: доступна, если прибор ПОДКЛЮЧЕН
         private bool CanExecuteDisconnect(object parameter)
         {
-            return true; // Используем публичное свойство
+            return !_isDeviceConnecting && !_isDeviceCalibrating;
         }
 
         // Проверка доступности команды Калибровка нуля: доступна, если прибор ПОДКЛЮЧЕН И НЕ КАЛИБРОВАН
         private bool CanExecuteZeroCalibration(object parameter)
         {
-            return true;
+            return !_isDeviceConnecting && !_isDeviceCalibrating;
         }
 
         // Проверка доступности команды Сохранить: есть объект устройства, серийный номер и измерения
@@ -808,6 +802,8 @@ namespace WPF_LCD_Test.ViewModels
         {
             // Проверка основных условий доступности
             return IsDeviceConnected       // Прибор подключен
+                   && !_isDeviceCalibrating // Прибор калибруется
+                   && !_isDeviceConnecting // Прибор подключается
                    && IsDeviceCalibrated   // Прибор откалиброван
                    && SerialNumber != "" // Серийный номер подтвержден
                    && (MeasurementTime > 0);  // Время измерения больше нуля
@@ -884,12 +880,6 @@ namespace WPF_LCD_Test.ViewModels
         // Этот класс представляет статус одной точки измерения в UI.
         // Он должен быть либо вложенным public классом в MainWindowViewModel, либо отдельным файлом в папке ViewModels.
         // ОН ДОЛЖЕН НАСЛЕДОВАТЬ ОТ BaseViewModel, чтобы UI мог реагировать на изменения его свойств.
-
-        // Если хочешь, чтобы был отдельный файл:
-        // Перенеси этот класс в файл MeasurementStatusViewModel.cs в папке ViewModels.
-        // Убедись, что у него public модификатор и правильное пространство имен (WPF_LCD_Test.ViewModels)
-        // и что он наследует от BaseViewModel.
-        // Если он вложенный, оставь его public class MeasurementStatusViewModel здесь.
 
         public class MeasurementStatusViewModel : BaseViewModel // Наследует от BaseViewModel
         {
@@ -1000,47 +990,71 @@ namespace WPF_LCD_Test.ViewModels
         // --- Метод для обновления всех локализуемых текстов в ViewModel ---
         // Пример правильного обновления статусов в UpdateLocalizedTexts() или в обработчиках событий сервиса
 
+        // Метод-обработчик для события StatusMessage от _colorMeasurementService
+        private void ColorMeasurementService_StatusMessage(object sender, string message)
+        {
+            ExecuteThreadInUI(() =>
+            {
+                AddLogMessage(message); // Получаем сообщения от сервиса прибора
+            });
+        }
+
+        // Метод-обработчик для события StatusMessage от _fileService
+        private void FileService_StatusMessage(object sender, string message)
+        {
+            ExecuteThreadInUI(() =>
+            {
+                AddLogMessage(message); // Получаем сообщения от сервиса файлов
+            });
+        }
+
+        private void ColorMeasurementService_CalibrationStatusChanged(object sender, bool isCalibrated)
+        {
+            // Обработка смены статуса калибровки
+            ExecuteThreadInUI(() =>
+            {
+                IsDeviceCalibrated = isCalibrated;
+            });
+            UpdateCommandsCanExecute();
+        }
+
+        private void ColorMeasurementService_ConnectionStatusChanged(object sender, bool isConnected)
+        {
+            // Обработка смены статуса подключения
+            ExecuteThreadInUI(() =>
+            {
+                IsDeviceConnected = isConnected;
+                UpdateCommandsCanExecute();
+            });
+        }
+
+        // Если у вас есть другие подписки через лямбды, создайте для них аналогичные именованные методы.
+        // Например, для ConnectionStatusChanged:
+        // private void ColorMeasurementService_ConnectionStatusChanged(object sender, bool isConnected)
+        // {
+        //     // Логика обработки смены статуса подключения
+        //     IsDeviceConnected = isConnected;
+        //     UpdateDeviceConnectionStatusText();
+        //     UpdateCommandsCanExecute();
+        // }
+
         public void Dispose()
         {
             AddLogMessage($"{ViewModelClearing}");
 
             // Отписываемся от событий сервисов
-            // Используем оператор -= для отписки. Лямбда-выражения (sender, args) => { ... }
-            // должны быть теми же экземплярами делегатов, что использовались при подписке.
-            // Если лямбда-выражения создаются "на лету", отписаться от них так не получится.
-            // Лучше создавать именованные приватные методы-обработчики и подписываться/отписываться от них.
-            // Пример с именованными методами:
-            // _colorMeasurementService.StatusMessage += ColorMeasurementService_StatusMessage;
-            // ...
-            // _colorMeasurementService.StatusMessage -= ColorMeasurementService_StatusMessage;
 
-            // Пример отписки от событий с использованием лямбд (работает, если компилятор кэширует лямбду):
             if (_colorMeasurementService != null)
             {
-                // Если подписывался так: += (s, msg) => AddLogMessage(msg);
-                // Отписка может потребовать сохранения ссылки на делегат лямбды.
-                // Самый надежный способ - использовать именованные методы.
-
-                // Временное решение (если используешь лямбды напрямую в конструкторе):
-                // Отписка может не сработать корректно для всех лямбд, созданных в конструкторе.
-                // Лучше переписать подписку на именованные методы и отписываться от них.
-
-                // Пример, если переписал подписку на именованные методы:
-                // _colorMeasurementService.StatusMessage -= OnColorMeasurementServiceStatusMessage;
-                // _colorMeasurementService.ConnectionStatusChanged -= OnColorMeasurementServiceConnectionStatusChanged;
-                // _colorMeasurementService.CalibrationStatusChanged -= OnColorMeasurementServiceCalibrationStatusChanged;
-                // ...
-
-                // Пока оставим как есть, но имей в виду, что отписка от лямбд, созданных на лету, проблематична.
-                // Возможно, для простых случаев (логгирование) это не критично, но для статусов - важно.
+                _colorMeasurementService.StatusMessage -= ColorMeasurementService_StatusMessage;
+                _colorMeasurementService.ConnectionStatusChanged -= ColorMeasurementService_ConnectionStatusChanged;
+                _colorMeasurementService.CalibrationStatusChanged -= ColorMeasurementService_CalibrationStatusChanged;
             }
 
             if (_fileService != null)
             {
-                // Пример, если переписал подписку на именованные методы:
-                // _fileService.StatusMessage -= OnFileServiceStatusMessage;
+                _fileService.StatusMessage -= FileService_StatusMessage;
                 // _fileService.SaveOperationCompleted -= OnFileServiceSaveOperationCompleted;
-                // ...
             }
 
             // Вызываем Dispose у сервисов, если они реализуют IDisposable
@@ -1061,6 +1075,22 @@ namespace WPF_LCD_Test.ViewModels
             // Если ViewModel сам создавал сервисы (что не рекомендуется), тогда их нужно сбросить.
 
             AddLogMessage($"{ViewModelCleared}");
+        }
+
+        private void ExecuteThreadInUI(Action action)
+        {
+            // Проверяем, находимся ли мы уже в потоке пользовательского интерфейса.
+            // Если да, выполняем действие напрямую.
+            if (App.Current.Dispatcher.CheckAccess())
+            {
+                action.Invoke(); // Или просто action();
+            }
+            else
+            {
+                // Если мы в фоновом потоке, используем BeginInvoke для выполнения действия
+                // в потоке пользовательского интерфейса асинхронно.
+                App.Current.Dispatcher.BeginInvoke(action);
+            }
         }
     }
 }

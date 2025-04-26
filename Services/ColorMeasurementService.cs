@@ -257,6 +257,7 @@ namespace WPF_LCD_Test.Services
                                 LvValues[i] = _objCa200.SingleCa.SingleProbe.Lv;
                                 TValues[i] = _objCa200.SingleCa.SingleProbe.T;
                             }
+                            MeasurementProgress?.Invoke(this, (double)(i + 1) / measurementTime * 100); // Прогресс в процентах
                         }
                         catch (COMException measureEx)
                         {
