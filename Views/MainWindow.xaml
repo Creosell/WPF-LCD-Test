@@ -20,14 +20,24 @@
 
         <Border Grid.Column="0" Background="#F0F0F0" BorderBrush="#CCCCCC" BorderThickness="0,0,1,0">
             <StackPanel Orientation="Vertical" Margin="10" MinWidth="150">
-                <Button Content="Измерения" Margin="0,0,0,5" Padding="5"
-                        HorizontalAlignment="Stretch" 
-                        Command="{Binding NavigateCommand}"
-                        CommandParameter="Measurement"/>
-                <Button Content="Настройки" Margin="0,0,0,5" Padding="5"
-                         HorizontalAlignment="Stretch"
-                         Command="{Binding NavigateCommand}"
-                         CommandParameter="Settings"/>
+                <StackPanel Orientation="Horizontal" >
+                    
+                    <Button Content="{DynamicResource MeasurementTitle}"
+                            Margin="0,0,0,5" Padding="30,5,5,5"
+                            
+                            HorizontalAlignment="Stretch"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="Measurement">
+                       
+                    </Button>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Width="Auto">
+                    <Button Content="{DynamicResource SettingsTitle}" Margin="0,0,0,5" Padding="5"
+                HorizontalAlignment="Stretch"
+                Command="{Binding NavigateCommand}"
+                CommandParameter="Settings"/>
+                </StackPanel>
+                
             </StackPanel>
         </Border>
 

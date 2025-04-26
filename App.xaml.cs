@@ -5,6 +5,7 @@ using System.Windows;
 using WPF_LCD_Test.Services;
 using WPF_LCD_Test.Views;
 using WPF_LCD_Test.ViewModels;
+using WPF_LCD_Test.Models;
 
 
 namespace WPF_LCD_Test
@@ -12,26 +13,29 @@ namespace WPF_LCD_Test
     public partial class App : Application
     {
         // Объявите приватные поля для сервисов, если они нужны на уровне App (например, LocalizationService)
-        private ILocalizationService _localizationService;
+
         IColorMeasurementService colorMeasurementService = new ColorMeasurementService(); // Реализация сервиса прибора
         IFileService fileService = new FileService(); // Реализация сервиса файлов
         IDialogService dialogService = new DialogService(); // Реализация сервиса диалогов
+        ISettingsService settingsService = SettingsService.Instance; // Получаем синглтон сервиса настроек (если он синглтон)
         ILocalizationService localizationService = LocalizationService.Instance; // Получаем синглтон сервиса локализации (если он синглтон)
+        
 
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             // === КОМПОЗИЦИОННЫЙ КОРЕНЬ: Здесь создаются все сервисы и главный ViewModel ===
 
-            // 1. Создаем экземпляры всех сервисов
-            
+            // 1. Загружаем настройки
+            AppSettings appSettings = settingsService.LoadSettings();
 
             // 2. Создаем экземпляр ГЛАВНОГО ViewModel приложения (оболочки)
             MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(
                 colorMeasurementService,
                 fileService,
                 dialogService,
-                localizationService
+                localizationService,
+                settingsService
             );
 
             // 3. Создаем экземпляр главного окна (View оболочки)
@@ -51,7 +55,7 @@ namespace WPF_LCD_Test
             localizationService.LanguageChanged += LocalizationService_LanguageChanged; // Если App сам обрабатывает смену словаря, подписка здесь
 
             // Устанавливаем язык по умолчанию (это вызовет SetLanguage в сервисе,
-            localizationService.SetLanguage("en"); // Или другой язык по умолчанию
+            localizationService.SetLanguage(appSettings.LanguageCultureCode);
 
             // 7. Показываем главное окно
             mainWindow.Show();

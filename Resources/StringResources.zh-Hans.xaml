@@ -2,66 +2,63 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <system:String x:Key="English"
->English</system:String>
+    <!--MainWindow keys-->
+    <system:String x:Key="MeasurementTitle">
+        测量</system:String>
+    <system:String x:Key="SettingsTitle">
+        设置</system:String>
 
+    <!--MeasurementView keys-->
+    <system:String x:Key="English">
+        English</system:String>
     <system:String x:Key="Chinese"
->中文</system:String>
+        >中文</system:String>
+    <system:String x:Key="ZeroCalibration">
+        零校准</system:String>
+    <system:String x:Key="MeasurementTimeSec">
+        测量时间：</system:String>
+    <system:String x:Key="SerialNumber">
+        序列号：</system:String>
+    <system:String x:Key="TopLeftPoint">
+        1. 左上</system:String>
+    <system:String x:Key="TopCenterPoint">
+        2. 顶中</system:String>
+    <system:String x:Key="TopRightPoint">
+        3. 右上</system:String>
+    <system:String x:Key="MiddleLeftPoint">
+        4. 左中</system:String>
+    <system:String x:Key="CenterPoint">
+        5. 中心</system:String>
+    <system:String x:Key="MiddleRightPoint">
+        6. 右中</system:String>
+    <system:String x:Key="BottomLeftPoint">
+        7. 左下</system:String>
+    <system:String x:Key="BottomCenterPoint">
+        8. 底部中心</system:String>
+    <system:String x:Key="BottomRightPoint">
+        9. 右下</system:String>
+    <system:String x:Key="LanguageMenu">
+        Language</system:String>
+    <system:String x:Key="RedPoint">
+        R. 红色</system:String>
+    <system:String x:Key="GreenPoint">
+        G.格林</system:String>
+    <system:String x:Key="BluePoint">
+        B.蓝色</system:String>
+    <system:String x:Key="BlackPoint">
+        0. 黑色</system:String>
+    <system:String x:Key="SaveResultsButton">
+        保存结果</system:String>
+    <system:String x:Key="ClearFieldsButton">
+        清除字段</system:String>
 
-    <system:String x:Key="ZeroCalibration"
->零校准</system:String>
-
-    <system:String x:Key="MeasurementTimeSec"
->测量时间：</system:String>
-
-    <system:String x:Key="SerialNumber"
->序列号：</system:String>
-
-    <system:String x:Key="TopLeftPoint"
->1. 左上</system:String>
-
-    <system:String x:Key="TopCenterPoint"
->2. 顶中</system:String>
-
-    <system:String x:Key="TopRightPoint"
->3. 右上</system:String>
-
-    <system:String x:Key="MiddleLeftPoint"
->4. 左中</system:String>
-
-    <system:String x:Key="CenterPoint"
->5. 中心</system:String>
-
-    <system:String x:Key="MiddleRightPoint"
->6. 右中</system:String>
-
-    <system:String x:Key="BottomLeftPoint"
->7. 左下</system:String>
-
-    <system:String x:Key="BottomCenterPoint"
->8. 底部中心</system:String>
-
-    <system:String x:Key="BottomRightPoint"
->9. 右下</system:String>
-
-    <system:String x:Key="LanguageMenu"
->Language</system:String>
-
-    <system:String x:Key="RedPoint"
->R. 红色</system:String>
-
-    <system:String x:Key="GreenPoint"
->G.格林</system:String>
-
-    <system:String x:Key="BluePoint"
->B.蓝色</system:String>
-
-    <system:String x:Key="BlackPoint"
->0. 黑色</system:String>
-
-    <system:String x:Key="SaveResultsButton"
->保存结果</system:String>
-
-    <system:String x:Key="ClearFieldsButton"
->清除字段</system:String>
+    <!--SettingsView keys-->
+    <system:String x:Key="DevicePortLabel">
+        设备端口：</system:String>
+    <system:String x:Key="AutoConnectLabel">
+        自动连接：</system:String>
+    <system:String x:Key="SaveButton">
+        节省</system:String>
+    <system:String x:Key="CancelButton">
+        取消</system:String>
 </ResourceDictionary>

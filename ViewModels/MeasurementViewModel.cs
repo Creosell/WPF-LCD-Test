@@ -29,11 +29,12 @@ namespace WPF_LCD_Test.ViewModels
         private readonly IDialogService _dialogService; // Сервис для показа диалогов (зависимость)
         private readonly ILocalizationService _localizationService; // Сервис для локализации (зависимость)
 
+
         private DeviceUnderTest _currentDevice; // Текущее устройство под тестированием (объект Модели)
 
         // --- Приватные поля для хранения данных и состояния UI (будут привязаны к View) ---
         private string _serialNumber;
-
+        private Dispatcher _dispatcher;
         private bool _isSerialNumberConfirmed = false;
 
         private int _measurementTime;

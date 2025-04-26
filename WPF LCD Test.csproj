@@ -12,6 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\ButtonsIcons\MeasurementViewIcon.svg" />
     <None Remove="Images\color_slurp_macos_bigsur_icon_190278.ico" />
     <None Remove="Views\color_slurp_macos_bigsur_icon_190278.ico" />
   </ItemGroup>
@@ -34,6 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Images\ButtonsIcons\MeasurementViewIcon.svg" />
     <Resource Include="Images\color_slurp_macos_bigsur_icon_190278.ico" />
     <Resource Include="Views\color_slurp_macos_bigsur_icon_190278.ico" />
   </ItemGroup>

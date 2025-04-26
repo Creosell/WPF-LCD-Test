@@ -2,66 +2,64 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <system:String x:Key="English">
-        English</system:String>
+    <!--MainWindow keys-->
+    <system:String x:Key="MeasurementTitle">
+        Measurement</system:String>
+    <system:String x:Key="SettingsTitle">
+        Settings</system:String>
 
+    <!--MeasurementView keys-->
+    <system:String x:Key="BadConnection">
+        Unsuccessful connection. Try to restart color analyzer</system:String>
+    <system:String x:Key="English">English</system:String>
     <system:String x:Key="Chinese">
         中文</system:String>
-
     <system:String x:Key="ZeroCalibration">
         Zero Calibration</system:String>
-
     <system:String x:Key="MeasurementTimeSec">
         Measurement time (s):</system:String>
-
     <system:String x:Key="SerialNumber">
         Serial number:</system:String>
-
     <system:String x:Key="TopLeftPoint">
         1. Top left</system:String>
-
     <system:String x:Key="TopCenterPoint">
         2. Top center</system:String>
-
     <system:String x:Key="TopRightPoint">
         3. Top right</system:String>
-
     <system:String x:Key="MiddleLeftPoint">
         4. Middle left</system:String>
-
     <system:String x:Key="CenterPoint">
         5. Center</system:String>
-
     <system:String x:Key="MiddleRightPoint">
         6. Middle right</system:String>
-
     <system:String x:Key="BottomLeftPoint">
         7. Bottom left</system:String>
-
     <system:String x:Key="BottomCenterPoint">
         8. Bottom center</system:String>
-
     <system:String x:Key="BottomRightPoint">
         9. Bottom right</system:String>
-
     <system:String x:Key="LanguageMenu">
         Language</system:String>
-
     <system:String x:Key="RedPoint">
         R. Red</system:String>
-
     <system:String x:Key="GreenPoint">
         G. Green</system:String>
-
     <system:String x:Key="BluePoint">
         B. Blue</system:String>
-
     <system:String x:Key="BlackPoint">
         0. Black</system:String>
-
     <system:String x:Key="SaveResultsButton">
         Save results</system:String>
-
     <system:String x:Key="ClearFieldsButton">
         Clear fields</system:String>
+
+    <!--SettingsView keys-->
+    <system:String x:Key="DevicePortLabel">
+        Device Port:</system:String>
+    <system:String x:Key="AutoConnectLabel">
+        Auto Connect:</system:String>
+    <system:String x:Key="SaveButton">
+        Save</system:String>
+    <system:String x:Key="CancelButton">
+        Cancel</system:String>
 </ResourceDictionary>

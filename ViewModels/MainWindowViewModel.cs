@@ -29,6 +29,7 @@ namespace WPF_LCD_Test.ViewModels
         private readonly IFileService _fileService;
         private readonly IDialogService _dialogService; // Возможно, нужен для общеприложениевых диалогов
         private readonly ILocalizationService _localizationService; // Нужен для смены языка и подписки
+        private readonly ISettingsService _settingService;
 
 
         // --- СВОЙСТВО НАВИГАЦИИ: Это свойство будет содержать текущий ViewModel отображаемой страницы !!! ---
@@ -68,13 +69,15 @@ namespace WPF_LCD_Test.ViewModels
             IColorMeasurementService colorMeasurementService,
             IFileService fileService,
             IDialogService dialogService,
-            ILocalizationService localizationService) : base()
+            ILocalizationService localizationService,
+            ISettingsService settingsService) : base()
         {
             // Инициализация зависимостей
             _colorMeasurementService = colorMeasurementService ?? throw new ArgumentNullException(nameof(colorMeasurementService));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(_fileService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(_dialogService)); // Сохраняем для общеприложениевых диалогов
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(_localizationService));
+            _settingService = settingsService ?? throw new ArgumentNullException(nameof(settingsService)); // Сохраняем для доступа к настройкам
 
 
             // Инициализация команд оболочки
@@ -144,7 +147,7 @@ namespace WPF_LCD_Test.ViewModels
                     if (!(CurrentPageViewModel is SettingsViewModel))
                     {
                         (CurrentPageViewModel as IDisposable)?.Dispose();
-                        CurrentPageViewModel = new SettingsViewModel(); // Создаем экземпляр SettingsViewModel
+                        CurrentPageViewModel = new SettingsViewModel(_settingService, _localizationService); // Создаем экземпляр SettingsViewModel
                     }
                     break;
                 // TODO: Добавьте case для других страниц (например, About, Help и т.д.)
