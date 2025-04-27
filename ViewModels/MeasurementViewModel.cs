@@ -39,7 +39,7 @@ namespace WPF_LCD_Test.ViewModels
         private bool _isSerialNumberConfirmed = false;
 
         private int _measurementTime;
-        private ObservableCollection<string> _logMessages; // Коллекция сообщений для лога UI (UI ListBox/ListView)
+        //private ObservableCollection<string> _logMessages; // Коллекция сообщений для лога UI (UI ListBox/ListView)
         private bool _isMeasurementButtonsEnabled; // Флаг доступности кнопок измерений (UI IsEnabled)
         private bool _isDeviceConnected; // Флаг статуса подключения прибора (UI индикатор)
         private bool _isDeviceCalibrated; // Флаг статуса калибровки прибора (UI индикатор)
@@ -95,9 +95,6 @@ namespace WPF_LCD_Test.ViewModels
                 // Если значение ИЗМЕНИЛОСЬ, SetProperty возвращает true, и выполняется код в блоке if.
                 if (SetProperty(ref _serialNumber, value))
                 {
-                    Debug.WriteLine($"SerialNumber set to in MeasurementViewModel: {value}"); // Для отладки
-                    // !!! Здесь только логика, выполняемая ПОСЛЕ изменения свойства !!!
-                    // При изменении серийного номера может измениться доступность команд и кнопок
                     UpdateMeasurementButtonsState(); // Ваша логика
                     UpdateCommandsCanExecute();     // Ваша логика
                 }
@@ -128,16 +125,8 @@ namespace WPF_LCD_Test.ViewModels
             get => _measurementTime;
             set
             {
-                // !!! Правильное использование SetProperty для этого свойства !!!
-                // Валидацию лучше делать ДО вызова SetProperty или использовать IDataErrorInfo.
-                // Для простоты, если значение невалидно, мы его просто не присваиваем.
                 if (value <= 0)
                 {
-                    // Если значение невалидно, ничего не делаем с полем,
-                    // но можно добавить логику валидации или показа ошибки.
-                    Debug.WriteLine($"Invalid MeasurementTime value received: {value}"); // Для отладки
-                                                                                           // Опционально: вызвать OnPropertyChanged(), чтобы UI обновился до текущего значения,
-                                                                                           // если пользователь ввел невалидное значение, и привязка TwoWay.
                     OnPropertyChanged(); // Уведомляем UI о текущем значении поля (_measurementTime)
                     return; // Выходим из сеттера
                 }
@@ -145,27 +134,36 @@ namespace WPF_LCD_Test.ViewModels
                 // Если значение валидно и отличается, используем SetProperty
                 if (SetProperty(ref _measurementTime, value))
                 {
-                    // Логика после успешного изменения свойства
-                    // UpdateCommandsCanExecute(); // Если время влияет на CanExecute
                 }
             }
         }
 
         // Коллекция сообщений для отображения в логе UI
         // ObservableCollection автоматически уведомляет UI при добавлении/удалении
-        public ObservableCollection<string> LogMessages
+        //public ObservableCollection<string> LogMessages
+        //{
+        //    get => _logMessages;
+        //    // Сеттер может быть приватным или отсутствовать, т.к. коллекция обычно инициализируется один раз в конструкторе
+        //    private set // Сделаем приватным, чтобы снаружи нельзя было просто заменить всю коллекцию
+        //    {
+        //        if (_logMessages != value)
+        //        {
+        //            _logMessages = value;
+        //            OnPropertyChanged();
+        //        }
+        //    }
+        //}
+        private string _logText = string.Empty; // Поле для хранения лога как единой строки
+        /// <summary>
+        /// Весь лог сообщений в виде единой строки для отображения в многострочном TextBox.
+        /// </summary>
+        public string LogText
         {
-            get => _logMessages;
-            // Сеттер может быть приватным или отсутствовать, т.к. коллекция обычно инициализируется один раз в конструкторе
-            private set // Сделаем приватным, чтобы снаружи нельзя было просто заменить всю коллекцию
-            {
-                if (_logMessages != value)
-                {
-                    _logMessages = value;
-                    OnPropertyChanged();
-                }
-            }
+            get => _logText;
+            // Используем SetProperty для уведомления View об изменении строки лога
+            set => SetProperty(ref _logText, value);
         }
+
 
         // Флаг, управляющий доступностью группы кнопок измерений
         public bool IsMeasurementButtonsEnabled
@@ -238,12 +236,11 @@ namespace WPF_LCD_Test.ViewModels
 
         public ObservableCollection<MeasurementStatusViewModel> AllMeasurementButtonStatuses { get; set; }
 
-        public ICommand ConnectCommand { get; private set; }
-        public ICommand DisconnectCommand { get; private set; }
+
         public ICommand ZeroCalibrationCommand { get; private set; }
         public ICommand SaveResultsCommand { get; private set; }
         public ICommand ClearFieldsCommand { get; private set; }
-        public ICommand TestCommand { get; private set; }
+        public ICommand ClearLogCommand { get; } // Если есть команда для очистки лога
         public ICommand SwitchLanguageCommand { get; private set; } // Принимает параметр (код языка)
 
         public ICommand MeasureCommand { get; private set; } // Принимает параметр (имя точки измерения)
@@ -264,7 +261,7 @@ namespace WPF_LCD_Test.ViewModels
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
 
             // Инициализация коллекций
-            LogMessages = [];
+            //LogMessages = [];
             //MeasurementStatuses = new ObservableCollection<MeasurementStatusViewModel>();
 
             // Инициализация свойств по умолчанию (как при старте приложения)
@@ -282,6 +279,7 @@ namespace WPF_LCD_Test.ViewModels
             SaveResultsCommand = new RelayCommand(ExecuteSaveResultsAsync, CanExecuteSaveResults); // Асинхронная команда
             ClearFieldsCommand = new RelayCommand(ExecuteClearFields, CanExecuteClearFields); // Синхронная команда, с CanExecute
             //TestCommand = new RelayCommand(ExecuteTest, CanExecuteTest); // Синхронная команда, с CanExecute
+            ClearLogCommand = new RelayCommand(ExecuteClearLog, CanExecuteClearLog); // Синхронная команда, с CanExecute
             SwitchLanguageCommand = new RelayCommand(ExecuteSwitchLanguage, CanExecuteSwitchLanguage); // Синхронная команда, с CanExecute
 
             // Команда измерения - принимает string parameter (имя точки)
@@ -492,7 +490,7 @@ namespace WPF_LCD_Test.ViewModels
                 IsSerialNumberConfirmed = false;
 
                 // Очистка коллекций ViewModel
-                LogMessages.Clear(); // ObservableCollection уведомит UI
+                ExecuteClearLog(parameter); // Очистка лога (вызываем команду очистки лога)
                 ResetMeasurementStatuses(); // Сбрасываем статусы всех точек измерения (обновит UI через MeasurementStatusViewModel)
 
                 AddLogMessage($"{ClearFieldsDone}");
@@ -756,10 +754,21 @@ namespace WPF_LCD_Test.ViewModels
             // но если влияет, нужно вызвать UpdateCommandsCanExecute();
         }
 
+        private void ExecuteClearLog(object parameter)
+        {
+            LogText = string.Empty; // Просто устанавливаем строку лога в пустую
+                                    // Свойство LogText вызывает SetProperty.
+        }
+
         // --- Методы ViewModel, проверяющие доступность команд (CanExecute...) ---
         // Эти методы возвращают true, если команда доступна, и false, если нет.
         // WPF вызывает эти методы, чтобы определить, должны ли элементы UI (например, кнопки) быть активными.
         // Они должны быть "чистыми" - не менять состояние, только возвращать bool на основе текущих свойств ViewModel.
+
+        private bool CanExecuteClearLog(object parameter)
+        {
+            return true; // Команда очистки лога всегда доступна
+        }
 
         // Проверка доступности команды Подключить: доступна, если прибор НЕ подключен
         private bool CanExecuteConnect(object parameter)
@@ -768,6 +777,7 @@ namespace WPF_LCD_Test.ViewModels
                 && !_isDeviceCalibrating
                 && !_isDeviceConnecting;
         }
+
 
         // Проверка доступности команды Отключить: доступна, если прибор ПОДКЛЮЧЕН
         private bool CanExecuteDisconnect(object parameter)
@@ -842,12 +852,20 @@ namespace WPF_LCD_Test.ViewModels
             // App.Current.Dispatcher.Invoke выполнит действие в UI потоке
             App.Current.Dispatcher.Invoke(() =>
             {
-                LogMessages.Add($"{DateTime.Now:HH:mm:ss} - {message}");
-                // Опционально: ограничить количество сообщений в логе
-                if (LogMessages.Count > 500) // Например, держать не более 500 сообщений
+                //LogMessages.Add($"{DateTime.Now:HH:mm:ss} - {message}");
+                //// Опционально: ограничить количество сообщений в логе
+                //if (LogMessages.Count > 500) // Например, держать не более 500 сообщений
+                //{
+                //    LogMessages.RemoveAt(0); // Удалить самое старое сообщение
+                //}
+                if (!string.IsNullOrEmpty(message))
                 {
-                    LogMessages.RemoveAt(0); // Удалить самое старое сообщение
+
+                     string timestamp = DateTime.Now.ToString("HH:mm:ss");
+                     LogText += $"{timestamp} {message}{Environment.NewLine}";
+
                 }
+
             });
         }
 
@@ -1071,8 +1089,9 @@ namespace WPF_LCD_Test.ViewModels
             (_fileService as IDisposable)?.Dispose();
             (_dialogService as IDisposable)?.Dispose(); // Если DialogService тоже IDisposable
 
+            ExecuteClearLog(null); // Очищаем лог, если нужно
             // Очищаем коллекции в ViewModel (опционально, но хорошая практика при завершении)
-            LogMessages.Clear();
+            //LogMessages.Clear();
             //MeasurementStatuses.Clear();
 
             // Сбрасываем ссылки на объекты Модели

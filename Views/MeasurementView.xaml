@@ -12,7 +12,10 @@
     d:DesignHeight="600"
     d:DesignWidth="800"
     Background="#FF424242"
+    Focusable="True"
     FontSize="15"
+    PreviewKeyDown="UserControl_PreviewKeyDown"
+    PreviewMouseDown="UserControl_PreviewMouseDown"
     mc:Ignorable="d">
 
     <!--<UserControl.Resources>
@@ -94,6 +97,7 @@
                             Margin="5,0"
                             VerticalAlignment="Center"
                             Foreground="White"
+                            LostFocus="MeasurementTimeTextBox_LostFocus"
                             Text="{Binding MeasurementTime, UpdateSourceTrigger=Explicit}">
                             <TextBox.InputBindings>
                                 <KeyBinding
@@ -117,6 +121,7 @@
                             Margin="5,0"
                             VerticalAlignment="Center"
                             Foreground="White"
+                            LostFocus="SerialNumberTextBox_LostFocus"
                             Text="{Binding SerialNumber, UpdateSourceTrigger=Explicit}">
                             <TextBox.InputBindings>
                                 <KeyBinding
@@ -332,47 +337,24 @@
             </Grid>
         </Grid>
 
-        <ListBox
-            x:Name="LogListBox"
+
+
+        <TextBox
+            x:Name="LogTextBox"
             Grid.Row="1"
             MinHeight="200"
             Margin="0,5,5,5"
+            AcceptsReturn="True"
+            Background="#FF2A2828"
+            BorderBrush="White"
+            BorderThickness="1"
             Foreground="White"
-            ItemsSource="{Binding LogMessages}"
-            OpacityMask="White"
-            SelectionMode="Single">
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem">
-                    <Setter Property="MinHeight" Value="18" />
-                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                </Style>
-            </ListBox.ItemContainerStyle>
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBox
-                        x:Name="LogTextBox"
-                        Padding="0,0,0,0"
-                        Background="Transparent"
-                        FocusVisualStyle="{x:Null}"
-                        IsReadOnly="True"
-                        Text="{Binding Mode=OneWay}"
-                        TextWrapping="Wrap">
-                        <TextBox.Style>
-                            <Style TargetType="TextBox">
-                                <Setter Property="BorderThickness" Value="0" />
-                                <Setter Property="BorderBrush" Value="Transparent" />
-                                <Style.Triggers>
-                                    <Trigger Property="IsKeyboardFocused" Value="True">
-                                        <Setter Property="BorderThickness" Value="0" />
-                                        <Setter Property="BorderBrush" Value="Transparent" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBox.Style>
-                    </TextBox>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+            HorizontalScrollBarVisibility="Disabled"
+            IsReadOnly="True"
+            Text="{Binding LogText, Mode=OneWay}"
+            TextWrapping="Wrap"
+            VerticalScrollBarVisibility="Auto" />
+
 
         <StackPanel
             Grid.Row="2"
