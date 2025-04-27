@@ -3,6 +3,7 @@
 
 // --- Usings для доступа к другим частям проекта и библиотекам ---
 using System.Collections.ObjectModel; // Для ObservableCollection (для логов, статусов)
+using System.Diagnostics;
 using System.Globalization; // Для CultureInfo (если нужно для форматирования в VM)
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions; // Для валидации серийного номера
@@ -89,30 +90,33 @@ namespace WPF_LCD_Test.ViewModels
             get => _serialNumber;
             set
             {
-                // Используем оператор ?. для безопасного вызова OnPropertyChanged
-                if (_serialNumber != value)
+                // !!! Правильное использование SetProperty !!!
+                // SetProperty проверяет !=, присваивает _serialNumber = value, и вызывает OnPropertyChanged.
+                // Если значение ИЗМЕНИЛОСЬ, SetProperty возвращает true, и выполняется код в блоке if.
+                if (SetProperty(ref _serialNumber, value))
                 {
-                    _serialNumber = value;
-                    OnPropertyChanged(nameof(SerialNumber)); // Уведомляем View об изменении свойства
+                    // !!! Здесь только логика, выполняемая ПОСЛЕ изменения свойства !!!
                     // При изменении серийного номера может измениться доступность команд и кнопок
-                    UpdateMeasurementButtonsState(); // Обновляем доступность кнопок измерения
-                    UpdateCommandsCanExecute(); // Обновляем доступность всех команд
+                    UpdateMeasurementButtonsState(); // Ваша логика
+                    UpdateCommandsCanExecute();     // Ваша логика
                 }
+                // Здесь НЕТ else блока, т.к. SetProperty уже вернул false, если значение не изменилось.
             }
         }
 
+        // Статус подтверждения серийного номера
         public bool IsSerialNumberConfirmed
         {
             get => _isSerialNumberConfirmed;
             set
             {
-                if (_isSerialNumberConfirmed != value)
+                // !!! Правильное использование SetProperty !!!
+                if (SetProperty(ref _isSerialNumberConfirmed, value))
                 {
-                    _isSerialNumberConfirmed = value;
-                    OnPropertyChanged(nameof(IsSerialNumberConfirmed));
+                    // Логика после изменения свойства
                     // Важно: при изменении этого статуса нужно переоценить доступность команд!
                     UpdateCommandsCanExecute();
-                    UpdateMeasurementButtonsState();
+                    UpdateMeasurementButtonsState(); // Ваша логика
                 }
             }
         }
@@ -123,22 +127,25 @@ namespace WPF_LCD_Test.ViewModels
             get => _measurementTime;
             set
             {
-                // Базовая валидация времени
-                try
+                // !!! Правильное использование SetProperty для этого свойства !!!
+                // Валидацию лучше делать ДО вызова SetProperty или использовать IDataErrorInfo.
+                // Для простоты, если значение невалидно, мы его просто не присваиваем.
+                if (value <= 0)
                 {
-                    if (value <= 0)
-                    {
-                        // Не меняем _measurementTime, но уведомляем UI, чтобы поле могло сбросить невалидный ввод, если привязано в TwoWay
-                        OnPropertyChanged();
-                    }
-                    else if (_measurementTime != value)
-                    {
-                        _measurementTime = value;
-                        OnPropertyChanged(); // Уведомляем View
-                    }
+                    // Если значение невалидно, ничего не делаем с полем,
+                    // но можно добавить логику валидации или показа ошибки.
+                    Debug.WriteLine($"Invalid MeasurementTime value received: {value}"); // Для отладки
+                                                                                           // Опционально: вызвать OnPropertyChanged(), чтобы UI обновился до текущего значения,
+                                                                                           // если пользователь ввел невалидное значение, и привязка TwoWay.
+                    OnPropertyChanged(); // Уведомляем UI о текущем значении поля (_measurementTime)
+                    return; // Выходим из сеттера
                 }
-                catch (FormatException ex)
+
+                // Если значение валидно и отличается, используем SetProperty
+                if (SetProperty(ref _measurementTime, value))
                 {
+                    // Логика после успешного изменения свойства
+                    // UpdateCommandsCanExecute(); // Если время влияет на CanExecute
                 }
             }
         }
@@ -1013,8 +1020,9 @@ namespace WPF_LCD_Test.ViewModels
             ExecuteThreadInUI(() =>
             {
                 IsDeviceCalibrated = isCalibrated;
+                UpdateCommandsCanExecute();
             });
-            UpdateCommandsCanExecute();
+            
         }
 
         private void ColorMeasurementService_ConnectionStatusChanged(object sender, bool isConnected)

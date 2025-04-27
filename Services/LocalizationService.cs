@@ -51,8 +51,8 @@ namespace WPF_LCD_Test.Services
         // Метод для установки нового языка
         public void SetLanguage(string cultureCode)
         {
-            // Keep the try-catch blocks and Console.WriteLine if desired for debugging
-            // Console.WriteLine($"LocalizationService: Попытка установки языка на {cultureCode}");
+            // Keep the try-catch blocks and Debug.WriteLine if desired for debugging
+            // Debug.WriteLine($"LocalizationService: Попытка установки языка на {cultureCode}");
             try
             {
                 CultureInfo culture = new CultureInfo(cultureCode);
@@ -62,7 +62,7 @@ namespace WPF_LCD_Test.Services
                 // !!! Проще всего удалить этот if блок или вынести OnLanguageChanged() за его пределы.
                 // if (Equals(Thread.CurrentThread.CurrentUICulture, culture))
                 // {
-                //     Console.WriteLine($"LocalizationService: Язык уже установлен на {cultureCode}. Пропускаем.");
+                //     Debug.WriteLine($"LocalizationService: Язык уже установлен на {cultureCode}. Пропускаем.");
                 //     // Если язык уже установлен, мы все равно можем захотеть вызвать OnLanguageChanged
                 //     // чтобы UI обновился, если ресурсы были изменены или добавлены.
                 //     // Если возвращаете здесь, OnLanguageChanged() будет пропущен!
@@ -77,7 +77,7 @@ namespace WPF_LCD_Test.Services
                 // !!! СОХРАНЯЕМ УСТАНОВЛЕННУЮ КУЛЬТУРУ В ПОЛЕ СЕРВИСА !!!
                 _applicationCulture = culture; // Сохраняем культуру, которую установили
 
-                // Console.WriteLine($"LocalizationService: Язык успешно изменен на: {cultureCode}");
+                // Debug.WriteLine($"LocalizationService: Язык успешно изменен на: {cultureCode}");
 
                 // Вызываем событие смены языка.
                 // !!! УБЕДИТЕСЬ, что этот вызов происходит ВСЕГДА, когда язык должен "смениться"

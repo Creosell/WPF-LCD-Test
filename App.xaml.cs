@@ -6,6 +6,7 @@ using WPF_LCD_Test.Services;
 using WPF_LCD_Test.Views;
 using WPF_LCD_Test.ViewModels;
 using WPF_LCD_Test.Models;
+using System.Diagnostics;
 
 
 namespace WPF_LCD_Test
@@ -110,7 +111,7 @@ namespace WPF_LCD_Test
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"App Ошибка: Не удалось загрузить или применить словарь ресурсов '{resourcePathToLoad}'. Ошибка: {ex.Message}");
+                Debug.WriteLine($"App Ошибка: Не удалось загрузить или применить словарь ресурсов '{resourcePathToLoad}'. Ошибка: {ex.Message}");
             }
         }
 

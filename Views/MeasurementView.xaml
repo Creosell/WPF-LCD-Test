@@ -8,6 +8,7 @@
     xmlns:res="clr-namespace:WPF_LCD_Test.Resources"
     xmlns:v="clr-namespace:WPF_LCD_Test.Views"
     xmlns:vm="clr-namespace:WPF_LCD_Test.ViewModels"
+    d:DataContext="{d:DesignInstance Type=vm:MeasurementViewModel}"
     d:DesignHeight="600"
     d:DesignWidth="800"
     Background="#FF424242"
@@ -93,7 +94,7 @@
                             Margin="5,0"
                             VerticalAlignment="Center"
                             Foreground="White"
-                            Text="{Binding MeasurementTime, UpdateSourceTrigger=Explicit}">
+                            Text="{Binding MeasurementTime, UpdateSourceTrigger=Explicit, Mode=TwoWay}">
                             <TextBox.InputBindings>
                                 <KeyBinding
                                     Key="Enter"
@@ -117,7 +118,7 @@
                             VerticalAlignment="Center"
                             Foreground="White"
                             LostFocus="SerialNumberTextBox_LostFocus"
-                            Text="{Binding SerialNumber, UpdateSourceTrigger=Explicit}">
+                            Text="{Binding SerialNumber, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                             <TextBox.InputBindings>
                                 <KeyBinding
                                     Key="Enter"
@@ -337,8 +338,10 @@
             Grid.Row="1"
             MinHeight="200"
             Margin="0,5,5,5"
+            Foreground="White"
             ItemsSource="{Binding LogMessages}"
-            SelectionMode="Single" Foreground="White" OpacityMask="White">
+            OpacityMask="White"
+            SelectionMode="Single">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
                     <Setter Property="MinHeight" Value="18" />

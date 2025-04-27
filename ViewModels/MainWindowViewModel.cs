@@ -7,7 +7,8 @@ using System.Windows.Input; // Для ICommand
 using WPF_LCD_Test.Services; // Для сервисов, которые нужны в оболочке или для создания других ViewModel
 using WPF_LCD_Test.Models;
 using MvvmHelpers;
-using WPF_LCD_Test.Commands; // Если DeviceUnderTest все еще управляется тут напрямую
+using WPF_LCD_Test.Commands;
+using System.Diagnostics; // Если DeviceUnderTest все еще управляется тут напрямую
 // using System.Collections.ObjectModel; // Удалите, если логи лога и статусы точек перенесены
 
 // using static WPF_LCD_Test.Resources.Resources; // Удалите, если прямой доступ к ресурсам не используется в этом VM
@@ -32,6 +33,8 @@ namespace WPF_LCD_Test.ViewModels
         private readonly ISettingsService _settingService;
         private BaseViewModel _currentPageViewModel;
         private string _currentPageIdentifier;
+        private MeasurementViewModel? _measurementViewModel; // Используем Nullable Reference Types ?
+        private SettingsViewModel? _settingsViewModel;
 
         // Геттеры и сеттеры для текущей страницы
         public string CurrentPageIdentifier
@@ -41,8 +44,7 @@ namespace WPF_LCD_Test.ViewModels
         }
 
 
-        public BaseViewModel CurrentPageViewModel // Используйте PageViewModelBase, если он создан
-        // public object CurrentPageViewModel // Или используйте object
+        public BaseViewModel CurrentPageViewModel
         {
             get => _currentPageViewModel;
             set
@@ -50,10 +52,11 @@ namespace WPF_LCD_Test.ViewModels
                 // Опционально: Вызвать метод при уходе со страницы (OnNavigatedFrom), если он есть в PageViewModelBase
                 // (_currentPageViewModel as PageViewModelBase)?.OnNavigatedFrom();
 
-                // !!! Важно: очищаем старый ViewModel страницы, если он реализует IDisposable !!!
-                (_currentPageViewModel as IDisposable)?.Dispose();
+                // !!! УДАЛЯЕМ ВЫЗОВ Dispose() ИЗ СЕТТЕРА !!!
+                // ViewModel страниц теперь будут очищаться в методе Dispose() этого класса.
+                // (_currentPageViewModel as IDisposable)?.Dispose(); // !!! УДАЛИТЕ ЭТУ СТРОКУ !!!
 
-                // Устанавливаем новый ViewModel страницы
+                // Устанавливаем новый ViewModel страницы (из хранимых экземпляров)
                 SetProperty(ref _currentPageViewModel, value);
 
                 // Опционально: Вызвать метод при переходе на новую страницу (OnNavigatedTo), если он есть в PageViewModelBase
@@ -125,49 +128,75 @@ namespace WPF_LCD_Test.ViewModels
         // Логика выполнения навигации - Создает ViewModel нужной страницы
         private void ExecuteNavigate(object parameter)
         {
-            string? pageName = parameter as string; // Получаем имя страницы из параметра команды
-            CurrentPageIdentifier = pageName; // Сохраняем идентификатор текущей страницы (если нужно)
+            string? pageName = parameter as string;
 
-            // Создаем соответствующий ViewModel для выбранной страницы.
+            if (string.IsNullOrEmpty(pageName)) return;
+
+            // CurrentPageIdentifier = pageName; // Если используется для подсветки
+
+            // --- Логика использования ХРАНИМЫХ экземпляров ViewModel !!! ---
+            BaseViewModel? targetViewModel = null; // Используем Nullable Reference Types
+
             switch (pageName)
             {
                 case "Measurement":
-
-                    if (!(CurrentPageViewModel is MeasurementViewModel))
+                    // !!! ПРАВИЛЬНО ПРОВЕРЯЕМ, СОЗДАН ЛИ УЖЕ ЭКЗЕМПЛЯР !!!
+                    if (_measurementViewModel == null)
                     {
-                        // Перед созданием нового ViewModel, очищаем предыдущий, если он IDisposable
-                        (CurrentPageViewModel as IDisposable)?.Dispose();
-
-                        // !!! Здесь создается НОВЫЙ экземпляр MeasurementViewModel !!!
-                        CurrentPageViewModel = new MeasurementViewModel(
+                        // !!! СОЗДАЕМ ТОЛЬКО ОДИН РАЗ И СОХРАНЯЕМ В ПОЛЕ !!!
+                        _measurementViewModel = new MeasurementViewModel(
                             _colorMeasurementService,
                             _fileService,
                             _dialogService,
-                            _localizationService // Передаем сервисы
+                            _localizationService
                         );
+                        Debug.WriteLine("--- Created NEW MeasurementViewModel instance ---"); // Добавьте для отладки
                     }
+                    // !!! ВСЕГДА ИСПОЛЬЗУЕМ ХРАНИМЫЙ ЭКЗЕМПЛЯР ДЛЯ targetViewModel !!!
+                    targetViewModel = _measurementViewModel;
+                    Debug.WriteLine("--- Using STORED MeasurementViewModel instance ---"); // Добавьте для отладки
                     break;
+
                 case "Settings":
-                    if (!(CurrentPageViewModel is SettingsViewModel))
+                    // !!! ПРАВИЛЬНО ПРОВЕРЯЕМ, СОЗДАН ЛИ УЖЕ ЭКЗЕМПЛЯР !!!
+                    if (_settingsViewModel == null)
                     {
-                        (CurrentPageViewModel as IDisposable)?.Dispose();
-                        CurrentPageViewModel = new SettingsViewModel(_settingService, _localizationService); // Создаем экземпляр SettingsViewModel
+                        // !!! СОЗДАЕМ ТОЛЬКО ОДИН РАЗ И СОХРАНЯЕМ В ПОЛЕ !!!
+                        _settingsViewModel = new SettingsViewModel(_settingService, _localizationService);
+                        Debug.WriteLine("--- Created NEW SettingsViewModel instance ---"); // Добавьте для отладки
                     }
+                    // !!! ВСЕГДА ИСПОЛЬЗУЕМ ХРАНИМЫЙ ЭКЗЕМПЛЯР ДЛЯ targetViewModel !!!
+                    targetViewModel = _settingsViewModel;
+                    Debug.WriteLine("--- Using STORED SettingsViewModel instance ---"); // Добавьте для отладки
                     break;
-                // TODO: Добавьте case для других страниц (например, About, Help и т.д.)
+
+                // TODO: Проверьте логику для других кейсов, если они есть
 
                 default:
-                    if (!(CurrentPageViewModel is MeasurementViewModel))
-                    {
-                        CurrentPageViewModel = new MeasurementViewModel( // Переходим на MeasurementWindowViewModel по умолчанию
-                         _colorMeasurementService, _fileService, _dialogService, _localizationService);
-                    }
+                    // Логика для страницы по умолчанию, тоже должна использовать хранимый экземпляр
+                    // ...
                     break;
-
             }
-            // Свойство CurrentPageViewModel вызывает SetProperty и OnPropertyChanged (из BaseViewModel),
-            // что заставляет ContentControl в MainWindow.xaml обновить свое содержимое,
-            // отобразив View (UserControl), соответствующий новому типу ViewModel.
+
+            // !!! Устанавливаем CurrentPageViewModel в найденный или созданный экземпляр !!!
+            // Сеттер CurrentPageViewModel больше НЕ вызывает Dispose().
+            if (targetViewModel != null && targetViewModel != _currentPageViewModel) // Проверяем, что есть что установить и это не текущий ViewModel
+            {
+                CurrentPageViewModel = targetViewModel;
+                Debug.WriteLine($"Navigated to: {pageName}"); // Для отладки
+            }
+            // Если targetViewModel null или равен текущему, навигация не происходит.
+
+            // !!! Обновляем флаг для подсветки активного RadioButton (если вы используете булевы флаги) !!!
+            // Этот код зависит от того, какой подход к подсветке вы используете (CurrentPageIdentifier vs булевы флаги)
+            // Если вы используете булевы флаги (IsMeasurementPageSelected и т.д.):
+            // Этот код должен быть здесь, чтобы флаги обновлялись при программной навигации (например, при старте).
+            // Если вы используете MultiBinding с CurrentPageIdentifier, этот блок не нужен.
+            /*
+            IsMeasurementPageSelected = (targetViewModel is MeasurementViewModel);
+            IsSettingsPageSelected = (targetViewModel is SettingsViewModel);
+            // TODO: Обновляйте флаги для других страниц
+            */
         }
 
         // !!! ОБРАБОТЧИК СМЕНЫ ЯЗЫКА В ОБОЛОЧКЕ (если нужен) !!!
@@ -208,7 +237,7 @@ namespace WPF_LCD_Test.ViewModels
             }
             // TODO: Если MainWindowViewModel подписывался на другие глобальные события, отпишитесь здесь.
             
-            Console.WriteLine("MainWindowViewModel Dispose Called.");
+            Debug.WriteLine("MainWindowViewModel Dispose Called.");
         }
 
         // TODO: Возможно, вам понадобится публичное свойство в MainWindowViewModel для привязки Title окна,
