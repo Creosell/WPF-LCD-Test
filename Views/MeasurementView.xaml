@@ -94,7 +94,7 @@
                             Margin="5,0"
                             VerticalAlignment="Center"
                             Foreground="White"
-                            Text="{Binding MeasurementTime, UpdateSourceTrigger=Explicit, Mode=TwoWay}">
+                            Text="{Binding MeasurementTime, UpdateSourceTrigger=Explicit}">
                             <TextBox.InputBindings>
                                 <KeyBinding
                                     Key="Enter"
@@ -117,8 +117,7 @@
                             Margin="5,0"
                             VerticalAlignment="Center"
                             Foreground="White"
-                            LostFocus="SerialNumberTextBox_LostFocus"
-                            Text="{Binding SerialNumber, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                            Text="{Binding SerialNumber, UpdateSourceTrigger=Explicit}">
                             <TextBox.InputBindings>
                                 <KeyBinding
                                     Key="Enter"

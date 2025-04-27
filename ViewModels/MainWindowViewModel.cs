@@ -137,8 +137,18 @@ namespace WPF_LCD_Test.ViewModels
             // --- Логика использования ХРАНИМЫХ экземпляров ViewModel !!! ---
             BaseViewModel? targetViewModel = null; // Используем Nullable Reference Types
 
+            if (_measurementViewModel != null)
+            {
+                // Если MeasurementViewModel уже создан, используем его
+                
+                Debug.WriteLine($"Значение SerialNumber в экземпляре MeasurementViewModel" +
+                    $"{_measurementViewModel.SerialNumber}"); // Добавьте для отладки
+                
+            }
+
             switch (pageName)
             {
+                
                 case "Measurement":
                     // !!! ПРАВИЛЬНО ПРОВЕРЯЕМ, СОЗДАН ЛИ УЖЕ ЭКЗЕМПЛЯР !!!
                     if (_measurementViewModel == null)

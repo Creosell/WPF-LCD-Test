@@ -32,10 +32,10 @@ namespace WPF_LCD_Test.Views
             ILocalizationService localizationService = LocalizationService.Instance; // Реализация сервиса локализации
 
             // Создаем экземпляр ViewModel, передавая ему зависимости (сервисы)
-            _viewModel = new MeasurementViewModel(colorMeasurementService, fileService, dialogService, localizationService);
+            //_viewModel = new MeasurementViewModel(colorMeasurementService, fileService, dialogService, localizationService);
 
             // Устанавливаем DataContext окна на созданный ViewModel
-            this.DataContext = _viewModel;
+            //this.DataContext = _viewModel;
 
             // --- Подписка на событие изменения коллекции лога для автопрокрутки ---
             // Убедимся, что ViewModel и LogMessages не равны null

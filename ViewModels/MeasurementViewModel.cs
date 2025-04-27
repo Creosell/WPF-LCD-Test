@@ -95,6 +95,7 @@ namespace WPF_LCD_Test.ViewModels
                 // Если значение ИЗМЕНИЛОСЬ, SetProperty возвращает true, и выполняется код в блоке if.
                 if (SetProperty(ref _serialNumber, value))
                 {
+                    Debug.WriteLine($"SerialNumber set to in MeasurementViewModel: {value}"); // Для отладки
                     // !!! Здесь только логика, выполняемая ПОСЛЕ изменения свойства !!!
                     // При изменении серийного номера может измениться доступность команд и кнопок
                     UpdateMeasurementButtonsState(); // Ваша логика
