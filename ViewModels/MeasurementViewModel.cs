@@ -48,6 +48,8 @@ namespace WPF_LCD_Test.ViewModels
 
         // private double _measurementProgress; // Если хотим показывать прогресс измерения (UI ProgressBar)
 
+        // --- Приватные поля для хранения состояния и статусов ---
+        public event EventHandler RequestClearInputFocus; 
         // Коллекция статусов измерений для точек (для изменения цвета кнопок в UI)
         // Каждый элемент MeasurementStatusViewModel уведомляет UI об изменении своих свойств (IsPassed, MeasuredValuesString)
         private ObservableCollection<MeasurementStatusViewModel> _measurementStatuses;
@@ -138,25 +140,9 @@ namespace WPF_LCD_Test.ViewModels
             }
         }
 
-        // Коллекция сообщений для отображения в логе UI
-        // ObservableCollection автоматически уведомляет UI при добавлении/удалении
-        //public ObservableCollection<string> LogMessages
-        //{
-        //    get => _logMessages;
-        //    // Сеттер может быть приватным или отсутствовать, т.к. коллекция обычно инициализируется один раз в конструкторе
-        //    private set // Сделаем приватным, чтобы снаружи нельзя было просто заменить всю коллекцию
-        //    {
-        //        if (_logMessages != value)
-        //        {
-        //            _logMessages = value;
-        //            OnPropertyChanged();
-        //        }
-        //    }
-        //}
+        
         private string _logText = string.Empty; // Поле для хранения лога как единой строки
-        /// <summary>
-        /// Весь лог сообщений в виде единой строки для отображения в многострочном TextBox.
-        /// </summary>
+
         public string LogText
         {
             get => _logText;
@@ -676,6 +662,7 @@ namespace WPF_LCD_Test.ViewModels
                 SerialNumber = enteredSerialNumber; // <-- Присваиваем подтвержденное значение свойству ViewModel
                 IsSerialNumberConfirmed = true; // Устанавливаем флаг подтверждения
                 AddLogMessage($"{CurrentSN}: {SerialNumber}");
+                RequestClearInputFocus?.Invoke(this, EventArgs.Empty); // Запрос на очистку фокуса ввода серийного номера
             }
             else
             {
@@ -743,6 +730,7 @@ namespace WPF_LCD_Test.ViewModels
                     MeasurementTime = measurementTime;
                     // Время успешно применено, сообщение в логе уже есть из сеттера свойства
                     AddLogMessage($"{CurrentMeasurementTime}: {MeasurementTime} {Seconds}");
+                    RequestClearInputFocus?.Invoke(this, EventArgs.Empty); // Запрос на очистку фокуса ввода времени измерения
                 }
             }
             catch
@@ -899,77 +887,6 @@ namespace WPF_LCD_Test.ViewModels
             // зависит от динамических свойств (кроме тех, которые всегда true)
             ((RelayCommand)ApplySerialNumberCommand)?.RaiseCanExecuteChanged();
             ((RelayCommand)ApplyMeasurementTimeCommand)?.RaiseCanExecuteChanged();
-        }
-
-        // --- Вспомогательный ViewModel для статуса одной точки измерения ---
-        // Этот класс представляет статус одной точки измерения в UI.
-        // Он должен быть либо вложенным public классом в MainWindowViewModel, либо отдельным файлом в папке ViewModels.
-        // ОН ДОЛЖЕН НАСЛЕДОВАТЬ ОТ BaseViewModel, чтобы UI мог реагировать на изменения его свойств.
-
-        public class MeasurementStatusViewModel : BaseViewModel // Наследует от BaseViewModel
-        {
-            public string Location { get; set; } // Имя точки измерения
-
-            private bool? _isPassed; // Статус измерения: null - не измерено, true - успешно, false - ошибка
-
-            public bool? IsPassed
-            {
-                get => _isPassed;
-                set
-                {
-                    if (_isPassed != value)
-                    {
-                        _isPassed = value;
-                        OnPropertyChanged(); // Уведомляем UI об изменении IsPassed
-                        OnPropertyChanged(nameof(StatusColor)); // Уведомляем, что свойство StatusColor тоже могло измениться
-                    }
-                }
-            }
-
-            // Свойство для определения цвета в UI (привязка к Background кнопки/TextBlock)
-            // Возвращает WPF Brush
-            [JsonIgnore] // Обычно это свойство не нужно сохранять в JSON, т.к. оно связано с представлением
-            public Brush StatusColor
-            {
-                get
-                {
-                    if (IsPassed == true) return Brushes.DarkGreen; // Успех
-                    if (IsPassed == false) return Brushes.Red;      // Ошибка
-                    return Brushes.DimGray; // По умолчанию (не измерено)
-                }
-            }
-
-            // Свойство для отображения измеренных значений рядом с точкой в UI
-            private string _measuredValuesString;
-
-            public string MeasuredValuesString
-            {
-                get => _measuredValuesString;
-                set
-                {
-                    if (_measuredValuesString != value)
-                    {
-                        _measuredValuesString = value;
-                        OnPropertyChanged(); // Уведомляем UI об изменении текста
-                    }
-                }
-            }
-
-            // Конструктор с параметром (имя точки) для удобства инициализации
-            public MeasurementStatusViewModel(string location)
-            {
-                Location = location;
-                IsPassed = null; // Изначально не измерено
-                MeasuredValuesString = ""; // Изначально пусто
-            }
-
-            // Конструктор по умолчанию (может быть полезен для XAML дизайнера или сериализации)
-            public MeasurementStatusViewModel() // Оставь, если хочешь использовать как отдельный класс
-            {
-                Location = "Unknown";
-                IsPassed = null;
-                MeasuredValuesString = "";
-            }
         }
 
         // Метод для обновления статуса конкретной точки измерения по ее имени

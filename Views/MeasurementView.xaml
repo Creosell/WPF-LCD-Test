@@ -10,15 +10,16 @@
     xmlns:v="clr-namespace:WPF_LCD_Test.Views"
     xmlns:vm="clr-namespace:WPF_LCD_Test.ViewModels"
     d:DataContext="{d:DesignInstance Type=vm:MeasurementViewModel}"
-    d:DesignHeight="600"
-    d:DesignWidth="800"
     Background="#FF424242"
     Focusable="True"
     FontSize="15"
     PreviewKeyDown="UserControl_PreviewKeyDown"
     PreviewMouseDown="UserControl_PreviewMouseDown"
     mc:Ignorable="d">
-
+    <!--
+        d:DesignHeight="600"
+        d:DesignWidth="800"
+    -->
 
     <UserControl.Resources>
         <Style
@@ -60,7 +61,7 @@
                     <Button
                         Margin="5"
                         MaterialDesign:ButtonAssist.CornerRadius="15"
-                        Command="{Binding DataContext.ZeroCalibrationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        Command="{Binding DataContext.ZeroCalibrationCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                         Content="{DynamicResource ZeroCalibration}" />
                 </StackPanel>
                 <Grid Grid.Row="1">
@@ -97,7 +98,7 @@
                             <TextBox.InputBindings>
                                 <KeyBinding
                                     Key="Enter"
-                                    Command="{Binding DataContext.ApplyMeasurementTimeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    Command="{Binding DataContext.ApplyMeasurementTimeCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                                     CommandParameter="{Binding Text, ElementName=MeasurementTimeTextBox}" />
                             </TextBox.InputBindings>
                         </TextBox>
@@ -121,7 +122,7 @@
                             <TextBox.InputBindings>
                                 <KeyBinding
                                     Key="Enter"
-                                    Command="{Binding DataContext.ApplySerialNumberCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    Command="{Binding DataContext.ApplySerialNumberCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                                     CommandParameter="{Binding Text, ElementName=SerialNumberTextBox}" />
                             </TextBox.InputBindings>
                         </TextBox>
@@ -150,185 +151,132 @@
                             Grid.Row="0"
                             Grid.Column="0"
                             Margin="5"
-                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            Background="{Binding TopLeftStatus.StatusColor}"
+                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{Binding TopLeftStatus.Location}"
                             Content="{DynamicResource TopLeftPoint}"
-                            Style="{StaticResource MeasurementButtonsStyle}">
-                            <Button.Background>
-                                <Binding Path="TopLeftStatus.StatusColor" />
-                            </Button.Background>
-                            <Button.ToolTip>
-                                <Binding Path="TopLeftStatus.MeasuredValuesString" />
-                            </Button.ToolTip>
-                        </Button>
+                            Style="{StaticResource MeasurementButtonsStyle}"
+                            ToolTip="{Binding TopLeftStatus.MeasuredValuesString}" />
                         <Button
                             Grid.Row="0"
                             Grid.Column="1"
-                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            Background="{Binding TopCenterStatus.StatusColor}"
+                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{Binding TopCenterStatus.Location}"
                             Content="{DynamicResource TopCenterPoint}"
-                            Style="{StaticResource MeasurementButtonsStyle}">
-                            <Button.Background>
-                                <Binding Path="TopCenterStatus.StatusColor" />
-                            </Button.Background>
-                            <Button.ToolTip>
-                                <Binding Path="TopCenterStatus.MeasuredValuesString" />
-                            </Button.ToolTip>
-                        </Button>
+                            Style="{StaticResource MeasurementButtonsStyle}"
+                            ToolTip="{Binding TopCenterStatus.MeasuredValuesString}" />
                         <Button
                             Grid.Row="0"
                             Grid.Column="2"
-                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            Background="{Binding TopRightStatus.StatusColor}"
+                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{Binding TopRightStatus.Location}"
                             Content="{DynamicResource TopRightPoint}"
-                            Style="{StaticResource MeasurementButtonsStyle}">
-                            <Button.Background>
-                                <Binding Path="TopRightStatus.StatusColor" />
-                            </Button.Background>
-                            <Button.ToolTip>
-                                <Binding Path="TopRightStatus.MeasuredValuesString" />
-                            </Button.ToolTip>
-                        </Button>
+                            Style="{StaticResource MeasurementButtonsStyle}"
+                            ToolTip="{Binding TopRightStatus.MeasuredValuesString}" />
                         <Button
                             Grid.Row="1"
                             Grid.Column="0"
-                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            Background="{Binding MiddleLeftStatus.StatusColor}"
+                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{Binding MiddleLeftStatus.Location}"
                             Content="{DynamicResource MiddleLeftPoint}"
-                            Style="{StaticResource MeasurementButtonsStyle}">
-                            <Button.Background>
-                                <Binding Path="MiddleLeftStatus.StatusColor" />
-                            </Button.Background>
-                            <Button.ToolTip>
-                                <Binding Path="MiddleLeftStatus.MeasuredValuesString" />
-                            </Button.ToolTip>
-                        </Button>
+                            Style="{StaticResource MeasurementButtonsStyle}"
+                            ToolTip="{Binding MiddleLeftStatus.MeasuredValuesString}" />
                         <Button
                             Grid.Row="1"
                             Grid.Column="1"
-                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            Background="{Binding CenterStatus.StatusColor}"
+                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{Binding CenterStatus.Location}"
                             Content="{DynamicResource CenterPoint}"
-                            Style="{StaticResource MeasurementButtonsStyle}">
-                            <Button.Background>
-                                <Binding Path="CenterStatus.StatusColor" />
-                            </Button.Background>
-                            <Button.ToolTip>
-                                <Binding Path="CenterStatus.MeasuredValuesString" />
-                            </Button.ToolTip>
-                        </Button>
+                            Style="{StaticResource MeasurementButtonsStyle}"
+                            ToolTip="{Binding CenterStatus.MeasuredValuesString}" />
                         <Button
                             Grid.Row="1"
                             Grid.Column="2"
-                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            Background="{Binding MiddleRightStatus.StatusColor}"
+                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{Binding MiddleRightStatus.Location}"
                             Content="{DynamicResource MiddleRightPoint}"
-                            Style="{StaticResource MeasurementButtonsStyle}">
-                            <Button.Background>
-                                <Binding Path="MiddleRightStatus.StatusColor" />
-                            </Button.Background>
-                            <Button.ToolTip>
-                                <Binding Path="MiddleRightStatus.MeasuredValuesString" />
-                            </Button.ToolTip>
-                        </Button>
+                            Style="{StaticResource MeasurementButtonsStyle}"
+                            ToolTip="{Binding MiddleRightStatus.MeasuredValuesString}" />
                         <Button
                             Grid.Row="2"
                             Grid.Column="0"
-                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            Background="{Binding BottomLeftStatus.StatusColor}"
+                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{Binding BottomLeftStatus.Location}"
                             Content="{DynamicResource BottomLeftPoint}"
-                            Style="{StaticResource MeasurementButtonsStyle}">
-                            <Button.Background>
-                                <Binding Path="BottomLeftStatus.StatusColor" />
-                            </Button.Background>
-                            <Button.ToolTip>
-                                <Binding Path="BottomLeftStatus.MeasuredValuesString" />
-                            </Button.ToolTip>
-                        </Button>
+                            Style="{StaticResource MeasurementButtonsStyle}"
+                            ToolTip="{Binding BottomLeftStatus.MeasuredValuesString}" />
                         <Button
                             Grid.Row="2"
                             Grid.Column="1"
-                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            Background="{Binding BottomCenterStatus.StatusColor}"
+                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{Binding BottomCenterStatus.Location}"
                             Content="{DynamicResource BottomCenterPoint}"
-                            Style="{StaticResource MeasurementButtonsStyle}">
-                            <Button.Background>
-                                <Binding Path="BottomCenterStatus.StatusColor" />
-                            </Button.Background>
-                            <Button.ToolTip>
-                                <Binding Path="BottomCenterStatus.MeasuredValuesString" />
-                            </Button.ToolTip>
-                        </Button>
+                            Style="{StaticResource MeasurementButtonsStyle}"
+                            ToolTip="{Binding BottomCenterStatus.MeasuredValuesString}" />
                         <Button
                             Grid.Row="2"
                             Grid.Column="2"
-                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            Background="{Binding BottomRightStatus.StatusColor}"
+                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{Binding BottomRightStatus.Location}"
                             Content="{DynamicResource BottomRightPoint}"
-                            Style="{StaticResource MeasurementButtonsStyle}">
-                            <Button.Background>
-                                <Binding Path="BottomRightStatus.StatusColor" />
-                            </Button.Background>
-                            <Button.ToolTip>
-                                <Binding Path="BottomRightStatus.MeasuredValuesString" />
-                            </Button.ToolTip>
-                        </Button>
+                            Style="{StaticResource MeasurementButtonsStyle}"
+                            ToolTip="{Binding BottomRightStatus.MeasuredValuesString}" />
                     </Grid>
-                    <StackPanel
+                    <Grid
                         Grid.Row="1"
-                        Margin="5,0,0,0"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Orientation="Horizontal">
+                        Margin="15,10,10,0"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="25*" />
+                            <ColumnDefinition Width="25*" />
+                            <ColumnDefinition Width="25*" />
+                            <ColumnDefinition Width="25*" />
+                        </Grid.ColumnDefinitions>
+
                         <Button
-                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            Grid.Column="0"
+                            Margin="1"
+                            Background="{Binding RedColorStatus.StatusColor}"
+                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{Binding RedColorStatus.Location}"
                             Content="{DynamicResource RedPoint}"
-                            Style="{StaticResource MeasurementButtonsStyle}">
-                            <Button.Background>
-                                <Binding Path="RedColorStatus.StatusColor" />
-                            </Button.Background>
-                            <Button.ToolTip>
-                                <Binding Path="RedColorStatus.MeasuredValuesString" />
-                            </Button.ToolTip>
-                        </Button>
+                            Style="{StaticResource MeasurementButtonsStyle}"
+                            ToolTip="{Binding RedColorStatus.MeasuredValuesString}" />
                         <Button
-                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            Grid.Column="1"
+                            Background="{Binding GreenColorStatus.StatusColor}"
+                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{Binding GreenColorStatus.Location}"
                             Content="{DynamicResource GreenPoint}"
-                            Style="{StaticResource MeasurementButtonsStyle}">
-                            <Button.Background>
-                                <Binding Path="GreenColorStatus.StatusColor" />
-                            </Button.Background>
-                            <Button.ToolTip>
-                                <Binding Path="GreenColorStatus.MeasuredValuesString" />
-                            </Button.ToolTip>
-                        </Button>
+                            Style="{StaticResource MeasurementButtonsStyle}"
+                            ToolTip="{Binding GreenColorStatus.MeasuredValuesString}" />
                         <Button
-                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            Grid.Column="2"
+                            Background="{Binding BlueColorStatus.StatusColor}"
+                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{Binding BlueColorStatus.Location}"
                             Content="{DynamicResource BluePoint}"
-                            Style="{StaticResource MeasurementButtonsStyle}">
-                            <Button.Background>
-                                <Binding Path="BlueColorStatus.StatusColor" />
-                            </Button.Background>
-                            <Button.ToolTip>
-                                <Binding Path="BlueColorStatus.MeasuredValuesString" />
-                            </Button.ToolTip>
-                        </Button>
+                            Style="{StaticResource MeasurementButtonsStyle}"
+                            ToolTip="{Binding BlueColorStatus.MeasuredValuesString}" />
                         <Button
-                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            Grid.Column="3"
+                            Background="{Binding BlackColorStatus.StatusColor}"
+                            Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{Binding BlackColorStatus.Location}"
                             Content="{DynamicResource BlackPoint}"
-                            Style="{StaticResource MeasurementButtonsStyle}">
-                            <Button.Background>
-                                <Binding Path="BlackColorStatus.StatusColor" />
-                            </Button.Background>
-                            <Button.ToolTip>
-                                <Binding Path="BlackColorStatus.MeasuredValuesString" />
-                            </Button.ToolTip>
-                        </Button>
-                    </StackPanel>
+                            Style="{StaticResource MeasurementButtonsStyle}"
+                            ToolTip="{Binding BlackColorStatus.MeasuredValuesString}" />
+                    </Grid>
+
                 </Grid>
             </Grid>
         </Grid>

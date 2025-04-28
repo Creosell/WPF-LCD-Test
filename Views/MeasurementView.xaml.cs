@@ -23,6 +23,7 @@ namespace WPF_LCD_Test.Views
             //this.PreviewKeyDown += UserControl_PreviewKeyDown;
   
             this.DataContextChanged += MeasurementView_DataContextChanged;
+            
 
             // Подписываемся на событие Unloaded для отписки от ViewModel
             this.Unloaded += MeasurementView_Unloaded;
@@ -40,16 +41,20 @@ namespace WPF_LCD_Test.Views
         private void MeasurementView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             // Отписываемся от события PropertyChanged у предыдущего ViewModel (если он был и реализовывал интерфейс)
-            if (e.OldValue is INotifyPropertyChanged oldViewModel)
+            if (e.OldValue is MeasurementViewModel oldViewModel)
             {
                 oldViewModel.PropertyChanged -= ViewModel_PropertyChanged;
+                oldViewModel.RequestClearInputFocus -= ViewModel_RequestClearInputFocus;
             }
 
             // Подписываемся на событие PropertyChanged у нового ViewModel (если он есть и реализует интерфейс)
-            if (e.NewValue is INotifyPropertyChanged newViewModel)
+            if (e.NewValue is MeasurementViewModel newViewModel)
             {
                 newViewModel.PropertyChanged += ViewModel_PropertyChanged;
+                newViewModel.RequestClearInputFocus += ViewModel_RequestClearInputFocus;
             }
+
+            
             // Теперь ViewModel доступен через this.DataContext или sender.DataContext
         }
 
@@ -60,9 +65,10 @@ namespace WPF_LCD_Test.Views
             // Важно: отписываемся от события PropertyChanged ViewModel,
             // чтобы этот экземпляр UserControl не удерживал ViewModel в памяти
             // после того, как сам UserControl уже не отображается.
-            if (this.DataContext is INotifyPropertyChanged viewModel)
+            if (this.DataContext is MeasurementViewModel viewModel)
             {
                 viewModel.PropertyChanged -= ViewModel_PropertyChanged;
+                viewModel.RequestClearInputFocus -= ViewModel_RequestClearInputFocus;
             }
             // TODO: Отпишитесь от любых других событий ViewModel или сервисов,
             // на которые вы подписались напрямую в коде-за этого View и
@@ -96,7 +102,13 @@ namespace WPF_LCD_Test.Views
             // TODO: Сохраните обработку изменений других свойств ViewModel, если необходимо
         }
 
+        // --- Обработчик события запроса очистки фокуса ввода ---
+        private void ViewModel_RequestClearInputFocus(object sender, EventArgs e)
+        {
 
+            this.Focus();
+ 
+        }
 
         private void UserControl_PreviewKeyDown(object sender, KeyEventArgs e)
         {
@@ -117,8 +129,8 @@ namespace WPF_LCD_Test.Views
             }
 
             // Если фокус находится на элементе ввода, просто выходим,
-            // позволяя элементу ввода обработать нажатие клавиши.
-            // Мы не устанавливаем e.Handled = true, чтобы символ появился в поле ввода.
+            // позволяя элементу ввода обработать нажатие клавиши
+            
             if (isInputControlFocused)
             {
                 return;

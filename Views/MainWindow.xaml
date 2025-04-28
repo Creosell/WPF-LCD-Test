@@ -11,10 +11,14 @@
     Title="LCD Test Tool"
     Width="1000"
     Height="600"
+    MinWidth="1000"
+    MinHeight="600"
     d:DataContext="{d:DesignInstance Type=viewmodel:SettingsViewModel}"
     AllowsTransparency="True"
     Background="#FF212121"
     Icon="/Views/color_slurp_macos_bigsur_icon_190278.ico"
+    ResizeMode="CanResizeWithGrip"
+    WindowStartupLocation="CenterScreen"
     WindowStyle="None"
     mc:Ignorable="d">
 
