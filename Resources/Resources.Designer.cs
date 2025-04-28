@@ -655,6 +655,24 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error: External program file not found.
+        /// </summary>
+        public static string RunExternalAppNotFoundErr {
+            get {
+                return ResourceManager.GetString("RunExternalAppNotFoundErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error when launching an external program.
+        /// </summary>
+        public static string RunExternalAppUnexpectedErr {
+            get {
+                return ResourceManager.GetString("RunExternalAppUnexpectedErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The save has been canceled by the user.
         /// </summary>
         public static string SaveCanceled {

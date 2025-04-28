@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-	  <ApplicationIcon>Views\color_slurp_macos_bigsur_icon_190278.ico</ApplicationIcon>
+	  <ApplicationIcon>Images\AppIcon.ico</ApplicationIcon>
   
   </PropertyGroup>
 
@@ -18,7 +18,6 @@
     <None Remove="Images\WindowsHeaderButtons\dock-window.png" />
     <None Remove="Images\WindowsHeaderButtons\window-maximize.png" />
     <None Remove="Images\WindowsHeaderButtons\window-minimize.png" />
-    <None Remove="Views\color_slurp_macos_bigsur_icon_190278.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +33,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Tools\ReportGenerator.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MaterialDesignThemes" Version="5.2.2-ci976" />
     <PackageReference Include="Refractored.MvvmHelpers" Version="1.6.2" />
   </ItemGroup>
@@ -46,7 +51,6 @@
     <Resource Include="Images\WindowsHeaderButtons\dock-window.png" />
     <Resource Include="Images\WindowsHeaderButtons\window-maximize.png" />
     <Resource Include="Images\WindowsHeaderButtons\window-minimize.png" />
-    <Resource Include="Views\color_slurp_macos_bigsur_icon_190278.ico" />
   </ItemGroup>
 
   <ItemGroup>

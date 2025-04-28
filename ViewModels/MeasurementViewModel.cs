@@ -5,8 +5,10 @@
 using System.Collections.ObjectModel; // Для ObservableCollection (для логов, статусов)
 using System.Diagnostics;
 using System.Globalization; // Для CultureInfo (если нужно для форматирования в VM)
+using System.IO;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions; // Для валидации серийного номера
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input; // Для интерфейса ICommand
 using System.Windows.Media; // Для System.Windows.Media.Brush / Brushes (в MeasurementStatusViewModel)
@@ -16,6 +18,7 @@ using WPF_LCD_Test.Commands; // Для класса RelayCommand и BaseViewMode
 using WPF_LCD_Test.Models; // Для классов Model (Measurement, DeviceUnderTest)
 using WPF_LCD_Test.Services; // Для интерфейсов Services (IColorMeasurementService, IFileService, IDialogService)
 using static WPF_LCD_Test.Resources.Resources;
+
 
 // Класс ViewModel для MainWindow. Наследует от BaseViewModel для уведомлений UI.
 // Реализует IDisposable для очистки ресурсов (отписка от событий).
@@ -236,6 +239,9 @@ namespace WPF_LCD_Test.ViewModels
 
         public ICommand ApplyMeasurementTimeCommand { get; private set; } // Применяет введенное время
 
+        public ICommand NewDeviceUnderTestCommand { get; private set; } // Создает новое устройство под тестирование
+        public ICommand LaunchExternalProgramCommand { get; } // Запускает внешнюю программу (например, для тестирования)
+
         // --- Конструктор ViewModel ---
         // Получает экземпляры всех необходимых сервисов через параметры (Инъекция Зависимостей)
         public MeasurementViewModel(IColorMeasurementService colorMeasurementService, IFileService fileService, IDialogService dialogService, ILocalizationService localizationService)
@@ -267,6 +273,8 @@ namespace WPF_LCD_Test.ViewModels
             //TestCommand = new RelayCommand(ExecuteTest, CanExecuteTest); // Синхронная команда, с CanExecute
             ClearLogCommand = new RelayCommand(ExecuteClearLog, CanExecuteClearLog); // Синхронная команда, с CanExecute
             SwitchLanguageCommand = new RelayCommand(ExecuteSwitchLanguage, CanExecuteSwitchLanguage); // Синхронная команда, с CanExecute
+            NewDeviceUnderTestCommand = new RelayCommand(ExecuteNewDeviceUnderTest, CanExecuteNewDeviceUnderTest); // Синхронная команда, с CanExecute
+            LaunchExternalProgramCommand = new RelayCommand(ExecuteLaunchExternalProgramCommand); // Синхронная команда, с CanExecute
 
             // Команда измерения - принимает string parameter (имя точки)
             MeasureCommand = new RelayCommand(ExecuteMeasureAsync, CanExecuteMeasure); // Асинхронная команда
@@ -439,14 +447,14 @@ namespace WPF_LCD_Test.ViewModels
                 // FileService сам отправит сообщения в лог через StatusMessage
                 bool saveSuccess = await _fileService.SaveDeviceDataToJsonAsync(_currentDevice);
 
-                if (saveSuccess)
-                {
-                    _dialogService.ShowMessage($"{ResultsSaved}", $"{Saved}");
-                }
-                else
-                {
-                    _dialogService.ShowMessage($"{SaveJSONErrForSN}", $"{Err}");
-                }
+                //if (saveSuccess)
+                //{
+                //    _dialogService.ShowMessage($"{ResultsSaved}", $"{Saved}");
+                //}
+                //else
+                //{
+                //    _dialogService.ShowMessage($"{SaveJSONErrForSN}", $"{Err}");
+                //}
             }
             catch (Exception ex)
             {
@@ -476,7 +484,7 @@ namespace WPF_LCD_Test.ViewModels
                 IsSerialNumberConfirmed = false;
 
                 // Очистка коллекций ViewModel
-                ExecuteClearLog(parameter); // Очистка лога (вызываем команду очистки лога)
+                //ExecuteClearLog(parameter); // Очистка лога (вызываем команду очистки лога)
                 ResetMeasurementStatuses(); // Сбрасываем статусы всех точек измерения (обновит UI через MeasurementStatusViewModel)
 
                 AddLogMessage($"{ClearFieldsDone}");
@@ -742,10 +750,63 @@ namespace WPF_LCD_Test.ViewModels
             // но если влияет, нужно вызвать UpdateCommandsCanExecute();
         }
 
+        private async Task ExecuteNewDeviceUnderTest(object parameter)
+        {
+            // Здесь можно добавить логику для создания нового устройства
+            // Например, сбросить все статусы и очистить лог
+
+            if (CanExecuteSaveResults(parameter))
+            {
+               await ExecuteSaveResultsAsync(parameter); // Сохраняем результаты, если команда доступна
+
+            }
+            if (CanExecuteClearFields(parameter))
+            {
+                ExecuteClearFields(parameter);
+            }
+            ResetMeasurementStatuses();
+        }
         private void ExecuteClearLog(object parameter)
         {
             LogText = string.Empty; // Просто устанавливаем строку лога в пустую
                                     // Свойство LogText вызывает SetProperty.
+        }
+
+        private void ExecuteLaunchExternalProgramCommand(object parameter) // Parameter может быть null, если не используется
+        {
+            try
+            {
+                // !!! Определение пути к внешнему исполняемому файлу !!!
+                // Получаем директорию, где находится ваше приложение.
+                string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+                string exeFileFolder = "Tools"; // Папка с exe файлом (если есть)
+
+                // Определите путь к вашему exe файлу относительно директории приложения.
+                // Пример 1: exe находится прямо в папке с приложением
+                string executableName = "ReportGenerator.exe";
+                string executablePath = Path.Combine(appDirectory,exeFileFolder, executableName);
+
+
+                // !!! Опционально: проверка существования файла !!!
+                if (File.Exists(executablePath))
+                {
+                    Process.Start(executablePath);
+                }
+                else
+                {
+                    // Если файл не найден, логируем ошибку и, возможно, показываем сообщение пользователю
+                    AddLogMessage($"{RunExternalAppNotFoundErr}: {executablePath}");
+                    // Предполагаем, что у вас есть сервис диалогов _dialogService
+                }
+            }
+            catch (Exception ex)
+            {
+                // Обработка любых ошибок, которые могут возникнуть при запуске процесса
+                // Например, если у пользователя нет прав на запуск или произошла другая системная ошибка.
+                AddLogMessage($"{RunExternalAppUnexpectedErr}: {ex.Message}");
+
+            }
         }
 
         // --- Методы ViewModel, проверяющие доступность команд (CanExecute...) ---
@@ -830,6 +891,11 @@ namespace WPF_LCD_Test.ViewModels
             return true;
         }
 
+        private bool CanExecuteNewDeviceUnderTest(object paramater)
+        {
+            return _currentDevice != null && !string.IsNullOrWhiteSpace(_currentDevice.SerialNumber) && _currentDevice.Measurements.Count > 0;
+        }
+
         // --- Вспомогательные методы ViewModel (для внутренней логики ViewModel) ---
         // Эти методы помогают организовать код внутри ViewModel, но не привязаны напрямую к UI.
 
@@ -887,6 +953,7 @@ namespace WPF_LCD_Test.ViewModels
             // зависит от динамических свойств (кроме тех, которые всегда true)
             ((RelayCommand)ApplySerialNumberCommand)?.RaiseCanExecuteChanged();
             ((RelayCommand)ApplyMeasurementTimeCommand)?.RaiseCanExecuteChanged();
+            ((RelayCommand)NewDeviceUnderTestCommand)?.RaiseCanExecuteChanged();
         }
 
         // Метод для обновления статуса конкретной точки измерения по ее имени

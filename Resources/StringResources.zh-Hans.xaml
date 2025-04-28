@@ -73,6 +73,15 @@
     <system:String x:Key="ClearFieldsButton">
         明确的结果
     </system:String>
+    <system:String x:Key="NewDeviceUnderTestButton">
+        新的 DUT
+    </system:String>
+    <system:String x:Key="ClearLogWindow">
+        清除日志窗口
+    </system:String>
+    <system:String x:Key="ReportButton">
+        创建报告
+    </system:String>
 
     <!--  SettingsView keys  -->
     <system:String x:Key="DevicePortLabel">

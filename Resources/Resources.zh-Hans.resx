@@ -387,4 +387,10 @@
   <data name="SnCantBeEmpty" xml:space="preserve">
     <value>序列号不能为空</value>
   </data>
+  <data name="RunExternalAppNotFoundErr" xml:space="preserve">
+    <value>错误： 未找到外部程序文件</value>
+  </data>
+  <data name="RunExternalAppUnexpectedErr" xml:space="preserve">
+    <value>启动外部程序时出错</value>
+  </data>
 </root>

@@ -14,7 +14,7 @@ namespace WPF_LCD_Test.Services
     public class FileService : IFileService
     {
         // Приватные поля для хранения путей
-        private string _desktopPath;
+        private string _applicationBasePath;
 
         private string _baseFolderPath;
         private readonly string _workFolerName = "Color measurement data";
@@ -41,8 +41,8 @@ namespace WPF_LCD_Test.Services
         {
             try
             {
-                _desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                _baseFolderPath = Path.Combine(_desktopPath, _workFolerName);
+                _applicationBasePath = AppDomain.CurrentDomain.BaseDirectory;
+                _baseFolderPath = Path.Combine(_applicationBasePath, _workFolerName);
 
                 // Проверяем и создаем базовую папку, если ее нет
                 if (!Directory.Exists(_baseFolderPath))

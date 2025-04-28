@@ -387,4 +387,10 @@
   <data name="SnCantBeEmpty" xml:space="preserve">
     <value>The serial number cannot be empty</value>
   </data>
+  <data name="RunExternalAppNotFoundErr" xml:space="preserve">
+    <value>Error: External program file not found</value>
+  </data>
+  <data name="RunExternalAppUnexpectedErr" xml:space="preserve">
+    <value>Error when launching an external program</value>
+  </data>
 </root>

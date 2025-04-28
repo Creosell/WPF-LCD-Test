@@ -76,6 +76,15 @@
     <system:String x:Key="ClearFieldsButton">
         Clear results
     </system:String>
+    <system:String x:Key="NewDeviceUnderTestButton">
+        New DUT
+    </system:String>
+    <system:String x:Key="ClearLogWindow">
+        Clear log window
+    </system:String>
+    <system:String x:Key="ReportButton">
+        Create report
+    </system:String>
 
     <!--  SettingsView keys  -->
     <system:String x:Key="DevicePortLabel">
