@@ -124,6 +124,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Calibrated.
+        /// </summary>
+        public static string CalibratedCA {
+            get {
+                return ResourceManager.GetString("CalibratedCA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Calibrating zero....
         /// </summary>
         public static string CalibratingZeroCA {
@@ -615,6 +624,15 @@ namespace WPF_LCD_Test.Resources {
         public static string NoSNErr {
             get {
                 return ResourceManager.GetString("NoSNErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not calibrated.
+        /// </summary>
+        public static string NotCalibratedCa {
+            get {
+                return ResourceManager.GetString("NotCalibratedCa", resourceCulture);
             }
         }
         

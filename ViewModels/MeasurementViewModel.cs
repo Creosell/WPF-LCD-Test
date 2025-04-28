@@ -6,19 +6,15 @@ using System.Collections.ObjectModel; // Для ObservableCollection (для л�
 using System.Diagnostics;
 using System.Globalization; // Для CultureInfo (если нужно для форматирования в VM)
 using System.IO;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions; // Для валидации серийного номера
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input; // Для интерфейса ICommand
-using System.Windows.Media; // Для System.Windows.Media.Brush / Brushes (в MeasurementStatusViewModel)
 using System.Windows.Threading;
 using MvvmHelpers;
 using WPF_LCD_Test.Commands; // Для класса RelayCommand и BaseViewModel
 using WPF_LCD_Test.Models; // Для классов Model (Measurement, DeviceUnderTest)
 using WPF_LCD_Test.Services; // Для интерфейсов Services (IColorMeasurementService, IFileService, IDialogService)
 using static WPF_LCD_Test.Resources.Resources;
-
 
 // Класс ViewModel для MainWindow. Наследует от BaseViewModel для уведомлений UI.
 // Реализует IDisposable для очистки ресурсов (отписка от событий).
@@ -33,17 +29,19 @@ namespace WPF_LCD_Test.ViewModels
         private readonly IDialogService _dialogService; // Сервис для показа диалогов (зависимость)
         private readonly ILocalizationService _localizationService; // Сервис для локализации (зависимость)
 
-
         private DeviceUnderTest _currentDevice; // Текущее устройство под тестированием (объект Модели)
 
         // --- Приватные поля для хранения данных и состояния UI (будут привязаны к View) ---
         private string _serialNumber;
+
         private Dispatcher _dispatcher;
         private bool _isSerialNumberConfirmed = false;
 
         private int _measurementTime;
+
         //private ObservableCollection<string> _logMessages; // Коллекция сообщений для лога UI (UI ListBox/ListView)
         private bool _isMeasurementButtonsEnabled; // Флаг доступности кнопок измерений (UI IsEnabled)
+
         private bool _isDeviceConnected; // Флаг статуса подключения прибора (UI индикатор)
         private bool _isDeviceCalibrated; // Флаг статуса калибровки прибора (UI индикатор)
         private bool _isDeviceConnecting;
@@ -52,10 +50,7 @@ namespace WPF_LCD_Test.ViewModels
         // private double _measurementProgress; // Если хотим показывать прогресс измерения (UI ProgressBar)
 
         // --- Приватные поля для хранения состояния и статусов ---
-        public event EventHandler RequestClearInputFocus; 
-        // Коллекция статусов измерений для точек (для изменения цвета кнопок в UI)
-        // Каждый элемент MeasurementStatusViewModel уведомляет UI об изменении своих свойств (IsPassed, MeasuredValuesString)
-        private ObservableCollection<MeasurementStatusViewModel> _measurementStatuses;
+        public event EventHandler RequestClearInputFocus;
 
         // Список ожидаемых измерений по именам точек (из WinForms measurementButtons)
         // Этот список может быть загружен из конфигурации или констант
@@ -68,15 +63,12 @@ namespace WPF_LCD_Test.ViewModels
 
         public MeasurementStatusViewModel TopCenterStatus { get; private set; }
         public MeasurementStatusViewModel TopRightStatus { get; private set; }
-
         public MeasurementStatusViewModel MiddleLeftStatus { get; private set; }
         public MeasurementStatusViewModel CenterStatus { get; private set; }
         public MeasurementStatusViewModel MiddleRightStatus { get; private set; }
-
         public MeasurementStatusViewModel BottomLeftStatus { get; private set; }
         public MeasurementStatusViewModel BottomCenterStatus { get; private set; }
         public MeasurementStatusViewModel BottomRightStatus { get; private set; }
-
         public MeasurementStatusViewModel RedColorStatus { get; private set; }
         public MeasurementStatusViewModel GreenColorStatus { get; private set; }
         public MeasurementStatusViewModel BlueColorStatus { get; private set; }
@@ -95,13 +87,10 @@ namespace WPF_LCD_Test.ViewModels
             get => _serialNumber;
             set
             {
-                // !!! Правильное использование SetProperty !!!
-                // SetProperty проверяет !=, присваивает _serialNumber = value, и вызывает OnPropertyChanged.
-                // Если значение ИЗМЕНИЛОСЬ, SetProperty возвращает true, и выполняется код в блоке if.
                 if (SetProperty(ref _serialNumber, value))
                 {
                     UpdateMeasurementButtonsState(); // Ваша логика
-                    UpdateCommandsCanExecute();     // Ваша логика
+                    UpdateCommandsCanExecute(); // Ваша логика
                 }
                 // Здесь НЕТ else блока, т.к. SetProperty уже вернул false, если значение не изменилось.
             }
@@ -137,13 +126,10 @@ namespace WPF_LCD_Test.ViewModels
                 }
 
                 // Если значение валидно и отличается, используем SetProperty
-                if (SetProperty(ref _measurementTime, value))
-                {
-                }
+                if (SetProperty(ref _measurementTime, value)) { }
             }
         }
 
-        
         private string _logText = string.Empty; // Поле для хранения лога как единой строки
 
         public string LogText
@@ -153,36 +139,25 @@ namespace WPF_LCD_Test.ViewModels
             set => SetProperty(ref _logText, value);
         }
 
-
         // Флаг, управляющий доступностью группы кнопок измерений
         public bool IsMeasurementButtonsEnabled
         {
             get => _isMeasurementButtonsEnabled;
-            private set // Сеттер приватный, доступность кнопок управляется логикой ViewModel (UpdateMeasurementButtonsState)
-            {
-                if (_isMeasurementButtonsEnabled != value)
-                {
-                    _isMeasurementButtonsEnabled = value;
-                    OnPropertyChanged(); // Уведомляем View
-                }
-            }
+            // Используем SetProperty в приватном сеттере
+            private set => SetProperty(ref _isMeasurementButtonsEnabled, value);
         }
 
         // Флаг статуса подключения прибора
         public bool IsDeviceConnected
         {
             get => _isDeviceConnected;
-            // Сеттер приватный, статус обновляется при обработке событий от Сервиса
             private set
             {
-                if (_isDeviceConnected != value)
+                if (SetProperty(ref _isDeviceConnected, value))
                 {
-                    _isDeviceConnected = value;
-                    OnPropertyChanged(); // Уведомляем View
-
-                    // При изменении статуса подключения, потенциально меняется доступность многих команд и кнопок
                     UpdateCommandsCanExecute(); // Уведомляем все команды о необходимости перепроверки CanExecute
                     UpdateMeasurementButtonsState(); // Обновляем доступность кнопок измерения
+                    OnPropertyChanged(nameof(DeviceConnectionStatusText));
                 }
             }
         }
@@ -191,40 +166,30 @@ namespace WPF_LCD_Test.ViewModels
         public bool IsDeviceCalibrated
         {
             get => _isDeviceCalibrated;
-            // Сеттер приватный, статус обновляется при обработке событий от Сервиса
             private set
             {
-                // ИСПРАВЛЕНИЕ: используем правильное имя приватного поля _isDeviceCalibrated
-                if (_isDeviceCalibrated != value)
+                // Используем SetProperty. Если значение изменилось (SetProperty вернул true), выполняем дополнительную логику.
+                if (SetProperty(ref _isDeviceCalibrated, value))
                 {
-                    _isDeviceCalibrated = value; // Используем _isDeviceCalibrated
-                    OnPropertyChanged(); // Уведомляем View
-
                     // При изменении статуса калибровки, потенциально меняется доступность команд (Измерение, Калибровка)
                     UpdateCommandsCanExecute(); // Уведомляем все команды
                     UpdateMeasurementButtonsState(); // Обновляем доступность кнопок измерения
+                    OnPropertyChanged(nameof(DeviceCalibrationStatusText));
                 }
             }
         }
 
-        private string _deviceConnectionStatusText;
-
         public string DeviceConnectionStatusText
         {
-            get => _deviceConnectionStatusText;
-            set { if (_deviceConnectionStatusText != value) { _deviceConnectionStatusText = value; OnPropertyChanged(); } }
+            get { return _isDeviceConnected ? ConnectedCA : DisconnectedCA; }
         }
-
-        private string _deviceCalibrationStatusText;
 
         public string DeviceCalibrationStatusText
         {
-            get => _deviceCalibrationStatusText;
-            set { if (_deviceCalibrationStatusText != value) { _deviceCalibrationStatusText = value; OnPropertyChanged(); } }
+            get { return _isDeviceCalibrated ? CalibratedCA : NotCalibratedCa; }
         }
 
         public ObservableCollection<MeasurementStatusViewModel> AllMeasurementButtonStatuses { get; set; }
-
 
         public ICommand ZeroCalibrationCommand { get; private set; }
         public ICommand SaveResultsCommand { get; private set; }
@@ -244,44 +209,64 @@ namespace WPF_LCD_Test.ViewModels
 
         // --- Конструктор ViewModel ---
         // Получает экземпляры всех необходимых сервисов через параметры (Инъекция Зависимостей)
-        public MeasurementViewModel(IColorMeasurementService colorMeasurementService, IFileService fileService, IDialogService dialogService, ILocalizationService localizationService)
+        public MeasurementViewModel(
+            IColorMeasurementService colorMeasurementService,
+            IFileService fileService,
+            IDialogService dialogService,
+            ILocalizationService localizationService
+        )
         {
             // Проверяем, что сервисы были корректно предоставлены
-            _colorMeasurementService = colorMeasurementService ?? throw new ArgumentNullException(nameof(colorMeasurementService));
+            _colorMeasurementService =
+                colorMeasurementService
+                ?? throw new ArgumentNullException(nameof(colorMeasurementService));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
-            _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
-            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
-
-            // Инициализация коллекций
-            //LogMessages = [];
-            //MeasurementStatuses = new ObservableCollection<MeasurementStatusViewModel>();
+            _dialogService =
+                dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+            _localizationService =
+                localizationService ?? throw new ArgumentNullException(nameof(localizationService));
 
             // Инициализация свойств по умолчанию (как при старте приложения)
             _measurementTime = DefaultMeasurementTime;
             _serialNumber = ""; // Пустая строка по умолчанию
 
             // Получаем Dispatcher UI-потока
-            _dispatcher = Application.Current.Dispatcher;
+            _dispatcher = App.Current.Dispatcher;
 
             // Инициализация команд, связывая их с методами Execute/CanExecute
             // Используем RelayCommand, который находится в папке Commands
             //ConnectCommand = new RelayCommand(ExecuteConnectAsync, CanExecuteConnect); // Асинхронная команда
             //DisconnectCommand = new RelayCommand(ExecuteDisconnect, CanExecuteDisconnect); // Синхронная команда (операция быстрая)
-            ZeroCalibrationCommand = new RelayCommand(ExecuteZeroCalibrationAsync, CanExecuteZeroCalibration); // Асинхронная команда
+            ZeroCalibrationCommand = new RelayCommand(
+                ExecuteZeroCalibrationAsync,
+                CanExecuteZeroCalibration
+            ); // Асинхронная команда
             SaveResultsCommand = new RelayCommand(ExecuteSaveResultsAsync, CanExecuteSaveResults); // Асинхронная команда
             ClearFieldsCommand = new RelayCommand(ExecuteClearFields, CanExecuteClearFields); // Синхронная команда, с CanExecute
             //TestCommand = new RelayCommand(ExecuteTest, CanExecuteTest); // Синхронная команда, с CanExecute
             ClearLogCommand = new RelayCommand(ExecuteClearLog, CanExecuteClearLog); // Синхронная команда, с CanExecute
-            SwitchLanguageCommand = new RelayCommand(ExecuteSwitchLanguage, CanExecuteSwitchLanguage); // Синхронная команда, с CanExecute
-            NewDeviceUnderTestCommand = new RelayCommand(ExecuteNewDeviceUnderTest, CanExecuteNewDeviceUnderTest); // Синхронная команда, с CanExecute
+            SwitchLanguageCommand = new RelayCommand(
+                ExecuteSwitchLanguage,
+                CanExecuteSwitchLanguage
+            ); // Синхронная команда, с CanExecute
+            NewDeviceUnderTestCommand = new RelayCommand(
+                ExecuteNewDeviceUnderTest,
+                CanExecuteNewDeviceUnderTest
+            ); // Синхронная команда, с CanExecute
             LaunchExternalProgramCommand = new RelayCommand(ExecuteLaunchExternalProgramCommand); // Синхронная команда, с CanExecute
 
             // Команда измерения - принимает string parameter (имя точки)
             MeasureCommand = new RelayCommand(ExecuteMeasureAsync, CanExecuteMeasure); // Асинхронная команда
 
             // Инициализация новых команд для ввода в поля
-            ApplySerialNumberCommand = new RelayCommand(ExecuteApplySerialNumber, CanExecuteApplySerialNumber); // Синхронная команда
-            ApplyMeasurementTimeCommand = new RelayCommand(ExecuteApplyMeasurementTime, CanExecuteApplyMeasurementTime); // Синхронная команда
+            ApplySerialNumberCommand = new RelayCommand(
+                ExecuteApplySerialNumber,
+                CanExecuteApplySerialNumber
+            ); // Синхронная команда
+            ApplyMeasurementTimeCommand = new RelayCommand(
+                ExecuteApplyMeasurementTime,
+                CanExecuteApplyMeasurementTime
+            ); // Синхронная команда
 
             // Подписка на события сервисов, чтобы ViewModel мог реагировать на их активность
             // и обновлять UI/состояние через свойства ViewModel или лог
@@ -289,12 +274,13 @@ namespace WPF_LCD_Test.ViewModels
             // Подписка на события сервисов с использованием именованных методов
             _colorMeasurementService.StatusMessage += ColorMeasurementService_StatusMessage;
             _fileService.StatusMessage += FileService_StatusMessage;
-            _colorMeasurementService.ConnectionStatusChanged += (sender, isConnected) => ColorMeasurementService_ConnectionStatusChanged(sender, isConnected); // Подписка на событие подключения
-            _colorMeasurementService.CalibrationStatusChanged += (sender, isCalibrated) => ColorMeasurementService_CalibrationStatusChanged(sender, isCalibrated); // Подписка на событие калибровки
+            _colorMeasurementService.ConnectionStatusChanged += (sender, isConnected) =>
+                ColorMeasurementService_ConnectionStatusChanged(sender, isConnected); // Подписка на событие подключения
+            _colorMeasurementService.CalibrationStatusChanged += (sender, isCalibrated) =>
+                ColorMeasurementService_CalibrationStatusChanged(sender, isCalibrated); // Подписка на событие калибровки
             //_localizationService.LanguageChanged += LocalizationService_LanguageChanged; // <-- Эта строка должна быть
 
             // Инициализация начального состояния UI и команд
-            //InitializeMeasurementStatuses(); // Создаем начальные статусы для всех точек измерения
             MeasurementButtonsStatusInit(); // Инициализация статусов для каждой точки измерения
             RequieredMeasurementButtonsInit();
             UpdateCommandsCanExecute(); // Обновляем доступность всех команд при запуске
@@ -338,13 +324,17 @@ namespace WPF_LCD_Test.ViewModels
 
         private void RequieredMeasurementButtonsInit()
         {
-            _requiredMeasurementNames = [.. AllMeasurementButtonStatuses.Select(status => status.Location)];  // Преобразуем результат в List<string>
+            _requiredMeasurementNames =
+            [
+                .. AllMeasurementButtonStatuses.Select(status => status.Location),
+            ]; // Преобразуем результат в List<string>
         }
 
         // Асинхронная команда подключения
         private async Task ExecuteConnectAsync(object parameter)
         {
-            if (!CanExecuteConnect(parameter)) return; // Проверка доступности
+            if (!CanExecuteConnect(parameter))
+                return; // Проверка доступности
 
             try
             {
@@ -366,7 +356,8 @@ namespace WPF_LCD_Test.ViewModels
         // Реализация синхронной команды отключения
         private void ExecuteDisconnect(object parameter)
         {
-            if (!CanExecuteDisconnect(parameter)) return;
+            if (!CanExecuteDisconnect(parameter))
+                return;
 
             try
             {
@@ -419,14 +410,19 @@ namespace WPF_LCD_Test.ViewModels
         private async Task ExecuteSaveResultsAsync(object parameter)
         {
             CheckCurrentAppLanguage();
-            if (!CanExecuteSaveResults(parameter)) return;
+            if (!CanExecuteSaveResults(parameter))
+                return;
 
             AddLogMessage($"{Saving}");
 
             try
             {
                 // Проверяем, есть ли данные для сохранения и SN
-                if (_currentDevice == null || string.IsNullOrWhiteSpace(_currentDevice.SerialNumber) || _currentDevice.Measurements.Count == 0)
+                if (
+                    _currentDevice == null
+                    || string.IsNullOrWhiteSpace(_currentDevice.SerialNumber)
+                    || _currentDevice.Measurements.Count == 0
+                )
                 {
                     _dialogService.ShowMessage($"{SaveJSONErrDeviceIsEmpty}", $"{Err}");
                     return;
@@ -435,7 +431,10 @@ namespace WPF_LCD_Test.ViewModels
                 // Проверяем полноту измерений и запрашиваем подтверждение, если не все собраны
                 if (!_currentDevice.IsContainsAllMeasurements(_requiredMeasurementNames))
                 {
-                    bool confirmSave = _dialogService.ShowQuestion($"{SavingNotFullWarning}", $"{Warning}");
+                    bool confirmSave = _dialogService.ShowQuestion(
+                        $"{SavingNotFullWarning}",
+                        $"{Warning}"
+                    );
                     if (!confirmSave)
                     {
                         AddLogMessage($"{SaveCanceled}");
@@ -468,7 +467,8 @@ namespace WPF_LCD_Test.ViewModels
         private void ExecuteClearFields(object parameter)
         {
             CheckCurrentAppLanguage();
-            if (!CanExecuteClearFields(parameter)) return; // Хотя обычно всегда true
+            if (!CanExecuteClearFields(parameter))
+                return; // Хотя обычно всегда true
 
             // Запрашиваем подтверждение очистки
             bool confirm = _dialogService.ShowQuestion($"{CleanFieldWarning}", $"{Warning}");
@@ -498,7 +498,8 @@ namespace WPF_LCD_Test.ViewModels
         // Реализация синхронной команды смены языка
         private void ExecuteSwitchLanguage(object parameter)
         {
-            if (!CanExecuteSwitchLanguage(parameter)) return;
+            if (!CanExecuteSwitchLanguage(parameter))
+                return;
 
             string? languageCode = parameter as string; // Получаем код языка из параметра команды
             if (string.IsNullOrWhiteSpace(languageCode))
@@ -549,7 +550,11 @@ namespace WPF_LCD_Test.ViewModels
             {
                 // 1. Убеждаемся, что есть объект DeviceUnderTest с серийным номером
                 // Эту логику можно вынести или обрабатывать в ExecuteApplySerialNumber
-                if (_currentDevice == null || string.IsNullOrWhiteSpace(_currentDevice.SerialNumber) || _currentDevice.SerialNumber != SerialNumber)
+                if (
+                    _currentDevice == null
+                    || string.IsNullOrWhiteSpace(_currentDevice.SerialNumber)
+                    || _currentDevice.SerialNumber != SerialNumber
+                )
                 {
                     // Проверяем SN из свойства ViewModel, т.к. оно привязано к TextBox
                     if (string.IsNullOrWhiteSpace(SerialNumber))
@@ -571,7 +576,9 @@ namespace WPF_LCD_Test.ViewModels
                 // 2. Вызываем асинхронный метод измерения у Сервиса
                 // Передаем время измерения из свойства ViewModel
                 // Сервис выполнит усреднение и вернет Measurement
-                Measurement resultMeasurement = await _colorMeasurementService.MeasureAsync(_measurementTime);
+                Measurement resultMeasurement = await _colorMeasurementService.MeasureAsync(
+                    _measurementTime
+                );
 
                 // 3. Обработка результата измерения, валидация, форматирование
                 bool isMeasurmentSuccess = false;
@@ -592,12 +599,17 @@ namespace WPF_LCD_Test.ViewModels
                     if (lvValidationPassed) // Если валидация по Lv пройдена (и сервис вернул Valid=true)
                     {
                         // Логика форматирования для вывода в лог/UI
-                        string LvFormatted = (measurementName == BlackColorStatus.Location) ?
-                                            resultMeasurement.Lv.ToString("F4", CultureInfo.InvariantCulture) :
-                                            resultMeasurement.Lv.ToString("F1", CultureInfo.InvariantCulture);
-                        string TFormatted = resultMeasurement.T.ToString("F0", CultureInfo.InvariantCulture);
+                        string LvFormatted =
+                            (measurementName == BlackColorStatus.Location)
+                                ? resultMeasurement.Lv.ToString("F4", CultureInfo.InvariantCulture)
+                                : resultMeasurement.Lv.ToString("F1", CultureInfo.InvariantCulture);
+                        string TFormatted = resultMeasurement.T.ToString(
+                            "F0",
+                            CultureInfo.InvariantCulture
+                        );
 
-                        measuredValuesDisplay = $"x={resultMeasurement.x:F3}, y={resultMeasurement.y:F3}, Lv={LvFormatted}, T={TFormatted}";
+                        measuredValuesDisplay =
+                            $"x={resultMeasurement.x:F3}, y={resultMeasurement.y:F3}, Lv={LvFormatted}, T={TFormatted}";
 
                         AddLogMessage($"{Result} '{measurementName}': {measuredValuesDisplay}");
 
@@ -608,11 +620,12 @@ namespace WPF_LCD_Test.ViewModels
 
                         // Логика сохранения в CSV - это задача Сервиса Файлов
                         // Форматируем CSV строку здесь или в Measurement
-                        string csvString = $"{resultMeasurement.Location},{resultMeasurement.x.ToString(CultureInfo.InvariantCulture)},{resultMeasurement.y.ToString(CultureInfo.InvariantCulture)},{resultMeasurement.Lv.ToString(CultureInfo.InvariantCulture)},{resultMeasurement.T.ToString(CultureInfo.InvariantCulture)}";
+                        string csvString =
+                            $"{resultMeasurement.Location},{resultMeasurement.x.ToString(CultureInfo.InvariantCulture)},{resultMeasurement.y.ToString(CultureInfo.InvariantCulture)},{resultMeasurement.Lv.ToString(CultureInfo.InvariantCulture)},{resultMeasurement.T.ToString(CultureInfo.InvariantCulture)}";
                         // Возможно, форматирование должно быть более точным, как в WinForms
 
                         // Вызываем асинхронный метод сохранения CSV у Сервиса Файлов
-                       // await _fileService.SaveMeasurementToCsvAsync(csvString, resultMeasurement.Location, _currentDevice.SerialNumber);
+                        // await _fileService.SaveMeasurementToCsvAsync(csvString, resultMeasurement.Location, _currentDevice.SerialNumber);
 
                         isMeasurmentSuccess = true; // Измерение успешно выполнено и обработано
                     }
@@ -637,7 +650,11 @@ namespace WPF_LCD_Test.ViewModels
                 }
 
                 // 4. Обновление статуса измерения для данной точки в коллекции ViewModel (для обновления UI)
-                UpdateMeasurementStatus(measurementName, isMeasurmentSuccess, measuredValuesDisplay);
+                UpdateMeasurementStatus(
+                    measurementName,
+                    isMeasurmentSuccess,
+                    measuredValuesDisplay
+                );
 
                 // После измерения, возможно, команда Сохранить стала доступной (если собраны все измерения)
                 UpdateCommandsCanExecute(); // Проверяем доступность команд
@@ -645,7 +662,10 @@ namespace WPF_LCD_Test.ViewModels
             catch (Exception ex)
             {
                 // Обработка непредвиденных ошибок при выполнении команды измерения
-                _dialogService.ShowMessage($"{UnexpectedMeasurementErr} '{measurementName}': {ex.Message}", $"{Err}");
+                _dialogService.ShowMessage(
+                    $"{UnexpectedMeasurementErr} '{measurementName}': {ex.Message}",
+                    $"{Err}"
+                );
 
                 // Помечаем статус точки как ошибочный в ViewModel
                 UpdateMeasurementStatus(measurementName, false, $"{Err}: {ex.Message}");
@@ -659,9 +679,13 @@ namespace WPF_LCD_Test.ViewModels
             CheckCurrentAppLanguage();
             string enteredSerialNumber = parameter as string;
             // Логика из SerialNumberTextBox_KeyDown
-            if (!CanExecuteApplySerialNumber(parameter)) return;
+            if (!CanExecuteApplySerialNumber(parameter))
+                return;
 
-            if (!string.IsNullOrWhiteSpace(enteredSerialNumber) && Regex.IsMatch(enteredSerialNumber, SerialNumberPattern))
+            if (
+                !string.IsNullOrWhiteSpace(enteredSerialNumber)
+                && Regex.IsMatch(enteredSerialNumber, SerialNumberPattern)
+            )
             {
                 // Если введен текст, обновляем свойство SerialNumber в ViewModel
                 // ЭТО НЕ вызовет сеттер SerialNumber, так как UpdateSourceTrigger=Explicit
@@ -711,7 +735,9 @@ namespace WPF_LCD_Test.ViewModels
             {
                 // Если устройство уже соответствует SN, возможно, ничего не нужно делать,
                 // или просто логируем подтверждение.
-                AddLogMessage($"{Resources.Resources.SerialNumber} {SerialNumber}' {AlreadyActivated}");
+                AddLogMessage(
+                    $"{Resources.Resources.SerialNumber} {SerialNumber}' {AlreadyActivated}"
+                );
             }
 
             // Обновляем доступность кнопок измерения (зависит от наличия SN)
@@ -757,8 +783,7 @@ namespace WPF_LCD_Test.ViewModels
 
             if (CanExecuteSaveResults(parameter))
             {
-               await ExecuteSaveResultsAsync(parameter); // Сохраняем результаты, если команда доступна
-
+                await ExecuteSaveResultsAsync(parameter); // Сохраняем результаты, если команда доступна
             }
             if (CanExecuteClearFields(parameter))
             {
@@ -766,10 +791,11 @@ namespace WPF_LCD_Test.ViewModels
             }
             ResetMeasurementStatuses();
         }
+
         private void ExecuteClearLog(object parameter)
         {
             LogText = string.Empty; // Просто устанавливаем строку лога в пустую
-                                    // Свойство LogText вызывает SetProperty.
+            // Свойство LogText вызывает SetProperty.
         }
 
         private void ExecuteLaunchExternalProgramCommand(object parameter) // Parameter может быть null, если не используется
@@ -785,8 +811,7 @@ namespace WPF_LCD_Test.ViewModels
                 // Определите путь к вашему exe файлу относительно директории приложения.
                 // Пример 1: exe находится прямо в папке с приложением
                 string executableName = "ReportGenerator.exe";
-                string executablePath = Path.Combine(appDirectory,exeFileFolder, executableName);
-
+                string executablePath = Path.Combine(appDirectory, exeFileFolder, executableName);
 
                 // !!! Опционально: проверка существования файла !!!
                 if (File.Exists(executablePath))
@@ -805,7 +830,6 @@ namespace WPF_LCD_Test.ViewModels
                 // Обработка любых ошибок, которые могут возникнуть при запуске процесса
                 // Например, если у пользователя нет прав на запуск или произошла другая системная ошибка.
                 AddLogMessage($"{RunExternalAppUnexpectedErr}: {ex.Message}");
-
             }
         }
 
@@ -822,11 +846,8 @@ namespace WPF_LCD_Test.ViewModels
         // Проверка доступности команды Подключить: доступна, если прибор НЕ подключен
         private bool CanExecuteConnect(object parameter)
         {
-            return !IsDeviceConnected
-                && !_isDeviceCalibrating
-                && !_isDeviceConnecting;
+            return !IsDeviceConnected && !_isDeviceCalibrating && !_isDeviceConnecting;
         }
-
 
         // Проверка доступности команды Отключить: доступна, если прибор ПОДКЛЮЧЕН
         private bool CanExecuteDisconnect(object parameter)
@@ -844,7 +865,9 @@ namespace WPF_LCD_Test.ViewModels
         private bool CanExecuteSaveResults(object parameter)
         {
             // Команда доступна, если объект _currentDevice создан И у него есть SN И в нем есть хотя бы 1 измерение
-            return _currentDevice != null && !string.IsNullOrWhiteSpace(_currentDevice.SerialNumber) && _currentDevice.Measurements.Count > 0;
+            return _currentDevice != null
+                && !string.IsNullOrWhiteSpace(_currentDevice.SerialNumber)
+                && _currentDevice.Measurements.Count > 0;
             // Опционально, можно требовать, чтобы были собраны ВСЕ необходимые измерения:
             // return _currentDevice != null && !string.IsNullOrWhiteSpace(_currentDevice.SerialNumber) && _currentDevice.IsContainsAllMeasurements(_requiredMeasurementNames);
         }
@@ -867,12 +890,12 @@ namespace WPF_LCD_Test.ViewModels
         private bool CanExecuteMeasure(object parameter)
         {
             // Проверка основных условий доступности
-            return IsDeviceConnected       // Прибор подключен
-                   && !_isDeviceCalibrating // Прибор калибруется
-                   && !_isDeviceConnecting // Прибор подключается
-                   && IsDeviceCalibrated   // Прибор откалиброван
-                   && SerialNumber != "" // Серийный номер подтвержден
-                   && (MeasurementTime > 0);  // Время измерения больше нуля
+            return IsDeviceConnected // Прибор подключен
+                && !_isDeviceCalibrating // Прибор калибруется
+                && !_isDeviceConnecting // Прибор подключается
+                && IsDeviceCalibrated // Прибор откалиброван
+                && SerialNumber != "" // Серийный номер подтвержден
+                && (MeasurementTime > 0); // Время измерения больше нуля
         }
 
         // Проверка доступности команды ApplySerialNumber: доступна, если Серийный номер в поле не пустой
@@ -893,7 +916,9 @@ namespace WPF_LCD_Test.ViewModels
 
         private bool CanExecuteNewDeviceUnderTest(object paramater)
         {
-            return _currentDevice != null && !string.IsNullOrWhiteSpace(_currentDevice.SerialNumber) && _currentDevice.Measurements.Count > 0;
+            return _currentDevice != null
+                && !string.IsNullOrWhiteSpace(_currentDevice.SerialNumber)
+                && _currentDevice.Measurements.Count > 0;
         }
 
         // --- Вспомогательные методы ViewModel (для внутренней логики ViewModel) ---
@@ -904,7 +929,7 @@ namespace WPF_LCD_Test.ViewModels
         private void AddLogMessage(string message)
         {
             // App.Current.Dispatcher.Invoke выполнит действие в UI потоке
-            App.Current.Dispatcher.Invoke(() =>
+            _dispatcher.Invoke(() =>
             {
                 //LogMessages.Add($"{DateTime.Now:HH:mm:ss} - {message}");
                 //// Опционально: ограничить количество сообщений в логе
@@ -914,12 +939,9 @@ namespace WPF_LCD_Test.ViewModels
                 //}
                 if (!string.IsNullOrEmpty(message))
                 {
-
-                     string timestamp = DateTime.Now.ToString("HH:mm:ss");
-                     LogText += $"{timestamp} {message}{Environment.NewLine}";
-
+                    string timestamp = DateTime.Now.ToString("HH:mm:ss");
+                    LogText += $"{timestamp} {message}{Environment.NewLine}";
                 }
-
             });
         }
 
@@ -928,7 +950,8 @@ namespace WPF_LCD_Test.ViewModels
         // Вызывается, когда изменяются свойства, от которых зависит доступность (Connected, Calibrated, SerialNumber)
         private void UpdateMeasurementButtonsState()
         {
-            IsMeasurementButtonsEnabled = IsDeviceConnected
+            IsMeasurementButtonsEnabled =
+                IsDeviceConnected
                 && IsDeviceCalibrated
                 && !string.IsNullOrWhiteSpace(SerialNumber)
                 && SerialNumber != "";
@@ -942,15 +965,9 @@ namespace WPF_LCD_Test.ViewModels
         // Вызывается, когда меняются свойства, которые влияют на доступность многих команд (например, IsDeviceConnected)
         private void UpdateCommandsCanExecute()
         {
-            // Для каждой команды, у которой есть метод CanExecute, вызываем RaiseCanExecuteChanged
-            // Это заставляет WPF перепроверить CanExecute для этих команд
-            //((RelayCommand)ConnectCommand)?.RaiseCanExecuteChanged();
-            //((RelayCommand)DisconnectCommand)?.RaiseCanExecuteChanged();
             ((RelayCommand)ZeroCalibrationCommand)?.RaiseCanExecuteChanged();
-            ((RelayCommand)MeasureCommand)?.RaiseCanExecuteChanged(); // Повторно, если MeasureButtonState не покрыл
+            ((RelayCommand)MeasureCommand)?.RaiseCanExecuteChanged();
             ((RelayCommand)SaveResultsCommand)?.RaiseCanExecuteChanged();
-            // Для команд ClearFields, Test, SwitchLanguage, Apply... тоже можно вызвать, если их CanExecute
-            // зависит от динамических свойств (кроме тех, которые всегда true)
             ((RelayCommand)ApplySerialNumberCommand)?.RaiseCanExecuteChanged();
             ((RelayCommand)ApplyMeasurementTimeCommand)?.RaiseCanExecuteChanged();
             ((RelayCommand)NewDeviceUnderTestCommand)?.RaiseCanExecuteChanged();
@@ -958,11 +975,17 @@ namespace WPF_LCD_Test.ViewModels
 
         // Метод для обновления статуса конкретной точки измерения по ее имени
         // Вызывается из ExecuteMeasureAsync после получения результата
-        private void UpdateMeasurementStatus(string location, bool? isPassed, string measuredValuesString = null)
+        private void UpdateMeasurementStatus(
+            string location,
+            bool? isPassed,
+            string measuredValuesString = null
+        )
         {
             // 1. Ищем нужный объект MeasurementStatusViewModel в коллекции по его Location
             //    Используем LINQ FirstOrDefault(). Он вернет первый найденный элемент или null, если не найден.
-            MeasurementStatusViewModel statusToUpdate = AllMeasurementButtonStatuses.FirstOrDefault(s => s.Location == location);
+            MeasurementStatusViewModel statusToUpdate = AllMeasurementButtonStatuses.FirstOrDefault(
+                s => s.Location == location
+            );
 
             // 2. Проверяем, был ли найден объект статуса
             if (statusToUpdate != null)
@@ -989,7 +1012,9 @@ namespace WPF_LCD_Test.ViewModels
         private void ResetMeasurementStatuses()
         {
             // Сбрасываем свойства у каждого публичного объекта статуса
-            foreach (MeasurementStatusViewModel measurementStatusViewModel in AllMeasurementButtonStatuses)
+            foreach (
+                MeasurementStatusViewModel measurementStatusViewModel in AllMeasurementButtonStatuses
+            )
             {
                 measurementStatusViewModel.IsPassed = null;
                 measurementStatusViewModel.MeasuredValuesString = null;
@@ -1017,7 +1042,10 @@ namespace WPF_LCD_Test.ViewModels
             });
         }
 
-        private void ColorMeasurementService_CalibrationStatusChanged(object sender, bool isCalibrated)
+        private void ColorMeasurementService_CalibrationStatusChanged(
+            object sender,
+            bool isCalibrated
+        )
         {
             // Обработка смены статуса калибровки
             ExecuteThreadInUI(() =>
@@ -1025,10 +1053,12 @@ namespace WPF_LCD_Test.ViewModels
                 IsDeviceCalibrated = isCalibrated;
                 UpdateCommandsCanExecute();
             });
-            
         }
 
-        private void ColorMeasurementService_ConnectionStatusChanged(object sender, bool isConnected)
+        private void ColorMeasurementService_ConnectionStatusChanged(
+            object sender,
+            bool isConnected
+        )
         {
             // Обработка смены статуса подключения
             ExecuteThreadInUI(() =>
@@ -1057,8 +1087,10 @@ namespace WPF_LCD_Test.ViewModels
             if (_colorMeasurementService != null)
             {
                 _colorMeasurementService.StatusMessage -= ColorMeasurementService_StatusMessage;
-                _colorMeasurementService.ConnectionStatusChanged -= ColorMeasurementService_ConnectionStatusChanged;
-                _colorMeasurementService.CalibrationStatusChanged -= ColorMeasurementService_CalibrationStatusChanged;
+                _colorMeasurementService.ConnectionStatusChanged -=
+                    ColorMeasurementService_ConnectionStatusChanged;
+                _colorMeasurementService.CalibrationStatusChanged -=
+                    ColorMeasurementService_CalibrationStatusChanged;
             }
 
             if (_fileService != null)
@@ -1074,9 +1106,6 @@ namespace WPF_LCD_Test.ViewModels
             (_dialogService as IDisposable)?.Dispose(); // Если DialogService тоже IDisposable
 
             ExecuteClearLog(null); // Очищаем лог, если нужно
-            // Очищаем коллекции в ViewModel (опционально, но хорошая практика при завершении)
-            //LogMessages.Clear();
-            //MeasurementStatuses.Clear();
 
             // Сбрасываем ссылки на объекты Модели
             _currentDevice = null;
@@ -1092,7 +1121,7 @@ namespace WPF_LCD_Test.ViewModels
         {
             // Проверяем, находимся ли мы уже в потоке пользовательского интерфейса.
             // Если да, выполняем действие напрямую.
-            if (App.Current.Dispatcher.CheckAccess())
+            if (_dispatcher.CheckAccess())
             {
                 action.Invoke(); // Или просто action();
             }
@@ -1100,7 +1129,7 @@ namespace WPF_LCD_Test.ViewModels
             {
                 // Если мы в фоновом потоке, используем BeginInvoke для выполнения действия
                 // в потоке пользовательского интерфейса асинхронно.
-                App.Current.Dispatcher.BeginInvoke(action);
+                _dispatcher.BeginInvoke(action);
             }
         }
     }

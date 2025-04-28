@@ -393,4 +393,10 @@
   <data name="RunExternalAppUnexpectedErr" xml:space="preserve">
     <value>启动外部程序时出错</value>
   </data>
+  <data name="CalibratedCA" xml:space="preserve">
+    <value>校准</value>
+  </data>
+  <data name="NotCalibratedCa" xml:space="preserve">
+    <value>未校准</value>
+  </data>
 </root>

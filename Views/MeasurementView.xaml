@@ -70,10 +70,12 @@
                         <TextBlock
                             Margin="5,0"
                             VerticalAlignment="Center"
+                            Foreground="White"
                             Text="{Binding DeviceConnectionStatusText}" />
                         <TextBlock
                             Margin="5,0"
                             VerticalAlignment="Center"
+                            Foreground="White"
                             Text="{Binding DeviceCalibrationStatusText}" />
                     </StackPanel>
                 </StackPanel>

@@ -393,4 +393,10 @@
   <data name="RunExternalAppUnexpectedErr" xml:space="preserve">
     <value>Error when launching an external program</value>
   </data>
+  <data name="CalibratedCA" xml:space="preserve">
+    <value>Calibrated</value>
+  </data>
+  <data name="NotCalibratedCa" xml:space="preserve">
+    <value>Not calibrated</value>
+  </data>
 </root>

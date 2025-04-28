@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+﻿    using System.Globalization;
 using System.Runtime.InteropServices;
 using CA200SRVRLib;
 using WPF_LCD_Test.Models;
@@ -121,6 +121,13 @@ namespace WPF_LCD_Test.Services
                     _isConnected = false;
                     ConnectionStatusChanged?.Invoke(this, _isConnected);
                 }
+                ///////TEST
+                //finally
+                //{
+
+                //    _isConnected = true;
+                //    ConnectionStatusChanged?.Invoke(this, _isConnected);
+                //}
             });
             return _isConnected; // Возвращаем статус подключения
         }
@@ -174,6 +181,11 @@ namespace WPF_LCD_Test.Services
                     _isCalibrated = false;
                     CalibrationStatusChanged?.Invoke(this, _isCalibrated);
                 }
+                //finally //////////TEST
+                //{
+                //    _isCalibrated = true;
+                //    CalibrationStatusChanged?.Invoke(this, _isCalibrated);
+                //}
             }); // Конец Task.Run
             return success;
         }

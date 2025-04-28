@@ -73,5 +73,8 @@ namespace WPF_LCD_Test.Models
             IsPassed = null;
             MeasuredValuesString = "";
         }
+
+
+
     }
 }
