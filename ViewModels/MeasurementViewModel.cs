@@ -933,9 +933,9 @@ namespace WPF_LCD_Test.ViewModels
             {
                 get
                 {
-                    if (IsPassed == true) return Brushes.LightGreen; // Успех
+                    if (IsPassed == true) return Brushes.DarkGreen; // Успех
                     if (IsPassed == false) return Brushes.Red;      // Ошибка
-                    return Brushes.LightGray; // По умолчанию (не измерено)
+                    return Brushes.DimGray; // По умолчанию (не измерено)
                 }
             }
 
