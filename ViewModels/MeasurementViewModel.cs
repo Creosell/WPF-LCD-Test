@@ -612,7 +612,7 @@ namespace WPF_LCD_Test.ViewModels
                         // Возможно, форматирование должно быть более точным, как в WinForms
 
                         // Вызываем асинхронный метод сохранения CSV у Сервиса Файлов
-                        await _fileService.SaveMeasurementToCsvAsync(csvString, resultMeasurement.Location, _currentDevice.SerialNumber);
+                       // await _fileService.SaveMeasurementToCsvAsync(csvString, resultMeasurement.Location, _currentDevice.SerialNumber);
 
                         isMeasurmentSuccess = true; // Измерение успешно выполнено и обработано
                     }
