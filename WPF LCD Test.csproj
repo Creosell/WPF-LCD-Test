@@ -30,7 +30,6 @@
     <None Remove="Images\WindowsHeaderButtons\window-maximize.png" />
     <None Remove="Images\WindowsHeaderButtons\window-minimize.png" />
     <None Remove="space.png" />
-    <None Remove="Tools\ReportGenerator.exe" />
   </ItemGroup>
 
   <ItemGroup>
@@ -83,9 +82,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="space.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Tools\ReportGenerator.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
