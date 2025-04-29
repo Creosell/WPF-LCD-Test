@@ -293,19 +293,19 @@ namespace WPF_LCD_Test.ViewModels
             AllMeasurementButtonStatuses = [];
 
             // Создаем объекты и добавляем ИХ в коллекцию
-            TopLeftStatus = new MeasurementStatusViewModel("Top left");
-            TopCenterStatus = new MeasurementStatusViewModel("Top center");
-            TopRightStatus = new MeasurementStatusViewModel("Top right");
-            MiddleLeftStatus = new MeasurementStatusViewModel("Middle left");
+            TopLeftStatus = new MeasurementStatusViewModel("TopLeft");
+            TopCenterStatus = new MeasurementStatusViewModel("TopCenter");
+            TopRightStatus = new MeasurementStatusViewModel("TopRight");
+            MiddleLeftStatus = new MeasurementStatusViewModel("MiddleLeft");
             CenterStatus = new MeasurementStatusViewModel("Center");
-            MiddleRightStatus = new MeasurementStatusViewModel("Middle right");
-            BottomLeftStatus = new MeasurementStatusViewModel("Bottom left");
-            BottomCenterStatus = new MeasurementStatusViewModel("Bottom center");
-            BottomRightStatus = new MeasurementStatusViewModel("Bottom right");
-            RedColorStatus = new MeasurementStatusViewModel("Red");
-            GreenColorStatus = new MeasurementStatusViewModel("Green");
-            BlueColorStatus = new MeasurementStatusViewModel("Blue");
-            BlackColorStatus = new MeasurementStatusViewModel("Black");
+            MiddleRightStatus = new MeasurementStatusViewModel("MiddleRight");
+            BottomLeftStatus = new MeasurementStatusViewModel("BottomLeft");
+            BottomCenterStatus = new MeasurementStatusViewModel("BottomCenter");
+            BottomRightStatus = new MeasurementStatusViewModel("BottomRight");
+            RedColorStatus = new MeasurementStatusViewModel("RedColor");
+            GreenColorStatus = new MeasurementStatusViewModel("GreenColor");
+            BlueColorStatus = new MeasurementStatusViewModel("BlueColor");
+            BlackColorStatus = new MeasurementStatusViewModel("BlackColor");
 
             AllMeasurementButtonStatuses.Add(TopLeftStatus);
             AllMeasurementButtonStatuses.Add(TopCenterStatus);
@@ -806,12 +806,13 @@ namespace WPF_LCD_Test.ViewModels
                 // Получаем директорию, где находится ваше приложение.
                 string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
-                string exeFileFolder = "Tools"; // Папка с exe файлом (если есть)
+                //string exeFileFolder = "Tools"; // Папка с exe файлом (если есть)
 
                 // Определите путь к вашему exe файлу относительно директории приложения.
                 // Пример 1: exe находится прямо в папке с приложением
                 string executableName = "ReportGenerator.exe";
-                string executablePath = Path.Combine(appDirectory, exeFileFolder, executableName);
+                string executablePath = Path.Combine(appDirectory, executableName);
+                //string executablePath = Path.Combine(appDirectory, exeFileFolder, executableName);
 
                 // !!! Опционально: проверка существования файла !!!
                 if (File.Exists(executablePath))

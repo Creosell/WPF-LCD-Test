@@ -18,6 +18,7 @@
     <None Remove="Images\WindowsHeaderButtons\dock-window.png" />
     <None Remove="Images\WindowsHeaderButtons\window-maximize.png" />
     <None Remove="Images\WindowsHeaderButtons\window-minimize.png" />
+    <None Remove="Tools\ReportGenerator.exe" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Tools\ReportGenerator.exe">
+    <Content Include="ReportGenerator.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -72,6 +73,10 @@
     <EmbeddedResource Update="Resources\Resources.zh-Hans.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Tools\" />
   </ItemGroup>
 
 </Project>

@@ -17,7 +17,7 @@ namespace WPF_LCD_Test.Services
         private string _applicationBasePath;
 
         private string _baseFolderPath;
-        private readonly string _workFolerName = "Color measurement data";
+        private readonly string _workFolerName = "data";
 
         // Публичные свойства из интерфейса
         public string BaseFolderPath => _baseFolderPath;
