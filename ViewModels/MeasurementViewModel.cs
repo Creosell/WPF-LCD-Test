@@ -601,7 +601,7 @@ namespace WPF_LCD_Test.ViewModels
                         // Логика форматирования для вывода в лог/UI
                         string LvFormatted =
                             (measurementName == BlackColorStatus.Location)
-                                ? resultMeasurement.Lv.ToString("F4", CultureInfo.InvariantCulture)
+                                ? resultMeasurement.Lv.ToString("F6", CultureInfo.InvariantCulture)
                                 : resultMeasurement.Lv.ToString("F1", CultureInfo.InvariantCulture);
                         string TFormatted = resultMeasurement.T.ToString(
                             "F0",

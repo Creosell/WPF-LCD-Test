@@ -148,31 +148,31 @@ namespace WPF_LCD_Test.Views
                 // WPF использует перечисление Key.
                 switch (e.Key)
                 {
-                    case Key.D1: measurementPointName = "Top left"; break;
-                    case Key.D2: measurementPointName = "Top center"; break;
-                    case Key.D3: measurementPointName = "Top right"; break;
-                    case Key.D4: measurementPointName = "Middle left"; break;
+                    case Key.D1: measurementPointName = "TopLeft"; break;
+                    case Key.D2: measurementPointName = "TopCenter"; break;
+                    case Key.D3: measurementPointName = "TopRight"; break;
+                    case Key.D4: measurementPointName = "MiddleLeft"; break;
                     case Key.D5: measurementPointName = "Center"; break;
-                    case Key.D6: measurementPointName = "Middle right"; break;
-                    case Key.D7: measurementPointName = "Bottom left"; break;
-                    case Key.D8: measurementPointName = "Bottom center"; break;
-                    case Key.D9: measurementPointName = "Bottom right"; break;
-                    case Key.D0: measurementPointName = "Black"; break;
+                    case Key.D6: measurementPointName = "MiddleRight"; break;
+                    case Key.D7: measurementPointName = "BottomLeft"; break;
+                    case Key.D8: measurementPointName = "BottomCenter"; break;
+                    case Key.D9: measurementPointName = "BottomRight"; break;
+                    case Key.D0: measurementPointName = "BlackColor"; break;
 
-                    case Key.R: measurementPointName = "Red"; break;
-                    case Key.G: measurementPointName = "Green"; break;
-                    case Key.B: measurementPointName = "Blue"; break;
+                    case Key.R: measurementPointName = "RedColor"; break;
+                    case Key.G: measurementPointName = "GreenColor"; break;
+                    case Key.B: measurementPointName = "BlueColor"; break;
 
-                    case Key.NumPad1: measurementPointName = "Top left"; break;
-                    case Key.NumPad2: measurementPointName = "Top center"; break;
-                    case Key.NumPad3: measurementPointName = "Top right"; break;
-                    case Key.NumPad4: measurementPointName = "Middle left"; break;
+                    case Key.NumPad1: measurementPointName = "TopLeft"; break;
+                    case Key.NumPad2: measurementPointName = "TopCenter"; break;
+                    case Key.NumPad3: measurementPointName = "TopRight"; break;
+                    case Key.NumPad4: measurementPointName = "MiddleLeft"; break;
                     case Key.NumPad5: measurementPointName = "Center"; break;
-                    case Key.NumPad6: measurementPointName = "Middle right"; break;
-                    case Key.NumPad7: measurementPointName = "Bottom left"; break;
-                    case Key.NumPad8: measurementPointName = "Bottom center"; break;
-                    case Key.NumPad9: measurementPointName = "Bottom right"; break;
-                    case Key.NumPad0: measurementPointName = "Black"; break;
+                    case Key.NumPad6: measurementPointName = "MiddleRight"; break;
+                    case Key.NumPad7: measurementPointName = "BottomLeft"; break;
+                    case Key.NumPad8: measurementPointName = "BottomCenter"; break;
+                    case Key.NumPad9: measurementPointName = "BottomRight"; break;
+                    case Key.NumPad0: measurementPointName = "BlackColor"; break;
                 }
 
                 // Если нажатая клавиша соответствует одной из точек измерения (т.е. measurementPointName != null)

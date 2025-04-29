@@ -12,12 +12,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="color_space.png" />
+    <None Remove="config\._color_space.yaml" />
+    <None Remove="config\._data_path.yaml" />
+    <None Remove="config\._expected_result.yaml" />
+    <None Remove="config\._main.yaml" />
+    <None Remove="config\._tests.yaml" />
+    <None Remove="config\color_space.yaml" />
+    <None Remove="config\data_path.yaml" />
+    <None Remove="config\expected_result.yaml" />
+    <None Remove="config\main.yaml" />
+    <None Remove="config\tests.yaml" />
     <None Remove="Images\ButtonsIcons\cropped-logo46.png" />
     <None Remove="Images\ButtonsIcons\SettingsViewIcon.png" />
     <None Remove="Images\WindowsHeaderButtons\close-thick.png" />
     <None Remove="Images\WindowsHeaderButtons\dock-window.png" />
     <None Remove="Images\WindowsHeaderButtons\window-maximize.png" />
     <None Remove="Images\WindowsHeaderButtons\window-minimize.png" />
+    <None Remove="space.png" />
     <None Remove="Tools\ReportGenerator.exe" />
   </ItemGroup>
 
@@ -34,7 +46,46 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="color_space.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="config\._color_space.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="config\._data_path.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="config\._expected_result.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="config\._main.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="config\._tests.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="config\color_space.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="config\data_path.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="config\expected_result.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="config\main.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="config\tests.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="ReportGenerator.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="space.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Tools\ReportGenerator.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -73,10 +124,6 @@
     <EmbeddedResource Update="Resources\Resources.zh-Hans.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Tools\" />
   </ItemGroup>
 
 </Project>

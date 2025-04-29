@@ -71,26 +71,27 @@ namespace WPF_LCD_Test.Converters // Используй соответствую
             // Если ты хочешь форматирование для x и y одинаково, можно использовать DoubleJsonConverter
             // Примененный к свойству x и y в классе Measurement, если этот конвертер НЕ применен к самому классу Measurement.
             // Но если этот конвертер применяется к классу Measurement, то логика форматирования x и y должна быть здесь.
-            writer.WriteString("x", value.x.ToString("F3"));
+            writer.WriteNumber("x", Math.Round(value.x, 3));
+
             // Записываем свойство y
-            writer.WriteString("y", value.y.ToString("F3"));
+            writer.WriteNumber("y", Math.Round(value.y, 3));
 
             // --- Условное форматирование для Lv ---
-            string LvFormat = "F1"; // Формат по умолчанию для Lv (2 знака)
+            int LvPrecision = 1; // Точность по умолчанию (для F1)
 
-            // Проверяем значение Location
-            if (value.Location == "Black") // Или "K. Black", зависит от того, как ты его инициализируешь
+            if (value.Location == "BlackColor") // Или "K. Black"
             {
-                LvFormat = "F4"; // Устанавливаем формат 4 знака для Black
+                LvPrecision = 8; // Точность 4 знака для Black (для F4)
             }
 
             // Записываем свойство Lv с выбранным форматированием
             // Записываем как строку, чтобы гарантировать точное количество знаков
-            writer.WriteString("Lv", value.Lv.ToString(LvFormat));
+            writer.WriteNumber("Lv", Math.Round(value.Lv, LvPrecision));
 
             // Записываем свойство T (предполагаем, что это int или double без специфического форматирования)
             // Если T - double, и ему нужно стандартное форматирование, используй writer.WriteNumber или writer.WriteString с F2
-            writer.WriteNumber("T", value.T);
+            writer.WriteNumber("T", Math.Round(value.T, 0)); // Используем ToString() для получения строкового представления значения
+
 
             // TODO: Запиши остальные свойства Measurement, если они должны быть в JSON
             // Например: writer.WriteString("Timestamp", value.Timestamp);
