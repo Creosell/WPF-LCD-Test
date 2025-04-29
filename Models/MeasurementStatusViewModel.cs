@@ -20,11 +20,14 @@ namespace WPF_LCD_Test.Models
             get => _isPassed;
             set
             {
-                if (_isPassed != value)
+                // !!! Используем SetProperty. SetProperty возвращает true, если значение ДЕЙСТВИТЕЛЬНО изменилось. !!!
+                // Если значение изменилось (SetProperty вернул true), выполняем дополнительную логику.
+                if (SetProperty(ref _isPassed, value))
                 {
-                    _isPassed = value;
-                    OnPropertyChanged(); // Уведомляем UI об изменении IsPassed
-                    OnPropertyChanged(nameof(StatusColor)); // Уведомляем, что свойство StatusColor тоже могло измениться
+                    // Если IsPassed изменилось, уведомляем UI об этом (это делает SetProperty).
+                    // И дополнительно уведомляем, что свойство StatusColor тоже могло измениться,
+                    // так как оно вычисляется на основе IsPassed.
+                    OnPropertyChanged(nameof(StatusColor));
                 }
             }
         }

@@ -30,12 +30,12 @@ namespace WPF_LCD_Test.ViewModels
         private readonly IDialogService _dialogService; // Сервис для показа диалогов (зависимость)
         private readonly ILocalizationService _localizationService; // Сервис для локализации (зависимость)
 
-        private DeviceUnderTest? _currentDevice; // Текущее устройство под тестированием (объект Модели)
+        public DeviceUnderTest? _currentDevice; // Текущее устройство под тестированием (объект Модели)
 
         // --- Приватные поля для хранения данных и состояния UI (будут привязаны к View) ---
         private string _serialNumber;
 
-        private readonly Dispatcher _dispatcher;
+        private readonly Dispatcher? _dispatcher; // Может быть null в тестовой среде
         private bool _isSerialNumberConfirmed = false;
 
         private int _measurementTime;
@@ -45,8 +45,8 @@ namespace WPF_LCD_Test.ViewModels
 
         private bool _isDeviceConnected; // Флаг статуса подключения прибора (UI индикатор)
         private bool _isDeviceCalibrated; // Флаг статуса калибровки прибора (UI индикатор)
-        private bool _isDeviceConnecting;
-        private bool _isDeviceCalibrating;
+        public bool _isDeviceConnecting;
+        public bool _isDeviceCalibrating;
 
         // private double _measurementProgress; // Если хотим показывать прогресс измерения (UI ProgressBar)
 
@@ -88,6 +88,7 @@ namespace WPF_LCD_Test.ViewModels
             get => _isSerialNumberConfirmed;
             set
             {
+                
                 // !!! Правильное использование SetProperty !!!
                 if (SetProperty(ref _isSerialNumberConfirmed, value))
                 {
@@ -137,7 +138,7 @@ namespace WPF_LCD_Test.ViewModels
         public bool IsDeviceConnected
         {
             get => _isDeviceConnected;
-            private set
+            set
             {
                 if (SetProperty(ref _isDeviceConnected, value))
                 {
@@ -152,9 +153,9 @@ namespace WPF_LCD_Test.ViewModels
         public bool IsDeviceCalibrated
         {
             get => _isDeviceCalibrated;
-            private set
+            set
             {
-                // Используем SetProperty. Если значение изменилось (SetProperty вернул true), выполняем дополнительную логику.
+                // Используем SetPropserty. Если значение изменилось (SetProperty вернул true), выполняем дополнительную логику.
                 if (SetProperty(ref _isDeviceCalibrated, value))
                 {
                     // При изменении статуса калибровки, потенциально меняется доступность команд (Измерение, Калибровка)
@@ -217,7 +218,7 @@ namespace WPF_LCD_Test.ViewModels
             _serialNumber = ""; // Пустая строка по умолчанию
 
             // Получаем Dispatcher UI-потока
-            _dispatcher = App.Current.Dispatcher;
+            _dispatcher = (App.Current != null) ? App.Current.Dispatcher : null;
 
             // Инициализация команд, связывая их с методами Execute/CanExecute
             // Используем RelayCommand, который находится в папке Commands
@@ -273,7 +274,7 @@ namespace WPF_LCD_Test.ViewModels
             UpdateMeasurementButtonsState(); // Обновляем доступность кнопок измерения при запуске
         }
 
-        private bool AreAllStatusesRepresentedInMeasurements()
+        public bool AreAllStatusesRepresentedInMeasurements()
         {
             // Сначала проверяем, что есть устройство и у него есть коллекция измерений
             if (_currentDevice?.Measurements == null || !_currentDevice.Measurements.Any())
@@ -666,14 +667,16 @@ namespace WPF_LCD_Test.ViewModels
         }
 
         // Реализация команды для применения введенного Серийного номера (например, по Enter)
-        private void ExecuteApplySerialNumber(object parameter)
+        public void ExecuteApplySerialNumber(object parameter)
         {
             CheckCurrentAppLanguage();
             var enteredSerialNumber = parameter as string;
             // Логика из SerialNumberTextBox_KeyDown
             if (!CanExecuteApplySerialNumber(parameter))
+            {
+                
                 return;
-
+            }
             if (
                 !string.IsNullOrWhiteSpace(enteredSerialNumber)
                 && Regex.IsMatch(enteredSerialNumber, SerialNumberPattern)
@@ -891,8 +894,8 @@ namespace WPF_LCD_Test.ViewModels
         // Проверка доступности команды ApplySerialNumber: доступна, если Серийный номер в поле не пустой
         private bool CanExecuteApplySerialNumber(object parameter)
         {
-            return true;
-            //return !string.IsNullOrWhiteSpace(SerialNumber);
+
+            return !string.IsNullOrWhiteSpace(parameter as string) && Regex.IsMatch(parameter as string, SerialNumberPattern);
         }
 
         // Проверка доступности команды ApplyMeasurementTime: доступна, если время в поле валидно (например, > 0)
@@ -911,28 +914,30 @@ namespace WPF_LCD_Test.ViewModels
                 && _currentDevice.Measurements.Count > 0;
         }
 
-        // --- Вспомогательные методы ViewModel (для внутренней логики ViewModel) ---
-        // Эти методы помогают организовать код внутри ViewModel, но не привязаны напрямую к UI.
 
-        // Метод для добавления сообщения в коллекцию логов
-        // Используем Dispatcher для потокобезопасного доступа к ObservableCollection
         private void AddLogMessage(string message)
         {
-            // App.Current.Dispatcher.Invoke выполнит действие в UI потоке
-            _dispatcher.Invoke(() =>
+            if (!string.IsNullOrEmpty(message)) // Проверяем, что само сообщение не пустое
             {
-                //LogMessages.Add($"{DateTime.Now:HH:mm:ss} - {message}");
-                //// Опционально: ограничить количество сообщений в логе
-                //if (LogMessages.Count > 500) // Например, держать не более 500 сообщений
-                //{
-                //    LogMessages.RemoveAt(0); // Удалить самое старое сообщение
-                //}
-                if (!string.IsNullOrEmpty(message))
+                // !!! Добавьте проверку на null для _dispatcher !!!
+                if (_dispatcher != null)
                 {
+                    // Если диспетчер доступен (приложение запущено в WPF), выполняем действие через него.
+                    _dispatcher.Invoke(() =>
+                    {
+                        // Логика добавления текста в лог
+                        string timestamp = DateTime.Now.ToString("HH:mm:ss");
+                        LogText += $"{timestamp} {message}{Environment.NewLine}";
+                    });
+                }
+                else
+                {
+                    // !!! Если диспетчер равен null (в тестовой среде), выполняем логику напрямую !!!
+                    // Логика добавления текста в лог
                     string timestamp = DateTime.Now.ToString("HH:mm:ss");
                     LogText += $"{timestamp} {message}{Environment.NewLine}";
                 }
-            });
+            }
         }
 
         // Метод для обновления состояния доступности кнопок измерения
@@ -1114,15 +1119,18 @@ namespace WPF_LCD_Test.ViewModels
         {
             // Проверяем, находимся ли мы уже в потоке пользовательского интерфейса.
             // Если да, выполняем действие напрямую.
-            if (_dispatcher.CheckAccess())
+            if (_dispatcher != null)
             {
-                action.Invoke(); // Или просто action();
-            }
-            else
-            {
-                // Если мы в фоновом потоке, используем BeginInvoke для выполнения действия
-                // в потоке пользовательского интерфейса асинхронно.
-                _dispatcher.BeginInvoke(action);
+                if (_dispatcher.CheckAccess())
+                {
+                    action.Invoke(); // Или просто action();
+                }
+                else
+                {
+                    // Если мы в фоновом потоке, используем BeginInvoke для выполнения действия
+                    // в потоке пользовательского интерфейса асинхронно.
+                    _dispatcher.BeginInvoke(action);
+                }
             }
         }
     }
