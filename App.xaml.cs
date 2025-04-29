@@ -20,7 +20,9 @@ namespace WPF_LCD_Test
         IDialogService dialogService = new DialogService(); // Реализация сервиса диалогов
         ISettingsService settingsService = SettingsService.Instance; // Получаем синглтон сервиса настроек (если он синглтон)
         ILocalizationService localizationService = LocalizationService.Instance; // Получаем синглтон сервиса локализации (если он синглтон)
-        
+        MeasurementStatusManager measurementStatusManager = MeasurementStatusManager.Instance; // Получаем синглтон менеджера статусов измерений (если он синглтон)
+
+
 
 
         private void Application_Startup(object sender, StartupEventArgs e)

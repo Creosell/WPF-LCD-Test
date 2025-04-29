@@ -15,6 +15,7 @@ using WPF_LCD_Test.Commands; // Для класса RelayCommand и BaseViewMode
 using WPF_LCD_Test.Models; // Для классов Model (Measurement, DeviceUnderTest)
 using WPF_LCD_Test.Services; // Для интерфейсов Services (IColorMeasurementService, IFileService, IDialogService)
 using static WPF_LCD_Test.Resources.Resources;
+using MeasurementStatusViewModel = WPF_LCD_Test.Services.MeasurementStatusViewModel;
 
 // Класс ViewModel для MainWindow. Наследует от BaseViewModel для уведомлений UI.
 // Реализует IDisposable для очистки ресурсов (отписка от событий).
@@ -59,20 +60,6 @@ namespace WPF_LCD_Test.ViewModels
         // В классе MainWindowViewModel (рядом с другими свойствами)
 
         // Публичные свойства для статуса каждой точки измерения
-        public MeasurementStatusViewModel TopLeftStatus { get; private set; }
-
-        public MeasurementStatusViewModel TopCenterStatus { get; private set; }
-        public MeasurementStatusViewModel TopRightStatus { get; private set; }
-        public MeasurementStatusViewModel MiddleLeftStatus { get; private set; }
-        public MeasurementStatusViewModel CenterStatus { get; private set; }
-        public MeasurementStatusViewModel MiddleRightStatus { get; private set; }
-        public MeasurementStatusViewModel BottomLeftStatus { get; private set; }
-        public MeasurementStatusViewModel BottomCenterStatus { get; private set; }
-        public MeasurementStatusViewModel BottomRightStatus { get; private set; }
-        public MeasurementStatusViewModel RedColorStatus { get; private set; }
-        public MeasurementStatusViewModel GreenColorStatus { get; private set; }
-        public MeasurementStatusViewModel BlueColorStatus { get; private set; }
-        public MeasurementStatusViewModel BlackColorStatus { get; private set; }
 
         // Константы валидации и значения по умолчанию
         private const string SerialNumberPattern = "^[a-zA-Z0-9]*$"; // Pattern for using only letters and digits
@@ -189,7 +176,7 @@ namespace WPF_LCD_Test.ViewModels
             get { return _isDeviceCalibrated ? CalibratedCA : NotCalibratedCa; }
         }
 
-        public ObservableCollection<MeasurementStatusViewModel> AllMeasurementButtonStatuses { get; set; }
+        //public ObservableCollection<MeasurementStatusViewModel> AllMeasurementButtonStatuses { get; set; }
 
         public ICommand ZeroCalibrationCommand { get; private set; }
         public ICommand SaveResultsCommand { get; private set; }
@@ -281,54 +268,13 @@ namespace WPF_LCD_Test.ViewModels
             //_localizationService.LanguageChanged += LocalizationService_LanguageChanged; // <-- Эта строка должна быть
 
             // Инициализация начального состояния UI и команд
-            MeasurementButtonsStatusInit(); // Инициализация статусов для каждой точки измерения
-            RequieredMeasurementButtonsInit();
+            //MeasurementButtonsStatusInit(); // Инициализация статусов для каждой точки измерения
+            //RequieredMeasurementButtonsInit();
             UpdateCommandsCanExecute(); // Обновляем доступность всех команд при запуске
             UpdateMeasurementButtonsState(); // Обновляем доступность кнопок измерения при запуске
         }
 
-        private void MeasurementButtonsStatusInit()
-        {
-            // Инициализируем коллекцию
-            AllMeasurementButtonStatuses = [];
 
-            // Создаем объекты и добавляем ИХ в коллекцию
-            TopLeftStatus = new MeasurementStatusViewModel("TopLeft");
-            TopCenterStatus = new MeasurementStatusViewModel("TopCenter");
-            TopRightStatus = new MeasurementStatusViewModel("TopRight");
-            MiddleLeftStatus = new MeasurementStatusViewModel("MiddleLeft");
-            CenterStatus = new MeasurementStatusViewModel("Center");
-            MiddleRightStatus = new MeasurementStatusViewModel("MiddleRight");
-            BottomLeftStatus = new MeasurementStatusViewModel("BottomLeft");
-            BottomCenterStatus = new MeasurementStatusViewModel("BottomCenter");
-            BottomRightStatus = new MeasurementStatusViewModel("BottomRight");
-            RedColorStatus = new MeasurementStatusViewModel("RedColor");
-            GreenColorStatus = new MeasurementStatusViewModel("GreenColor");
-            BlueColorStatus = new MeasurementStatusViewModel("BlueColor");
-            BlackColorStatus = new MeasurementStatusViewModel("BlackColor");
-
-            AllMeasurementButtonStatuses.Add(TopLeftStatus);
-            AllMeasurementButtonStatuses.Add(TopCenterStatus);
-            AllMeasurementButtonStatuses.Add(TopRightStatus);
-            AllMeasurementButtonStatuses.Add(MiddleLeftStatus);
-            AllMeasurementButtonStatuses.Add(CenterStatus);
-            AllMeasurementButtonStatuses.Add(MiddleRightStatus);
-            AllMeasurementButtonStatuses.Add(BottomLeftStatus);
-            AllMeasurementButtonStatuses.Add(BottomCenterStatus);
-            AllMeasurementButtonStatuses.Add(BottomRightStatus);
-            AllMeasurementButtonStatuses.Add(RedColorStatus);
-            AllMeasurementButtonStatuses.Add(GreenColorStatus);
-            AllMeasurementButtonStatuses.Add(BlueColorStatus);
-            AllMeasurementButtonStatuses.Add(BlackColorStatus);
-        }
-
-        private void RequieredMeasurementButtonsInit()
-        {
-            _requiredMeasurementNames =
-            [
-                .. AllMeasurementButtonStatuses.Select(status => status.Location),
-            ]; // Преобразуем результат в List<string>
-        }
 
         // Асинхронная команда подключения
         private async Task ExecuteConnectAsync(object parameter)
@@ -589,7 +535,8 @@ namespace WPF_LCD_Test.ViewModels
                 {
                     // Логика валидации Lv < 10 (для всех, кроме BlackColor)
                     bool lvValidationPassed = true;
-                    if (measurementName != BlackColorStatus.Location && resultMeasurement.Lv < 10)
+
+                    if (measurementName != MeasurementStatusManager.Instance.BlackColorStatus.Location && resultMeasurement.Lv < 10)
                     {
                         AddLogMessage($"{LvIsTooLow}: {resultMeasurement.Lv:F1}. {CheckProbe}");
                         lvValidationPassed = false; // Валидация по Lv не пройдена
@@ -600,7 +547,7 @@ namespace WPF_LCD_Test.ViewModels
                     {
                         // Логика форматирования для вывода в лог/UI
                         string LvFormatted =
-                            (measurementName == BlackColorStatus.Location)
+                            (measurementName == MeasurementStatusManager.Instance.BlackColorStatus.Location)
                                 ? resultMeasurement.Lv.ToString("F6", CultureInfo.InvariantCulture)
                                 : resultMeasurement.Lv.ToString("F1", CultureInfo.InvariantCulture);
                         string TFormatted = resultMeasurement.T.ToString(
@@ -984,7 +931,7 @@ namespace WPF_LCD_Test.ViewModels
         {
             // 1. Ищем нужный объект MeasurementStatusViewModel в коллекции по его Location
             //    Используем LINQ FirstOrDefault(). Он вернет первый найденный элемент или null, если не найден.
-            MeasurementStatusViewModel statusToUpdate = AllMeasurementButtonStatuses.FirstOrDefault(
+            MeasurementStatusViewModel statusToUpdate = MeasurementStatusManager.Instance.AllMeasurementButtonStatuses.FirstOrDefault(
                 s => s.Location == location
             );
 
@@ -1014,7 +961,7 @@ namespace WPF_LCD_Test.ViewModels
         {
             // Сбрасываем свойства у каждого публичного объекта статуса
             foreach (
-                MeasurementStatusViewModel measurementStatusViewModel in AllMeasurementButtonStatuses
+                MeasurementStatusViewModel measurementStatusViewModel in MeasurementStatusManager.Instance.AllMeasurementButtonStatuses
             )
             {
                 measurementStatusViewModel.IsPassed = null;
