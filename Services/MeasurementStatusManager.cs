@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel; // Для ObservableCollection
 using System.Linq;
-using MvvmHelpers;
 using System.Text.Json.Serialization;
 using System.Windows.Media;
+using MvvmHelpers;
 using WPF_LCD_Test.Models;
 using WPF_LCD_Test.ViewModels; // Убедитесь, что пространство имен вашего ViewModel доступно
 
@@ -19,7 +19,8 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
 
         // Приватное статическое поле для хранения единственного экземпляра класса
         // Используем System.Lazy для потокобезопасной и ленивой инициализации
-        private static readonly Lazy<MeasurementStatusManager> _lazyInstance = new Lazy<MeasurementStatusManager>(() => new MeasurementStatusManager());
+        private static readonly Lazy<MeasurementStatusManager> _lazyInstance =
+            new Lazy<MeasurementStatusManager>(() => new MeasurementStatusManager());
 
         // Публичное статическое свойство для доступа к единственному экземпляру класса
         // При первом обращении к Instance.Value будет создан экземпляр
@@ -58,6 +59,8 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
         public MeasurementStatusViewModel? BlueColorStatus { get; }
         public MeasurementStatusViewModel? BlackColorStatus { get; }
 
+     
+
         public MeasurementStatusManager()
         {
             AllMeasurementButtonStatuses = []; // Инициализируем коллекцию
@@ -65,10 +68,19 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
             // Список всех имен точек измерения, используем константы
             var locations = new List<string>
             {
-                TopLeftLocationName, TopCenterLocationName, TopRightLocationName,
-                MiddleLeftLocationName, CenterLocationName, MiddleRightLocationName,
-                BottomLeftLocationName, BottomCenterLocationName, BottomRightLocationName,
-                RedColorLocationName, GreenColorLocationName, BlueColorLocationName, BlackColorLocationName
+                TopLeftLocationName,
+                TopCenterLocationName,
+                TopRightLocationName,
+                MiddleLeftLocationName,
+                CenterLocationName,
+                MiddleRightLocationName,
+                BottomLeftLocationName,
+                BottomCenterLocationName,
+                BottomRightLocationName,
+                RedColorLocationName,
+                GreenColorLocationName,
+                BlueColorLocationName,
+                BlackColorLocationName,
             };
 
             foreach (var location in locations)
@@ -79,19 +91,45 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
                 // Присваиваем созданный объект статусному свойству в этом менеджере
                 switch (location)
                 {
-                    case TopLeftLocationName: TopLeftStatus = status; break;
-                    case TopCenterLocationName: TopCenterStatus = status; break;
-                    case TopRightLocationName: TopRightStatus = status; break;
-                    case MiddleLeftLocationName: MiddleLeftStatus = status; break;
-                    case CenterLocationName: CenterStatus = status; break;
-                    case MiddleRightLocationName: MiddleRightStatus = status; break;
-                    case BottomLeftLocationName: BottomLeftStatus = status; break;
-                    case BottomCenterLocationName: BottomCenterStatus = status; break;
-                    case BottomRightLocationName: BottomRightStatus = status; break;
-                    case RedColorLocationName: RedColorStatus = status; break;
-                    case GreenColorLocationName: GreenColorStatus = status; break;
-                    case BlueColorLocationName: BlueColorStatus = status; break;
-                    case BlackColorLocationName: BlackColorStatus = status; break;
+                    case TopLeftLocationName:
+                        TopLeftStatus = status;
+                        break;
+                    case TopCenterLocationName:
+                        TopCenterStatus = status;
+                        break;
+                    case TopRightLocationName:
+                        TopRightStatus = status;
+                        break;
+                    case MiddleLeftLocationName:
+                        MiddleLeftStatus = status;
+                        break;
+                    case CenterLocationName:
+                        CenterStatus = status;
+                        break;
+                    case MiddleRightLocationName:
+                        MiddleRightStatus = status;
+                        break;
+                    case BottomLeftLocationName:
+                        BottomLeftStatus = status;
+                        break;
+                    case BottomCenterLocationName:
+                        BottomCenterStatus = status;
+                        break;
+                    case BottomRightLocationName:
+                        BottomRightStatus = status;
+                        break;
+                    case RedColorLocationName:
+                        RedColorStatus = status;
+                        break;
+                    case GreenColorLocationName:
+                        GreenColorStatus = status;
+                        break;
+                    case BlueColorLocationName:
+                        BlueColorStatus = status;
+                        break;
+                    case BlackColorLocationName:
+                        BlackColorStatus = status;
+                        break;
                 }
             }
         }
@@ -102,9 +140,6 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
             // Используем LINQ для поиска первого статуса с совпадающим именем локации
             return AllMeasurementButtonStatuses.FirstOrDefault(s => s.Location == location);
         }
-
-    
-
     }
 
     public class MeasurementStatusViewModel : BaseViewModel // Наследует от BaseViewModel
@@ -134,8 +169,10 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
         {
             get
             {
-                if (IsPassed == true) return Brushes.DarkGreen; // Успех
-                if (IsPassed == false) return Brushes.DarkRed;      // Ошибка
+                if (IsPassed == true)
+                    return Brushes.DarkGreen; // Успех
+                if (IsPassed == false)
+                    return Brushes.DarkRed; // Ошибка
                 return Brushes.DimGray; // По умолчанию (не измерено)
             }
         }
@@ -171,8 +208,5 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
             IsPassed = null;
             MeasuredValuesString = "";
         }
-
-
-
     }
 }

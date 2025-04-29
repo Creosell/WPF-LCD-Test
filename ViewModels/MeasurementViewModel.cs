@@ -30,12 +30,12 @@ namespace WPF_LCD_Test.ViewModels
         private readonly IDialogService _dialogService; // Сервис для показа диалогов (зависимость)
         private readonly ILocalizationService _localizationService; // Сервис для локализации (зависимость)
 
-        private DeviceUnderTest _currentDevice; // Текущее устройство под тестированием (объект Модели)
+        private DeviceUnderTest? _currentDevice; // Текущее устройство под тестированием (объект Модели)
 
         // --- Приватные поля для хранения данных и состояния UI (будут привязаны к View) ---
         private string _serialNumber;
 
-        private Dispatcher _dispatcher;
+        private readonly Dispatcher _dispatcher;
         private bool _isSerialNumberConfirmed = false;
 
         private int _measurementTime;
@@ -55,7 +55,6 @@ namespace WPF_LCD_Test.ViewModels
 
         // Список ожидаемых измерений по именам точек (из WinForms measurementButtons)
         // Этот список может быть загружен из конфигурации или констант
-        private List<string> _requiredMeasurementNames;
 
         // В классе MainWindowViewModel (рядом с другими свойствами)
 
@@ -274,7 +273,44 @@ namespace WPF_LCD_Test.ViewModels
             UpdateMeasurementButtonsState(); // Обновляем доступность кнопок измерения при запуске
         }
 
+        private bool AreAllStatusesRepresentedInMeasurements()
+        {
+            // Сначала проверяем, что есть устройство и у него есть коллекция измерений
+            if (_currentDevice?.Measurements == null || !_currentDevice.Measurements.Any())
+            {
+                // Если нет устройства или у него нет измерений, то условие не выполнено
+                return false;
+            }
 
+            // Получаем коллекцию всех статусов точек измерения из менеджера статусов
+            var allStatusPoints = MeasurementStatusManager.Instance.AllMeasurementButtonStatuses;
+
+            // Проверяем, что менеджер статусов содержит точки (хотя он должен быть инициализирован с ними)
+            if (allStatusPoints == null || !allStatusPoints.Any())
+            {
+                // Если в менеджере статусов нет точек, это может указывать на проблему инициализации
+                // или если такая ситуация допустима, возможно, здесь нужно вернуть true.
+                // Предполагаем, что менеджер статусов всегда должен содержать точки.
+                return false;
+            }
+
+
+            // Для КАЖДОЙ точки, представленной в менеджере статусов (AllStatuses),
+            // проверяем, есть ли соответствующее измерение в коллекции Measurements текущего устройства.
+            foreach (var status in allStatusPoints)
+            {
+                // Для текущей точки статуса (например, "TopLeft") ищем измерение в коллекции устройства
+                // с таким же Location.
+                if (!_currentDevice.Measurements.Any(measurement => measurement.Location == status.Location))
+                {
+                    // Если мы нашли точку в менеджере статусов, для которой НЕТ измерения в коллекции устройства,
+                    // значит, не все статусы представлены измерениями. Возвращаем false.
+                    return false;
+                }
+               
+            }
+            return true;
+        }
 
         // Асинхронная команда подключения
         private async Task ExecuteConnectAsync(object parameter)
@@ -374,8 +410,10 @@ namespace WPF_LCD_Test.ViewModels
                     return;
                 }
 
+               
+
                 // Проверяем полноту измерений и запрашиваем подтверждение, если не все собраны
-                if (!_currentDevice.IsContainsAllMeasurements(_requiredMeasurementNames))
+                if (!AreAllStatusesRepresentedInMeasurements())
                 {
                     bool confirmSave = _dialogService.ShowQuestion(
                         $"{SavingNotFullWarning}",
@@ -478,7 +516,7 @@ namespace WPF_LCD_Test.ViewModels
         {
             CheckCurrentAppLanguage();
             // Получаем имя точки измерения из параметра команды
-            string measurementName = parameter as string;
+            var measurementName = parameter as string;
             if (string.IsNullOrWhiteSpace(measurementName))
             {
                 return;
@@ -536,7 +574,11 @@ namespace WPF_LCD_Test.ViewModels
                     // Логика валидации Lv < 10 (для всех, кроме BlackColor)
                     bool lvValidationPassed = true;
 
-                    if (measurementName != MeasurementStatusManager.Instance.BlackColorStatus.Location && resultMeasurement.Lv < 10)
+                    if (
+                        measurementName
+                            != MeasurementStatusManager.Instance.BlackColorStatus.Location
+                        && resultMeasurement.Lv < 10
+                    )
                     {
                         AddLogMessage($"{LvIsTooLow}: {resultMeasurement.Lv:F1}. {CheckProbe}");
                         lvValidationPassed = false; // Валидация по Lv не пройдена
@@ -547,7 +589,10 @@ namespace WPF_LCD_Test.ViewModels
                     {
                         // Логика форматирования для вывода в лог/UI
                         string LvFormatted =
-                            (measurementName == MeasurementStatusManager.Instance.BlackColorStatus.Location)
+                            (
+                                measurementName
+                                == MeasurementStatusManager.Instance.BlackColorStatus.Location
+                            )
                                 ? resultMeasurement.Lv.ToString("F6", CultureInfo.InvariantCulture)
                                 : resultMeasurement.Lv.ToString("F1", CultureInfo.InvariantCulture);
                         string TFormatted = resultMeasurement.T.ToString(
@@ -624,7 +669,7 @@ namespace WPF_LCD_Test.ViewModels
         private void ExecuteApplySerialNumber(object parameter)
         {
             CheckCurrentAppLanguage();
-            string enteredSerialNumber = parameter as string;
+            var enteredSerialNumber = parameter as string;
             // Логика из SerialNumberTextBox_KeyDown
             if (!CanExecuteApplySerialNumber(parameter))
                 return;
@@ -699,7 +744,7 @@ namespace WPF_LCD_Test.ViewModels
             CheckCurrentAppLanguage();
             try
             {
-                string enteredMeasurementTime = parameter as string;
+                var enteredMeasurementTime = parameter as string;
                 int measurementTime = int.Parse(s: enteredMeasurementTime); // Пробуем преобразовать строку в число
                 if (measurementTime <= 0)
                 {
@@ -816,8 +861,6 @@ namespace WPF_LCD_Test.ViewModels
             return _currentDevice != null
                 && !string.IsNullOrWhiteSpace(_currentDevice.SerialNumber)
                 && _currentDevice.Measurements.Count > 0;
-            // Опционально, можно требовать, чтобы были собраны ВСЕ необходимые измерения:
-            // return _currentDevice != null && !string.IsNullOrWhiteSpace(_currentDevice.SerialNumber) && _currentDevice.IsContainsAllMeasurements(_requiredMeasurementNames);
         }
 
         // Проверка доступности команды Очистить: всегда доступна
@@ -834,7 +877,6 @@ namespace WPF_LCD_Test.ViewModels
             // Если список доступных языков динамический, можно добавить проверку, что languageCode есть в этом списке.
         }
 
-        // Проверка доступности команды Измерение: указана точка, прибор ПОДКЛЮЧЕН, ОТКАЛИБРОВАН, введен SN
         private bool CanExecuteMeasure(object parameter)
         {
             // Проверка основных условий доступности
@@ -931,9 +973,10 @@ namespace WPF_LCD_Test.ViewModels
         {
             // 1. Ищем нужный объект MeasurementStatusViewModel в коллекции по его Location
             //    Используем LINQ FirstOrDefault(). Он вернет первый найденный элемент или null, если не найден.
-            MeasurementStatusViewModel statusToUpdate = MeasurementStatusManager.Instance.AllMeasurementButtonStatuses.FirstOrDefault(
-                s => s.Location == location
-            );
+            MeasurementStatusViewModel statusToUpdate =
+                MeasurementStatusManager.Instance.AllMeasurementButtonStatuses.FirstOrDefault(s =>
+                    s.Location == location
+                );
 
             // 2. Проверяем, был ли найден объект статуса
             if (statusToUpdate != null)
@@ -961,7 +1004,9 @@ namespace WPF_LCD_Test.ViewModels
         {
             // Сбрасываем свойства у каждого публичного объекта статуса
             foreach (
-                MeasurementStatusViewModel measurementStatusViewModel in MeasurementStatusManager.Instance.AllMeasurementButtonStatuses
+                MeasurementStatusViewModel measurementStatusViewModel in MeasurementStatusManager
+                    .Instance
+                    .AllMeasurementButtonStatuses
             )
             {
                 measurementStatusViewModel.IsPassed = null;

@@ -2,7 +2,6 @@
 using WPF_LCD_Test.Converters;
 using static WPF_LCD_Test.Resources.Resources;
 
-// using System.Windows.Forms; // Этот using понадобится только для IsContainsAllMeasurements в текущем виде
 
 namespace WPF_LCD_Test.Models // Пространство имен должно быть в папке Models
 {
@@ -50,26 +49,6 @@ namespace WPF_LCD_Test.Models // Пространство имен должно 
             }
 
             Measurements.Add(newMeasurement);
-        }
-
-        // Предложение: Перегрузка или изменение метода, чтобы принимать список имен (string)
-        public bool IsContainsAllMeasurements(List<string> requiredMeasurementNames)
-        {
-            if (requiredMeasurementNames == null || !requiredMeasurementNames.Any())
-            {
-                // Нет обязательных имен для проверки
-                return false;
-            }
-
-            // Проверяем, что все обязательные имена присутствуют среди Location имеющихся измерений
-            foreach (string requiredName in requiredMeasurementNames)
-            {
-                if (!Measurements.Any(existingMeasurement => existingMeasurement.Location == requiredName))
-                {
-                    return false; // Нашли обязательное имя, для которого нет измерения
-                }
-            }
-            return true; // Все обязательные имена найдены
         }
     }
 }
