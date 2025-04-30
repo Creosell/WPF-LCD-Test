@@ -8,56 +8,62 @@ namespace WPF_LCD_Test.Commands
     public class RelayCommand : ICommand
     {
         // Меняем поля для поддержки как синхронных (Action), так и асинхронных (Func<Task>) execute методов
-        private readonly Action<object> _execute; // Для синхронных методов
+        private readonly Action<object>? _execute; // Для синхронных методов
 
-        private readonly Func<object, Task> _executeAsync; // Для асинхронных методов
+        private readonly Func<object, Task>? _executeAsync; // Для асинхронных методов
 
-        private readonly Func<object, bool> _canExecute;
+        private readonly Func<object, bool>? _canExecute;
 
         // Поле для отслеживания выполнения асинхронной команды (опционально, но полезно для CanExecute)
         private bool _isExecuting;
 
         // Событие CanExecuteChanged
-        public event EventHandler CanExecuteChanged;
+        public event EventHandler? CanExecuteChanged;
 
         // --- Добавляем новые конструкторы для асинхронных команд ---
 
         // Конструктор для асинхронной команды с параметром
-        public RelayCommand(Func<object, Task> executeAsync, Func<object, bool> canExecute = null)
+        public RelayCommand(Func<object, Task> executeAsync, Func<object, bool>? canExecute = null)
         {
             _executeAsync = executeAsync ?? throw new ArgumentNullException(nameof(executeAsync));
-            _canExecute = canExecute;
+            if (canExecute != null)
+            {
+                _canExecute = canExecute;
+            }
             _execute = null; // Указываем, что синхронный execute не используется
         }
 
         // Конструктор для асинхронной команды без параметра
-        public RelayCommand(Func<Task> executeAsync, Func<bool> canExecute = null)
+        public RelayCommand(Func<Task> executeAsync, Func<bool>? canExecute = null)
              : this(async (p) => await executeAsync(), (p) => canExecute?.Invoke() ?? true) // Переиспользуем основной асинхронный конструктор
         {
-            if (executeAsync == null) throw new ArgumentNullException(nameof(executeAsync));
+            ArgumentNullException.ThrowIfNull(executeAsync);
         }
 
         // --- Оставляем старые конструкторы для синхронных команд ---
 
         // Конструктор для синхронной команды с параметром
-        public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
+        public RelayCommand(Action<object> execute, Func<object, bool>? canExecute = null)
         {
             _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _canExecute = canExecute;
+            if (canExecute != null)
+            {
+                _canExecute = canExecute;
+            }
             _executeAsync = null; // Указываем, что асинхронный execute не используется
         }
 
         // Конструктор для синхронной команды без параметра
-        public RelayCommand(Action execute, Func<bool> canExecute = null)
+        public RelayCommand(Action execute, Func<bool>? canExecute = null)
              : this((p) => execute?.Invoke(), (p) => canExecute?.Invoke() ?? true) // Переиспользуем основной синхронный конструктор
         {
-            if (execute == null) throw new ArgumentNullException(nameof(execute));
+            ArgumentNullException.ThrowIfNull(execute);
         }
 
         // --- Методы из интерфейса ICommand ---
 
         // Проверка доступности команды
-        public bool CanExecute(object parameter)
+        public bool CanExecute(object? parameter)
         {
             // Команда доступна, если она не выполняется прямо сейчас (для асинхронных)
             // И если метод CanExecute разрешает выполнение
@@ -74,7 +80,7 @@ namespace WPF_LCD_Test.Commands
         }
 
         // Выполнение команды
-        public async void Execute(object parameter) // Используем async void здесь для поддержки await внутри Execute
+        public async void Execute(object? parameter) // Используем async void здесь для поддержки await внутри Execute
         {
             if (!CanExecute(parameter)) return;
 

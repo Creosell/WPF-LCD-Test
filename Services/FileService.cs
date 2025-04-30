@@ -24,6 +24,13 @@ namespace WPF_LCD_Test.Services
 
         public string WorkFolderName => _workFolerName;
 
+        // Опции для ЗАГРУЗКИ настроек (десериализация)
+        private static readonly JsonSerializerOptions _saveSerializerOptions = new()
+        {
+            WriteIndented = true
+            // Добавьте другие опции, нужные для загрузки
+        };
+
         // События из интерфейса
         public event EventHandler<string> StatusMessage;
 
@@ -58,7 +65,7 @@ namespace WPF_LCD_Test.Services
             }
         }
 
-        private void CheckCurrentAppLanguage()
+        private static void CheckCurrentAppLanguage()
         {
             CultureInfo culture = LocalizationService.Instance.CurrentCulture; // Получаем текущую культуру из сервиса локализации
 
@@ -88,8 +95,8 @@ namespace WPF_LCD_Test.Services
                 string filePath = Path.Combine(BaseFolderPath, fileName); // Путь - базовая папка + имя файла
 
                 // Сериализуем объект DeviceUnderTest в JSON
-                var options = new JsonSerializerOptions { WriteIndented = true };
-                string jsonString = JsonSerializer.Serialize(device, options); // Сериализуем объект Модели
+                
+                string jsonString = JsonSerializer.Serialize(device, _saveSerializerOptions); // Сериализуем объект Модели
 
                 // Асинхронно записываем JSON строку в файл
                 await File.WriteAllTextAsync(filePath, jsonString); // Используем асинхронный метод записи

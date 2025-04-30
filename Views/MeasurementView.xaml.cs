@@ -113,13 +113,12 @@ namespace WPF_LCD_Test.Views
         private void UserControl_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             // Получаем элемент, который в данный момент имеет клавиатурный фокус.
-            DependencyObject focusedElement = Keyboard.FocusedElement as DependencyObject;
 
             // Проверяем, находится ли фокус на элементе ввода (например, TextBox),
             // где нажатие клавиши должно обрабатываться как ввод текста,
             // а не как запуск измерения.
             bool isInputControlFocused = false;
-            if (focusedElement != null)
+            if (Keyboard.FocusedElement is DependencyObject focusedElement)
             {
                 // Проверяем, является ли элемент текстовым полем.
                 if (focusedElement is TextBox)
@@ -199,12 +198,11 @@ namespace WPF_LCD_Test.Views
         {
             // Получаем элемент, который был изначально кликнут мышкой
             // e.OriginalSource указывает на самый глубокий элемент под курсором.
-            DependencyObject originalSource = e.OriginalSource as DependencyObject;
 
             // Флаг, который покажет, был ли клик на (или внутри) интерактивного контрола, который может получать фокус.
             bool clickedOnFocusableControl = false;
 
-            if (originalSource != null)
+            if (e.OriginalSource is DependencyObject originalSource)
             {
                 // Проходим вверх по визуальному дереву от кликнутого элемента.
                 // Это нужно, чтобы поймать клик, если он был на дочернем элементе контрола

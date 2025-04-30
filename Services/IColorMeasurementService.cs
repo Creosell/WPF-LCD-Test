@@ -9,7 +9,6 @@ namespace WPF_LCD_Test.Services
         bool IsConnected { get; }
 
         bool IsCalibrated { get; }
-        string PortID { get; } // Возможно, захочешь отображать в UI
 
         // Методы для команд UI
         Task<bool> ConnectAsync(); // Асинхронная операция для подключения

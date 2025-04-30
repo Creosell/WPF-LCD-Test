@@ -9,7 +9,6 @@ namespace WPF_LCD_Test.Models // Пространство имен должно 
     public class DeviceUnderTest // Было internal, лучше сделать public
     {
         // Поля и свойства
-        private string dateTimeFormat = "yyyyMMdd_HHmm"; // Формат для строки времени (связано с представлением/сохранением)
 
         public string SerialNumber { get; set; } // Серийный номер - данные устройства
 
@@ -29,16 +28,13 @@ namespace WPF_LCD_Test.Models // Пространство имен должно 
             }
             SerialNumber = serialNumber;
             MeasurementDateTime = DateTime.Now;
-            Measurements = new List<Measurement>();
+            Measurements = [];
         }
 
         // Метод добавления измерения
         public void AddMeasurement(Measurement newMeasurement)
         {
-            if (newMeasurement == null)
-            {
-                throw new ArgumentNullException(nameof(newMeasurement));
-            }
+            ArgumentNullException.ThrowIfNull(newMeasurement);
 
             // Логика замены существующего измерения по Location - это бизнес-логика Модели, оставляем здесь
             Measurement existingMeasurement = Measurements.Find(deviceMeasurement => deviceMeasurement.Location == newMeasurement.Location);

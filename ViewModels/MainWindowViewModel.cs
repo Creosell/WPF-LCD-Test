@@ -4,6 +4,7 @@
 using System;
 using System.Windows.Input;
 using WPF_LCD_Test.Services;
+
 using WPF_LCD_Test.Models;
 using MvvmHelpers;
 using WPF_LCD_Test.Commands;
@@ -63,9 +64,9 @@ namespace WPF_LCD_Test.ViewModels
         {
             // Инициализация зависимостей
             _colorMeasurementService = colorMeasurementService ?? throw new ArgumentNullException(nameof(colorMeasurementService));
-            _fileService = fileService ?? throw new ArgumentNullException(nameof(_fileService));
-            _dialogService = dialogService ?? throw new ArgumentNullException(nameof(_dialogService)); // Сохраняем для общеприложениевых диалогов
-            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(_localizationService));
+            _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+            _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService)); // Сохраняем для общеприложениевых диалогов
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _settingService = settingsService ?? throw new ArgumentNullException(nameof(settingsService)); // Сохраняем для доступа к настройкам
 
             // Инициализация команд оболочки
@@ -75,7 +76,6 @@ namespace WPF_LCD_Test.ViewModels
             // При запуске приложения автоматически переходим на страницу измерений.
             ExecuteNavigate("Measurement");
 
-            _localizationService.LanguageChanged += LocalizationService_LanguageChanged;
         }
 
 
@@ -105,27 +105,19 @@ namespace WPF_LCD_Test.ViewModels
 
                 case "Measurement":
 
-                    if (_measurementViewModel == null)
-                    {
-
-                        _measurementViewModel = new MeasurementViewModel(
+                    _measurementViewModel ??= new MeasurementViewModel(
                             _colorMeasurementService,
                             _fileService,
                             _dialogService,
                             _localizationService
                         );
-                    }
 
                     targetViewModel = _measurementViewModel;
                     break;
 
                 case "Settings":
 
-                    if (_settingsViewModel == null)
-                    {
-
-                        _settingsViewModel = new SettingsViewModel(_settingService, _localizationService);
-                    }
+                    _settingsViewModel ??= new SettingsViewModel(_settingService, _localizationService);
 
                     targetViewModel = _settingsViewModel;
                     break;
@@ -133,16 +125,12 @@ namespace WPF_LCD_Test.ViewModels
 
 
                 default:
-                    if (_measurementViewModel == null)
-                    {
-
-                        _measurementViewModel = new MeasurementViewModel(
+                    _measurementViewModel ??= new MeasurementViewModel(
                             _colorMeasurementService,
                             _fileService,
                             _dialogService,
                             _localizationService
                         );
-                    }
                     break;
             }
 
@@ -152,20 +140,6 @@ namespace WPF_LCD_Test.ViewModels
             {
                 CurrentPageViewModel = targetViewModel;
             }
-        }
-
-        private void LocalizationService_LanguageChanged(object sender, EventArgs e)
-        {
-            // Если в этом ViewModel (оболочки) есть локализуемые свойства, обновите их здесь.
-            // Например:
-            // MainWindowTitle = Resources.Resources.AppTitle; // Пример обновления свойства для заголовка окна
-            // OnPropertyChanged(nameof(MainWindowTitle));
-
-            // ViewModel активной страницы должен сам обновить свои локализуемые свойства,
-            // если он подписан на событие LanguageChanged от LocalizationService.
-            // Если ViewModel страниц не подписываются сами, то здесь можно было бы
-            // вызвать какой-то метод обновления у текущего CurrentPageViewModel.
-            // Например: (CurrentPageViewModel as PageViewModelBase)?.UpdateLocalizedContent(); // Требует метода в PageViewModelBase
         }
 
         // --- IDisposable ---
@@ -178,13 +152,8 @@ namespace WPF_LCD_Test.ViewModels
             // Это важно, чтобы ViewModel страницы мог отписаться от событий сервисов и освободить ресурсы.
             (CurrentPageViewModel as IDisposable)?.Dispose();
 
-            // Отписываемся от событий сервисов, на которые подписан ТОЛЬКО MainWindowViewModel.
-            if (_localizationService != null)
-            {
-                _localizationService.LanguageChanged -= LocalizationService_LanguageChanged;
-            }
             // TODO: Если MainWindowViewModel подписывался на другие глобальные события, отпишитесь здесь.
-            
+            GC.SuppressFinalize(this); // Вызываем сборщик мусора, если нужно
         }
     }
 }

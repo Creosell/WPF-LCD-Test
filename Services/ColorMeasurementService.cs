@@ -10,7 +10,6 @@ namespace WPF_LCD_Test.Services
     {
         private Ca200? _objCa200 = null;
         private Ca? _objCa = null;
-        private string? _portID = null;
         private bool _isConnected = false;
         private bool _isCalibrated = false;
 
@@ -57,31 +56,30 @@ namespace WPF_LCD_Test.Services
         //Range setting:0~99ch
         private const int ZeroChannel = 0; //Konica Minolta calibration memory channel
 
-        public event EventHandler<bool> ConnectionStatusChanged;
+        public event EventHandler<bool>? ConnectionStatusChanged;
 
-        public event EventHandler<bool> CalibrationStatusChanged;
+        public event EventHandler<bool>? CalibrationStatusChanged;
 
-        public event EventHandler<string> StatusMessage;
+        public event EventHandler<string>? StatusMessage;
 
-        public event EventHandler<double> MeasurementProgress;
+        public event EventHandler<double>? MeasurementProgress;
 
         public bool IsConnected => _isConnected;
 
         public bool IsCalibrated => _isCalibrated;
 
-        public string PortID => _portID;
-
         public ColorMeasurementService()
         {
+            
         }
 
-        private double GetMeasuredSx() => _objCa200.SingleCa.SingleProbe.sx;
+        private double? GetMeasuredSx() => _objCa200?.SingleCa.SingleProbe.sx;
 
-        private double GetMeasuredSy() => _objCa200.SingleCa.SingleProbe.sy;
+        private double? GetMeasuredSy() => _objCa200?.SingleCa.SingleProbe.sy;
 
-        private double GetMeasuredLv() => _objCa200.SingleCa.SingleProbe.Lv;
+        private double? GetMeasuredLv() => _objCa200?.SingleCa.SingleProbe.Lv;
 
-        private double GetMeasuredT() => _objCa200.SingleCa.SingleProbe.T;
+        private double? GetMeasuredT() => _objCa200?.SingleCa.SingleProbe.T;
 
         public async Task<bool> ConnectAsync()
 
@@ -92,10 +90,7 @@ namespace WPF_LCD_Test.Services
 
                 try
                 {
-                    if (_objCa200 == null)
-                    {
-                        _objCa200 = new Ca200();
-                    }
+                    _objCa200 ??= new Ca200();
 
                     if (!_isConnected)
                     {
@@ -103,7 +98,7 @@ namespace WPF_LCD_Test.Services
 
                         _objCa200.AutoConnect(); // Блокирующий вызов COM
                         _objCa = _objCa200.SingleCa;
-                        _portID = _objCa.PortID;
+
                         _isConnected = true;
                         ConnectionStatusChanged?.Invoke(this, _isConnected); // Оповещаем ViewModel об изменении статуса
                         StatusMessage?.Invoke(this, ConnectedCA); // Отправляем сообщение
@@ -134,10 +129,10 @@ namespace WPF_LCD_Test.Services
 
         private void Disconnect()
         {
-            Dispose();
+            Dispose(true);
         }
 
-        private void CheckCurrentAppLanguage()
+        private static void CheckCurrentAppLanguage()
         {
             CultureInfo culture = LocalizationService.Instance.CurrentCulture; // Получаем текущую культуру из сервиса локализации
 
@@ -155,14 +150,16 @@ namespace WPF_LCD_Test.Services
                 try
                 {
                     StatusMessage?.Invoke(this, (CalibratingZeroCA)); // Сообщение
-                    _objCa200.SingleCa.CalZero(); // Блокирующий вызов COM
+                    if (_objCa200 != null)
+                    {
+                        _objCa200.SingleCa.CalZero(); // Блокирующий вызов COM
 
-                    _objCa200.SingleCa.SyncMode = (int)UniverslaSyncMode;
-                    _objCa200.SingleCa.AveragingMode = (int)AutoMeasuringMode;
-                    _objCa200.SingleCa.SetAnalogRange(Convert.ToSingle(DefaultDisplayRange), Convert.ToSingle(DefaultDisplayRange));
-                    _objCa200.SingleCa.DisplayMode = (int)LvxyDisplayMode;
-                    _objCa200.SingleCa.Memory.ChannelNO = (int)ZeroChannel;
-
+                        _objCa200.SingleCa.SyncMode = (int)UniverslaSyncMode;
+                        _objCa200.SingleCa.AveragingMode = (int)AutoMeasuringMode;
+                        _objCa200.SingleCa.SetAnalogRange(Convert.ToSingle(DefaultDisplayRange), Convert.ToSingle(DefaultDisplayRange));
+                        _objCa200.SingleCa.DisplayMode = (int)LvxyDisplayMode;
+                        _objCa200.SingleCa.Memory.ChannelNO = (int)ZeroChannel;
+                    }
                     _isCalibrated = true; // Обновляем статус
                     CalibrationStatusChanged?.Invoke(this, _isCalibrated); // Оповещаем
                     StatusMessage?.Invoke(this, (ZeroCalibratedCA)); // Сообщение
@@ -190,7 +187,7 @@ namespace WPF_LCD_Test.Services
             return success;
         }
 
-        private void Dispose()
+        void IDisposable.Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
@@ -221,6 +218,7 @@ namespace WPF_LCD_Test.Services
                 CalibrationStatusChanged?.Invoke(this, _isCalibrated); // Оповещаем
                 StatusMessage?.Invoke(this, (DisconnectedCA)); // Сообщение
             }
+            
         }
 
         ~ColorMeasurementService()
@@ -230,7 +228,7 @@ namespace WPF_LCD_Test.Services
 
         public async Task<Measurement> MeasureAsync(int measurementTime)
         {
-            Measurement result = new Measurement(); // Создаем объект результата
+            Measurement result = new(); // Создаем объект результата
             await Task.Run(async () => // Выполняем в фоновом потоке
             {
                 CheckCurrentAppLanguage(); // Проверяем текущую культуру приложения
@@ -304,11 +302,6 @@ namespace WPF_LCD_Test.Services
             });
 
             return result;
-        }
-
-        void IDisposable.Dispose()
-        {
-            Dispose();
         }
 
         void IColorMeasurementService.Disconnect()

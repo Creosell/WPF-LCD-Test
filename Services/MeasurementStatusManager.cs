@@ -20,7 +20,7 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
         // Приватное статическое поле для хранения единственного экземпляра класса
         // Используем System.Lazy для потокобезопасной и ленивой инициализации
         private static readonly Lazy<MeasurementStatusManager> _lazyInstance =
-            new Lazy<MeasurementStatusManager>(() => new MeasurementStatusManager());
+            new(() => new MeasurementStatusManager());
 
         // Публичное статическое свойство для доступа к единственному экземпляру класса
         // При первом обращении к Instance.Value будет создан экземпляр
@@ -178,7 +178,7 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
         }
 
         // Свойство для отображения измеренных значений рядом с точкой в UI
-        private string _measuredValuesString;
+        private string _measuredValuesString ="";
 
         public string MeasuredValuesString
         {

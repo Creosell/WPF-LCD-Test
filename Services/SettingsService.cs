@@ -19,7 +19,7 @@ namespace WPF_LCD_Test.Services
         // --- Реализация Singleton ---
 
         // Lazy<T> для потокобезопасной ленивой инициализации
-        private static readonly Lazy<SettingsService> _lazyInstance = new Lazy<SettingsService>(
+        private static readonly Lazy<SettingsService> _lazyInstance = new(
             () => new SettingsService(), LazyThreadSafetyMode.ExecutionAndPublication);
 
         /// <summary>
@@ -40,8 +40,24 @@ namespace WPF_LCD_Test.Services
         // Имя файла настроек
         private const string SettingsFileName = "appsettings.json";
 
+        // Опции для ЗАГРУЗКИ настроек (десериализация)
+        private static readonly JsonSerializerOptions _loadJsonSerializerOptions = new()
+        {
+            AllowTrailingCommas = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            PropertyNameCaseInsensitive = true
+            // Добавьте другие опции, нужные для загрузки
+        };
+
+        // Опции для СОХРАНЕНИЯ настроек (сериализация) - Это те, что вызывали предупреждение WriteIndented
+        private static readonly JsonSerializerOptions _saveJsonSerializerOptions = new()
+        {
+            WriteIndented = true
+            // Добавьте другие опции, нужные для сохранения
+        };
+
         // Полный путь к файлу настроек (в папке с исполняемым файлом)
-        private string SettingsFilePath
+        private static string SettingsFilePath
         {
             get
             {
@@ -54,7 +70,7 @@ namespace WPF_LCD_Test.Services
         public AppSettings LoadSettings()
         {
             // Создаем объект AppSettings со значениями по умолчанию
-            AppSettings settings = new AppSettings();
+            AppSettings settings = new();
 
             // Проверяем, существует ли файл настроек
             if (File.Exists(SettingsFilePath))
@@ -63,40 +79,32 @@ namespace WPF_LCD_Test.Services
                 try
                 {
                     string jsonString = File.ReadAllText(SettingsFilePath);
-
-                    var options = new JsonSerializerOptions
-                    {
-                        AllowTrailingCommas = true,
-                        ReadCommentHandling = JsonCommentHandling.Skip,
-                        PropertyNameCaseInsensitive = true
-                    };
-
-                    var loadedSettings = JsonSerializer.Deserialize<AppSettings>(jsonString, options);
+                    var loadedSettings = JsonSerializer.Deserialize<AppSettings>(jsonString, _loadJsonSerializerOptions);
 
                     if (loadedSettings != null)
                     {
                         settings = loadedSettings;
                     }
 
-                    //Debug.WriteLine($"SettingsService: Настройки загружены из '{SettingsFilePath}'.");
+                    Debug.WriteLine($"SettingsService: Настройки загружены из '{SettingsFilePath}'.");
                 }
                 catch (JsonException jsonEx)
                 {
-                    //Debug.WriteLine($"SettingsService Ошибка JSON: Не удалось загрузить настройки из '{SettingsFilePath}'. Используются настройки по умолчанию. Ошибка: {jsonEx.Message}");
+                    Debug.WriteLine($"SettingsService Ошибка JSON: Не удалось загрузить настройки из '{SettingsFilePath}'. Используются настройки по умолчанию. Ошибка: {jsonEx.Message}");
                 }
                 catch (IOException ioEx)
                 {
-                    //Debug.WriteLine($"SettingsService Ошибка ввода/вывода: Не удалось прочитать файл настроек '{SettingsFilePath}'. Используются настройки по умолчанию. Ошибка: {ioEx.Message}");
+                    Debug.WriteLine($"SettingsService Ошибка ввода/вывода: Не удалось прочитать файл настроек '{SettingsFilePath}'. Используются настройки по умолчанию. Ошибка: {ioEx.Message}");
                 }
                 catch (Exception ex)
                 {
-                    //Debug.WriteLine($"SettingsService Неожиданная ошибка: Не удалось загрузить настройки из '{SettingsFilePath}'. Используются настройки по умолчанию. Ошибка: {ex.Message}");
+                    Debug.WriteLine($"SettingsService Неожиданная ошибка: Не удалось загрузить настройки из '{SettingsFilePath}'. Используются настройки по умолчанию. Ошибка: {ex.Message}");
                 }
             }
             else
             {
                 // --- Логика, если файл НЕ существует: создаем его с настройками по умолчанию ---
-                //Debug.WriteLine($"SettingsService: Файл настроек '{SettingsFilePath}' не найден. Создаем его с настройками по умолчанию.");
+                Debug.WriteLine($"SettingsService: Файл настроек '{SettingsFilePath}' не найден. Создаем его с настройками по умолчанию.");
 
                 try
                 {
@@ -104,11 +112,11 @@ namespace WPF_LCD_Test.Services
                     // Вызываем метод сохранения, чтобы создать файл
                     SaveSettings(settings);
 
-                    //Debug.WriteLine($"SettingsService: Файл настроек '{SettingsFilePath}' создан с настройками по умолчанию.");
+                    Debug.WriteLine($"SettingsService: Файл настроек '{SettingsFilePath}' создан с настройками по умолчанию.");
                 }
                 catch (Exception ex)
                 {
-                    //Debug.WriteLine($"SettingsService Ошибка: Не удалось создать и сохранить файл настроек '{SettingsFilePath}' с настройками по умолчанию. Ошибка: {ex.Message}");
+                    Debug.WriteLine($"SettingsService Ошибка: Не удалось создать и сохранить файл настроек '{SettingsFilePath}' с настройками по умолчанию. Ошибка: {ex.Message}");
                 }
             }
 
@@ -120,44 +128,30 @@ namespace WPF_LCD_Test.Services
         {
             if (settings == null)
             {
-                //Debug.WriteLine("SettingsService Ошибка: Невозможно сохранить настройки. Объект AppSettings равен null.");
+                Debug.WriteLine("SettingsService Ошибка: Невозможно сохранить настройки. Объект AppSettings равен null.");
                 return;
             }
 
             try
             {
-                var options = new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                };
-
-                string jsonString = JsonSerializer.Serialize(settings, options);
+                string jsonString = JsonSerializer.Serialize(settings, _saveJsonSerializerOptions);
 
                 File.WriteAllText(SettingsFilePath, jsonString);
 
-                //Debug.WriteLine($"SettingsService: Настройки сохранены в '{SettingsFilePath}'.");
+                Debug.WriteLine($"SettingsService: Настройки сохранены в '{SettingsFilePath}'.");
             }
             catch (JsonException jsonEx)
             {
-                //Debug.WriteLine($"SettingsService Ошибка JSON: Не удалось сохранить настройки в '{SettingsFilePath}'. Ошибка: {jsonEx.Message}");
+                Debug.WriteLine($"SettingsService Ошибка JSON: Не удалось сохранить настройки в '{SettingsFilePath}'. Ошибка: {jsonEx.Message}");
             }
             catch (IOException ioEx)
             {
-                //Debug.WriteLine($"SettingsService Ошибка ввода/вывода: Не удалось записать файл настроек '{SettingsFilePath}'. Ошибка: {ioEx.Message}");
+                Debug.WriteLine($"SettingsService Ошибка ввода/вывода: Не удалось записать файл настроек '{SettingsFilePath}'. Ошибка: {ioEx.Message}");
             }
             catch (Exception ex)
             {
-                //Debug.WriteLine($"SettingsService Неожиданная ошибка: Не удалось сохранить настройки в '{SettingsFilePath}'. Ошибка: {ex.Message}");
+                Debug.WriteLine($"SettingsService Неожиданная ошибка: Не удалось сохранить настройки в '{SettingsFilePath}'. Ошибка: {ex.Message}");
             }
         }
-
-        // Реализация IDisposable для SettingsService обычно не нужна,
-        // так как он не управляет неуправляемыми ресурсами или подписками,
-        // которые требуют явной очистки. Удалите реализацию IDisposable
-        // из этого класса, если она у вас была.
-        // public void Dispose() { ... }
-
-        // Если был финализатор, его тоже можно удалить, если нет неуправляемых ресурсов.
-        // ~SettingsService() { ... }
     }
 }

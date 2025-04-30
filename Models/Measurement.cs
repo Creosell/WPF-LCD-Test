@@ -12,9 +12,13 @@ namespace WPF_LCD_Test.Models
     public class Measurement
     {
         public string Location { get; set; }
+#pragma warning disable IDE1006 // Naming Styles
         public double x { get; set; }
+
+#pragma warning disable IDE1006 // Naming Styles
         public double y { get; set; }
-        //[JsonIgnore]
+
+                               //[JsonIgnore]
         public double Lv { get; set; }
         public double T { get; set; }
 
