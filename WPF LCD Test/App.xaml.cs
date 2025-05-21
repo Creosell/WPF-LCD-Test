@@ -2,7 +2,7 @@
 
 
 using System.Windows;
-using WPF_LCD_Test.Services;
+using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Views;
 using WPF_LCD_Test.ViewModels;
 using WPF_LCD_Test.Models;

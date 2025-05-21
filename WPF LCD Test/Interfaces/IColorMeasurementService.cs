@@ -1,6 +1,6 @@
 ﻿using WPF_LCD_Test.Models;
 
-namespace WPF_LCD_Test.Services
+namespace WPF_LCD_Test.Interfaces
 {
     // Интерфейс для сервиса управления колориметром
     public interface IColorMeasurementService : IDisposable // Сервис тоже может требовать освобождения ресурсов

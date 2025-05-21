@@ -7,7 +7,7 @@
     xmlns:local="clr-namespace:WPF_LCD_Test"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:res="clr-namespace:WPF_LCD_Test.Resources"
-    xmlns:services="clr-namespace:WPF_LCD_Test.Services"
+    xmlns:services="clr-namespace:WPF_LCD_Test.Interfaces"
     xmlns:v="clr-namespace:WPF_LCD_Test.Views"
     xmlns:vm="clr-namespace:WPF_LCD_Test.ViewModels"
     d:DataContext="{d:DesignInstance Type=vm:MeasurementViewModel}"

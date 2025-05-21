@@ -1,7 +1,7 @@
-﻿// В папке Services
+﻿// В папке Interfaces
 // Файл IDialogService.cs
 
-namespace WPF_LCD_Test.Interfaces // Пространство имен должно соответствовать папке Services
+namespace WPF_LCD_Test.Interfaces // Пространство имен должно соответствовать папке Interfaces
 {
     // Интерфейс для сервиса показа диалоговых окон
     public interface IDialogService

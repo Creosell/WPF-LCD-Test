@@ -5,7 +5,7 @@
 using NUnit.Framework;
 using Moq; // Для использования Moq
 using System.Windows; // Для MessageBoxResult и других enum
-using WPF_LCD_Test.Services; // Для DialogService
+using WPF_LCD_Test.Interfaces; // Для DialogService
 
 namespace WPF_LCD_Test.UnitTests.ServicesTests
 {

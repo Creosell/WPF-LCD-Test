@@ -1,4 +1,4 @@
-﻿// В папке Services
+﻿// В папке Interfaces
 // Файл SettingsService.cs
 
 using System;
@@ -8,7 +8,7 @@ using WPF_LCD_Test.Models; // Ссылка на вашу модель AppSetting
 using System.Threading;
 using System.Diagnostics; // Для Lazy
 
-namespace WPF_LCD_Test.Services
+namespace WPF_LCD_Test.Interfaces
 {
     /// <summary>
     /// Сервис для загрузки и сохранения настроек приложения в JSON файл.
@@ -16,10 +16,12 @@ namespace WPF_LCD_Test.Services
     /// </summary>
     public class SettingsService : ISettingsService // Реализуем интерфейс
     {
+        private string _currentSettingsFilePath;
+      
         // --- Реализация Singleton ---
 
         // Lazy<T> для потокобезопасной ленивой инициализации
-        private static readonly Lazy<SettingsService> _lazyInstance = new(
+        private static Lazy<SettingsService> _lazyInstance = new(
             () => new SettingsService(), LazyThreadSafetyMode.ExecutionAndPublication);
 
         /// <summary>
@@ -30,15 +32,20 @@ namespace WPF_LCD_Test.Services
         // Приватный конструктор для предотвращения создания экземпляров извне
         private SettingsService()
         {
+            // Инициализируем _currentSettingsFilePath здесь для экземпляра синглтона
+            _currentSettingsFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _settingsFileName);
             LoadSettings(); // Здесь можно вызвать загрузку настроек при создании сервиса
-            // Здесь можно выполнить какую-то начальную инициализацию, если нужно.
-            // Но логика загрузки настроек будет в методе LoadSettings.
         }
 
-        // --- Остальная часть класса (ваши методы LoadSettings, SaveSettings) ---
+        // --- Вспомогательный метод для тестов: устанавливает _currentSettingsFilePath ---
+        // Использование рефлексии для доступа к этому методу в тестах.
+        internal void SetTestFilePath(string testFilePath) // Сделаем internal, чтобы тесты могли вызывать
+        {
+            _currentSettingsFilePath = testFilePath;
+        }
 
         // Имя файла настроек
-        private const string SettingsFileName = "appsettings.json";
+        private const string _settingsFileName = "appsettings.json";
 
         // Опции для ЗАГРУЗКИ настроек (десериализация)
         private static readonly JsonSerializerOptions _loadJsonSerializerOptions = new()
@@ -56,15 +63,7 @@ namespace WPF_LCD_Test.Services
             // Добавьте другие опции, нужные для сохранения
         };
 
-        // Полный путь к файлу настроек (в папке с исполняемым файлом)
-        private static string SettingsFilePath
-        {
-            get
-            {
-                string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                return Path.Combine(appDirectory, SettingsFileName);
-            }
-        }
+       
 
         // Метод загрузки настроек (ваш текущий код для этого метода)
         public AppSettings LoadSettings()
@@ -73,12 +72,12 @@ namespace WPF_LCD_Test.Services
             AppSettings settings = new();
 
             // Проверяем, существует ли файл настроек
-            if (File.Exists(SettingsFilePath))
+            if (File.Exists(_currentSettingsFilePath))
             {
                 // --- Логика, если файл существует ---
                 try
                 {
-                    string jsonString = File.ReadAllText(SettingsFilePath);
+                    string jsonString = File.ReadAllText(_currentSettingsFilePath);
                     var loadedSettings = JsonSerializer.Deserialize<AppSettings>(jsonString, _loadJsonSerializerOptions);
 
                     if (loadedSettings != null)
@@ -86,25 +85,25 @@ namespace WPF_LCD_Test.Services
                         settings = loadedSettings;
                     }
 
-                    Debug.WriteLine($"SettingsService: Настройки загружены из '{SettingsFilePath}'.");
+                    Debug.WriteLine($"SettingsService: Настройки загружены из '{_currentSettingsFilePath}'.");
                 }
                 catch (JsonException jsonEx)
                 {
-                    Debug.WriteLine($"SettingsService Ошибка JSON: Не удалось загрузить настройки из '{SettingsFilePath}'. Используются настройки по умолчанию. Ошибка: {jsonEx.Message}");
+                    Debug.WriteLine($"SettingsService Ошибка JSON: Не удалось загрузить настройки из '{_currentSettingsFilePath}'. Используются настройки по умолчанию. Ошибка: {jsonEx.Message}");
                 }
                 catch (IOException ioEx)
                 {
-                    Debug.WriteLine($"SettingsService Ошибка ввода/вывода: Не удалось прочитать файл настроек '{SettingsFilePath}'. Используются настройки по умолчанию. Ошибка: {ioEx.Message}");
+                    Debug.WriteLine($"SettingsService Ошибка ввода/вывода: Не удалось прочитать файл настроек '{_currentSettingsFilePath}'. Используются настройки по умолчанию. Ошибка: {ioEx.Message}");
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SettingsService Неожиданная ошибка: Не удалось загрузить настройки из '{SettingsFilePath}'. Используются настройки по умолчанию. Ошибка: {ex.Message}");
+                    Debug.WriteLine($"SettingsService Неожиданная ошибка: Не удалось загрузить настройки из '{_currentSettingsFilePath}'. Используются настройки по умолчанию. Ошибка: {ex.Message}");
                 }
             }
             else
             {
                 // --- Логика, если файл НЕ существует: создаем его с настройками по умолчанию ---
-                Debug.WriteLine($"SettingsService: Файл настроек '{SettingsFilePath}' не найден. Создаем его с настройками по умолчанию.");
+                Debug.WriteLine($"SettingsService: Файл настроек '{_currentSettingsFilePath}' не найден. Создаем его с настройками по умолчанию.");
 
                 try
                 {
@@ -112,11 +111,11 @@ namespace WPF_LCD_Test.Services
                     // Вызываем метод сохранения, чтобы создать файл
                     SaveSettings(settings);
 
-                    Debug.WriteLine($"SettingsService: Файл настроек '{SettingsFilePath}' создан с настройками по умолчанию.");
+                    Debug.WriteLine($"SettingsService: Файл настроек '{_currentSettingsFilePath}' создан с настройками по умолчанию.");
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"SettingsService Ошибка: Не удалось создать и сохранить файл настроек '{SettingsFilePath}' с настройками по умолчанию. Ошибка: {ex.Message}");
+                    Debug.WriteLine($"SettingsService Ошибка: Не удалось создать и сохранить файл настроек '{_currentSettingsFilePath}' с настройками по умолчанию. Ошибка: {ex.Message}");
                 }
             }
 
@@ -136,21 +135,21 @@ namespace WPF_LCD_Test.Services
             {
                 string jsonString = JsonSerializer.Serialize(settings, _saveJsonSerializerOptions);
 
-                File.WriteAllText(SettingsFilePath, jsonString);
+                File.WriteAllText(_currentSettingsFilePath, jsonString);
 
-                Debug.WriteLine($"SettingsService: Настройки сохранены в '{SettingsFilePath}'.");
+                Debug.WriteLine($"SettingsService: Настройки сохранены в '{_currentSettingsFilePath}'.");
             }
             catch (JsonException jsonEx)
             {
-                Debug.WriteLine($"SettingsService Ошибка JSON: Не удалось сохранить настройки в '{SettingsFilePath}'. Ошибка: {jsonEx.Message}");
+                Debug.WriteLine($"SettingsService Ошибка JSON: Не удалось сохранить настройки в '{_currentSettingsFilePath}'. Ошибка: {jsonEx.Message}");
             }
             catch (IOException ioEx)
             {
-                Debug.WriteLine($"SettingsService Ошибка ввода/вывода: Не удалось записать файл настроек '{SettingsFilePath}'. Ошибка: {ioEx.Message}");
+                Debug.WriteLine($"SettingsService Ошибка ввода/вывода: Не удалось записать файл настроек '{_currentSettingsFilePath}'. Ошибка: {ioEx.Message}");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"SettingsService Неожиданная ошибка: Не удалось сохранить настройки в '{SettingsFilePath}'. Ошибка: {ex.Message}");
+                Debug.WriteLine($"SettingsService Неожиданная ошибка: Не удалось сохранить настройки в '{_currentSettingsFilePath}'. Ошибка: {ex.Message}");
             }
         }
     }

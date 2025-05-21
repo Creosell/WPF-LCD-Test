@@ -1,4 +1,4 @@
-﻿// В папке Services
+﻿// В папке Interfaces
 // Файл FileService.cs (реализация IFileService)
 
 using System.Globalization;
@@ -10,7 +10,7 @@ using WPF_LCD_Test.Wrappers;
 using static WPF_LCD_Test.Resources.Resources;
 
 // using System.Globalization; // Если потребуется для форматирования чисел при сохранении CSV
-namespace WPF_LCD_Test.Services
+namespace WPF_LCD_Test.Interfaces
 {
     // Класс, реализующий интерфейс сервиса работы с файлами
     public class FileService : IFileService

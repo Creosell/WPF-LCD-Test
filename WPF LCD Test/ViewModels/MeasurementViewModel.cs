@@ -14,9 +14,8 @@ using MvvmHelpers;
 using WPF_LCD_Test.Commands; // Для класса RelayCommand и BaseViewModel
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models; // Для классов Model (Measurement, DeviceUnderTest)
-using WPF_LCD_Test.Services; // Для интерфейсов Services (IColorMeasurementService, IFileService, IDialogService)
 using static WPF_LCD_Test.Resources.Resources;
-using MeasurementStatusViewModel = WPF_LCD_Test.Services.MeasurementStatusViewModel;
+using MeasurementStatusViewModel = WPF_LCD_Test.Interfaces.MeasurementStatusViewModel;
 
 // Класс ViewModel для MainWindow. Наследует от BaseViewModel для уведомлений UI.
 // Реализует IDisposable для очистки ресурсов (отписка от событий).

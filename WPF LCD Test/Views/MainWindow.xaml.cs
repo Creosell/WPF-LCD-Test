@@ -2,7 +2,7 @@
 
 using System.Windows;
 using System.Windows.Input;
-using WPF_LCD_Test.Services;
+using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.ViewModels;
 
 namespace WPF_LCD_Test.Views

@@ -399,4 +399,7 @@
   <data name="NotCalibratedCa" xml:space="preserve">
     <value>未校准</value>
   </data>
+  <data name="TestFormatString" xml:space="preserve">
+    <value>这是一个数字测试： {0}</value>
+  </data>
 </root>

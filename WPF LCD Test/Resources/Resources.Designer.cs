@@ -790,6 +790,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This is a test with a number: {0}.
+        /// </summary>
+        public static string TestFormatString {
+            get {
+                return ResourceManager.GetString("TestFormatString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Testing of the device with SN has begun.
         /// </summary>
         public static string TestStartInfo {

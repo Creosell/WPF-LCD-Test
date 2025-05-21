@@ -1,7 +1,7 @@
-﻿// В папке Services (или Utilities)
+﻿// В папке Interfaces (или Utilities)
 // Файл MessageBoxWrapper.cs
 using System.Windows;
-using WPF_LCD_Test.Services;
+using WPF_LCD_Test.Interfaces;
 
 namespace WPF_LCD_Test.Wrappers
 {

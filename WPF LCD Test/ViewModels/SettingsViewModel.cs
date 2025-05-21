@@ -7,7 +7,7 @@ using System.Globalization; // Для CultureInfo
 using System.Linq; // Для Linq (FirstOrDefault)
 using System.Windows.Input;
 using WPF_LCD_Test.ViewModels;
-using WPF_LCD_Test.Services;
+using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
 using System.Diagnostics;
 using MvvmHelpers;

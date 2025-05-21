@@ -1,4 +1,4 @@
-﻿// В папке Services
+﻿// В папке Interfaces
 // Файл ColorMeasurementService.cs (реализация IColorMeasurementService)
 
 using System.Globalization;
@@ -7,7 +7,7 @@ using CA200SRVRLib;
 using WPF_LCD_Test.Models;
 using static WPF_LCD_Test.Resources.Resources;
 
-namespace WPF_LCD_Test.Services
+namespace WPF_LCD_Test.Interfaces
 {
     public class ColorMeasurementService : IDisposable, IColorMeasurementService
     {

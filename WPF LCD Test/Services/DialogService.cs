@@ -1,11 +1,11 @@
-﻿// В папке Services
+﻿// В папке Interfaces
 // Файл DialogService.cs
 
 using System.Windows;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Wrappers;
 
-namespace WPF_LCD_Test.Services
+namespace WPF_LCD_Test.Interfaces
 {
     public class DialogService : IDialogService
     {

@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using WPF_LCD_Test.Models; // Убедись, что пространство имен класса Measurement доступно
-using WPF_LCD_Test.Services;
+using WPF_LCD_Test.Interfaces;
 
 namespace WPF_LCD_Test.Converters // Используй соответствующее пространство имен
 {

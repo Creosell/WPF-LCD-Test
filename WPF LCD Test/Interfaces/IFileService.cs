@@ -1,9 +1,9 @@
-﻿// В папке Services
+﻿// В папке Interfaces
 // Файл IFileService.cs
 
 using WPF_LCD_Test.Models;
 
-namespace WPF_LCD_Test.Services
+namespace WPF_LCD_Test.Interfaces
 {
     // Интерфейс для сервиса работы с файлами
     public interface IFileService

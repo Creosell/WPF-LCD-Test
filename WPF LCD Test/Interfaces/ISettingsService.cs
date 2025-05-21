@@ -1,10 +1,10 @@
-﻿// В папке Services
+﻿// В папке Interfaces
 // Файл ISettingsService.cs
 
 using System;
 using WPF_LCD_Test.Models; // Ссылка на вашу модель AppSettings
 
-namespace WPF_LCD_Test.Services
+namespace WPF_LCD_Test.Interfaces
 {
     /// <summary>
     /// Интерфейс сервиса для загрузки и сохранения настроек приложения.

@@ -9,7 +9,7 @@ using System.IO;
 using System.Threading.Tasks;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
-using WPF_LCD_Test.Services; // Для FileService
+using WPF_LCD_Test.Interfaces; // Для FileService
 using static WPF_LCD_Test.Resources.Resources;
 using System.Globalization;
 using System.Threading;

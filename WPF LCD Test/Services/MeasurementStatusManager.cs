@@ -10,7 +10,7 @@ using MvvmHelpers;
 using WPF_LCD_Test.Models;
 using WPF_LCD_Test.ViewModels; // Убедитесь, что пространство имен вашего ViewModel доступно
 
-namespace WPF_LCD_Test.Services // Или Managers, в зависимости от вашей структуры
+namespace WPF_LCD_Test.Interfaces // Или Managers, в зависимости от вашей структуры
 {
     // Класс, отвечающий за управление коллекцией статусов точек измерения
     public class MeasurementStatusManager
@@ -19,7 +19,7 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
 
         // Приватное статическое поле для хранения единственного экземпляра класса
         // Используем System.Lazy для потокобезопасной и ленивой инициализации
-        private static readonly Lazy<MeasurementStatusManager> _lazyInstance =
+        private static Lazy<MeasurementStatusManager> _lazyInstance =
             new(() => new MeasurementStatusManager());
 
         // Публичное статическое свойство для доступа к единственному экземпляру класса
@@ -61,7 +61,7 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
 
      
 
-        public MeasurementStatusManager()
+        private MeasurementStatusManager()
         {
             AllMeasurementButtonStatuses = []; // Инициализируем коллекцию
 

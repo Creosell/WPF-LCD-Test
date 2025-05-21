@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace WPF_LCD_Test.Services
+namespace WPF_LCD_Test.Interfaces
 {
     public interface ILocalizationService
     {
@@ -18,5 +18,8 @@ namespace WPF_LCD_Test.Services
 
         // Метод для получения локализованной строки с форматированием
         string GetString(string key, params object[] args);
+
+        // Событие для передачи сообщений об ошибках и статусах
+        event EventHandler<string> StatusMessage;
     }
 }
