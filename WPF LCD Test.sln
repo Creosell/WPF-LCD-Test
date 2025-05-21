@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF LCD Test", "WPF LCD Test.csproj", "{AE9BE77B-3088-4C69-83F2-A3B1852879A8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF LCD Test", "WPF LCD Test\WPF LCD Test.csproj", "{2D380470-85BF-7B8D-C499-16522543CD79}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF_LCD_Test.UnitTests", "WPF_LCD_Test.UnitTests\WPF_LCD_Test.UnitTests.csproj", "{162A4888-B5C8-8A4E-6542-0C41B5906B84}"
 EndProject
@@ -13,10 +13,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{AE9BE77B-3088-4C69-83F2-A3B1852879A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AE9BE77B-3088-4C69-83F2-A3B1852879A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AE9BE77B-3088-4C69-83F2-A3B1852879A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AE9BE77B-3088-4C69-83F2-A3B1852879A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D380470-85BF-7B8D-C499-16522543CD79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D380470-85BF-7B8D-C499-16522543CD79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D380470-85BF-7B8D-C499-16522543CD79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D380470-85BF-7B8D-C499-16522543CD79}.Release|Any CPU.Build.0 = Release|Any CPU
 		{162A4888-B5C8-8A4E-6542-0C41B5906B84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{162A4888-B5C8-8A4E-6542-0C41B5906B84}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{162A4888-B5C8-8A4E-6542-0C41B5906B84}.Release|Any CPU.ActiveCfg = Release|Any CPU

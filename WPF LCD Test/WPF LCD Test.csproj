@@ -12,6 +12,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="WPF_LCD_Test.UnitTests\**" />
+    <EmbeddedResource Remove="WPF_LCD_Test.UnitTests\**" />
+    <None Remove="WPF_LCD_Test.UnitTests\**" />
+    <Page Remove="WPF_LCD_Test.UnitTests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="color_space.png" />
     <None Remove="config\._color_space.yaml" />
     <None Remove="config\._data_path.yaml" />

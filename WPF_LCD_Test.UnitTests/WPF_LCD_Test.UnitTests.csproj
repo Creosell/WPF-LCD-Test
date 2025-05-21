@@ -20,8 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WPF-LCD-Test\WPF LCD Test.csproj" />
+    <ProjectReference Include="..\WPF LCD Test\WPF LCD Test.csproj" />
   </ItemGroup>
+
 
   <ItemGroup>
     <Using Include="NUnit.Framework" />
