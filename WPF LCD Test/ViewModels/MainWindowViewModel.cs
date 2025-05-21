@@ -8,7 +8,8 @@ using WPF_LCD_Test.Services;
 using WPF_LCD_Test.Models;
 using MvvmHelpers;
 using WPF_LCD_Test.Commands;
-using System.Diagnostics; 
+using System.Diagnostics;
+using WPF_LCD_Test.Interfaces;
 
 
 namespace WPF_LCD_Test.ViewModels

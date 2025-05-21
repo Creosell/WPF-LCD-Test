@@ -12,6 +12,7 @@ using System.Windows.Input; // Для интерфейса ICommand
 using System.Windows.Threading;
 using MvvmHelpers;
 using WPF_LCD_Test.Commands; // Для класса RelayCommand и BaseViewModel
+using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models; // Для классов Model (Measurement, DeviceUnderTest)
 using WPF_LCD_Test.Services; // Для интерфейсов Services (IColorMeasurementService, IFileService, IDialogService)
 using static WPF_LCD_Test.Resources.Resources;

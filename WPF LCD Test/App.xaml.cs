@@ -7,6 +7,7 @@ using WPF_LCD_Test.Views;
 using WPF_LCD_Test.ViewModels;
 using WPF_LCD_Test.Models;
 using System.Diagnostics;
+using WPF_LCD_Test.Interfaces;
 
 
 namespace WPF_LCD_Test
