@@ -1,4 +1,7 @@
-﻿    using System.Globalization;
+﻿// В папке Services
+// Файл ColorMeasurementService.cs (реализация IColorMeasurementService)
+
+using System.Globalization;
 using System.Runtime.InteropServices;
 using CA200SRVRLib;
 using WPF_LCD_Test.Models;

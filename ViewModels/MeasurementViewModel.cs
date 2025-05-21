@@ -182,14 +182,9 @@ namespace WPF_LCD_Test.ViewModels
         public ICommand ClearFieldsCommand { get; private set; }
         public ICommand ClearLogCommand { get; } // Если есть команда для очистки лога
         public ICommand SwitchLanguageCommand { get; private set; } // Принимает параметр (код языка)
-
         public ICommand MeasureCommand { get; private set; } // Принимает параметр (имя точки измерения)
-
-        // Новые команды для обработки ввода в текстовых полях (по Enter, например)
         public ICommand ApplySerialNumberCommand { get; private set; } // Применяет введенный SN
-
         public ICommand ApplyMeasurementTimeCommand { get; private set; } // Применяет введенное время
-
         public ICommand NewDeviceUnderTestCommand { get; private set; } // Создает новое устройство под тестирование
         public ICommand LaunchExternalProgramCommand { get; } // Запускает внешнюю программу (например, для тестирования)
 

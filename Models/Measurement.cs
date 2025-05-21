@@ -25,24 +25,6 @@ namespace WPF_LCD_Test.Models
         [JsonIgnore]
         public bool IsValid { get; set; } = true; // Устанавливаем по умолчанию true
 
-        //[JsonPropertyName("Lv")] // Указываем, что в JSON это свойство должно называться "Lv"
-        //public string FormattedLvValue // Используем другое имя для свойства внутри класса
-        //{
-        //    get
-        //    {
-        //        // Применяем логику форматирования
-        //        if (Location == "Black")
-        //        {
-        //            return Lv.ToString("F4", CultureInfo.InvariantCulture);
-        //        }
-        //        else
-        //        {
-        //            return Lv.ToString("F1", CultureInfo.InvariantCulture);
-        //        }
-        //    }
-        //    // Сеттер не нужен, если свойство только для сериализации.
-        //}
-
 
         public Measurement(string location, double x, double y, double Lv, double T)
         {
@@ -60,13 +42,17 @@ namespace WPF_LCD_Test.Models
             IsValid = true;
         }
 
-        // Метод для получения строкового представления (например, для лога или отладки)
-        // Это ОБЩЕЕ строковое представление, не привязанное к CSV
+        // Метод для получения строкового представления
         public override string ToString()
         {
-            // Используем формат "F2" для примера, можно настроить
-            // Используем InvariantCulture для точки в качестве разделителя
-            return $"Location: {Location}, x: {x.ToString("F3", CultureInfo.InvariantCulture)}, y: {y.ToString("F3", CultureInfo.InvariantCulture)}, Lv: {Lv.ToString("F1", CultureInfo.InvariantCulture)}, T: {T.ToString("F0", CultureInfo.InvariantCulture)}";
+            // Применяем Math.Round с MidpointRounding.AwayFromZero перед форматированием
+            // Это обеспечит округление .5 вверх, как в MeasurementJsonConverter
+            string formattedX = Math.Round(x, 3, MidpointRounding.AwayFromZero).ToString("F3", CultureInfo.InvariantCulture);
+            string formattedY = Math.Round(y, 3, MidpointRounding.AwayFromZero).ToString("F3", CultureInfo.InvariantCulture);
+            string formattedLv = Math.Round(Lv, 1, MidpointRounding.AwayFromZero).ToString("F1", CultureInfo.InvariantCulture);
+            string formattedT = Math.Round(T, 0, MidpointRounding.AwayFromZero).ToString("F0", CultureInfo.InvariantCulture);
+
+            return $"Location: {Location}, x: {formattedX}, y: {formattedY}, Lv: {formattedLv}, T: {formattedT}";
         }
 
         // Метод для форматирования специально для CSV
@@ -78,6 +64,5 @@ namespace WPF_LCD_Test.Models
             // return $"{Location},{X.ToString("F3", CultureInfo.InvariantCulture)},{Y.ToString("F3", CultureInfo.InvariantCulture)},{Lv.ToString("F4", CultureInfo.InvariantCulture)},{T.ToString("F0", CultureInfo.InvariantCulture)}";
         }
 
-        // Метод SetValues можно удалить, так как конструктор и публичные сеттеры уже позволяют установить значения.
     }
 }

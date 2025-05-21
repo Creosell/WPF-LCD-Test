@@ -1,40 +1,34 @@
 ﻿// В папке Services
 // Файл DialogService.cs
 
-// Нужно для использования MessageBox в реализации
 using System.Windows;
 
-namespace WPF_LCD_Test.Services // Пространство имен должно соответствовать папке Services
+namespace WPF_LCD_Test.Services
 {
-    // Реализация сервиса показа диалоговых окон с использованием стандартного MessageBox
-    public class DialogService : IDialogService // Этот класс реализует интерфейс IDialogService
+    public class DialogService : IDialogService
     {
-        // Реализация метода показа диалога с вопросом
+        private readonly IMessageBox _messageBox; // Добавляем зависимость
+
+        // Конструктор для внедрения зависимости
+        public DialogService(IMessageBox messageBox)
+        {
+            _messageBox = messageBox;
+        }
+
+        // Конструктор по умолчанию для продакшн-кода (если не используется DI-контейнер)
+        public DialogService() : this(new MessageBoxWrapper())
+        {
+        }
+
         public bool ShowQuestion(string message, string caption)
         {
-            // Используем стандартный WPF MessageBox.Show
-            MessageBoxResult result = MessageBox.Show(message, caption, MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            // Возвращаем true, если пользователь нажал Yes
+            MessageBoxResult result = _messageBox.Show(message, caption, MessageBoxButton.YesNo, MessageBoxImage.Question);
             return result == MessageBoxResult.Yes;
         }
 
-        // Реализация метода показа информационного сообщения
         public void ShowMessage(string message, string caption)
         {
-            // Используем стандартный WPF MessageBox.Show
-            MessageBox.Show(message, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+            _messageBox.Show(message, caption, MessageBoxButton.OK, MessageBoxImage.Information);
         }
-
-        // Реализация других методов интерфейса, если ты их добавил в IDialogService
-        // Например:
-        /*
-        public string ShowOpenFileDialog(string filter)
-        {
-             // Здесь будет код для показа OpenFileDialog
-             // return filePath;
-             throw new NotImplementedException(); // Заглушка, пока не реализовано
-        }
-        */
     }
 }
