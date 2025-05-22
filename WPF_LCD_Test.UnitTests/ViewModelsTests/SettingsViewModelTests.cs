@@ -58,18 +58,24 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         }
 
         [Test]
-        [TestCase(null)]
-        public void Ctor_ThrowsArgumentNullException_IfAnyDependencyIsNull(string paramName)
+        public void Ctor_ThrowsArgumentNullException_IfAnyDependencyIsNull() // УДАЛИТЕ ПАРАМЕТР string paramName
         {
-            Assert.Throws<ArgumentNullException>(() => new SettingsViewModel(
+            // Тест для settingsService
+            var ex1 = Assert.Throws<ArgumentNullException>(() => new SettingsViewModel(
                 null,
                 _mockLocalizationService.Object
-            ), "Should throw for settingsService");
+            ));
+            // Добавьте проверку ParamName, если это необходимо
+            Assert.That(ex1.ParamName, Is.EqualTo("settingsService"), "ParamName should be 'settingsService'");
 
-            Assert.Throws<ArgumentNullException>(() => new SettingsViewModel(
+
+            // Тест для localizationService
+            var ex2 = Assert.Throws<ArgumentNullException>(() => new SettingsViewModel(
                 _mockSettingsService.Object,
                 null
-            ), "Should throw for localizationService");
+            ));
+            // Добавьте проверку ParamName, если это необходимо
+            Assert.That(ex2.ParamName, Is.EqualTo("localizationService"), "ParamName should be 'localizationService'");
         }
 
         [Test]

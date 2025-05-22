@@ -26,6 +26,7 @@ namespace WPF_LCD_Test.ViewModels
         private readonly IDialogService _dialogService; // Возможно, нужен для общеприложениевых диалогов
         private readonly ILocalizationService _localizationService; // Нужен для смены языка и подписки
         private readonly ISettingsService _settingService;
+        private readonly IDispatcher _dispatcher; // Возможно, нужен для работы с UI потоками
         private BaseViewModel _currentPageViewModel;
         private string _currentPageIdentifier;
         private MeasurementViewModel? _measurementViewModel; // Используем Nullable Reference Types ?
@@ -61,7 +62,8 @@ namespace WPF_LCD_Test.ViewModels
             IFileService fileService,
             IDialogService dialogService,
             ILocalizationService localizationService,
-            ISettingsService settingsService) : base()
+            ISettingsService settingsService,
+            IDispatcher dispatcher) : base()
         {
             // Инициализация зависимостей
             _colorMeasurementService = colorMeasurementService ?? throw new ArgumentNullException(nameof(colorMeasurementService));
@@ -69,6 +71,7 @@ namespace WPF_LCD_Test.ViewModels
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService)); // Сохраняем для общеприложениевых диалогов
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _settingService = settingsService ?? throw new ArgumentNullException(nameof(settingsService)); // Сохраняем для доступа к настройкам
+            _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher)); // Сохраняем для работы с UI потоками
 
             // Инициализация команд оболочки
             // Команда NavigateCommand принимает параметр (string pageName)
@@ -110,7 +113,8 @@ namespace WPF_LCD_Test.ViewModels
                             _colorMeasurementService,
                             _fileService,
                             _dialogService,
-                            _localizationService
+                            _localizationService,
+                            _dispatcher
                         );
 
                     targetViewModel = _measurementViewModel;
@@ -130,7 +134,8 @@ namespace WPF_LCD_Test.ViewModels
                             _colorMeasurementService,
                             _fileService,
                             _dialogService,
-                            _localizationService
+                            _localizationService,
+                            _dispatcher
                         );
                     break;
             }

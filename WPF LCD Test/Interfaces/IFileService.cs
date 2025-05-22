@@ -32,7 +32,7 @@ namespace WPF_LCD_Test.Interfaces
 
         event EventHandler<bool> SaveOperationCompleted; // Оповещение о завершении сохранения
 
-        // Возможно, методы для загрузки данных, если они нужны
-        // Task<DeviceUnderTest> LoadDeviceDataFromJsonAsync(string serialNumber);
+        // Новый метод для запуска внешней программы
+        bool RunExternalProgram(string executableName);
     }
 }

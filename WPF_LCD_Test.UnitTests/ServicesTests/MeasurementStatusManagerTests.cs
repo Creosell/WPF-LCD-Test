@@ -1,4 +1,4 @@
-﻿// WPF_LCD_Test.UnitTests/ServicesTests/MeasurementStatusManagerTests.cs
+﻿// WPF_LCD_Test.UnitTests/ServicesTests/MeasurementStatusServiceTests.cs
 
 using NUnit.Framework;
 using System.Linq;
@@ -7,18 +7,19 @@ using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.ViewModels;
 using System.Reflection; // Обязательно для рефлексии
 using System; // Обязательно для Lazy
+using WPF_LCD_Test.Services; // Убедитесь, что это пространство имен соответствует вашему проекту
 
 namespace WPF_LCD_Test.UnitTests.ServicesTests
 {
     [TestFixture]
-    public class MeasurementStatusManagerTests
+    public class MeasurementStatusServiceTests
     {
-        private MeasurementStatusManager _manager;
+        private MeasurementStatusService _manager;
 
-        // Метод для сброса синглтона MeasurementStatusManager с использованием рефлексии
-        private void ResetMeasurementStatusManagerSingleton()
+        // Метод для сброса синглтона MeasurementStatusService с использованием рефлексии
+        private void ResetMeasurementStatusServiceSingleton()
         {
-            var lazyInstanceField = typeof(MeasurementStatusManager)
+            var lazyInstanceField = typeof(MeasurementStatusService)
                 .GetField("_lazyInstance", BindingFlags.NonPublic | BindingFlags.Static);
 
             if (lazyInstanceField == null)
@@ -27,20 +28,20 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
                 Assert.Fail("Private static field '_lazyInstance' not found.");
             }
 
-            // Находим приватный конструктор MeasurementStatusManager
-            var privateCtor = typeof(MeasurementStatusManager)
+            // Находим приватный конструктор MeasurementStatusService
+            var privateCtor = typeof(MeasurementStatusService)
                 .GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)
                 .FirstOrDefault(c => c.GetParameters().Length == 0); // Ищем конструктор без параметров
 
             if (privateCtor == null)
             {
-                Assert.Fail("Private parameterless constructor not found for MeasurementStatusManager.");
+                Assert.Fail("Private parameterless constructor not found for MeasurementStatusService.");
             }
 
-            // Создаем новый Lazy<MeasurementStatusManager>, используя рефлексию для вызова приватного конструктора
-            var newLazyInstance = new Lazy<MeasurementStatusManager>(() =>
+            // Создаем новый Lazy<MeasurementStatusService>, используя рефлексию для вызова приватного конструктора
+            var newLazyInstance = new Lazy<MeasurementStatusService>(() =>
             {
-                return (MeasurementStatusManager)privateCtor.Invoke(null);
+                return (MeasurementStatusService)privateCtor.Invoke(null);
             });
 
             // Устанавливаем _lazyInstance в новый Lazy<T> объект
@@ -51,10 +52,10 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public void Setup()
         {
             // !!! СБРОС СИНГЛТОНА ПЕРЕД КАЖДЫМ ТЕСТОМ !!!
-            ResetMeasurementStatusManagerSingleton();
+            ResetMeasurementStatusServiceSingleton();
 
             // Получаем (новый) экземпляр синглтона.
-            _manager = MeasurementStatusManager.Instance;
+            _manager = MeasurementStatusService.Instance;
         }
 
         [TearDown]
@@ -67,12 +68,12 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public void Instance_ReturnsSingletonInstance()
         {
             // Act
-            var instance1 = MeasurementStatusManager.Instance;
-            var instance2 = MeasurementStatusManager.Instance;
+            var instance1 = MeasurementStatusService.Instance;
+            var instance2 = MeasurementStatusService.Instance;
 
             // Assert
             Assert.That(instance1, Is.SameAs(instance2), "Instance should return the same singleton object.");
-            Assert.That(instance1, Is.InstanceOf<MeasurementStatusManager>(), "Instance should be of type MeasurementStatusManager.");
+            Assert.That(instance1, Is.InstanceOf<MeasurementStatusService>(), "Instance should be of type MeasurementStatusService.");
         }
 
         [Test]
@@ -81,19 +82,19 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             // Arrange (уже сделано в Setup)
             var expectedLocations = new string[]
             {
-                MeasurementStatusManager.TopLeftLocationName,
-                MeasurementStatusManager.TopCenterLocationName,
-                MeasurementStatusManager.TopRightLocationName,
-                MeasurementStatusManager.MiddleLeftLocationName,
-                MeasurementStatusManager.CenterLocationName,
-                MeasurementStatusManager.MiddleRightLocationName,
-                MeasurementStatusManager.BottomLeftLocationName,
-                MeasurementStatusManager.BottomCenterLocationName,
-                MeasurementStatusManager.BottomRightLocationName,
-                MeasurementStatusManager.RedColorLocationName,
-                MeasurementStatusManager.GreenColorLocationName,
-                MeasurementStatusManager.BlueColorLocationName,
-                MeasurementStatusManager.BlackColorLocationName
+                MeasurementStatusService.TopLeftLocationName,
+                MeasurementStatusService.TopCenterLocationName,
+                MeasurementStatusService.TopRightLocationName,
+                MeasurementStatusService.MiddleLeftLocationName,
+                MeasurementStatusService.CenterLocationName,
+                MeasurementStatusService.MiddleRightLocationName,
+                MeasurementStatusService.BottomLeftLocationName,
+                MeasurementStatusService.BottomCenterLocationName,
+                MeasurementStatusService.BottomRightLocationName,
+                MeasurementStatusService.RedColorLocationName,
+                MeasurementStatusService.GreenColorLocationName,
+                MeasurementStatusService.BlueColorLocationName,
+                MeasurementStatusService.BlackColorLocationName
             };
 
             // Assert
@@ -110,7 +111,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public void GetStatusByLocation_ReturnsCorrectStatus()
         {
             // Arrange (коллекция уже инициализирована в Setup)
-            string targetLocation = MeasurementStatusManager.CenterLocationName;
+            string targetLocation = MeasurementStatusService.CenterLocationName;
 
             // Act
             var status = _manager.GetStatusByLocation(targetLocation);
@@ -137,20 +138,20 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public void PublicProperties_AreInitializedCorrectly()
         {
             Assert.That(_manager.TopLeftStatus, Is.Not.Null);
-            Assert.That(_manager.TopLeftStatus.Location, Is.EqualTo(MeasurementStatusManager.TopLeftLocationName));
+            Assert.That(_manager.TopLeftStatus.Location, Is.EqualTo(MeasurementStatusService.TopLeftLocationName));
 
             Assert.That(_manager.CenterStatus, Is.Not.Null);
-            Assert.That(_manager.CenterStatus.Location, Is.EqualTo(MeasurementStatusManager.CenterLocationName));
+            Assert.That(_manager.CenterStatus.Location, Is.EqualTo(MeasurementStatusService.CenterLocationName));
 
             Assert.That(_manager.RedColorStatus, Is.Not.Null);
-            Assert.That(_manager.RedColorStatus.Location, Is.EqualTo(MeasurementStatusManager.RedColorLocationName));
+            Assert.That(_manager.RedColorStatus.Location, Is.EqualTo(MeasurementStatusService.RedColorLocationName));
         }
 
         [Test]
         public void InitialStatus_IsPassedIsNullAndValuesAreEmpty()
         {
             // Arrange
-            string targetLocation = MeasurementStatusManager.TopLeftLocationName;
+            string targetLocation = MeasurementStatusService.TopLeftLocationName;
             var status = _manager.GetStatusByLocation(targetLocation);
 
             // Assert
@@ -164,7 +165,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public void SetIsPassed_UpdatesStatusAndColor()
         {
             // Arrange
-            string targetLocation = MeasurementStatusManager.CenterLocationName;
+            string targetLocation = MeasurementStatusService.CenterLocationName;
             var status = _manager.GetStatusByLocation(targetLocation);
             Assert.That(status, Is.Not.Null);
 
@@ -194,7 +195,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public void SetMeasuredValuesString_UpdatesValue()
         {
             // Arrange
-            string targetLocation = MeasurementStatusManager.BottomLeftLocationName;
+            string targetLocation = MeasurementStatusService.BottomLeftLocationName;
             var status = _manager.GetStatusByLocation(targetLocation);
             Assert.That(status, Is.Not.Null);
 

@@ -6,15 +6,16 @@ using System.Runtime.InteropServices;
 using CA200SRVRLib;
 using WPF_LCD_Test.Models;
 using static WPF_LCD_Test.Resources.Resources;
+using WPF_LCD_Test.Interfaces;
 
-namespace WPF_LCD_Test.Interfaces
+namespace WPF_LCD_Test.Services
 {
     public class ColorMeasurementService : IDisposable, IColorMeasurementService
     {
         private Ca200? _objCa200 = null;
         private Ca? _objCa = null;
-        private bool _isConnected = false;
-        private bool _isCalibrated = false;
+        private bool _isDeviceConnected = false;
+        private bool _isDeviceCalibrated = false;
 
         //Color analyzer constants
         //Remote modes
@@ -67,9 +68,9 @@ namespace WPF_LCD_Test.Interfaces
 
         public event EventHandler<double>? MeasurementProgress;
 
-        public bool IsConnected => _isConnected;
+        public bool IsDeviceConnected => _isDeviceConnected;
 
-        public bool IsCalibrated => _isCalibrated;
+        public bool IsDeviceCalibrated => _isDeviceCalibrated;
 
         public ColorMeasurementService()
         {
@@ -95,39 +96,39 @@ namespace WPF_LCD_Test.Interfaces
                 {
                     _objCa200 ??= new Ca200();
 
-                    if (!_isConnected)
+                    if (!_isDeviceConnected)
                     {
                         StatusMessage?.Invoke(this, ConnectingCA);
 
                         _objCa200.AutoConnect(); // Блокирующий вызов COM
                         _objCa = _objCa200.SingleCa;
 
-                        _isConnected = true;
-                        ConnectionStatusChanged?.Invoke(this, _isConnected); // Оповещаем ViewModel об изменении статуса
+                        _isDeviceConnected = true;
+                        ConnectionStatusChanged?.Invoke(this, _isDeviceConnected); // Оповещаем ViewModel об изменении статуса
                         StatusMessage?.Invoke(this, ConnectedCA); // Отправляем сообщение
                     }
                 }
                 catch (COMException ex)
                 {
                     StatusMessage?.Invoke(this, $"{ConnectionError}:    {ex.Message}"); // Отправляем ошибку
-                    _isConnected = false; // Обновляем статус
-                    ConnectionStatusChanged?.Invoke(this, _isConnected); // Оповещаем ViewModel
+                    _isDeviceConnected = false; // Обновляем статус
+                    ConnectionStatusChanged?.Invoke(this, _isDeviceConnected); // Оповещаем ViewModel
                 }
                 catch (Exception ex) // Ловим другие возможные исключения
                 {
                     StatusMessage?.Invoke(this, $"{ConnectionError}: {ex.Message}");
-                    _isConnected = false;
-                    ConnectionStatusChanged?.Invoke(this, _isConnected);
+                    _isDeviceConnected = false;
+                    ConnectionStatusChanged?.Invoke(this, _isDeviceConnected);
                 }
                 ///////TEST
                 //finally
                 //{
 
-                //    _isConnected = true;
-                //    ConnectionStatusChanged?.Invoke(this, _isConnected);
+                //    _isDeviceConnected = true;
+                //    ConnectionStatusChanged?.Invoke(this, _isDeviceConnected);
                 //}
             });
-            return _isConnected; // Возвращаем статус подключения
+            return _isDeviceConnected; // Возвращаем статус подключения
         }
 
         private void Disconnect()
@@ -163,28 +164,28 @@ namespace WPF_LCD_Test.Interfaces
                         _objCa200.SingleCa.DisplayMode = (int)LvxyDisplayMode;
                         _objCa200.SingleCa.Memory.ChannelNO = (int)ZeroChannel;
                     }
-                    _isCalibrated = true; // Обновляем статус
-                    CalibrationStatusChanged?.Invoke(this, _isCalibrated); // Оповещаем
+                    _isDeviceCalibrated = true; // Обновляем статус
+                    CalibrationStatusChanged?.Invoke(this, _isDeviceCalibrated); // Оповещаем
                     StatusMessage?.Invoke(this, (ZeroCalibratedCA)); // Сообщение
                     success = true; // Успех
                 }
                 catch (COMException ex) // Ловим ошибки COM
                 {
                     StatusMessage?.Invoke(this, (CheckConnectionCA) + $": {ex.Message}");
-                    _isCalibrated = false; // Обновляем статус
-                    CalibrationStatusChanged?.Invoke(this, _isCalibrated); // Оповещаем
+                    _isDeviceCalibrated = false; // Обновляем статус
+                    CalibrationStatusChanged?.Invoke(this, _isDeviceCalibrated); // Оповещаем
                                                                            // Не пробрасываем исключение, обрабатываем внутри сервиса
                 }
                 catch (Exception ex)
                 {  // Ловим другие ошибки
                     StatusMessage?.Invoke(this, (ErrAtCalibration) + $": {ex.Message}");
-                    _isCalibrated = false;
-                    CalibrationStatusChanged?.Invoke(this, _isCalibrated);
+                    _isDeviceCalibrated = false;
+                    CalibrationStatusChanged?.Invoke(this, _isDeviceCalibrated);
                 }
                 //finally //////////TEST
                 //{
-                //    _isCalibrated = true;
-                //    CalibrationStatusChanged?.Invoke(this, _isCalibrated);
+                //    _isDeviceCalibrated = true;
+                //    CalibrationStatusChanged?.Invoke(this, _isDeviceCalibrated);
                 //}
             }); // Конец Task.Run
             return success;
@@ -215,10 +216,10 @@ namespace WPF_LCD_Test.Interfaces
                     _objCa200 = null;
                 }
 
-                _isConnected = false;
-                ConnectionStatusChanged?.Invoke(this, _isConnected); // Оповещаем
-                _isCalibrated = false;
-                CalibrationStatusChanged?.Invoke(this, _isCalibrated); // Оповещаем
+                _isDeviceConnected = false;
+                ConnectionStatusChanged?.Invoke(this, _isDeviceConnected); // Оповещаем
+                _isDeviceCalibrated = false;
+                CalibrationStatusChanged?.Invoke(this, _isDeviceCalibrated); // Оповещаем
                 StatusMessage?.Invoke(this, (DisconnectedCA)); // Сообщение
             }
             
@@ -237,13 +238,13 @@ namespace WPF_LCD_Test.Interfaces
                 CheckCurrentAppLanguage(); // Проверяем текущую культуру приложения
                 try
                 {
-                    if (!_isConnected)
+                    if (!_isDeviceConnected)
                     {
                         StatusMessage?.Invoke(this, (MeasureWihoutConnectionError));
                         result.IsValid = false; // Отмечаем результат как невалидный
                         return; // Выходим из лямбды
                     }
-                    if (!_isCalibrated) // Проверяем калибровку
+                    if (!_isDeviceCalibrated) // Проверяем калибровку
                     {
                         StatusMessage?.Invoke(this, (MakeZeroCalibration));
                         result.IsValid = false; // Отмечаем результат как невалидный

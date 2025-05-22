@@ -1,16 +1,13 @@
 ﻿using Moq;
-using MvvmHelpers;
-using NUnit.Framework;
-using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Input;
+using System.Globalization;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
+using WPF_LCD_Test.Services; // Добавляем using для доступа к MeasurementStatusService
 using WPF_LCD_Test.ViewModels;
+// Это важно: позволяет получить доступ к свойствам Resources.resx напрямую (например, IncorrectMeasTimeFormat)
+using static WPF_LCD_Test.Resources.Resources;
 
 namespace WPF_LCD_Test.UnitTests.ViewModels
 {
@@ -21,14 +18,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         private Mock<IFileService> _mockFileService;
         private Mock<IDialogService> _mockDialogService;
         private Mock<ILocalizationService> _mockLocalizationService;
+        private Mock<IDispatcher> _mockDispatcher;
         private MeasurementViewModel _viewModel;
-
-        public class TestDispatcher
-        {
-            public bool CheckAccess() => true;
-            public void Invoke(Action action) => action();
-            public void BeginInvoke(Action action) => action();
-        }
 
         [SetUp]
         public void Setup()
@@ -37,76 +28,111 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             _mockFileService = new Mock<IFileService>();
             _mockDialogService = new Mock<IDialogService>();
             _mockLocalizationService = new Mock<ILocalizationService>();
+            _mockDispatcher = new Mock<IDispatcher>();
 
-            _mockColorMeasurementService.SetupGet(s => s.IsConnected).Returns(false);
-            _mockColorMeasurementService.SetupGet(s => s.IsCalibrated).Returns(false);
+            // --- КЛЮЧЕВОЕ ИЗМЕНЕНИЕ ЗДЕСЬ: Добавляем IDisposable к мокам СРАЗУ ПОСЛЕ ИХ СОЗДАНИЯ ---
+            // Делаем это, если интерфейсы IColorMeasurementService, IFileService, IDialogService
+            // сами по себе НЕ реализуют IDisposable, но ViewModel пытается Dispose() их.
+            _mockColorMeasurementService.As<IDisposable>();
+            _mockFileService.As<IDisposable>();
+            _mockDialogService.As<IDisposable>();
 
-            // Настройка LocalizationService
-            _mockLocalizationService.Setup(l => l.GetString("strStartMeasurement")).Returns("Начать измерение");
-            _mockLocalizationService.Setup(l => l.GetString("strStopMeasurement")).Returns("Остановить измерение");
-            _mockLocalizationService.Setup(l => l.GetString("strConnecting")).Returns("Подключение...");
-            _mockLocalizationService.Setup(l => l.GetString("strConnected")).Returns("Подключено");
-            _mockLocalizationService.Setup(l => l.GetString("strDisconnected")).Returns("Отключено");
-            _mockLocalizationService.Setup(l => l.GetString("strMeasurementInProgress")).Returns("Измерение в процессе...");
-            _mockLocalizationService.Setup(l => l.GetString("strMeasurementCompleted")).Returns("Измерение завершено.");
-            _mockLocalizationService.Setup(l => l.GetString("strMeasurementCancelled")).Returns("Измерение отменено.");
-            _mockLocalizationService.Setup(l => l.GetString("strMeasurementFailed")).Returns("Измерение не удалось!");
-            _mockLocalizationService.Setup(l => l.GetString("strError")).Returns("Ошибка");
-            _mockLocalizationService.Setup(l => l.GetString("strColorDataFile")).Returns("Файл данных цвета");
-            _mockLocalizationService.Setup(l => l.GetString("strAllFiles")).Returns("Все файлы");
-            _mockLocalizationService.Setup(l => l.GetString("strInvalidColorDataFormat")).Returns("Неверный формат данных цвета.");
-            _mockLocalizationService.Setup(l => l.GetString("strFillSN")).Returns("Введите серийный номер");
-            _mockLocalizationService.Setup(l => l.GetString("strNoSNErr")).Returns("Нет SN");
-            _mockLocalizationService.Setup(l => l.GetString("strTestStartInfo")).Returns("Тест начат для SN:");
-            _mockLocalizationService.Setup(l => l.GetString("strResult")).Returns("Результат");
-            _mockLocalizationService.Setup(l => l.GetString("strNoData")).Returns("Нет данных");
-            _mockLocalizationService.Setup(l => l.GetString("strLvIsTooLow")).Returns("Значение Lv слишком низкое");
-            _mockLocalizationService.Setup(l => l.GetString("strCheckProbe")).Returns("Проверьте щуп");
-            _mockLocalizationService.Setup(l => l.GetString("strInvalidResultErr")).Returns("Недопустимый результат");
-            _mockLocalizationService.Setup(l => l.GetString("strColorServiceErr")).Returns("Ошибка службы цвета");
-            _mockLocalizationService.Setup(l => l.GetString("strColorAnalyzerErr")).Returns("Ошибка анализатора цвета");
-            _mockLocalizationService.Setup(l => l.GetString("strUnexpectedMeasurementErr")).Returns("Непредвиденная ошибка измерения");
-            _mockLocalizationService.Setup(l => l.GetString("strSaving")).Returns("Сохранение...");
-            _mockLocalizationService.Setup(l => l.GetString("strSaveJSONErrDeviceIsEmpty")).Returns("Устройство пустое");
-            _mockLocalizationService.Setup(l => l.GetString("strSavingNotFullWarning")).Returns("Не все измерения собраны");
-            _mockLocalizationService.Setup(l => l.GetString("strWarning")).Returns("Предупреждение");
-            _mockLocalizationService.Setup(l => l.GetString("strSaveCanceled")).Returns("Сохранение отменено");
-            _mockLocalizationService.Setup(l => l.GetString("strSaveJSONErrForSN")).Returns("Ошибка сохранения для SN");
-            _mockLocalizationService.Setup(l => l.GetString("strCleanFieldWarning")).Returns("Очистить все поля?");
-            _mockLocalizationService.Setup(l => l.GetString("strClearFieldsDone")).Returns("Поля очищены.");
-            _mockLocalizationService.Setup(l => l.GetString("strErrMsgLangSwitchFailed")).Returns("Ошибка смены языка");
-            _mockLocalizationService.Setup(l => l.GetString("strIncorrectFormatForSNErr")).Returns("Неверный формат SN");
-            _mockLocalizationService.Setup(l => l.GetString("strSerialNumber")).Returns("Серийный номер");
-            _mockLocalizationService.Setup(l => l.GetString("strAlreadyActivated")).Returns("уже активирован");
-            _mockLocalizationService.Setup(l => l.GetString("strIncorrectMeasTimeFormat")).Returns("Неверный формат времени измерения");
-            _mockLocalizationService.Setup(l => l.GetString("strCurrentMeasurementTime")).Returns("Текущее время измерения");
-            _mockLocalizationService.Setup(l => l.GetString("strSeconds")).Returns("секунд");
-            _mockLocalizationService.Setup(l => l.GetString("strViewModelClearing")).Returns("Очистка ViewModel");
-            _mockLocalizationService.Setup(l => l.GetString("strViewModelCleared")).Returns("ViewModel очищен");
-            _mockLocalizationService.Setup(l => l.GetString("strRunExternalAppNotFoundErr")).Returns("Внешнее приложение не найдено");
-            _mockLocalizationService.Setup(l => l.GetString("strRunExternalAppUnexpectedErr")).Returns("Непредвиденная ошибка при запуске внешнего приложения");
-            _mockLocalizationService.Setup(l => l.GetString("strErrAtCalibration")).Returns("Ошибка при калибровке");
-            _mockLocalizationService.Setup(l => l.GetString("strErrUnexpected")).Returns("Непредвиденная ошибка");
-            _mockLocalizationService.Setup(l => l.GetString("strErr")).Returns("Ошибка");
-            _mockLocalizationService.Setup(l => l.GetString("strMeasuring")).Returns("Измерение...");
+            // И сразу настраиваем их поведение Dispose()
+            _mockColorMeasurementService.As<IDisposable>().Setup(m => m.Dispose());
+            _mockFileService.As<IDisposable>().Setup(m => m.Dispose());
+            _mockDialogService.As<IDisposable>().Setup(m => m.Dispose());
 
-            if (App.Current == null)
-            {
-                new App();
-            }
-            var testDispatcher = new TestDispatcher();
-            typeof(App)
-                .GetProperty("Current")
-                .GetValue(null)
-                .GetType()
-                .GetField("_dispatcher", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                .SetValue(App.Current, testDispatcher);
+            // Настройка поведения мока диспетчера:
+            _mockDispatcher.Setup(d => d.Invoke(It.IsAny<Action>()))
+                           .Callback<Action>(action => action.Invoke());
+            _mockDispatcher.Setup(d => d.BeginInvoke(It.IsAny<Action>()))
+                           .Callback<Action>(action => action.Invoke());
+            _mockDispatcher.Setup(d => d.CheckAccess()).Returns(true);
+
+            _mockLocalizationService.Setup(l => l.GetString(It.IsAny<string>())).Returns((string key) => key);
+            _mockLocalizationService.Setup(l => l.GetString(It.IsAny<string>(), It.IsAny<object[]>())).Returns((string key, object[] args) => key + string.Join("", args));
+
+            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+            CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
 
             _viewModel = new MeasurementViewModel(
                 _mockColorMeasurementService.Object,
                 _mockFileService.Object,
                 _mockDialogService.Object,
-                _mockLocalizationService.Object
+                _mockLocalizationService.Object,
+                _mockDispatcher.Object
+            );
+        
+
+
+        // Настройка LocalizationService:
+        // Мокируем сервис локализации, чтобы он возвращал реальные значения из Resources.resx
+        _mockLocalizationService.Setup(l => l.GetString(It.IsAny<string>()))
+                                    .Returns((string key) =>
+                                    {
+                                        switch (key)
+                                        {
+                                            case nameof(ConnectingCA): return ConnectingCA;
+                                            case nameof(ConnectedCA): return ConnectedCA;
+                                            case nameof(DisconnectedCA): return DisconnectedCA;
+                                            case nameof(Err): return Err;
+                                            case nameof(FillSN): return FillSN;
+                                            case nameof(NoSNErr): return NoSNErr;
+                                            case nameof(TestStartInfo): return TestStartInfo;
+                                            case nameof(Result): return Result;
+                                            case nameof(NoData): return NoData;
+                                            case nameof(LvIsTooLow): return LvIsTooLow;
+                                            case nameof(CheckProbe): return CheckProbe;
+                                            case nameof(InvalidResultErr): return InvalidResultErr;
+                                            case nameof(ColorServiceErr): return ColorServiceErr;
+                                            case nameof(ColorAnalyzerErr): return ColorAnalyzerErr;
+                                            case nameof(UnexpectedMeasurementErr): return UnexpectedMeasurementErr;
+                                            case nameof(Saving): return Saving;
+                                            case nameof(SaveJSONErrDeviceIsEmpty): return SaveJSONErrDeviceIsEmpty;
+                                            case nameof(SavingNotFullWarning): return SavingNotFullWarning;
+                                            case nameof(Warning): return Warning;
+                                            case nameof(SaveCanceled): return SaveCanceled;
+                                            case nameof(SaveJSONErrForSN): return SaveJSONErrForSN;
+                                            case nameof(CleanFieldWarning): return CleanFieldWarning;
+                                            case nameof(ClearFieldsDone): return ClearFieldsDone;
+                                            case nameof(ErrMsgLangSwitchFailed): return ErrMsgLangSwitchFailed;
+                                            case nameof(IncorrectFormatForSNErr): return IncorrectFormatForSNErr;
+                                            case nameof(SerialNumber): return SerialNumber;
+                                            case nameof(AlreadyActivated): return AlreadyActivated;
+                                            case nameof(IncorrectMeasTimeFormat): return IncorrectMeasTimeFormat;
+                                            case nameof(CurrentMeasurementTime): return CurrentMeasurementTime;
+                                            case nameof(Seconds): return Seconds;
+                                            case nameof(ViewModelClearing): return ViewModelClearing;
+                                            case nameof(ViewModelCleared): return ViewModelCleared;
+                                            case nameof(RunExternalAppNotFoundErr): return RunExternalAppNotFoundErr;
+                                            case nameof(RunExternalAppUnexpectedErr): return RunExternalAppUnexpectedErr;
+                                            case nameof(ErrAtCalibration): return ErrAtCalibration;
+                                            case nameof(ErrUnexpected): return ErrUnexpected;
+                                            case nameof(Measuring): return Measuring;
+                                            case nameof(ResultsSaved): return ResultsSaved;
+                                            case nameof(ConnectionError): return ConnectionError;
+                                            case nameof(ErrReleaseConnectionCA): return ErrReleaseConnectionCA;
+                                            case nameof(MeasureWihoutConnectionError): return MeasureWihoutConnectionError;
+                                            case nameof(MakeZeroCalibration): return MakeZeroCalibration;
+                                            case nameof(ZeroCalibratedCA): return ZeroCalibratedCA;
+                                            case nameof(WorkFolderCreatedForSN): return WorkFolderCreatedForSN;
+                                            case nameof(CalibratedCA): return CalibratedCA;
+                                            case nameof(NotCalibratedCa): return NotCalibratedCa;
+                                            case nameof(TestFormatString): return TestFormatString;
+                                            case nameof(BadConnection): return BadConnection;
+                                            case nameof(ZeroCalibration): return ZeroCalibration;
+                                            default: return $"{key}";
+                                        }
+                                    });
+
+
+            // Создаем ViewModel, передавая ему моки сервисов
+            _viewModel = new MeasurementViewModel(
+                _mockColorMeasurementService.Object,
+                _mockFileService.Object,
+                _mockDialogService.Object,
+                _mockLocalizationService.Object,
+                _mockDispatcher.Object
             );
         }
 
@@ -114,194 +140,865 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         public void Teardown()
         {
             _viewModel.Dispose();
-            if (App.Current != null)
-            {
-                typeof(App)
-                    .GetProperty("Current")
-                    .GetValue(null)
-                    .GetType()
-                    .GetField("_dispatcher", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                    .SetValue(App.Current, null);
-            }
-        }
-
-        // --- Тесты конструктора ---
-
-        [Test]
-        public void Ctor_InitializesWithDependencies()
-        {
-            Assert.That(_viewModel, Is.Not.Null);
         }
 
         [Test]
-        public void Ctor_InitializesPropertiesToDefaultValues()
+        public void InitializeViewModel_SetsInitialStates()
         {
             Assert.That(_viewModel.IsDeviceConnected, Is.False);
-            Assert.That(_viewModel.IsMeasurementButtonsEnabled, Is.False);
-            Assert.That(_viewModel.MeasurementTime, Is.EqualTo(2));
-            Assert.That(_viewModel.SerialNumber, Is.Empty);
-            Assert.That(_viewModel.LogText, Is.Empty);
+            Assert.That(_viewModel.IsDeviceCalibrated, Is.False);
             Assert.That(_viewModel.IsSerialNumberConfirmed, Is.False);
-            Assert.That(_viewModel.IsDeviceCalibrated, Is.False);
-            Assert.That(_viewModel.DeviceConnectionStatusText, Is.EqualTo("Отключено"));
-            Assert.That(_viewModel.DeviceCalibrationStatusText, Is.EqualTo("Не откалибровано"));
+            Assert.That(_viewModel.IsMeasurementButtonsEnabled, Is.False);
+            Assert.That(_viewModel.LogText, Is.Empty);
+            
         }
 
+        // --- Тесты для ZeroCalibrationCommand ---
         [Test]
-        public void Ctor_SubscribesToConnectionStatusChangedEvent()
+        public async Task ZeroCalibrationCommand_Execute_CalibratesAndLogs()
         {
-            _mockColorMeasurementService.VerifyAdd(s => s.ConnectionStatusChanged += It.IsAny<EventHandler<bool>>(), Times.Once());
-        }
+            // Arrange
+            _mockColorMeasurementService.Setup(s => s.CalibrateZeroAsync()).Returns(Task.FromResult(true));
+            // Используем свойство IsDeviceConnected
+            _mockColorMeasurementService.Setup(s => s.IsDeviceConnected).Returns(true);
+            _viewModel.IsDeviceConnected = true; // Убеждаемся, что свойство ViewModel тоже установлено
 
-        [Test]
-        public void Ctor_SubscribesToCalibrationStatusChangedEvent()
-        {
-            _mockColorMeasurementService.VerifyAdd(s => s.CalibrationStatusChanged += It.IsAny<EventHandler<bool>>(), Times.Once());
-        }
+            // Act
+            _viewModel.ZeroCalibrationCommand.Execute(null);
+            await Task.Delay(50); // Ждем завершения асинхронной операции
 
-        [Test]
-        public void Ctor_SubscribesToServiceStatusMessages()
-        {
-            _mockColorMeasurementService.VerifyAdd(s => s.StatusMessage += It.IsAny<EventHandler<string>>(), Times.Once());
-            _mockFileService.VerifyAdd(s => s.StatusMessage += It.IsAny<EventHandler<string>>(), Times.Once());
-        }
-
-        [Test]
-        public void Ctor_PopulatesLocalizedStrings()
-        {
-            _mockLocalizationService.Verify(l => l.GetString("strStartMeasurement"), Times.AtLeastOnce());
-            _mockLocalizationService.Verify(l => l.GetString("strStopMeasurement"), Times.AtLeastOnce());
-        }
-
-        // --- Тесты статуса соединения/калибровки ---
-
-        [Test]
-        public void ConnectionStatusChanged_UpdatesIsDeviceConnectedPropertyAndText()
-        {
-            _mockColorMeasurementService.Raise(s => s.ConnectionStatusChanged += null, null, true);
-            Assert.That(_viewModel.IsDeviceConnected, Is.True);
-            Assert.That(_viewModel.DeviceConnectionStatusText, Is.EqualTo("Подключено"));
-
-            _mockColorMeasurementService.Raise(s => s.ConnectionStatusChanged += null, null, false);
-            Assert.That(_viewModel.IsDeviceConnected, Is.False);
-            Assert.That(_viewModel.DeviceConnectionStatusText, Is.EqualTo("Отключено"));
-        }
-
-        [Test]
-        public void CalibrationStatusChanged_UpdatesIsDeviceCalibratedPropertyAndText()
-        {
-            _mockColorMeasurementService.Raise(s => s.CalibrationStatusChanged += null, null, true);
+            // Assert
+            _mockColorMeasurementService.Verify(s => s.CalibrateZeroAsync(), Times.Once);
             Assert.That(_viewModel.IsDeviceCalibrated, Is.True);
-            Assert.That(_viewModel.DeviceCalibrationStatusText, Is.EqualTo("Откалибровано"));
+            Assert.That(_viewModel.LogText.Contains(ZeroCalibratedCA), Is.True);
+        }
 
-            _mockColorMeasurementService.Raise(s => s.CalibrationStatusChanged += null, null, false);
+        [Test]
+        public async Task ZeroCalibrationCommand_Execute_HandlesCalibrationError()
+        {
+            // Arrange
+            _mockColorMeasurementService.Setup(s => s.CalibrateZeroAsync()).Returns(Task.FromResult(false));
+            _mockColorMeasurementService.Setup(s => s.IsDeviceConnected).Returns(true);
+            _viewModel.IsDeviceConnected = true;
+
+            // Act
+            _viewModel.ZeroCalibrationCommand.Execute(null);
+            await Task.Delay(50);
+
+            // Assert
+            _mockColorMeasurementService.Verify(s => s.CalibrateZeroAsync(), Times.Once);
+            _mockDialogService.Verify(d => d.ShowMessage(
+                It.Is<string>(msg => msg.Contains(ErrAtCalibration)),
+                It.Is<string>(title => title == Err)
+            ), Times.Once);
             Assert.That(_viewModel.IsDeviceCalibrated, Is.False);
-            Assert.That(_viewModel.DeviceCalibrationStatusText, Is.EqualTo("Не откалибровано"));
+            Assert.That(_viewModel.LogText.Contains(ErrAtCalibration), Is.True);
         }
 
         [Test]
-        public void ConnectionStatusChanged_UpdatesCommandCanExecuteStates()
+        public async Task ZeroCalibrationCommand_Execute_RequiresConnection()
         {
-            // Initial state (disconnected)
-            Assert.That(_viewModel.MeasureCommand.CanExecute(null), Is.False);
-            Assert.That(_viewModel.ZeroCalibrationCommand.CanExecute(null), Is.False);
-
-            // Connect
-            _mockColorMeasurementService.SetupGet(s => s.IsConnected).Returns(true);
-            _viewModel.IsDeviceConnected = true;
-            _mockColorMeasurementService.Raise(s => s.ConnectionStatusChanged += null, null, true);
-
-            Assert.That(_viewModel.MeasureCommand.CanExecute(null), Is.False);
-            Assert.That(_viewModel.ZeroCalibrationCommand.CanExecute(null), Is.True);
-
-            // Disconnect
-            _mockColorMeasurementService.SetupGet(s => s.IsConnected).Returns(false);
+            // Arrange
+            _mockColorMeasurementService.Setup(s => s.IsDeviceConnected).Returns(false);
             _viewModel.IsDeviceConnected = false;
-            _mockColorMeasurementService.Raise(s => s.ConnectionStatusChanged += null, null, false);
 
-            Assert.That(_viewModel.MeasureCommand.CanExecute(null), Is.False);
-            Assert.That(_viewModel.ZeroCalibrationCommand.CanExecute(null), Is.False);
+            // Act
+            _viewModel.ZeroCalibrationCommand.Execute(null);
+            await Task.Delay(50);
+
+            // Assert
+            _mockColorMeasurementService.Verify(s => s.CalibrateZeroAsync(), Times.Never);
+            _mockDialogService.Verify(d => d.ShowMessage(
+                It.Is<string>(msg => msg.Contains(MeasureWihoutConnectionError)),
+                It.Is<string>(title => title == Err)
+            ), Times.Once);
+            Assert.That(_viewModel.LogText.Contains(MeasureWihoutConnectionError), Is.True);
+        }
+
+        // --- Тесты для SaveResultsCommand ---
+        
+        [Test]
+        public async Task SaveResultsCommand_Execute_SavesResultsAndLogs()
+        {
+            // Arrange
+            string testSn = "TESTSN";
+            _viewModel.ExecuteApplySerialNumber(testSn);
+
+            // Убедимся, что _currentDevice содержит ВСЕ необходимые измерения,
+            // чтобы CanExecuteSaveResults вернул true и AreAllStatusesRepresentedInMeasurements() вернул true.
+            foreach (var status in MeasurementStatusService.Instance.AllMeasurementButtonStatuses)
+            {
+                _viewModel._currentDevice.AddMeasurement(new Measurement { Location = status.Location, IsValid = true });
+            }
+
+            // Настройка моков для успешного сохранения
+            // Мокируем SaveDeviceDataToJsonAsync так, чтобы он возвращал true и вызывал StatusMessage
+            _mockFileService.Setup(f => f.SaveDeviceDataToJsonAsync(
+                It.IsAny<DeviceUnderTest>()
+            ))
+            .ReturnsAsync((DeviceUnderTest device) =>
+            {
+                // Имитируем вызов StatusMessage
+                _mockFileService.Raise(f => f.StatusMessage += null, _mockFileService.Object,
+                    _mockLocalizationService.Object.GetString(ResultsForSN, device.SerialNumber) + $" {SavedToJSON}: mock/path");
+                return true;
+            });
+
+            // Мокируем SaveMeasurementToCsvAsync, чтобы он не мешал
+            _mockFileService.Setup(f => f.SaveMeasurementToCsvAsync(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>()
+            )).ReturnsAsync(true);
+
+
+            // Act
+            _viewModel.SaveResultsCommand.Execute(null); // Вызываем команду
+
+            // Assert
+            // 1. Проверяем, что SaveDeviceDataToJsonAsync был вызван.
+            _mockFileService.Verify(f => f.SaveDeviceDataToJsonAsync(
+                It.Is<DeviceUnderTest>(d => d.SerialNumber == testSn)
+            ), Times.Once);
+
+            // 2. Проверяем, что лог содержит сообщение об успешном сохранении из FileService.
+            // Используем Contains, так как может быть дополнительная информация (дата, путь).
+            // Добавим ожидание, чтобы асинхронное добавление в лог успело произойти
+            await Task.Delay(100); // Небольшая задержка для UI-потока, чтобы обновить ObservableCollection
+
+            // Проверяем, что лог содержит сообщение об успешном сохранении
+            Assert.That(_viewModel.LogText, Does.Contain(_mockLocalizationService.Object.GetString(ResultsForSN, testSn)),
+                        $"Log should contain the successful save message from FileService. Current logs: {_viewModel.LogText}");
+            Assert.That(_viewModel.LogText, Does.Contain(SavedToJSON),
+                        $"Log should contain the successful save message from FileService. Current logs: {_viewModel.LogText}");
+
+
+            // Проверяем, что также есть сообщения "Current SN is: TESTSN" и "Saving..."
+            Assert.That(_viewModel.LogText, Does.Contain(string.Format(_mockLocalizationService.Object.GetString(CurrentSN), testSn)),
+                        "Log should contain 'Current SN is: TESTSN' message.");
+            Assert.That(_viewModel.LogText, Does.Contain(_mockLocalizationService.Object.GetString(Saving)),
+                        "Log should contain 'Saving...' message.");
+
+            // 3. Проверяем, что диалоговое окно НЕ было показано при успешном сохранении
+            _mockDialogService.Verify(d => d.ShowMessage(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }
 
         [Test]
-        public void CalibrationStatusChanged_UpdatesCommandCanExecuteStates()
+        public async Task SaveResultsCommand_Execute_HandlesSaveError()
         {
-            // Initial state (disconnected, not calibrated)
-            Assert.That(_viewModel.MeasureCommand.CanExecute(null), Is.False);
+            // Arrange
+            string testSnErr = "TESTSNERR";
+            _viewModel.ExecuteApplySerialNumber(testSnErr);
 
-            // Connect and then calibrate
-            _mockColorMeasurementService.SetupGet(s => s.IsConnected).Returns(true);
+            // Убедимся, что _currentDevice содержит ВСЕ необходимые измерения,
+            // чтобы CanExecuteSaveResults вернул true и AreAllStatusesRepresentedInMeasurements() вернул true.
+            // Это предотвратит ShowQuestion и обеспечит вызов SaveDeviceDataToJsonAsync.
+            foreach (var status in MeasurementStatusService.Instance.AllMeasurementButtonStatuses)
+            {
+                _viewModel._currentDevice.AddMeasurement(new Measurement { Location = status.Location, IsValid = true });
+            }
+
+            // Мокируем SaveDeviceDataToJsonAsync так, чтобы он ВЫБРОСИЛ ИСКЛЮЧЕНИЕ.
+            // Это заставит код войти в блок catch в ExecuteSaveResultsAsync.
+            var commandFinishedEvent = new ManualResetEventSlim(false);
+
+            _mockFileService.Setup(f => f.SaveDeviceDataToJsonAsync(It.IsAny<DeviceUnderTest>()))
+                            .Returns(async (DeviceUnderTest device) =>
+                            {
+                                await Task.Yield(); // Имитируем асинхронность
+                                commandFinishedEvent.Set(); // Сигнализируем о завершении после "бросания" исключения
+                                throw new IOException("Simulated save error for test."); // Бросаем исключение
+                            });
+
+
+            // Act
+            _viewModel.SaveResultsCommand.Execute(null); // Вызываем команду
+
+            // Ждем, пока команда завершит свою асинхронную часть
+            bool finished = commandFinishedEvent.Wait(TimeSpan.FromSeconds(5));
+            Assert.That(finished, Is.True, "Command did not complete its async operation within the timeout.");
+
+
+            // Assert
+            // 1. Проверяем, что _mockFileService.SaveDeviceDataToJsonAsync был вызван ровно один раз.
+            _mockFileService.Verify(f => f.SaveDeviceDataToJsonAsync(It.IsAny<DeviceUnderTest>()), Times.Once);
+
+            // 2. Проверяем, что в лог добавлено сообщение "Saving...".
+            Assert.That(_viewModel.LogText, Does.Contain(_mockLocalizationService.Object.GetString(Saving)));
+
+            // 3. Проверяем, что в лог добавлено сообщение об ОШИБКЕ (из catch блока).
+            // Ожидаем увидеть "ErrUnexpected" и сообщение исключения.
+            Assert.That(_viewModel.LogText, Does.Contain(_mockLocalizationService.Object.GetString(ErrUnexpected)), "Log should contain the unexpected error prefix.");
+            // Проверка на полное сообщение из лога, включая текст исключения
+            Assert.That(_viewModel.LogText, Does.Contain("Simulated save error for test."), "Log should contain the simulated exception message.");
+
+            // 4. Проверяем, что ShowMessage для ошибки сохранения был вызван с правильными параметрами.
+            _mockDialogService.Verify(d => d.ShowMessage(
+                It.Is<string>(msg => msg.Contains(_mockLocalizationService.Object.GetString(SaveJSONErrForSN))), // Проверяем, что сообщение диалога содержит SaveJSONErrForSN
+                It.Is<string>(title => title == _mockLocalizationService.Object.GetString(Err)) // Проверяем заголовок диалога
+            ), Times.Once);
+            // Проверяем, что сообщение диалога также содержит текст исключения
+            _mockDialogService.Verify(d => d.ShowMessage(
+                It.Is<string>(msg => msg.Contains("Simulated save error for test.")),
+                It.IsAny<string>()
+            ), Times.Once);
+        }
+
+
+        [Test]
+        public void SaveResultsCommand_CanExecute_ReturnsFalse_WhenEmptyDevice()
+        {
+            // Arrange
+            _viewModel._currentDevice = null; // Устройство null
+
+            // Act
+            bool canExecute = _viewModel.SaveResultsCommand.CanExecute(null);
+
+            // Assert
+            Assert.That(canExecute, Is.False);
+            // Никакие сервисы не должны быть вызваны, если команда неактивна.
+            _mockFileService.Verify(f => f.SaveDeviceDataToJsonAsync(It.IsAny<DeviceUnderTest>()), Times.Never);
+            _mockDialogService.Verify(d => d.ShowMessage(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Test]
+        public void SaveResultsCommand_CanExecute_ReturnsFalse_WhenDeviceHasNoMeasurements()
+        {
+            // Arrange
+            _viewModel.ExecuteApplySerialNumber("TestSN"); // Создаем устройство, но без измерений
+            Assert.That(_viewModel._currentDevice.Measurements, Is.Empty);
+
+            // Act
+            bool canExecute = _viewModel.SaveResultsCommand.CanExecute(null);
+
+            // Assert
+            Assert.That(canExecute, Is.False);
+            _mockFileService.Verify(f => f.SaveDeviceDataToJsonAsync(It.IsAny<DeviceUnderTest>()), Times.Never);
+            _mockDialogService.Verify(d => d.ShowMessage(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Test]
+        public async Task SaveResultsCommand_Execute_HandlesSaveCanceled() // Метод должен быть async
+        {
+            // Arrange
+            _viewModel.ExecuteApplySerialNumber("TESTSNCANCEL"); // Убедимся, что SN применен
+
+            // _viewModel._currentDevice будет содержать только одно измерение,
+            // что приведет к тому, что _viewModel.AreAllStatusesRepresentedInMeasurements() вернет false.
+            // Это активирует диалог подтверждения.
+            _viewModel._currentDevice.AddMeasurement(new Measurement { Location = "Test", IsValid = true });
+
+            // Мокируем, что пользователь отменил сохранение (нажал "Нет" в диалоге подтверждения)
+            _mockDialogService.Setup(d => d.ShowQuestion(
+                It.Is<string>(msg => msg.Contains(SavingNotFullWarning)),
+                It.Is<string>(title => title == Warning)
+            )).Returns(false);
+
+            // Act
+            _viewModel.SaveResultsCommand.Execute(null);
+            await Task.Delay(100); // Даем небольшую задержку для завершения асинхронной операции
+
+            // Assert
+            // Проверяем, что асинхронный метод сохранения НЕ вызывался
+            _mockFileService.Verify(f => f.SaveDeviceDataToJsonAsync(It.IsAny<DeviceUnderTest>()), Times.Never);
+            _mockDialogService.Verify(d => d.ShowQuestion(
+                It.Is<string>(msg => msg.Contains(SavingNotFullWarning)),
+                It.Is<string>(title => title == Warning)
+            ), Times.Once);
+            Assert.That(_viewModel.LogText.Contains(SaveCanceled), Is.True);
+        }
+
+        // --- Тесты для ClearFieldsCommand ---
+        [Test]
+        public void ClearFieldsCommand_Execute_ClearsFieldsAndLogs()
+        {
+            // Arrange
+            _viewModel.AddLogMessage("Some log message");
+            _viewModel.SerialNumber = "123";
+            _viewModel.MeasurementTime = 5;
             _viewModel.IsDeviceConnected = true;
+            _viewModel.IsDeviceCalibrated = true;
+            _viewModel.IsSerialNumberConfirmed = true;
+            _viewModel.IsMeasurementButtonsEnabled = true;
+
+            _mockDialogService.Setup(d => d.ShowQuestion(
+                It.Is<string>(msg => msg.Contains(CleanFieldWarning)),
+                It.Is<string>(title => title == Warning)
+            )).Returns(true);
+
+            // Act
+            _viewModel.ClearFieldsCommand.Execute(null);
+
+            // Assert
+            Assert.That(_viewModel.SerialNumber, Is.Empty);
+            Assert.That(_viewModel.MeasurementTime, Is.EqualTo(2));
+            Assert.That(_viewModel.IsDeviceConnected, Is.True);
+            Assert.That(_viewModel.IsDeviceCalibrated, Is.True);
+            Assert.That(_viewModel.IsSerialNumberConfirmed, Is.False);
+            Assert.That(_viewModel.IsMeasurementButtonsEnabled, Is.False);
+            Assert.That(_viewModel.LogText.Contains(ClearFieldsDone), Is.True);
+            _mockDialogService.Verify(d => d.ShowQuestion(
+                It.Is<string>(msg => msg.Contains(CleanFieldWarning)),
+                It.Is<string>(title => title == Warning)
+            ), Times.Once);
+        }
+
+        [Test]
+        public void ClearFieldsCommand_Execute_DoesNotClearIfCanceled()
+        {
+            // Arrange
+            _viewModel.AddLogMessage("Some log message");
+            _viewModel.SerialNumber = "123";
+            _viewModel.MeasurementTime = 5;
+            _viewModel.IsDeviceConnected = true;
+            _viewModel.IsDeviceCalibrated = true;
+            _viewModel.IsSerialNumberConfirmed = true;
+            _viewModel.IsMeasurementButtonsEnabled = true;
+
+            _mockDialogService.Setup(d => d.ShowQuestion(
+                It.Is<string>(msg => msg.Contains(CleanFieldWarning)),
+                It.Is<string>(title => title == Warning)
+            )).Returns(false);
+
+            // Act
+            _viewModel.ClearFieldsCommand.Execute(null);
+
+            // Assert
+            Assert.That(_viewModel.SerialNumber, Is.EqualTo("123"));
+            Assert.That(_viewModel.MeasurementTime, Is.EqualTo(5));
+            Assert.That(_viewModel.IsDeviceConnected, Is.True);
+            Assert.That(_viewModel.IsDeviceCalibrated, Is.True);
+            Assert.That(_viewModel.IsSerialNumberConfirmed, Is.True);
+            Assert.That(_viewModel.IsMeasurementButtonsEnabled, Is.True);
+            Assert.That(_viewModel.LogText.Contains(ClearFieldsDone), Is.False);
+            _mockDialogService.Verify(d => d.ShowQuestion(
+                It.Is<string>(msg => msg.Contains(CleanFieldWarning)),
+                It.Is<string>(title => title == Warning)
+            ), Times.Once);
+        }
+
+        // --- Тесты для ClearLogCommand ---
+        [Test]
+        public void ExecuteClearLog_ClearsLogs()
+        {
+            // Arrange
+            _viewModel.AddLogMessage("Log entry 1");
+            _viewModel.AddLogMessage("Log entry 2");
+
+            // Act
+            _viewModel.ExecuteClearLog();
+
+            // Assert
+            Assert.That(_viewModel.LogText, Is.Empty);
+        }
+
+        // --- Тесты для ApplySerialNumberCommand (применяется через ExecuteApplySerialNumber) ---
+        [Test]
+        public void ApplySerialNumberCommand_Execute_SetsSerialNumberAndConfirms()
+        {
+            // Arrange
+            string testSn = "VALIDSNXYZ";
+
+            // Убраны моки для CreateFolderForSN и GetOrCreateWorkFolder,
+            // так как этих методов нет в предоставленном коде IFileService/FileService.
+            // Если ViewModel действительно вызывает эти методы, то это указывает на несоответствие
+            // между ViewModel и IFileService.
+
+            // Act
+            _viewModel.ExecuteApplySerialNumber(testSn);
+
+            // Assert
+            Assert.That(_viewModel.SerialNumber, Is.EqualTo(testSn));
+            Assert.That(_viewModel.IsSerialNumberConfirmed, Is.True);
+            // Удалена верификация для CreateFolderForSN, так как метода нет
+            Assert.That(_viewModel.LogText.Contains($"{CurrentSN}: {testSn}"), Is.True);
+        }
+
+        [Test]
+        public void ApplySerialNumberCommand_Execute_HandlesInvalidSerialNumberFormat()
+        {
+            // Arrange
+            string invalidSn = "SN!@#";
+
+            // Act
+            _viewModel.ExecuteApplySerialNumber(invalidSn);
+
+            // Assert
+            Assert.That(_viewModel.SerialNumber, Is.Not.EqualTo(invalidSn));
+            _mockDialogService.Verify(d => d.ShowMessage(
+                It.Is<string>(msg => msg.Contains(IncorrectFormatForSNErr)),
+                It.Is<string>(title => title == Err)
+            ), Times.Once);
+            Assert.That(_viewModel.IsSerialNumberConfirmed, Is.False);
+        }
+
+        // --- Тесты для ApplyMeasurementTimeCommand ---
+        [Test]
+        public void ApplyMeasurementTimeCommand_Execute_AppliesValidTime()
+        {
+            // Arrange
+            // Команда ожидает строковый параметр, поэтому устанавливаем его здесь.
+            string expectedTime = "10"; // <--- Это было ключевое изменение
+            _viewModel._currentDevice = new DeviceUnderTest("123"); // Убедимся, что _currentDevice не null
+
+            // Act
+            // Передаем строковое значение времени в качестве параметра команды
+            _viewModel.ApplyMeasurementTimeCommand.Execute(expectedTime); // <--- Это было ключевое изменение
+
+            // Assert
+            // Проверяем, что свойство MeasurementTime было обновлено командой до 10 (int).
+            Assert.That(_viewModel.MeasurementTime, Is.EqualTo(10));
+
+            // С учетом вашей реализации AddLogMessage и мока ILocalizationService (который возвращает ключи ресурсов),
+            // ожидаемая строка в логе будет "CurrentMeasurementTime: 10 Seconds".
+            // Проверяем наличие всей ожидаемой строки в логе.
+            Assert.That(_viewModel.LogText.Contains($"{CurrentMeasurementTime}: 10 {Seconds}"), Is.True);
+
+            // Можно также проверить, что диалог НЕ был показан для этого случая
+            _mockDialogService.Verify(d => d.ShowMessage(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        }
+
+        // Дополнительные тесты для обработки некорректного ввода, основанные на вашей реализации:
+        [Test]
+        public void ApplyMeasurementTimeCommand_Execute_EmptyInput()
+        {
+            // Arrange
+            string emptyInput = "";
+
+            // Act
+            _viewModel.ApplyMeasurementTimeCommand.Execute(emptyInput);
+
+            // Assert
+            _mockDialogService.Verify(d => d.ShowMessage(
+                It.Is<string>(msg => msg.Contains(IncorrectMeasTimeFormat)),
+                It.Is<string>(title => title.Contains(Err))
+            ), Times.Once);
+            // Проверяем, что лог не содержит сообщения об успешном применении времени
+            Assert.That(_viewModel.LogText.Contains($"{CurrentMeasurementTime}:"), Is.False);
+        }                                                                                                                                       
+      
+
+        [Test]
+        public void ApplyMeasurementTimeCommand_Execute_HandlesNegativeInput()
+        {
+            // Arrange
+            string negativeInput = "-5";
+
+            // Act
+            _viewModel.ApplyMeasurementTimeCommand.Execute(negativeInput);
+
+            // Assert
+            _mockDialogService.Verify(d => d.ShowMessage(
+                It.Is<string>(msg => msg.Contains(IncorrectMeasTimeFormat)),
+                It.Is<string>(title => title.Contains(Err))
+            ), Times.Once);
+            Assert.That(_viewModel.LogText.Contains(CurrentMeasurementTime), Is.False);
+        }
+
+        [Test]
+        public void ApplyMeasurementTimeCommand_Execute_HandlesZeroInput()
+        {
+            // Arrange
+            string zeroInput = "0";
+
+            // Act
+            _viewModel.ApplyMeasurementTimeCommand.Execute(zeroInput);
+
+            // Assert
+            _mockDialogService.Verify(d => d.ShowMessage(
+                It.Is<string>(msg => msg.Contains(IncorrectMeasTimeFormat)),
+                It.Is<string>(title => title.Contains(Err))
+            ), Times.Once);
+            Assert.That(_viewModel.LogText.Contains(CurrentMeasurementTime), Is.False);
+        }
+
+        [Test]
+        public void ApplyMeasurementTimeCommand_Execute_HandlesNonNumericInput()
+        {
+            // Arrange
+            string nonNumericInput = "abc";
+
+            // Act
+            _viewModel.ApplyMeasurementTimeCommand.Execute(nonNumericInput);
+
+            // Assert
+            _mockDialogService.Verify(d => d.ShowMessage(
+                It.Is<string>(msg => msg.Contains(IncorrectMeasTimeFormat)),
+                It.Is<string>(title => title.Contains(Err))
+            ), Times.Once);
+            Assert.That(_viewModel.LogText.Contains(CurrentMeasurementTime), Is.False);
+        }
+
+        // --- Тесты для MeasureCommand ---
+
+        [Test]
+        public void MeasureCommand_Execute_DoesNothing_WhenNoConnection()
+        {
+            // Arrange
+            _viewModel.IsDeviceConnected = false; // Ключевое условие для CanExecute: false
+            _viewModel.IsDeviceCalibrated = true;
+            _viewModel.SerialNumber = "SomeSN";
+            _viewModel.IsSerialNumberConfirmed = true; // Убедимся, что SN подтвержден, если IsSerialNumberConfirmed используется в CanExecute
+            _viewModel.MeasurementTime = 10; // Убедимся, что другие условия CanExecute выполнены
+
+            // Act
+            // Выполняем команду. Так как CanExecuteMeasure вернет false,
+            // метод ExecuteMeasure не должен быть вызван.
+            _viewModel.MeasureCommand.Execute(null);
+
+            // Assert
+            // 1. Проверяем, что _colorMeasurementService.MeasureAsync НИКОГДА не был вызван.
+            _mockColorMeasurementService.Verify(s => s.MeasureAsync(It.IsAny<int>()), Times.Never);
+
+            // 2. Проверяем, что _dialogService.ShowMessage НИКОГДА не был вызван.
+            _mockDialogService.Verify(d => d.ShowMessage(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+
+            // 3. Проверяем, что лог НЕ содержит сообщений, связанных с выполнением этой команды.
+            Assert.That(_viewModel.LogText.Contains("MeasureWihoutConnectionError"), Is.False);
+            Assert.That(_viewModel.LogText.Contains("Measuring"), Is.False); // Также, чтобы не было сообщений об успешном измерении
+        }
+
+        [Test]
+        public void MeasureCommand_Execute_DoesNothing_WhenNotCalibrated()
+        {
+            // Arrange
+            _viewModel.IsDeviceConnected = true;
+            _viewModel.IsDeviceCalibrated = false; // Ключевое условие для CanExecute: false
+            _viewModel.SerialNumber = "SomeSN";
+            _viewModel.IsSerialNumberConfirmed = true;
+            _viewModel.MeasurementTime = 10;
+
+            // Act
+            _viewModel.MeasureCommand.Execute(null);
+
+            // Assert
+            // 1. Проверяем, что _colorMeasurementService.MeasureAsync НИКОГДА не был вызван.
+            _mockColorMeasurementService.Verify(s => s.MeasureAsync(It.IsAny<int>()), Times.Never);
+
+            // 2. Проверяем, что _dialogService.ShowMessage НИКОГДА не был вызван.
+            _mockDialogService.Verify(d => d.ShowMessage(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+
+            // 3. Проверяем, что лог НЕ содержит сообщений, связанных с выполнением этой команды.
+            Assert.That(_viewModel.LogText.Contains("MakeZeroCalibration"), Is.False); // Если раньше здесь был этот лог
+            Assert.That(_viewModel.LogText.Contains("Measuring"), Is.False);
+        }
+
+        [Test]
+        public void MeasureCommand_Execute_DoesNothing_WhenNoSerialNumber()
+        {
+            // Arrange
+            _viewModel.IsDeviceConnected = true;
+            _viewModel.IsDeviceCalibrated = true;
+            _viewModel.SerialNumber = ""; // Ключевое условие для CanExecute: false
+            _viewModel.IsSerialNumberConfirmed = false; // Убедимся, что это свойство также отражает пустой SN
+            _viewModel.MeasurementTime = 10;
+
+            // Act
+            _viewModel.MeasureCommand.Execute(null);
+
+            // Assert
+            // 1. Проверяем, что _colorMeasurementService.MeasureAsync НИКОГДА не был вызван.
+            _mockColorMeasurementService.Verify(s => s.MeasureAsync(It.IsAny<int>()), Times.Never);
+
+            // 2. Проверяем, что _dialogService.ShowMessage НИКОГДА не был вызван.
+            _mockDialogService.Verify(d => d.ShowMessage(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+
+            // 3. Проверяем, что лог НЕ содержит сообщений, связанных с выполнением этой команды.
+            Assert.That(_viewModel.LogText.Contains("FillSN"), Is.False); // Если раньше здесь был этот лог
+            Assert.That(_viewModel.LogText.Contains("Measuring"), Is.False);
+        }
+
+        [Test]
+        public async Task MeasureCommand_Execute_PerformsMeasurementAndLogs()
+        {
+            // Arrange
+            // Устанавливаем все условия для CanExecute в true, чтобы команда МОГЛА быть выполнена.
+            _viewModel.IsDeviceConnected = true;
+            _viewModel.IsDeviceCalibrated = true;
             _viewModel.SerialNumber = "TESTSN";
+            _viewModel.MeasurementTime = 1;
+
+            // Убедимся, что серийный номер подтвержден, так как это часть логики CanExecute.
+            // Если IsSerialNumberConfirmed устанавливается через метод, вызываем его.
+            // Если это свойство, то просто устанавливаем его в true, если оно не связано с SerialNumber напрямую.
+            // Лучше всего, чтобы SerialNumber устанавливал IsSerialNumberConfirmed при валидации.
+            // Если ExecuteApplySerialNumber устанавливает IsSerialNumberConfirmed, то нужно вызвать его.
+            // _viewModel.ExecuteApplySerialNumber(_viewModel.SerialNumber); // Если этот метод устанавливает IsSerialNumberConfirmed
+
+            // Предполагаем, что IsSerialNumberConfirmed зависит от SerialNumber != "".
+            // Если это не так, и IsSerialNumberConfirmed - отдельное свойство, то установим его здесь:
             _viewModel.IsSerialNumberConfirmed = true;
 
-            Assert.That(_viewModel.MeasureCommand.CanExecute(null), Is.False);
+            // Настраиваем мок ColorMeasurementService для возврата тестовых данных
+            _mockColorMeasurementService.Setup(s => s.MeasureAsync(It.IsAny<int>()))
+                                         .Returns(Task.FromResult(new Models.Measurement { Location = MeasurementStatusService.CenterLocationName, IsValid = true, x = 0.331, y = 0.322, Lv = 200, T = 6000 }));
 
-            _mockColorMeasurementService.SetupGet(s => s.IsCalibrated).Returns(true);
+            // Act
+            _viewModel.MeasureCommand.Execute(MeasurementStatusService.CenterLocationName); // Передаем параметр (например, Location)
+            await Task.Delay(100); // Даем время для завершения асинхронной операции
+
+            // Assert
+            // 1. Проверяем, что MeasureAsync был вызван ровно один раз.
+            _mockColorMeasurementService.Verify(s => s.MeasureAsync(It.IsAny<int>()), Times.Once);
+
+            // 2. Проверяем, что никаких диалоговых окон об ошибке не было показано.
+            _mockDialogService.Verify(d => d.ShowMessage(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+
+            // 3. Проверяем, что лог содержит сообщение об успешном измерении.
+            Assert.That(_viewModel.LogText, Does.Contain($"{Result} '{MeasurementStatusService.CenterLocationName}': x=0.331, y=0.322, Lv=200.0, T=6000"));
+
+            // 4. Проверяем, что измерения были добавлены в CurrentDevice.
+            Assert.That(_viewModel._currentDevice.Measurements.Count, Is.GreaterThan(0));
+            Assert.That(_viewModel._currentDevice.Measurements.Any(m => m.Location == MeasurementStatusService.CenterLocationName), Is.True);
+        }
+
+        [Test]
+        public async Task MeasureCommand_Execute_HandlesMeasurementFailure()
+        {
+            // Arrange
+            _viewModel.IsDeviceConnected = true;
             _viewModel.IsDeviceCalibrated = true;
-            _mockColorMeasurementService.Raise(s => s.CalibrationStatusChanged += null, null, true);
+            _viewModel.SerialNumber = "FAILSN";
+            _viewModel.MeasurementTime = 1;
+            // _viewModel.InitializeViewModel(); // Убрано, так как этого метода нет в ViewModel
+            _viewModel.ExecuteApplySerialNumber(_viewModel.SerialNumber); // Устанавливаем SN и подтверждаем
 
+            _mockColorMeasurementService.Setup(s => s.MeasureAsync(It.IsAny<int>()))
+                                        .Returns(Task.FromResult((Models.Measurement)null));
+
+            // Act
+            _viewModel.MeasureCommand.Execute(MeasurementStatusService.CenterLocationName);
+            await Task.Delay(100); // Ждем завершения асинхронной операции
+
+            // Assert
+            _mockColorMeasurementService.Verify(s => s.MeasureAsync(It.IsAny<int>()), Times.Once);
+            Assert.That(_viewModel.LogText.Contains(ColorServiceErr), Is.True);
+            Assert.That(_viewModel._currentDevice?.Measurements.Count, Is.EqualTo(0));
+        }
+
+        // --- Тесты для SwitchLanguageCommand ---
+        [Test]
+        public void SwitchLanguageCommand_Execute_ChangesLanguageAndLogs()
+        {
+            // Arrange
+            string langCode = "en-US";
+            // Мокируем вызов SetLanguage, так как это void-метод.
+            _mockLocalizationService.Setup(l => l.SetLanguage(langCode));
+
+            // Act
+            _viewModel.SwitchLanguageCommand.Execute(langCode);
+
+            // Assert
+            // Проверяем, что метод SetLanguage был вызван один раз.
+            _mockLocalizationService.Verify(l => l.SetLanguage(langCode), Times.Once);
+            // Для успешного переключения языка обычно не ожидается сообщение в логе (если только ViewModel не логирует успех)
+            // Если ViewModel логирует успех, добавьте: Assert.That(_viewModel.LogText.Contains("Language changed to en-US"), Is.True);
+        }
+
+        [Test]
+        public void SwitchLanguageCommand_Execute_HandlesLanguageSwitchFailure()
+        {
+            // Arrange
+            string langCode = "invalidcode";
+
+            // Мокируем SetLanguage так, чтобы он ВЫБРОСИЛ ИСКЛЮЧЕНИЕ
+            _mockLocalizationService
+                .Setup(l => l.SetLanguage(langCode))
+                .Throws(new InvalidOperationException("Simulated language switch error.")); // Имитируем выброс исключения
+
+            // Act
+            _viewModel.SwitchLanguageCommand.Execute(langCode);
+
+            // Assert
+            // Проверяем, что метод SetLanguage был вызван один раз.
+            _mockLocalizationService.Verify(l => l.SetLanguage(langCode), Times.Once);
+
+            // Проверяем, что DialogService показал сообщение об ошибке, содержащее ErrMsgLangSwitchFailed.
+            _mockDialogService.Verify(d => d.ShowMessage(
+                It.Is<string>(msg => msg.Contains(_mockLocalizationService.Object.GetString(ErrMsgLangSwitchFailed))),
+                It.Is<string>(title => title == _mockLocalizationService.Object.GetString(Err))
+            ), Times.Once);
+
+        }
+
+        // --- Тесты для NewDeviceUnderTestCommand ---
+        [Test]
+        public void NewDeviceUnderTestCommand_Execute_CreatesNewDevice()
+        {
+            // Arrange
+            _viewModel.ExecuteApplySerialNumber("OLDSN"); // Создаем старое устройство
+            Assert.That(_viewModel._currentDevice, Is.Not.Null);
+            var oldDevice = _viewModel._currentDevice;
+            oldDevice.AddMeasurement(new Models.Measurement { Location = MeasurementStatusService.CenterLocationName, IsValid = true, x = 0.331, y = 0.322, Lv = 200, T = 6000 });
+
+            // ДОБАВЛЕНО: Мокируем ShowQuestion, чтобы он вернул true (подтверждаем очистку)
+            _mockDialogService.Setup(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+
+            // Act
+            _viewModel.NewDeviceUnderTestCommand.Execute(null);
+
+            // Assert
+            Assert.That(_viewModel._currentDevice, Is.Null);
+            Assert.That(_viewModel.SerialNumber, Is.Empty); // SN должен быть сброшен
+            Assert.That(_viewModel.IsSerialNumberConfirmed, Is.False); // SN не подтвержден
+        }
+
+        // --- Тесты для LaunchExternalProgramCommand ---
+        [Test]
+        public void LaunchExternalProgramCommand_Execute_LaunchesProgram()
+        {
+            // Arrange
+            string programPath = "notepad.exe";
+            // Теперь мокируем новый метод RunExternalProgram в IFileService
+            _mockFileService.Setup(f => f.RunExternalProgram(It.IsAny<string>())).Returns(true);
+
+            // Act
+            _viewModel.LaunchExternalProgramCommand.Execute(programPath);
+
+            // Assert
+            // Теперь проверяем, что ViewModel вызвал RunExternalProgram у IFileService
+            _mockFileService.Verify(f => f.RunExternalProgram(It.Is<string>(p => p.Contains(programPath))), Times.Once);
+            // Проверяем, что в логе было сообщение об успехе, если ViewModel его добавляет
+            // Assert.That(_viewModel.LogText.Contains($"Launched program: {programPath}"), Is.True);
+        }
+
+        [Test]
+        public void LaunchExternalProgramCommand_Execute_HandlesProgramNotFound()
+        {
+            // Arrange
+            // Передаем только имя программы, как теперь ожидает ViewModel
+            string programName = "nonexistent.exe";
+
+            // Мокируем, что RunExternalProgram будет вызван с этим именем и вернет false.
+            // Теперь Moq будет ожидать именно "nonexistent.exe", а не полный путь.
+            _mockFileService.Setup(f => f.RunExternalProgram(programName)).Returns(false);
+
+            // Act
+            // Передаем название программы
+            _viewModel.LaunchExternalProgramCommand.Execute(programName);
+
+            // Assert
+            // Проверяем, что ViewModel вызвал RunExternalProgram у IFileService с ПРАВИЛЬНЫМ НАЗВАНИЕМ ПРОГРАММЫ.
+            _mockFileService.Verify(f => f.RunExternalProgram(programName), Times.Once);
+
+            // Проверяем, что DialogService показал сообщение об ошибке.
+            // Используем мок ILocalizationService для получения ожидаемых строк.
+            // (Как мы выяснили ранее, если ресурсы возвращают локализованные строки, то Verify должен ожидать их).
+            _mockDialogService.Verify(d => d.ShowMessage(
+                It.Is<string>(msg => msg == _mockLocalizationService.Object.GetString(RunExternalAppNotFoundErr)),
+                It.Is<string>(title => title == _mockLocalizationService.Object.GetString(Err))
+            ), Times.Once);
+
+            // Проверяем, что в лог было добавлено сообщение об ошибке.
+            // Если вы добавили имя программы в лог, то ожидаем его здесь:
+            Assert.That(_viewModel.LogText.Contains($"{_mockLocalizationService.Object.GetString(RunExternalAppNotFoundErr)}: {programName}"), Is.True);
+            // Если просто сообщение об ошибке без имени программы:
+            // Assert.That(_viewModel.LogText.Contains(_mockLocalizationService.Object.GetString(RunExternalAppNotFoundErr)), Is.True);
+        }
+
+        [Test]
+        public void LaunchExternalProgramCommand_Execute_HandlesUnexpectedError()
+        {
+            // Arrange
+            string programPath = "some_program.exe";
+            string errorMessage = "Access denied.";
+            // Мокируем, что RunExternalProgram выбросит исключение или вернет false
+            _mockFileService.Setup(f => f.RunExternalProgram(It.IsAny<string>())).Throws(new Exception(errorMessage));
+
+            // Act
+            _viewModel.LaunchExternalProgramCommand.Execute(programPath);
+
+            // Assert
+            _mockFileService.Verify(f => f.RunExternalProgram(It.Is<string>(p => p.Contains(programPath))), Times.Once);
+            _mockDialogService.Verify(d => d.ShowMessage(
+                It.Is<string>(msg => msg.Contains(RunExternalAppUnexpectedErr) && msg.Contains(errorMessage)),
+                It.Is<string>(title => title == Err)
+            ), Times.Once);
+            Assert.That(_viewModel.LogText.Contains(RunExternalAppUnexpectedErr), Is.True);
+            Assert.That(_viewModel.LogText.Contains(errorMessage), Is.True);
+        }
+
+        // --- Тесты для Dispose ---
+        [Test]
+        public void Dispose_CleansUpResources()
+        {
+            // Arrange
+            _viewModel.AddLogMessage("Test log");
+            _viewModel.SerialNumber = "DisposeTest";
+            _viewModel.IsDeviceConnected = true;
+            _viewModel.IsDeviceCalibrated = true;
+            _viewModel.IsSerialNumberConfirmed = true;
+            _viewModel.IsMeasurementButtonsEnabled = true;
+
+            // Act
+            _viewModel.Dispose();
+
+            // Assert
+            Assert.That(_viewModel.LogText, Is.Not.Empty);
+            Assert.That(_viewModel.LogText.Contains(ViewModelCleared), Is.True);
+            Assert.That(_viewModel.SerialNumber, Is.Empty);
+            Assert.That(_viewModel.IsDeviceConnected, Is.False);
+            Assert.That(_viewModel.IsDeviceCalibrated, Is.False);
+            Assert.That(_viewModel.IsSerialNumberConfirmed, Is.False);
+            Assert.That(_viewModel.IsMeasurementButtonsEnabled, Is.False);
+
+            _mockColorMeasurementService.As<IDisposable>().Verify(d => d.Dispose(), Times.Once);
+            _mockFileService.As<IDisposable>().Verify(d => d.Dispose(), Times.Once);
+        }
+
+        // --- Тесты для CanExecute методов команд (примеры) ---
+        [Test]
+        public void ZeroCalibrationCommand_CanExecute_ReturnsTrue_WhenConnected()
+        {
+            _viewModel.IsDeviceConnected = true;
+            Assert.That(_viewModel.ZeroCalibrationCommand.CanExecute(null), Is.True);
+        }
+
+        [Test]
+        public void ZeroCalibrationCommand_CanExecute_ReturnsFalse_WhenNotConnected()
+        {
+            _viewModel.IsDeviceConnected = false;
+            Assert.That(_viewModel.ZeroCalibrationCommand.CanExecute(null), Is.False);
+        }
+
+        [Test]
+        public void MeasureCommand_CanExecute_ReturnsTrue_WhenConnectedCalibratedAndSNPresentAndConfirmed()
+        {
+            _viewModel.IsDeviceConnected = true;
+            _viewModel.IsDeviceCalibrated = true;
+            _viewModel.SerialNumber = "SomeSN";
+            _viewModel.IsSerialNumberConfirmed = true;
+            // Проверяем, что ExecuteMeasureAsync не выполняется в данный момент.
+            // Это можно сделать, например, через флаг IsMeasuring, если бы он был,
+            // или косвенно, если кнопки блокируются через IsMeasurementButtonsEnabled
+            // Если MeasureCommand.CanExecute зависит от _viewModel.IsMeasurementButtonsEnabled, то
+            // Assert.That(_viewModel.IsMeasurementButtonsEnabled, Is.True);
             Assert.That(_viewModel.MeasureCommand.CanExecute(null), Is.True);
         }
 
-        // --- Тесты CanExecute команд ---
-
         [Test]
-        public void ZeroCalibrationCommand_CanExecute_ReturnsTrueWhenConnectedAndNotCalibrating()
+        public void MeasureCommand_CanExecute_ReturnsFalse_WhenNotConnected()
         {
-            _mockColorMeasurementService.SetupGet(s => s.IsConnected).Returns(true);
-            _viewModel.IsDeviceConnected = true;
-            Assert.That(_viewModel.ZeroCalibrationCommand.CanExecute(null), Is.True);
-        }
-
-        [Test]
-        public void ZeroCalibrationCommand_CanExecute_ReturnsFalseWhenNotConnected()
-        {
-            _mockColorMeasurementService.SetupGet(s => s.IsConnected).Returns(false);
-            _viewModel.IsDeviceConnected = false;
-            Assert.That(_viewModel.ZeroCalibrationCommand.CanExecute(null), Is.False);
-        }
-
-        [Test]
-        public void MeasureCommand_CanExecute_ReturnsTrueWhenConnectedCalibratedAndSNConfirmed()
-        {
-            _mockColorMeasurementService.SetupGet(s => s.IsConnected).Returns(true);
-            _mockColorMeasurementService.SetupGet(s => s.IsCalibrated).Returns(true);
-            _viewModel.IsDeviceConnected = true;
-            _viewModel.IsDeviceCalibrated = true;
-            _viewModel.SerialNumber = "TESTSN";
-            _viewModel.IsSerialNumberConfirmed = true;
-            Assert.That(_viewModel.MeasureCommand.CanExecute(null), Is.True);
-        }
-
-        [Test]
-        public void MeasureCommand_CanExecute_ReturnsFalseWhenDisconnected()
-        {
-            _mockColorMeasurementService.SetupGet(s => s.IsConnected).Returns(false);
             _viewModel.IsDeviceConnected = false;
             _viewModel.IsDeviceCalibrated = true;
-            _viewModel.SerialNumber = "TESTSN";
+            _viewModel.SerialNumber = "SomeSN";
             _viewModel.IsSerialNumberConfirmed = true;
             Assert.That(_viewModel.MeasureCommand.CanExecute(null), Is.False);
         }
 
         [Test]
-        public void MeasureCommand_CanExecute_ReturnsFalseWhenNotCalibrated()
+        public void MeasureCommand_CanExecute_ReturnsFalse_WhenNotCalibrated()
         {
-            _mockColorMeasurementService.SetupGet(s => s.IsConnected).Returns(true);
-            _mockColorMeasurementService.SetupGet(s => s.IsCalibrated).Returns(false);
             _viewModel.IsDeviceConnected = true;
             _viewModel.IsDeviceCalibrated = false;
-            _viewModel.SerialNumber = "TESTSN";
+            _viewModel.SerialNumber = "SomeSN";
             _viewModel.IsSerialNumberConfirmed = true;
             Assert.That(_viewModel.MeasureCommand.CanExecute(null), Is.False);
         }
 
         [Test]
-        public void MeasureCommand_CanExecute_ReturnsFalseWhenSerialNumberNotConfirmed()
+        public void MeasureCommand_CanExecute_ReturnsFalse_WhenSerialNumberIsEmpty()
         {
-            _mockColorMeasurementService.SetupGet(s => s.IsConnected).Returns(true);
-            _mockColorMeasurementService.SetupGet(s => s.IsCalibrated).Returns(true);
             _viewModel.IsDeviceConnected = true;
             _viewModel.IsDeviceCalibrated = true;
             _viewModel.SerialNumber = "";
@@ -309,538 +1006,18 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             Assert.That(_viewModel.MeasureCommand.CanExecute(null), Is.False);
         }
 
-        [Test]
-        public void SaveResultsCommand_CanExecute_ReturnsTrueWhenDeviceHasMeasurements()
-        {
-            _viewModel.ExecuteApplySerialNumber("SN123");
-            _viewModel._currentDevice.AddMeasurement(new Measurement { Location = "Test", IsValid = true });
-            Assert.That(_viewModel.SaveResultsCommand.CanExecute(null), Is.True);
-        }
-
-        [Test]
-        public void SaveResultsCommand_CanExecute_ReturnsFalseWhenNoDeviceOrNoMeasurements()
-        {
-            Assert.That(_viewModel.SaveResultsCommand.CanExecute(null), Is.False);
-
-            _viewModel.ExecuteApplySerialNumber("SN123");
-            Assert.That(_viewModel.SaveResultsCommand.CanExecute(null), Is.False);
-        }
-
-        [Test]
-        public void ClearFieldsCommand_CanExecute_ReturnsTrueAlways()
-        {
-            Assert.That(_viewModel.ClearFieldsCommand.CanExecute(null), Is.True);
-        }
-
-        [Test]
-        public void SwitchLanguageCommand_CanExecute_ReturnsTrueWhenParameterIsString()
-        {
-            Assert.That(_viewModel.SwitchLanguageCommand.CanExecute("en-US"), Is.True);
-            Assert.That(_viewModel.SwitchLanguageCommand.CanExecute(null), Is.False);
-            Assert.That(_viewModel.SwitchLanguageCommand.CanExecute(123), Is.False);
-        }
-
-        [Test]
-        public void ApplySerialNumberCommand_CanExecute_ReturnsTrueAlways()
-        {
-            Assert.That(_viewModel.ApplySerialNumberCommand.CanExecute("ABC123"), Is.True);
-            Assert.That(_viewModel.ApplySerialNumberCommand.CanExecute(""), Is.True);
-        }
-
-        [Test]
-        public void ApplyMeasurementTimeCommand_CanExecute_ReturnsTrueAlways()
-        {
-            Assert.That(_viewModel.ApplyMeasurementTimeCommand.CanExecute("10"), Is.True);
-            Assert.That(_viewModel.ApplyMeasurementTimeCommand.CanExecute("invalid"), Is.True);
-        }
-
-        [Test]
-        public void NewDeviceUnderTestCommand_CanExecute_ReturnsTrueWhenDeviceExistsWithMeasurements()
-        {
-            _viewModel.ExecuteApplySerialNumber("SN123");
-            _viewModel._currentDevice.AddMeasurement(new Measurement { Location = "Test", IsValid = true });
-            Assert.That(_viewModel.NewDeviceUnderTestCommand.CanExecute(null), Is.True);
-        }
-
-        [Test]
-        public void NewDeviceUnderTestCommand_CanExecute_ReturnsFalseWhenNoDeviceOrNoMeasurements()
-        {
-            Assert.That(_viewModel.NewDeviceUnderTestCommand.CanExecute(null), Is.False);
-
-            _viewModel.ExecuteApplySerialNumber("SN123");
-            Assert.That(_viewModel.NewDeviceUnderTestCommand.CanExecute(null), Is.False);
-        }
-
-        [Test]
-        public void LaunchExternalProgramCommand_CanExecute_ReturnsTrueAlways()
-        {
-            Assert.That(_viewModel.LaunchExternalProgramCommand.CanExecute(null), Is.True);
-        }
-
-        [Test]
-        public void ClearLogCommand_CanExecute_ReturnsTrueAlways()
-        {
-            Assert.That(_viewModel.ClearLogCommand.CanExecute(null), Is.True);
-        }
-
-        // --- Тесты команды ZeroCalibration ---
-
-        [Test]
-        public async Task ZeroCalibrationCommand_Execute_CallsCalibrateZeroAsyncAndUpdatesStatus()
-        {
-            _mockColorMeasurementService.SetupGet(s => s.IsConnected).Returns(true);
-            _viewModel.IsDeviceConnected = true;
-
-            _mockColorMeasurementService.Setup(s => s.CalibrateZeroAsync()).Returns(Task.CompletedTask);
-
-            await _viewModel.ZeroCalibrationCommand.ExecuteAsync(null);
-
-            _mockColorMeasurementService.Verify(s => s.CalibrateZeroAsync(), Times.Once());
-            _mockColorMeasurementService.Raise(s => s.CalibrationStatusChanged += null, null, true);
-            Assert.That(_viewModel.IsDeviceCalibrated, Is.True);
-            Assert.That(_viewModel.LogText, Does.Contain("Очистка ViewModel"));
-        }
-
-        [Test]
-        public async Task ZeroCalibrationCommand_Execute_ConnectsIfDisconnectedThenCalibrates()
-        {
-            _mockColorMeasurementService.SetupGet(s => s.IsConnected).Returns(false);
-            _viewModel.IsDeviceConnected = false;
-
-            _mockColorMeasurementService.Setup(s => s.ConnectAsync()).Returns(Task.CompletedTask);
-            _mockColorMeasurementService.Setup(s => s.CalibrateZeroAsync()).Returns(Task.CompletedTask);
-
-            await _viewModel.ZeroCalibrationCommand.ExecuteAsync(null);
-
-            _mockColorMeasurementService.Verify(s => s.ConnectAsync(), Times.Once());
-            _mockColorMeasurementService.Verify(s => s.CalibrateZeroAsync(), Times.Once());
-        }
-
-        [Test]
-        public async Task ZeroCalibrationCommand_Execute_HandlesException()
-        {
-            _mockColorMeasurementService.SetupGet(s => s.IsConnected).Returns(true);
-            _viewModel.IsDeviceConnected = true;
-
-            _mockColorMeasurementService.Setup(s => s.CalibrateZeroAsync()).ThrowsAsync(new Exception("Calibration error"));
-            _mockDialogService.Setup(d => d.ShowMessage(It.IsAny<string>(), It.IsAny<string>()));
-
-            await _viewModel.ZeroCalibrationCommand.ExecuteAsync(null);
-
-            _mockDialogService.Verify(d => d.ShowMessage(
-                It.Is<string>(msg => msg.Contains("Ошибка при калибровке")),
-                It.Is<string>(title => title == "Ошибка")), Times.Once());
-            _mockColorMeasurementService.Verify(s => s.Disconnect(), Times.Once());
-        }
-
-        // --- Тесты команды SaveResults ---
-
-        [Test]
-        public async Task SaveResultsCommand_Execute_SavesDeviceDataToFile()
-        {
-            _viewModel.ExecuteApplySerialNumber("TESTSN");
-            var measurement = new Measurement { Location = "Top", x = 0.3, y = 0.3, Lv = 100, T = 6500, IsValid = true };
-            _viewModel._currentDevice.AddMeasurement(measurement);
-
-            // ИСПРАВЛЕНИЕ: Изменено с ReturnsAsync(true) на Returns(Task.CompletedTask)
-            _mockFileService.Setup(f => f.SaveDeviceDataToJsonAsync(It.IsAny<DeviceUnderTest>())).Returns(Task.CompletedTask);
-            _mockDialogService.Setup(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
-
-            await _viewModel.SaveResultsCommand.ExecuteAsync(null);
-
-            _mockFileService.Verify(f => f.SaveDeviceDataToJsonAsync(_viewModel._currentDevice), Times.Once());
-            Assert.That(_viewModel.LogText, Does.Contain("Сохранение..."));
-        }
-
-        [Test]
-        public async Task SaveResultsCommand_Execute_ShowsWarningAndCanBeCanceledIfNotFull()
-        {
-            _viewModel.ExecuteApplySerialNumber("TESTSN");
-            var measurement = new Measurement { Location = "Top", x = 0.3, y = 0.3, Lv = 100, T = 6500, IsValid = true };
-            _viewModel._currentDevice.AddMeasurement(measurement);
-            _mockDialogService.Setup(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>())).Returns(false);
-
-            await _viewModel.SaveResultsCommand.ExecuteAsync(null);
-
-            _mockDialogService.Verify(d => d.ShowQuestion("Не все измерения собраны", "Предупреждение"), Times.Once());
-            // ИСПРАВЛЕНИЕ: Изменено с ReturnsAsync(true) на Returns(Task.CompletedTask)
-            _mockFileService.Verify(f => f.SaveDeviceDataToJsonAsync(It.IsAny<DeviceUnderTest>()), Times.Never());
-            Assert.That(_viewModel.LogText, Does.Contain("Сохранение отменено"));
-        }
-
-        [Test]
-        public async Task SaveResultsCommand_Execute_HandlesFileServiceException()
-        {
-            _viewModel.ExecuteApplySerialNumber("TESTSN");
-            var measurement = new Measurement { Location = "Top", x = 0.3, y = 0.3, Lv = 100, T = 6500, IsValid = true };
-            _viewModel._currentDevice.AddMeasurement(measurement);
-            _mockFileService.Setup(f => f.SaveDeviceDataToJsonAsync(It.IsAny<DeviceUnderTest>()))
-                .ThrowsAsync(new IOException("Disk error"));
-            _mockDialogService.Setup(d => d.ShowMessage(It.IsAny<string>(), It.IsAny<string>()));
-            _mockDialogService.Setup(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
-
-            await _viewModel.SaveResultsCommand.ExecuteAsync(null);
-
-            _mockDialogService.Verify(d => d.ShowMessage(
-                It.Is<string>(msg => msg.Contains("Disk error")),
-                It.Is<string>(title => title == "Ошибка")), Times.Once());
-            Assert.That(_viewModel.LogText, Does.Contain("Непредвиденная ошибка: Disk error"));
-        }
-
-        // --- Тесты команды ClearFields ---
-
-        [Test]
-        public void ClearFieldsCommand_Execute_ResetsPropertiesAndStatuses()
-        {
-            _viewModel.SerialNumber = "OLD_SN";
-            _viewModel.IsSerialNumberConfirmed = true;
-            _viewModel.MeasurementTime = 10;
-            _viewModel.LogText = "Some old log message";
-            _viewModel.ExecuteApplySerialNumber("SN123");
-            _viewModel._currentDevice.AddMeasurement(new Measurement { Location = "Test", IsValid = true });
-
-            var status = MeasurementStatusManager.Instance.AllMeasurementButtonStatuses.FirstOrDefault();
-            if (status != null)
-            {
-                status.IsPassed = true;
-                status.MeasuredValuesString = "x=0.1, y=0.2";
-            }
-
-            _mockDialogService.Setup(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
-
-            _viewModel.ClearFieldsCommand.Execute(null);
-
-            Assert.That(_viewModel.SerialNumber, Is.Empty);
-            Assert.That(_viewModel.IsSerialNumberConfirmed, Is.False);
-            Assert.That(_viewModel.MeasurementTime, Is.EqualTo(2));
-            Assert.That(_viewModel.LogText, Does.Contain("Поля очищены."));
-            Assert.That(_viewModel._currentDevice, Is.Null);
-
-            foreach (var s in MeasurementStatusManager.Instance.AllMeasurementButtonStatuses)
-            {
-                Assert.That(s.IsPassed, Is.Null);
-                Assert.That(s.MeasuredValuesString, Is.Empty);
-            }
-        }
-
-        [Test]
-        public void ClearFieldsCommand_Execute_HandlesCancellation()
-        {
-            _viewModel.SerialNumber = "OLD_SN";
-            _mockDialogService.Setup(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>())).Returns(false);
-
-            _viewModel.ClearFieldsCommand.Execute(null);
-
-            Assert.That(_viewModel.SerialNumber, Is.EqualTo("OLD_SN"));
-            Assert.That(_viewModel.LogText, Does.Not.Contain("Поля очищены."));
-        }
-
-        // --- Тесты команды SwitchLanguage ---
-
-        [Test]
-        public void SwitchLanguageCommand_Execute_SetsLanguage()
-        {
-            _mockLocalizationService.Setup(l => l.SetLanguage("en-US"));
-            _mockLocalizationService.Setup(l => l.CurrentCulture).Returns(new System.Globalization.CultureInfo("en-US"));
-
-            _viewModel.SwitchLanguageCommand.Execute("en-US");
-
-            _mockLocalizationService.Verify(l => l.SetLanguage("en-US"), Times.Once());
-            Assert.That(System.Threading.Thread.CurrentThread.CurrentCulture.Name, Is.EqualTo("en-US"));
-            Assert.That(System.Threading.Thread.CurrentThread.CurrentUICulture.Name, Is.EqualTo("en-US"));
-        }
-
-        [Test]
-        public void SwitchLanguageCommand_Execute_HandlesException()
-        {
-            _mockLocalizationService.Setup(l => l.SetLanguage(It.IsAny<string>())).Throws(new Exception("Language switch failed"));
-            _mockDialogService.Setup(d => d.ShowMessage(It.IsAny<string>(), It.IsAny<string>()));
-
-            _viewModel.SwitchLanguageCommand.Execute("invalid-code");
-
-            _mockDialogService.Verify(d => d.ShowMessage(
-                It.Is<string>(msg => msg.Contains("Ошибка смены языка: Language switch failed")),
-                It.Is<string>(title => title == "Ошибка")), Times.Once());
-        }
-
-        // --- Тесты команды MeasureCommand ---
-
-        [Test]
-        public async Task MeasureCommand_Execute_PerformsMeasurementAndUpdatesStatus()
-        {
-            _mockColorMeasurementService.SetupGet(s => s.IsConnected).Returns(true);
-            _mockColorMeasurementService.SetupGet(s => s.IsCalibrated).Returns(true);
-            _viewModel.IsDeviceConnected = true;
-            _viewModel.IsDeviceCalibrated = true;
-            _viewModel.SerialNumber = "TESTSN";
-            _viewModel.IsSerialNumberConfirmed = true;
-            _viewModel.MeasurementTime = 5;
-
-            var mockMeasurement = new Measurement { x = 0.3, y = 0.35, Lv = 123.45, T = 6500, IsValid = true };
-            _mockColorMeasurementService.Setup(s => s.MeasureAsync(5))
-                .ReturnsAsync(mockMeasurement);
-
-            string measurementLocation = "TopLeft";
-            MeasurementStatusManager.Instance.AllMeasurementButtonStatuses.Add(new MeasurementStatusViewModel { Location = measurementLocation });
-
-            await _viewModel.MeasureCommand.ExecuteAsync(measurementLocation);
-
-            _mockColorMeasurementService.Verify(s => s.MeasureAsync(5), Times.Once());
-
-            Assert.That(_viewModel.LogText, Does.Contain($"Тест начат для SN: TESTSN"));
-            Assert.That(_viewModel.LogText, Does.Contain($"Измерение..."));
-            Assert.That(_viewModel.LogText, Does.Contain($"Результат '{measurementLocation}': x=0.300, y=0.350, Lv=123.5, T=6500"));
-
-            Assert.That(_viewModel._currentDevice, Is.Not.Null);
-            Assert.That(_viewModel._currentDevice.SerialNumber, Is.EqualTo("TESTSN"));
-            Assert.That(_viewModel._currentDevice.Measurements.Count, Is.EqualTo(1));
-            Assert.That(_viewModel._currentDevice.Measurements.First().Location, Is.EqualTo(measurementLocation));
-            Assert.That(_viewModel._currentDevice.Measurements.First().Lv, Is.EqualTo(123.45));
-
-            var status = MeasurementStatusManager.Instance.AllMeasurementButtonStatuses.FirstOrDefault(s => s.Location == measurementLocation);
-            Assert.That(status, Is.Not.Null);
-            Assert.That(status.IsPassed, Is.True);
-            Assert.That(status.MeasuredValuesString, Is.EqualTo("x=0.300, y=0.350, Lv=123.5, T=6500"));
-        }
-
-        [Test]
-        public async Task MeasureCommand_Execute_HandlesLvTooLowValidation()
-        {
-            _mockColorMeasurementService.SetupGet(s => s.IsConnected).Returns(true);
-            _mockColorMeasurementService.SetupGet(s => s.IsCalibrated).Returns(true);
-            _viewModel.IsDeviceConnected = true;
-            _viewModel.IsDeviceCalibrated = true;
-            _viewModel.SerialNumber = "TESTSN";
-            _viewModel.IsSerialNumberConfirmed = true;
-            _viewModel.MeasurementTime = 5;
-
-            var mockMeasurement = new Measurement { x = 0.3, y = 0.35, Lv = 5.0, T = 6500, IsValid = true };
-            _mockColorMeasurementService.Setup(s => s.MeasureAsync(5))
-                .ReturnsAsync(mockMeasurement);
-
-            string measurementLocation = "TopLeft";
-            MeasurementStatusManager.Instance.AllMeasurementButtonStatuses.Add(new MeasurementStatusViewModel { Location = measurementLocation });
-
-            await _viewModel.MeasureCommand.ExecuteAsync(measurementLocation);
-
-            _mockColorMeasurementService.Verify(s => s.MeasureAsync(5), Times.Once());
-
-            Assert.That(_viewModel.LogText, Does.Contain($"Значение Lv слишком низкое: 5.0. Проверьте щуп"));
-            Assert.That(_viewModel.LogText, Does.Not.Contain($"Результат '{measurementLocation}':"));
-
-            Assert.That(_viewModel._currentDevice.Measurements.Count, Is.EqualTo(0));
-
-            var status = MeasurementStatusManager.Instance.AllMeasurementButtonStatuses.FirstOrDefault(s => s.Location == measurementLocation);
-            Assert.That(status, Is.Not.Null);
-            Assert.That(status.IsPassed, Is.False);
-            Assert.That(status.MeasuredValuesString, Is.EqualTo("Значение Lv слишком низкое: 5.0"));
-        }
-
-        [Test]
-        public async Task MeasureCommand_Execute_HandlesMeasurementException()
-        {
-            _mockColorMeasurementService.SetupGet(s => s.IsConnected).Returns(true);
-            _mockColorMeasurementService.SetupGet(s => s.IsCalibrated).Returns(true);
-            _viewModel.IsDeviceConnected = true;
-            _viewModel.IsDeviceCalibrated = true;
-            _viewModel.SerialNumber = "TESTSN";
-            _viewModel.IsSerialNumberConfirmed = true;
-            _viewModel.MeasurementTime = 5;
-
-            _mockColorMeasurementService.Setup(s => s.MeasureAsync(It.IsAny<int>()))
-                .ThrowsAsync(new InvalidOperationException("Device communication error"));
-
-            string measurementLocation = "BottomRight";
-            MeasurementStatusManager.Instance.AllMeasurementButtonStatuses.Add(new MeasurementStatusViewModel { Location = measurementLocation });
-
-            _mockDialogService.Setup(d => d.ShowMessage(It.IsAny<string>(), It.IsAny<string>()));
-
-            await _viewModel.MeasureCommand.ExecuteAsync(measurementLocation);
-
-            _mockColorMeasurementService.Verify(s => s.MeasureAsync(It.IsAny<int>()), Times.Once());
-
-            _mockDialogService.Verify(d => d.ShowMessage(
-                It.Is<string>(msg => msg.Contains("Непредвиденная ошибка измерения 'BottomRight': Device communication error")),
-                It.Is<string>(title => title == "Ошибка")), Times.Once());
-
-            var status = MeasurementStatusManager.Instance.AllMeasurementButtonStatuses.FirstOrDefault(s => s.Location == measurementLocation);
-            Assert.That(status, Is.Not.Null);
-            Assert.That(status.IsPassed, Is.False);
-            Assert.That(status.MeasuredValuesString, Is.EqualTo("Ошибка: Device communication error"));
-            Assert.That(_viewModel.LogText, Does.Not.Contain("Результат"));
-        }
-
-        // --- Тесты команды ApplySerialNumber ---
-
-        [Test]
-        public void ApplySerialNumberCommand_Execute_SetsSerialNumberAndConfirms()
-        {
-            string newSerialNumber = "ABC123XYZ";
-            _mockLocalizationService.Setup(l => l.GetString("strCurrentSN")).Returns("Текущий SN:");
-
-            _viewModel.ApplySerialNumberCommand.Execute(newSerialNumber);
-
-            Assert.That(_viewModel.SerialNumber, Is.EqualTo(newSerialNumber));
-            Assert.That(_viewModel.IsSerialNumberConfirmed, Is.True);
-            Assert.That(_viewModel._currentDevice, Is.Not.Null);
-            Assert.That(_viewModel._currentDevice.SerialNumber, Is.EqualTo(newSerialNumber));
-            Assert.That(_viewModel.LogText, Does.Contain($"Текущий SN: {newSerialNumber}"));
-        }
-
-        [Test]
-        public void ApplySerialNumberCommand_Execute_HandlesInvalidSerialNumber()
-        {
-            string invalidSerialNumber = "SN-123!";
-            _mockDialogService.Setup(d => d.ShowMessage(It.IsAny<string>(), It.IsAny<string>()));
-
-            _viewModel.ApplySerialNumberCommand.Execute(invalidSerialNumber);
-
-            Assert.That(_viewModel.SerialNumber, Is.Empty);
-            Assert.That(_viewModel.IsSerialNumberConfirmed, Is.False);
-            Assert.That(_viewModel._currentDevice, Is.Null);
-            _mockDialogService.Verify(d => d.ShowMessage(
-                It.Is<string>(msg => msg.Contains("Неверный формат SN")),
-                It.Is<string>(title => title == "Ошибка")), Times.Once());
-        }
-
-        // --- Тесты команды ApplyMeasurementTime ---
-
-        [Test]
-        public void ApplyMeasurementTimeCommand_Execute_SetsMeasurementTime()
-        {
-            string newTime = "15";
-            _mockLocalizationService.Setup(l => l.GetString("strCurrentMeasurementTime")).Returns("Текущее время измерения:");
-            _mockLocalizationService.Setup(l => l.GetString("strSeconds")).Returns("секунд");
-
-            _viewModel.ApplyMeasurementTimeCommand.Execute(newTime);
-
-            Assert.That(_viewModel.MeasurementTime, Is.EqualTo(15));
-            Assert.That(_viewModel.LogText, Does.Contain("Текущее время измерения: 15 секунд"));
-        }
-
-        [Test]
-        public void ApplyMeasurementTimeCommand_Execute_HandlesInvalidTime()
-        {
-            string invalidTime = "abc";
-            _mockDialogService.Setup(d => d.ShowMessage(It.IsAny<string>(), It.IsAny<string>()));
-
-            _viewModel.ApplyMeasurementTimeCommand.Execute(invalidTime);
-
-            Assert.That(_viewModel.MeasurementTime, Is.EqualTo(2));
-            _mockDialogService.Verify(d => d.ShowMessage(
-                It.Is<string>(msg => msg.Contains("Неверный формат времени измерения")),
-                It.Is<string>(title => title == "Ошибка")), Times.Once());
-        }
-
-        [Test]
-        public void ApplyMeasurementTimeCommand_Execute_HandlesZeroOrNegativeTime()
-        {
-            _mockDialogService.Setup(d => d.ShowMessage(It.IsAny<string>(), It.IsAny<string>()));
-
-            _viewModel.ApplyMeasurementTimeCommand.Execute("0");
-            Assert.That(_viewModel.MeasurementTime, Is.EqualTo(2));
-            _mockDialogService.Verify(d => d.ShowMessage(
-                It.Is<string>(msg => msg.Contains("Неверный формат времени измерения")),
-                It.Is<string>(title => title == "Ошибка")), Times.Once());
-
-            _mockDialogService.Invocations.Clear();
-            _viewModel.ApplyMeasurementTimeCommand.Execute("-5");
-            Assert.That(_viewModel.MeasurementTime, Is.EqualTo(2));
-            _mockDialogService.Verify(d => d.ShowMessage(
-                It.Is<string>(msg => msg.Contains("Неверный формат времени измерения")),
-                It.Is<string>(title => title == "Ошибка")), Times.Once());
-        }
-
-        // --- Тесты команды NewDeviceUnderTest ---
-
-        [Test]
-        public async Task NewDeviceUnderTestCommand_Execute_ClearsAndOffersSaveIfDataExists()
-        {
-            _viewModel.SerialNumber = "OLD_SN";
-            _viewModel.IsSerialNumberConfirmed = true;
-            _viewModel.ExecuteApplySerialNumber("OLD_SN");
-            _viewModel._currentDevice.AddMeasurement(new Measurement { Location = "Test", IsValid = true });
-
-            _mockDialogService.Setup(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
-            // ИСПРАВЛЕНИЕ: Изменено с ReturnsAsync(true) на Returns(Task.CompletedTask)
-            _mockFileService.Setup(f => f.SaveDeviceDataToJsonAsync(It.IsAny<DeviceUnderTest>())).Returns(Task.CompletedTask);
-
-            await _viewModel.NewDeviceUnderTestCommand.ExecuteAsync(null);
-
-            _mockFileService.Verify(f => f.SaveDeviceDataToJsonAsync(_viewModel._currentDevice), Times.Once());
-            Assert.That(_viewModel.SerialNumber, Is.Empty);
-            Assert.That(_viewModel._currentDevice, Is.Null);
-            Assert.That(_viewModel.IsSerialNumberConfirmed, Is.False);
-            Assert.That(_viewModel.LogText, Does.Contain("Поля очищены."));
-        }
-
-        [Test]
-        public async Task NewDeviceUnderTestCommand_Execute_ClearsWithoutSaveIfNoData()
-        {
-            _viewModel.SerialNumber = "NEW_SN";
-            _viewModel.IsSerialNumberConfirmed = true;
-            _mockDialogService.Setup(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
-
-            await _viewModel.NewDeviceUnderTestCommand.ExecuteAsync(null);
-
-            _mockFileService.Verify(f => f.SaveDeviceDataToJsonAsync(It.IsAny<DeviceUnderTest>()), Times.Never());
-            Assert.That(_viewModel.SerialNumber, Is.Empty);
-            Assert.That(_viewModel.IsSerialNumberConfirmed, Is.False);
-            Assert.That(_viewModel._currentDevice, Is.Null);
-            Assert.That(_viewModel.LogText, Does.Contain("Поля очищены."));
-        }
-
-        // --- Тесты команды ClearLog ---
-
-        [Test]
-        public void ClearLogCommand_Execute_ClearsLogText()
-        {
-            _viewModel.LogText = "Some log message to clear.";
-
-            _viewModel.ClearLogCommand.Execute(null);
-
-            Assert.That(_viewModel.LogText, Is.Empty);
-        }
-
-        // --- Тесты IDisposable ---
-
-        [Test]
-        public void Dispose_UnsubscribesFromEvents()
-        {
-            _viewModel.Dispose();
-
-            _mockColorMeasurementService.VerifyRemove(s => s.StatusMessage -= It.IsAny<EventHandler<string>>(), Times.Once());
-            _mockColorMeasurementService.VerifyRemove(s => s.ConnectionStatusChanged -= It.IsAny<EventHandler<bool>>(), Times.Once());
-            _mockColorMeasurementService.VerifyRemove(s => s.CalibrationStatusChanged -= It.IsAny<EventHandler<bool>>(), Times.Once());
-            _mockFileService.VerifyRemove(s => s.StatusMessage -= It.IsAny<EventHandler<string>>(), Times.Once());
-
-            Assert.That(_viewModel.LogText, Does.Contain("Очистка ViewModel"));
-            Assert.That(_viewModel.LogText, Does.Contain("ViewModel очищен"));
-        }
-
-        [Test]
-        public void Dispose_CallsDisposeOnServicesIfDisposable()
-        {
-            var mockColorServiceDisposable = _mockColorMeasurementService.As<IDisposable>();
-            var mockFileServiceDisposable = _mockFileService.As<IDisposable>();
-            var mockDialogServiceDisposable = _mockDialogService.As<IDisposable>();
-
-            _viewModel.Dispose();
-
-            mockColorServiceDisposable.Verify(d => d.Dispose(), Times.Once());
-            mockFileServiceDisposable.Verify(d => d.Dispose(), Times.Once());
-            mockDialogServiceDisposable.Verify(d => d.Dispose(), Times.Once());
-        }
-
-        // --- Тесты AreAllStatusesRepresentedInMeasurements ---
-
+        // --- Вспомогательные тесты ---
         [Test]
         public void AreAllStatusesRepresentedInMeasurements_ReturnsTrue_WhenAllPresent()
         {
-            _viewModel.ExecuteApplySerialNumber("SN_FULL");
-            foreach (var status in MeasurementStatusManager.Instance.AllMeasurementButtonStatuses)
+            _viewModel.ExecuteApplySerialNumber("SnFull");
+            Assert.That(_viewModel._currentDevice, Is.Not.Null);
+
+            var allExpectedLocations = MeasurementStatusService.Instance.AllMeasurementButtonStatuses.Select(s => s.Location).ToList();
+
+            foreach (var location in allExpectedLocations)
             {
-                _viewModel._currentDevice.AddMeasurement(new Measurement { Location = status.Location, IsValid = true });
+                _viewModel._currentDevice.AddMeasurement(new Measurement { Location = location, IsValid = true });
             }
 
             bool result = _viewModel.AreAllStatusesRepresentedInMeasurements();
@@ -851,7 +1028,9 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         [Test]
         public void AreAllStatusesRepresentedInMeasurements_ReturnsFalse_WhenNotAllPresent()
         {
-            _viewModel.ExecuteApplySerialNumber("SN_PARTIAL");
+            _viewModel.ExecuteApplySerialNumber("SnPartial");
+            Assert.That(_viewModel._currentDevice, Is.Not.Null);
+
             _viewModel._currentDevice.AddMeasurement(new Measurement { Location = "TopLeft", IsValid = true });
 
             bool result = _viewModel.AreAllStatusesRepresentedInMeasurements();
@@ -862,6 +1041,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         [Test]
         public void AreAllStatusesRepresentedInMeasurements_ReturnsFalse_WhenNoDevice()
         {
+            _viewModel._currentDevice = null;
             bool result = _viewModel.AreAllStatusesRepresentedInMeasurements();
 
             Assert.That(result, Is.False);
@@ -870,7 +1050,9 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         [Test]
         public void AreAllStatusesRepresentedInMeasurements_ReturnsFalse_WhenDeviceHasNoMeasurements()
         {
-            _viewModel.ExecuteApplySerialNumber("SN_EMPTY");
+            _viewModel.ExecuteApplySerialNumber("SnEmpty");
+            Assert.That(_viewModel._currentDevice, Is.Not.Null);
+            Assert.That(_viewModel._currentDevice.Measurements, Is.Empty);
 
             bool result = _viewModel.AreAllStatusesRepresentedInMeasurements();
 

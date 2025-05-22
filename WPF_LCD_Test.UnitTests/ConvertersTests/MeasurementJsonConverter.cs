@@ -19,7 +19,7 @@ namespace WPF_LCD_Test.UnitTests.ConvertersTests
             public Measurement TestMeasurement { get; set; }
         }
 
-        // Жестко задаем значение, чтобы не зависеть от MeasurementStatusManager в тесте
+        // Жестко задаем значение, чтобы не зависеть от MeasurementStatusService в тесте
         private const string BlackColorLocationName = "BlackColor"; // Используем значение из вашего кода
 
         [Test]

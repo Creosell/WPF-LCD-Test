@@ -673,6 +673,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Incorrect path for calling an external program.
+        /// </summary>
+        public static string RunExternalAppInvalidPathErr {
+            get {
+                return ResourceManager.GetString("RunExternalAppInvalidPathErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error: External program file not found.
         /// </summary>
         public static string RunExternalAppNotFoundErr {

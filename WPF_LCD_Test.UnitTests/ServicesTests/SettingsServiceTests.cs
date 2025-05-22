@@ -4,7 +4,7 @@ using NUnit.Framework;
 using System.IO;
 using System.Text.Json;
 using WPF_LCD_Test.Models; // Убедитесь, что эта ссылка есть
-using WPF_LCD_Test.Interfaces;
+using WPF_LCD_Test.Services;
 using System;
 using System.Reflection; // Обязательно для рефлексии
 

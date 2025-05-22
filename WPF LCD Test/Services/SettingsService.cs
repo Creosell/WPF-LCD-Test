@@ -7,8 +7,9 @@ using System.Text.Json; // Для работы с JSON
 using WPF_LCD_Test.Models; // Ссылка на вашу модель AppSettings
 using System.Threading;
 using System.Diagnostics; // Для Lazy
+using WPF_LCD_Test.Interfaces; // Ссылка на интерфейс ISettingsService
 
-namespace WPF_LCD_Test.Interfaces
+namespace WPF_LCD_Test.Services
 {
     /// <summary>
     /// Сервис для загрузки и сохранения настроек приложения в JSON файл.

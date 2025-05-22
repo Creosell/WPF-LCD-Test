@@ -15,7 +15,7 @@ using WPF_LCD_Test.Commands; // Для класса RelayCommand и BaseViewMode
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models; // Для классов Model (Measurement, DeviceUnderTest)
 using static WPF_LCD_Test.Resources.Resources;
-using MeasurementStatusViewModel = WPF_LCD_Test.Interfaces.MeasurementStatusViewModel;
+using WPF_LCD_Test.Services; // Для сервисов (IFileService, IDialogService, ILocalizationService)
 
 // Класс ViewModel для MainWindow. Наследует от BaseViewModel для уведомлений UI.
 // Реализует IDisposable для очистки ресурсов (отписка от событий).
@@ -29,13 +29,13 @@ namespace WPF_LCD_Test.ViewModels
         private readonly IFileService _fileService; // Сервис для работы с файлами (зависимость)
         private readonly IDialogService _dialogService; // Сервис для показа диалогов (зависимость)
         private readonly ILocalizationService _localizationService; // Сервис для локализации (зависимость)
+        private readonly IDispatcher _dispatcher;
 
         public DeviceUnderTest? _currentDevice; // Текущее устройство под тестированием (объект Модели)
 
         // --- Приватные поля для хранения данных и состояния UI (будут привязаны к View) ---
         private string _serialNumber;
 
-        private readonly Dispatcher? _dispatcher; // Может быть null в тестовой среде
         private bool _isSerialNumberConfirmed = false;
 
         private int _measurementTime;
@@ -99,6 +99,7 @@ namespace WPF_LCD_Test.ViewModels
             }
         }
 
+
         // Время измерения в секундах
         public int MeasurementTime
         {
@@ -130,7 +131,7 @@ namespace WPF_LCD_Test.ViewModels
         {
             get => _isMeasurementButtonsEnabled;
             // Используем SetProperty в приватном сеттере
-            private set => SetProperty(ref _isMeasurementButtonsEnabled, value);
+            set => SetProperty(ref _isMeasurementButtonsEnabled, value);
         }
 
         // Флаг статуса подключения прибора
@@ -194,7 +195,8 @@ namespace WPF_LCD_Test.ViewModels
             IColorMeasurementService colorMeasurementService,
             IFileService fileService,
             IDialogService dialogService,
-            ILocalizationService localizationService
+            ILocalizationService localizationService,
+            IDispatcher dispatcher
         )
         {
             // Проверяем, что сервисы были корректно предоставлены
@@ -206,18 +208,14 @@ namespace WPF_LCD_Test.ViewModels
                 dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _localizationService =
                 localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+            _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
             // Инициализация свойств по умолчанию (как при старте приложения)
             _measurementTime = DefaultMeasurementTime;
             _serialNumber = ""; // Пустая строка по умолчанию
 
-            // Получаем Dispatcher UI-потока
-            _dispatcher = App.Current?.Dispatcher;
-
             // Инициализация команд, связывая их с методами Execute/CanExecute
             // Используем RelayCommand, который находится в папке Commands
-            //ConnectCommand = new RelayCommand(ExecuteConnectAsync, CanExecuteConnect); // Асинхронная команда
-            //DisconnectCommand = new RelayCommand(ExecuteDisconnect, CanExecuteDisconnect); // Синхронная команда (операция быстрая)
             ZeroCalibrationCommand = new RelayCommand(
                 ExecuteZeroCalibrationAsync,
                 CanExecuteZeroCalibration
@@ -278,7 +276,7 @@ namespace WPF_LCD_Test.ViewModels
             }
 
             // Получаем коллекцию всех статусов точек измерения из менеджера статусов
-            var allStatusPoints = MeasurementStatusManager.Instance.AllMeasurementButtonStatuses;
+            var allStatusPoints = MeasurementStatusService.Instance.AllMeasurementButtonStatuses;
 
             // Проверяем, что менеджер статусов содержит точки (хотя он должен быть инициализирован с ними)
             if (allStatusPoints == null || !allStatusPoints.Any())
@@ -573,7 +571,7 @@ namespace WPF_LCD_Test.ViewModels
 
                     if (
                         measurementName
-                            != MeasurementStatusManager.Instance.BlackColorStatus.Location
+                            != MeasurementStatusService.Instance.BlackColorStatus.Location
                         && resultMeasurement.Lv < 10
                     )
                     {
@@ -588,7 +586,7 @@ namespace WPF_LCD_Test.ViewModels
                         string LvFormatted =
                             (
                                 measurementName
-                                == MeasurementStatusManager.Instance.BlackColorStatus.Location
+                                == MeasurementStatusService.Instance.BlackColorStatus.Location
                             )
                                 ? resultMeasurement.Lv.ToString("F6", CultureInfo.InvariantCulture)
                                 : resultMeasurement.Lv.ToString("F1", CultureInfo.InvariantCulture);
@@ -784,45 +782,44 @@ namespace WPF_LCD_Test.ViewModels
             ResetMeasurementStatuses();
         }
 
-        private void ExecuteClearLog()
+        public void ExecuteClearLog()
         {
             LogText = string.Empty; // Просто устанавливаем строку лога в пустую
             // Свойство LogText вызывает SetProperty.
         }
 
-        private void ExecuteLaunchExternalProgramCommand(object parameter) // Parameter может быть null, если не используется
+        private void ExecuteLaunchExternalProgramCommand(object parameter)
         {
             try
             {
-                // !!! Определение пути к внешнему исполняемому файлу !!!
-                // Получаем директорию, где находится ваше приложение.
-                string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                // Теперь параметр - это название программы, а не полный путь.
+                string executableName = parameter as string;
 
-                //string exeFileFolder = "Tools"; // Папка с exe файлом (если есть)
-
-                // Определите путь к вашему exe файлу относительно директории приложения.
-                // Пример 1: exe находится прямо в папке с приложением
-                string executableName = "ReportGenerator.exe";
-                string executablePath = Path.Combine(appDirectory, executableName);
-                //string executablePath = Path.Combine(appDirectory, exeFileFolder, executableName);
-
-                // !!! Опционально: проверка существования файла !!!
-                if (File.Exists(executablePath))
+                if (string.IsNullOrWhiteSpace(executableName))
                 {
-                    Process.Start(executablePath);
+                    // Сообщение об ошибке, если название программы не предоставлено
+                    _dialogService.ShowMessage(
+                        _localizationService.GetString(RunExternalAppNotFoundErr), // Предполагаем, что у вас есть такой ресурс
+                        _localizationService.GetString(Err)
+                    );
+                    AddLogMessage($"{_localizationService.GetString(RunExternalAppNotFoundErr)}");
+                    return;
                 }
-                else
+
+                // FileService теперь будет отвечать за построение полного пути
+                // (например, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, executableName))
+                bool success = _fileService.RunExternalProgram(executableName);
+
+                if (!success)
                 {
-                    // Если файл не найден, логируем ошибку и, возможно, показываем сообщение пользователю
-                    AddLogMessage($"{RunExternalAppNotFoundErr}: {executablePath}");
-                    // Предполагаем, что у вас есть сервис диалогов _dialogService
+                    _dialogService.ShowMessage(_localizationService.GetString(RunExternalAppNotFoundErr), _localizationService.GetString(Err));
+                    AddLogMessage($"{_localizationService.GetString(RunExternalAppNotFoundErr)}: {executableName}"); // Добавим имя программы в лог
                 }
             }
             catch (Exception ex)
             {
-                // Обработка любых ошибок, которые могут возникнуть при запуске процесса
-                // Например, если у пользователя нет прав на запуск или произошла другая системная ошибка.
-                AddLogMessage($"{RunExternalAppUnexpectedErr}: {ex.Message}");
+                AddLogMessage($"{_localizationService.GetString(RunExternalAppUnexpectedErr)}: {ex.Message}");
+                _dialogService.ShowMessage($"{_localizationService.GetString(RunExternalAppUnexpectedErr)}: {ex.Message}", _localizationService.GetString(Err));
             }
         }
 
@@ -846,7 +843,7 @@ namespace WPF_LCD_Test.ViewModels
         // Проверка доступности команды Калибровка нуля: доступна, если прибор ПОДКЛЮЧЕН И НЕ КАЛИБРОВАН
         private bool CanExecuteZeroCalibration(object parameter)
         {
-            return !_isDeviceConnecting && !_isDeviceCalibrating;
+            return !_isDeviceConnecting && !_isDeviceCalibrating &&_isDeviceConnected;
         }
 
         // Проверка доступности команды Сохранить: есть объект устройства, серийный номер и измерения
@@ -906,7 +903,7 @@ namespace WPF_LCD_Test.ViewModels
                 && _currentDevice.Measurements.Count > 0;
         }
 
-        private void AddLogMessage(string message)
+        public void AddLogMessage(string message)
         {
             if (!string.IsNullOrEmpty(message)) // Проверяем, что само сообщение не пустое
             {
@@ -970,7 +967,7 @@ namespace WPF_LCD_Test.ViewModels
             // 1. Ищем нужный объект MeasurementStatusViewModel в коллекции по его Location
             //    Используем LINQ FirstOrDefault(). Он вернет первый найденный элемент или null, если не найден.
             MeasurementStatusViewModel statusToUpdate =
-                MeasurementStatusManager.Instance.AllMeasurementButtonStatuses.FirstOrDefault(s =>
+                MeasurementStatusService.Instance.AllMeasurementButtonStatuses.FirstOrDefault(s =>
                     s.Location == location
                 );
 
@@ -1000,7 +997,7 @@ namespace WPF_LCD_Test.ViewModels
         {
             // Сбрасываем свойства у каждого публичного объекта статуса
             foreach (
-                MeasurementStatusViewModel measurementStatusViewModel in MeasurementStatusManager
+                MeasurementStatusViewModel measurementStatusViewModel in MeasurementStatusService
                     .Instance
                     .AllMeasurementButtonStatuses
             )
@@ -1098,6 +1095,13 @@ namespace WPF_LCD_Test.ViewModels
 
             // Сбрасываем ссылки на объекты Модели
             _currentDevice = null;
+
+            _serialNumber = string.Empty; // Сбрасываем серийный номер
+            _measurementTime = DefaultMeasurementTime; // Сбрасываем время измерения
+            _isDeviceConnected = false; // Сбрасываем статус подключения
+            _isDeviceCalibrated = false;// Сбрасываем статус калибровки
+            _isSerialNumberConfirmed = false; // Сбрасываем флаг подтверждения серийного номера
+            _isMeasurementButtonsEnabled = false; // Сбрасываем доступность кнопок измерения
 
             // Ссылки на сервисы, если они были инжектированы, обычно не сбрасываются здесь,
             // их жизненным циклом управляет контейнер DI.

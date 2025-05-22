@@ -1,4 +1,4 @@
-﻿// В новом файле MeasurementStatusManager.cs
+﻿// В новом файле MeasurementStatusService.cs
 
 using System;
 using System.Collections.Generic;
@@ -10,21 +10,21 @@ using MvvmHelpers;
 using WPF_LCD_Test.Models;
 using WPF_LCD_Test.ViewModels; // Убедитесь, что пространство имен вашего ViewModel доступно
 
-namespace WPF_LCD_Test.Interfaces // Или Managers, в зависимости от вашей структуры
+namespace WPF_LCD_Test.Services // Или Managers, в зависимости от вашей структуры
 {
     // Класс, отвечающий за управление коллекцией статусов точек измерения
-    public class MeasurementStatusManager
+    public class MeasurementStatusService
     {
         // --- Реализация Lazy Singleton ---
 
         // Приватное статическое поле для хранения единственного экземпляра класса
         // Используем System.Lazy для потокобезопасной и ленивой инициализации
-        private static Lazy<MeasurementStatusManager> _lazyInstance =
-            new(() => new MeasurementStatusManager());
+        private static Lazy<MeasurementStatusService> _lazyInstance =
+            new(() => new MeasurementStatusService());
 
         // Публичное статическое свойство для доступа к единственному экземпляру класса
         // При первом обращении к Instance.Value будет создан экземпляр
-        public static MeasurementStatusManager Instance => _lazyInstance.Value;
+        public static MeasurementStatusService Instance => _lazyInstance.Value;
 
         // --- Конец реализации Lazy Singleton ---
         // Публичная коллекция статусов, к которой будут обращаться другие классы
@@ -61,7 +61,7 @@ namespace WPF_LCD_Test.Interfaces // Или Managers, в зависимости 
 
      
 
-        private MeasurementStatusManager()
+        private MeasurementStatusService()
         {
             AllMeasurementButtonStatuses = []; // Инициализируем коллекцию
 
@@ -139,74 +139,6 @@ namespace WPF_LCD_Test.Interfaces // Или Managers, в зависимости 
         {
             // Используем LINQ для поиска первого статуса с совпадающим именем локации
             return AllMeasurementButtonStatuses.FirstOrDefault(s => s.Location == location);
-        }
-    }
-
-    public class MeasurementStatusViewModel : BaseViewModel // Наследует от BaseViewModel
-    {
-        public string Location { get; set; } // Имя точки измерения
-
-        private bool? _isPassed; // Статус измерения: null - не измерено, true - успешно, false - ошибка
-
-        public bool? IsPassed
-        {
-            get => _isPassed;
-            set
-            {
-                if (_isPassed != value)
-                {
-                    _isPassed = value;
-                    OnPropertyChanged(); // Уведомляем UI об изменении IsPassed
-                    OnPropertyChanged(nameof(StatusColor)); // Уведомляем, что свойство StatusColor тоже могло измениться
-                }
-            }
-        }
-
-        // Свойство для определения цвета в UI (привязка к Background кнопки/TextBlock)
-        // Возвращает WPF Brush
-        [JsonIgnore] // Обычно это свойство не нужно сохранять в JSON, т.к. оно связано с представлением
-        public Brush StatusColor
-        {
-            get
-            {
-                if (IsPassed == true)
-                    return Brushes.DarkGreen; // Успех
-                if (IsPassed == false)
-                    return Brushes.DarkRed; // Ошибка
-                return Brushes.DimGray; // По умолчанию (не измерено)
-            }
-        }
-
-        // Свойство для отображения измеренных значений рядом с точкой в UI
-        private string _measuredValuesString ="";
-
-        public string MeasuredValuesString
-        {
-            get => _measuredValuesString;
-            set
-            {
-                if (_measuredValuesString != value)
-                {
-                    _measuredValuesString = value;
-                    OnPropertyChanged(); // Уведомляем UI об изменении текста
-                }
-            }
-        }
-
-        // Конструктор с параметром (имя точки) для удобства инициализации
-        public MeasurementStatusViewModel(string location)
-        {
-            Location = location;
-            IsPassed = null; // Изначально не измерено
-            MeasuredValuesString = ""; // Изначально пусто
-        }
-
-        // Конструктор по умолчанию (может быть полезен для XAML дизайнера или сериализации)
-        public MeasurementStatusViewModel() // Оставь, если хочешь использовать как отдельный класс
-        {
-            Location = "Unknown";
-            IsPassed = null;
-            MeasuredValuesString = "";
         }
     }
 }

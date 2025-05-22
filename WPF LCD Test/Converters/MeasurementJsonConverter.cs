@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using WPF_LCD_Test.Models; // Убедись, что пространство имен класса Measurement доступно
-using WPF_LCD_Test.Interfaces;
+using WPF_LCD_Test.Services;
 
 namespace WPF_LCD_Test.Converters // Используй соответствующее пространство имен
 {
@@ -33,7 +33,7 @@ namespace WPF_LCD_Test.Converters // Используй соответствую
             // --- Условное форматирование для Lv ---
             int LvPrecision = 1; // Точность по умолчанию (для F1)
 
-            if (value.Location == MeasurementStatusManager.BlackColorLocationName) // Или "K. Black"
+            if (value.Location == MeasurementStatusService.BlackColorLocationName) // Или "K. Black"
             {
                 LvPrecision = 8; // Точность 4 знака для Black (для F4)
             }

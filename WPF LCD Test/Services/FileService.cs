@@ -1,6 +1,7 @@
 ﻿// В папке Interfaces
 // Файл FileService.cs (реализация IFileService)
 
+using System.Diagnostics;
 using System.Globalization;
 using System.IO; // Для работы с файлами и папками
 using System.Text.Json; // Для сериализации в JSON
@@ -10,7 +11,7 @@ using WPF_LCD_Test.Wrappers;
 using static WPF_LCD_Test.Resources.Resources;
 
 // using System.Globalization; // Если потребуется для форматирования чисел при сохранении CSV
-namespace WPF_LCD_Test.Interfaces
+namespace WPF_LCD_Test.Services
 {
     // Класс, реализующий интерфейс сервиса работы с файлами
     public class FileService : IFileService
@@ -180,6 +181,28 @@ namespace WPF_LCD_Test.Interfaces
                 StatusMessage?.Invoke(this, $"{ErrCSV} '{measurementLocationName}' (SN {serialNumber}): {ex.Message}"); // Сообщение об ошибке
                                                                                                                         // OnSaveOperationCompleted?.Invoke(this, false); // Может быть, не нужно оповещать о завершении каждого CSV
                 return false; // Ошибка
+            }
+        }
+
+        public bool RunExternalProgram(string executableName)
+        {
+            // Построение полного пути к исполняемому файлу
+            string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string executablePath = Path.Combine(appDirectory, executableName);
+
+            if (!File.Exists(executablePath))
+            {
+                return false;
+            }
+
+            try
+            {
+                Process.Start(executablePath);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
             }
         }
     }

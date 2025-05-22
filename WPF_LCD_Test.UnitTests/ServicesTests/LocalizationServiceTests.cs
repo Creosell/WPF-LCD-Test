@@ -9,7 +9,7 @@ using System.Reflection; // Для рефлексии при сбросе син
 using WPF_LCD_Test.Resources; // Убедитесь, что это пространство имен соответствует вашим .resx файлам
 
 using WPF_LCD_Test.Interfaces;
-using WPF_LCD_Test.Interfaces;
+using WPF_LCD_Test.Services;
 using System.Diagnostics; // Убедитесь, что ILocalizationService доступен
 
 namespace WPF_LCD_Test.UnitTests.ServicesTests

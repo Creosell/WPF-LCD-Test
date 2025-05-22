@@ -7,7 +7,7 @@ using WPF_LCD_Test.Views;
 using WPF_LCD_Test.ViewModels;
 using WPF_LCD_Test.Models;
 using System.Diagnostics;
-using WPF_LCD_Test.Interfaces;
+using WPF_LCD_Test.Services;
 
 
 namespace WPF_LCD_Test
@@ -21,10 +21,7 @@ namespace WPF_LCD_Test
         IDialogService dialogService = new DialogService(); // Реализация сервиса диалогов
         ISettingsService settingsService = SettingsService.Instance; // Получаем синглтон сервиса настроек (если он синглтон)
         ILocalizationService localizationService = LocalizationService.Instance; // Получаем синглтон сервиса локализации (если он синглтон)
-        MeasurementStatusManager measurementStatusManager = MeasurementStatusManager.Instance; // Получаем синглтон менеджера статусов измерений (если он синглтон)
-
-
-
+        IDispatcher dispatcher = new WpfDispatcher(); // Реализация обертки для Dispatcher (если нужна)
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
@@ -39,7 +36,8 @@ namespace WPF_LCD_Test
                 fileService,
                 dialogService,
                 localizationService,
-                settingsService
+                settingsService,
+                dispatcher
             );
 
             // 3. Создаем экземпляр главного окна (View оболочки)

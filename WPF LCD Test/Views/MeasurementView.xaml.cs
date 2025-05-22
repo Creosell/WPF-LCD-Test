@@ -4,7 +4,7 @@ using System.Windows.Controls; // Нужно для создания экзем�
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
-using WPF_LCD_Test.Interfaces;
+using WPF_LCD_Test.Services;
 using WPF_LCD_Test.ViewModels; // Убедись, что используешь пространство имен твоего ViewModel
 
 namespace WPF_LCD_Test.Views

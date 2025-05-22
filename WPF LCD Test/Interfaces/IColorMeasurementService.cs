@@ -6,9 +6,9 @@ namespace WPF_LCD_Test.Interfaces
     public interface IColorMeasurementService : IDisposable // Сервис тоже может требовать освобождения ресурсов
     {
         // Свойства состояния устройства, доступные для чтения
-        bool IsConnected { get; }
+        bool IsDeviceConnected { get; }
 
-        bool IsCalibrated { get; }
+        bool IsDeviceCalibrated { get; }
 
         // Методы для команд UI
         Task<bool> ConnectAsync(); // Асинхронная операция для подключения

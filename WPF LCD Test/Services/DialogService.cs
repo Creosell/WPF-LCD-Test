@@ -5,7 +5,7 @@ using System.Windows;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Wrappers;
 
-namespace WPF_LCD_Test.Interfaces
+namespace WPF_LCD_Test.Services
 {
     public class DialogService : IDialogService
     {

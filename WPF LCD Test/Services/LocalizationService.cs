@@ -2,13 +2,14 @@
 
 using System.Globalization;
 using static WPF_LCD_Test.Resources.Resources; // Убедись, что это пространство имен соответствует твоим .resx файлам
+using WPF_LCD_Test.Interfaces; // Для ILocalizationService
 
 // Добавьте using для ResourceManager, если его нет
 
 // Возможно, вам все еще нужен using static для Resources.Resources для StatusMessage?.Invoke внутри этого класса, если вы там их используете.
 // using static WPF_LCD_Test.Resources.Resources;
 
-namespace WPF_LCD_Test.Interfaces
+namespace WPF_LCD_Test.Services
 {
     public class LocalizationService : ILocalizationService
     {

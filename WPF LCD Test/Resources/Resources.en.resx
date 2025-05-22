@@ -402,4 +402,7 @@
   <data name="TestFormatString" xml:space="preserve">
     <value>This is a test with a number: {0}</value>
   </data>
+  <data name="RunExternalAppInvalidPathErr" xml:space="preserve">
+    <value>Incorrect path for calling an external program</value>
+  </data>
 </root>
