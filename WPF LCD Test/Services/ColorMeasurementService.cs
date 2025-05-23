@@ -1,4 +1,4 @@
-﻿// В папке Interfaces
+﻿// В папке Services
 // Файл ColorMeasurementService.cs (реализация IColorMeasurementService)
 
 using System.Globalization;
@@ -120,13 +120,7 @@ namespace WPF_LCD_Test.Services
                     _isDeviceConnected = false;
                     ConnectionStatusChanged?.Invoke(this, _isDeviceConnected);
                 }
-                ///////TEST
-                //finally
-                //{
-
-                //    _isDeviceConnected = true;
-                //    ConnectionStatusChanged?.Invoke(this, _isDeviceConnected);
-                //}
+              
             });
             return _isDeviceConnected; // Возвращаем статус подключения
         }
@@ -182,12 +176,8 @@ namespace WPF_LCD_Test.Services
                     _isDeviceCalibrated = false;
                     CalibrationStatusChanged?.Invoke(this, _isDeviceCalibrated);
                 }
-                //finally //////////TEST
-                //{
-                //    _isDeviceCalibrated = true;
-                //    CalibrationStatusChanged?.Invoke(this, _isDeviceCalibrated);
-                //}
-            }); // Конец Task.Run
+                
+            }); 
             return success;
         }
 

@@ -1,4 +1,4 @@
-﻿// В папке Interfaces
+﻿// В папке Services
 // Файл FileService.cs (реализация IFileService)
 
 using System.Diagnostics;

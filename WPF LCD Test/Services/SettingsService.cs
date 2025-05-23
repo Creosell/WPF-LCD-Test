@@ -1,4 +1,4 @@
-﻿// В папке Interfaces
+﻿// В папке Services
 // Файл SettingsService.cs
 
 using System;

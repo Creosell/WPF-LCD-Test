@@ -1,4 +1,5 @@
-﻿// В файле Interfaces/LocalizationService.cs
+﻿// В папке Services
+// В файле LocalizationService.cs
 
 using System.Globalization;
 using static WPF_LCD_Test.Resources.Resources; // Убедись, что это пространство имен соответствует твоим .resx файлам

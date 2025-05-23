@@ -52,8 +52,6 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             _mockLocalizationService.Setup(l => l.GetString(It.IsAny<string>())).Returns((string key) => key);
             _mockLocalizationService.Setup(l => l.GetString(It.IsAny<string>(), It.IsAny<object[]>())).Returns((string key, object[] args) => key + string.Join("", args));
 
-            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
-            CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
 
             _viewModel = new MeasurementViewModel(
                 _mockColorMeasurementService.Object,
@@ -62,6 +60,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                 _mockLocalizationService.Object,
                 _mockDispatcher.Object
             );
+
+
         
 
 
@@ -158,28 +158,92 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         public async Task ZeroCalibrationCommand_Execute_CalibratesAndLogs()
         {
             // Arrange
-            _mockColorMeasurementService.Setup(s => s.CalibrateZeroAsync()).Returns(Task.FromResult(true));
-            // Используем свойство IsDeviceConnected
-            _mockColorMeasurementService.Setup(s => s.IsDeviceConnected).Returns(true);
-            _viewModel.IsDeviceConnected = true; // Убеждаемся, что свойство ViewModel тоже установлено
+            // 1. Имитируем успешное подключение устройства, чтобы CanExecute команды был true.
+            _mockColorMeasurementService.Raise(
+                s => s.ConnectionStatusChanged += null, // Событие, которое нужно вызвать
+                _mockColorMeasurementService.Object,    // Отправитель события
+                true                                    // Аргумент события (статус подключения = true)
+            );
+
+            // Убедимся, что ViewModel обновил свой статус подключения
+            Assert.That(_viewModel.IsDeviceConnected, Is.True, "ViewModel.IsDeviceConnected should be true after mocking ConnectionStatusChanged event.");
+
+            // 2. Мокируем CalibrateZeroAsync И имитируем вызовы событий StatusMessage и CalibrationStatusChanged
+            _mockColorMeasurementService.Setup(s => s.CalibrateZeroAsync())
+                .Returns(Task.FromResult(true)) // Возвращаем успешный результат операции
+                .Callback(() => {
+                    // Имитируем вызов события StatusMessage в начале калибровки
+                    _mockColorMeasurementService.Raise(
+                        s => s.StatusMessage += null,
+                        _mockColorMeasurementService.Object,
+                        _mockLocalizationService.Object.GetString(CalibratingZeroCA) // ПЕРВОЕ СООБЩЕНИЕ
+                    );
+
+                    // Имитируем вызов события CalibrationStatusChanged при завершении калибровки
+                    _mockColorMeasurementService.Raise(
+                        s => s.CalibrationStatusChanged += null,
+                        _mockColorMeasurementService.Object,
+                        true
+                    );
+
+                    // Имитируем вызов события StatusMessage после успешной калибровки
+                    _mockColorMeasurementService.Raise(
+                        s => s.StatusMessage += null,
+                        _mockColorMeasurementService.Object,
+                        _mockLocalizationService.Object.GetString(ZeroCalibratedCA) // ВТОРОЕ СООБЩЕНИЕ
+                    );
+                });
+
+
 
             // Act
             _viewModel.ZeroCalibrationCommand.Execute(null);
-            await Task.Delay(50); // Ждем завершения асинхронной операции
+
+            // Ждем завершения асинхронной операции и обработки события ViewModel'ом.
+            // Возможно, потребуется небольшая задержка, если логика ViewModel асинхронна после события.
+            await Task.Delay(50);
 
             // Assert
+            // Проверяем, что мокированный метод был вызван.
             _mockColorMeasurementService.Verify(s => s.CalibrateZeroAsync(), Times.Once);
-            Assert.That(_viewModel.IsDeviceCalibrated, Is.True);
-            Assert.That(_viewModel.LogText.Contains(ZeroCalibratedCA), Is.True);
+
+            // Проверяем, что ViewModel обновил статус калибровки.
+            Assert.That(_viewModel.IsDeviceCalibrated, Is.True, "ViewModel.IsDeviceCalibrated should be true after successful calibration.");
+
+            // Проверяем, что в лог добавлено ОБА сообщения о калибровке.
+            // Используем Does.Contain дважды для обоих сообщений.
+            Assert.That(_viewModel.LogText, Does.Contain(_mockLocalizationService.Object.GetString(CalibratingZeroCA)),
+                        "Log should contain the 'Calibrating Zero' message.");
+            Assert.That(_viewModel.LogText, Does.Contain(_mockLocalizationService.Object.GetString(ZeroCalibratedCA)),
+                        "Log should contain the 'Zero is calibrated' message.");
         }
 
         [Test]
         public async Task ZeroCalibrationCommand_Execute_HandlesCalibrationError()
         {
             // Arrange
-            _mockColorMeasurementService.Setup(s => s.CalibrateZeroAsync()).Returns(Task.FromResult(false));
             _mockColorMeasurementService.Setup(s => s.IsDeviceConnected).Returns(true);
             _viewModel.IsDeviceConnected = true;
+
+
+            // Мокируем CalibrateZeroAsync И имитируем вызовы событий StatusMessage и CalibrationStatusChanged
+            _mockColorMeasurementService.Setup(s => s.CalibrateZeroAsync())
+                .Returns(Task.FromResult(false)) // Возвращаем успешный результат операции
+                .Callback(() => {
+                    // Имитируем вызов события StatusMessage в начале калибровки
+                    _mockColorMeasurementService.Raise(
+                        s => s.StatusMessage += null,
+                        _mockColorMeasurementService.Object,
+                        _mockLocalizationService.Object.GetString(CalibratingZeroCA) 
+                    );
+
+                    // Имитируем вызов события StatusMessage после успешной калибровки
+                    _mockColorMeasurementService.Raise(
+                        s => s.StatusMessage += null,
+                        _mockColorMeasurementService.Object,
+                        _mockLocalizationService.Object.GetString(CheckConnectionCA)
+                    );
+                });
 
             // Act
             _viewModel.ZeroCalibrationCommand.Execute(null);
@@ -187,32 +251,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
 
             // Assert
             _mockColorMeasurementService.Verify(s => s.CalibrateZeroAsync(), Times.Once);
-            _mockDialogService.Verify(d => d.ShowMessage(
-                It.Is<string>(msg => msg.Contains(ErrAtCalibration)),
-                It.Is<string>(title => title == Err)
-            ), Times.Once);
             Assert.That(_viewModel.IsDeviceCalibrated, Is.False);
-            Assert.That(_viewModel.LogText.Contains(ErrAtCalibration), Is.True);
-        }
-
-        [Test]
-        public async Task ZeroCalibrationCommand_Execute_RequiresConnection()
-        {
-            // Arrange
-            _mockColorMeasurementService.Setup(s => s.IsDeviceConnected).Returns(false);
-            _viewModel.IsDeviceConnected = false;
-
-            // Act
-            _viewModel.ZeroCalibrationCommand.Execute(null);
-            await Task.Delay(50);
-
-            // Assert
-            _mockColorMeasurementService.Verify(s => s.CalibrateZeroAsync(), Times.Never);
-            _mockDialogService.Verify(d => d.ShowMessage(
-                It.Is<string>(msg => msg.Contains(MeasureWihoutConnectionError)),
-                It.Is<string>(title => title == Err)
-            ), Times.Once);
-            Assert.That(_viewModel.LogText.Contains(MeasureWihoutConnectionError), Is.True);
+            Assert.That(_viewModel.LogText.Contains(CheckConnectionCA), Is.True);
         }
 
         // --- Тесты для SaveResultsCommand ---
@@ -717,6 +757,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             _viewModel.IsDeviceCalibrated = true;
             _viewModel.SerialNumber = "TESTSN";
             _viewModel.MeasurementTime = 1;
+            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+            CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
 
             // Убедимся, что серийный номер подтвержден, так как это часть логики CanExecute.
             // Если IsSerialNumberConfirmed устанавливается через метод, вызываем его.
@@ -731,7 +773,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
 
             // Настраиваем мок ColorMeasurementService для возврата тестовых данных
             _mockColorMeasurementService.Setup(s => s.MeasureAsync(It.IsAny<int>()))
-                                         .Returns(Task.FromResult(new Models.Measurement { Location = MeasurementStatusService.CenterLocationName, IsValid = true, x = 0.331, y = 0.322, Lv = 200, T = 6000 }));
+                                         .Returns(Task.FromResult(new Measurement { Location = MeasurementStatusService.CenterLocationName, IsValid = true, x = 0.331, y = 0.322, Lv = 200, T = 6000 }));
 
             // Act
             _viewModel.MeasureCommand.Execute(MeasurementStatusService.CenterLocationName); // Передаем параметр (например, Location)

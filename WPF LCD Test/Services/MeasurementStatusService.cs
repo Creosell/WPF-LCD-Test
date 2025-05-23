@@ -1,4 +1,5 @@
-﻿// В новом файле MeasurementStatusService.cs
+﻿// В папке Services
+// В новом файле MeasurementStatusService.cs
 
 using System;
 using System.Collections.Generic;

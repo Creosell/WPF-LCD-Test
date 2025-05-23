@@ -582,6 +582,8 @@ namespace WPF_LCD_Test.ViewModels
 
                     if (lvValidationPassed) // Если валидация по Lv пройдена (и сервис вернул Valid=true)
                     {
+                        string xFormatted = resultMeasurement.x.ToString("F3", CultureInfo.InvariantCulture);
+                        string yFormatted = resultMeasurement.y.ToString("F3", CultureInfo.InvariantCulture);
                         // Логика форматирования для вывода в лог/UI
                         string LvFormatted =
                             (
@@ -595,8 +597,8 @@ namespace WPF_LCD_Test.ViewModels
                             CultureInfo.InvariantCulture
                         );
 
-                        measuredValuesDisplay =
-                            $"x={resultMeasurement.x:F3}, y={resultMeasurement.y:F3}, Lv={LvFormatted}, T={TFormatted}";
+                        measuredValuesDisplay = 
+                            $"x={xFormatted}, y={yFormatted}, Lv={LvFormatted}, T={TFormatted}";
 
                         AddLogMessage($"{Result} '{measurementName}': {measuredValuesDisplay}");
 
