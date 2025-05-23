@@ -18,13 +18,13 @@ namespace WPF_LCD_Test.Models
 #pragma warning disable IDE1006 // Naming Styles
         public double y { get; set; }
 
-                               //[JsonIgnore]
+        //[JsonIgnore]
         public double Lv { get; set; }
+
         public double T { get; set; }
 
         [JsonIgnore]
         public bool IsValid { get; set; } = true; // Устанавливаем по умолчанию true
-
 
         public Measurement(string location, double x, double y, double Lv, double T)
         {
@@ -63,6 +63,5 @@ namespace WPF_LCD_Test.Models
             // Возможно, нужно явно указать форматы precisionThreeDigits и т.п. как ты делал раньше, если они важны для CSV
             // return $"{Location},{X.ToString("F3", CultureInfo.InvariantCulture)},{Y.ToString("F3", CultureInfo.InvariantCulture)},{Lv.ToString("F4", CultureInfo.InvariantCulture)},{T.ToString("F0", CultureInfo.InvariantCulture)}";
         }
-
     }
 }

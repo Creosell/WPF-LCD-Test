@@ -1,5 +1,4 @@
 ﻿// В файле Services/WpfDispatcher.cs (или в другом подходящем месте)
-using System;
 using System.Windows; // Для Application.Current
 using WPF_LCD_Test.Interfaces;
 

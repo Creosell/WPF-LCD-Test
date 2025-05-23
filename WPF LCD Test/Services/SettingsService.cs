@@ -1,13 +1,11 @@
 ﻿// В папке Services
 // Файл SettingsService.cs
 
-using System;
+using System.Diagnostics; // Для Lazy
 using System.IO; // Для работы с файлами
 using System.Text.Json; // Для работы с JSON
-using WPF_LCD_Test.Models; // Ссылка на вашу модель AppSettings
-using System.Threading;
-using System.Diagnostics; // Для Lazy
 using WPF_LCD_Test.Interfaces; // Ссылка на интерфейс ISettingsService
+using WPF_LCD_Test.Models; // Ссылка на вашу модель AppSettings
 
 namespace WPF_LCD_Test.Services
 {
@@ -18,7 +16,7 @@ namespace WPF_LCD_Test.Services
     public class SettingsService : ISettingsService // Реализуем интерфейс
     {
         private string _currentSettingsFilePath;
-      
+
         // --- Реализация Singleton ---
 
         // Lazy<T> для потокобезопасной ленивой инициализации
@@ -63,8 +61,6 @@ namespace WPF_LCD_Test.Services
             WriteIndented = true
             // Добавьте другие опции, нужные для сохранения
         };
-
-       
 
         // Метод загрузки настроек (ваш текущий код для этого метода)
         public AppSettings LoadSettings()

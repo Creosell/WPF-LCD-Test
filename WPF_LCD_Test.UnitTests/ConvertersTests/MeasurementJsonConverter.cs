@@ -1,8 +1,6 @@
 ﻿// В проекте WPF_LCD_Test.UnitTests (папка ConvertersTests)
 // Файл MeasurementJsonConverterTests.cs
 
-using NUnit.Framework;
-using System;
 using System.Text.Json;
 using WPF_LCD_Test.Converters;
 using WPF_LCD_Test.Models; // Для класса Measurement
@@ -102,7 +100,6 @@ namespace WPF_LCD_Test.UnitTests.ConvertersTests
             Assert.That(jsonString, Does.Not.Contain("true"), "Boolean 'true' from IsValid should not be in JSON.");
             Assert.That(jsonString, Does.Not.Contain("false"), "Boolean 'false' from IsValid should not be in JSON.");
         }
-
 
         [Test]
         public void Read_ThrowsNotImplementedException()

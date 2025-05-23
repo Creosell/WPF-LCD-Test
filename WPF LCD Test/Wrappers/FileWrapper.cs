@@ -1,7 +1,6 @@
 ﻿// В папке Wrappers
 // Файл FileWrapper.cs
 using System.IO;
-using System.Threading.Tasks;
 using WPF_LCD_Test.Interfaces; // Убедитесь, что это правильное пространство имен
 
 namespace WPF_LCD_Test.Wrappers

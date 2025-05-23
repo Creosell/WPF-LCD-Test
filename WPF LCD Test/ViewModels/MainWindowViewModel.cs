@@ -1,16 +1,10 @@
 ﻿// В новом файле ViewModels
 // Файл MainWindowViewModel.cs
 
-using System;
-using System.Windows.Input;
-using WPF_LCD_Test.Interfaces;
-
-using WPF_LCD_Test.Models;
 using MvvmHelpers;
+using System.Windows.Input;
 using WPF_LCD_Test.Commands;
-using System.Diagnostics;
 using WPF_LCD_Test.Interfaces;
-
 
 namespace WPF_LCD_Test.ViewModels
 {
@@ -22,6 +16,7 @@ namespace WPF_LCD_Test.ViewModels
         // Сервисы, которые будут переданы в конструкторы ViewModel страниц.
         // MainWindowViewModel действует как "фабрика" или композиционный корень для ViewModel страниц.
         private readonly IColorMeasurementService _colorMeasurementService;
+
         private readonly IFileService _fileService;
         private readonly IDialogService _dialogService; // Возможно, нужен для общеприложениевых диалогов
         private readonly ILocalizationService _localizationService; // Нужен для смены языка и подписки
@@ -39,7 +34,6 @@ namespace WPF_LCD_Test.ViewModels
             private set => SetProperty(ref _currentPageIdentifier, value); // Используем SetProperty для уведомления UI
         }
 
-
         public BaseViewModel CurrentPageViewModel
         {
             get => _currentPageViewModel;
@@ -50,9 +44,7 @@ namespace WPF_LCD_Test.ViewModels
             }
         }
 
-
         public ICommand NavigateCommand { get; }
-
 
         // --- КОНСТРУКТОР ---
         // В конструкторе инициализируем сервисы и команды оболочки.
@@ -79,9 +71,7 @@ namespace WPF_LCD_Test.ViewModels
 
             // При запуске приложения автоматически переходим на страницу измерений.
             ExecuteNavigate("Measurement");
-
         }
-
 
         // --- МЕТОДЫ ВЫПОЛНЕНИЯ КОМАНД ОБОЛОЧКИ (Execute... и CanExecute...) ---
 
@@ -103,10 +93,8 @@ namespace WPF_LCD_Test.ViewModels
             // --- Логика использования ХРАНИМЫХ экземпляров ViewModel !!! ---
             BaseViewModel? targetViewModel = null; // Используем Nullable Reference Types
 
-
             switch (pageName)
             {
-
                 case "Measurement":
 
                     _measurementViewModel ??= new MeasurementViewModel(
@@ -126,8 +114,6 @@ namespace WPF_LCD_Test.ViewModels
 
                     targetViewModel = _settingsViewModel;
                     break;
-
-
 
                 default:
                     _measurementViewModel ??= new MeasurementViewModel(

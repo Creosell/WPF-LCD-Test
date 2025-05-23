@@ -46,7 +46,6 @@ namespace WPF_LCD_Test.Converters // Используй соответствую
             // Если T - double, и ему нужно стандартное форматирование, используй writer.WriteNumber или writer.WriteString с F2
             writer.WriteNumber("T", Math.Round(value.T, 0, MidpointRounding.AwayFromZero)); // Используем ToString() для получения строкового представления значения
 
-
             // TODO: Запиши остальные свойства Measurement, если они должны быть в JSON
             // Например: writer.WriteString("Timestamp", value.Timestamp);
             //          if (value.ErrorMessage != null) writer.WriteString("ErrorMessage", value.ErrorMessage);

@@ -2,17 +2,12 @@
 // Папка ServicesTests
 // Файл FileServiceTests.cs
 
-using NUnit.Framework;
 using Moq;
-using System;
-using System.IO;
-using System.Threading.Tasks;
+using System.Globalization;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
 using WPF_LCD_Test.Services; // Для FileService
 using static WPF_LCD_Test.Resources.Resources;
-using System.Globalization;
-using System.Threading;
 
 namespace WPF_LCD_Test.UnitTests.ServicesTests
 {
@@ -24,8 +19,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         private Mock<IPath> _mockPath;
         private FileService _fileService;
         private string _testBasePath;
-        private Mock<ILocalizationService> _mockLocalizationService; 
-
+        private Mock<ILocalizationService> _mockLocalizationService;
 
         [SetUp]
         public void Setup()
@@ -111,7 +105,6 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             Assert.That(fileService.BaseFolderPath, Is.EqualTo(expectedBaseFolderPath));
         }
 
-
         // Тесты для SaveDeviceDataToJsonAsync
         [Test]
         public async Task SaveDeviceDataToJsonAsync_ReturnsFalseAndSendsMessage_WhenDeviceIsNull()
@@ -139,7 +132,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         {
             // Arrange
             _fileService = new FileService(_mockDirectory.Object, _mockFile.Object, _mockPath.Object, _testBasePath, _mockLocalizationService.Object);
-            var device = new DeviceUnderTest ("SN123");
+            var device = new DeviceUnderTest("SN123");
             string expectedFilePath = System.IO.Path.Combine(_testBasePath, "data", "SN123.json");
             string capturedJsonContent = null;
 
@@ -181,7 +174,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         {
             // Arrange
             _fileService = new FileService(_mockDirectory.Object, _mockFile.Object, _mockPath.Object, _testBasePath, _mockLocalizationService.Object);
-            var device = new DeviceUnderTest ("SN456");
+            var device = new DeviceUnderTest("SN456");
             string expectedFilePath = System.IO.Path.Combine(_testBasePath, "data", "SN456.json");
 
             // Имитируем исключение при записи файла

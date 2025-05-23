@@ -3,10 +3,10 @@
 
 using System.Globalization;
 using System.Runtime.InteropServices;
-using WPF_LCD_Test.Models;
-using static WPF_LCD_Test.Resources.Resources;
 using WPF_LCD_Test.Interfaces;
+using WPF_LCD_Test.Models;
 using WPF_LCD_Test.Services.Wrappers;
+using static WPF_LCD_Test.Resources.Resources;
 
 namespace WPF_LCD_Test.Services
 {
@@ -81,7 +81,6 @@ namespace WPF_LCD_Test.Services
             _objCa200 = ca200Wrapper ?? throw new ArgumentNullException(nameof(ca200Wrapper));
         }
 
-
         public async Task<bool> ConnectAsync()
 
         {
@@ -91,17 +90,12 @@ namespace WPF_LCD_Test.Services
 
                 try
                 {
-                    
-
-                    if (!_isDeviceConnected && _objCa200!=null)
+                    if (!_isDeviceConnected && _objCa200 != null)
                     {
                         StatusMessage?.Invoke(this, ConnectingCA);
 
-                        
                         _objCa200.AutoConnect(); // Блокирующий вызов COM
                         _objCa = _objCa200.SingleCa;
-
-
 
                         _isDeviceConnected = true;
                         ConnectionStatusChanged?.Invoke(this, _isDeviceConnected); // Оповещаем ViewModel об изменении статуса
@@ -120,7 +114,6 @@ namespace WPF_LCD_Test.Services
                     _isDeviceConnected = false;
                     ConnectionStatusChanged?.Invoke(this, _isDeviceConnected);
                 }
-               
             });
             return _isDeviceConnected; // Возвращаем статус подключения
         }
@@ -129,8 +122,6 @@ namespace WPF_LCD_Test.Services
         {
             Dispose(true);
         }
-
-        
 
         public async Task<bool> CalibrateZeroAsync()
         {
@@ -160,7 +151,7 @@ namespace WPF_LCD_Test.Services
                     StatusMessage?.Invoke(this, (CheckConnectionCA) + $": {ex.Message}");
                     _isDeviceCalibrated = false; // Обновляем статус
                     CalibrationStatusChanged?.Invoke(this, _isDeviceCalibrated); // Оповещаем
-                                                                           // Не пробрасываем исключение, обрабатываем внутри сервиса
+                                                                                 // Не пробрасываем исключение, обрабатываем внутри сервиса
                 }
                 catch (Exception ex)
                 {  // Ловим другие ошибки
@@ -168,8 +159,7 @@ namespace WPF_LCD_Test.Services
                     _isDeviceCalibrated = false;
                     CalibrationStatusChanged?.Invoke(this, _isDeviceCalibrated);
                 }
-                
-            }); 
+            });
             return success;
         }
 
@@ -251,7 +241,6 @@ namespace WPF_LCD_Test.Services
             return result;
         }
 
-
         void IDisposable.Dispose()
         {
             Dispose(true);
@@ -263,7 +252,7 @@ namespace WPF_LCD_Test.Services
             if (disposing)
             {
                 StatusMessage?.Invoke(this, (DisconnectingCA)); // Сообщение
-                
+
                 if (_objCa200 != null)
                 {
                     _objCa200.Dispose();
@@ -276,7 +265,6 @@ namespace WPF_LCD_Test.Services
                 CalibrationStatusChanged?.Invoke(this, _isDeviceCalibrated); // Оповещаем
                 StatusMessage?.Invoke(this, (DisconnectedCA)); // Сообщение
             }
-            
         }
 
         ~ColorMeasurementService()

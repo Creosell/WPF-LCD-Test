@@ -1,7 +1,4 @@
-﻿using NUnit.Framework;
-using System;
-using System.Threading.Tasks;
-using WPF_LCD_Test.Commands; // Убедитесь, что это правильное пространство имен
+﻿using WPF_LCD_Test.Commands; // Убедитесь, что это правильное пространство имен
 
 namespace WPF_LCD_Test.UnitTests.Commands
 {

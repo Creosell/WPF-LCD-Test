@@ -4,7 +4,6 @@ using System.Windows.Controls; // Нужно для создания экзем�
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
-using WPF_LCD_Test.Services;
 using WPF_LCD_Test.ViewModels; // Убедись, что используешь пространство имен твоего ViewModel
 
 namespace WPF_LCD_Test.Views
@@ -14,20 +13,19 @@ namespace WPF_LCD_Test.Views
     /// </summary>
     public partial class MeasurementView : UserControl
     {
-     
         public MeasurementView()
         {
             InitializeComponent(); // Инициализирует элементы UI, описанные в XAML
 
             //this.PreviewMouseDown += UserControl_PreviewMouseDown;
             //this.PreviewKeyDown += UserControl_PreviewKeyDown;
-  
+
             this.DataContextChanged += MeasurementView_DataContextChanged;
-            
 
             // Подписываемся на событие Unloaded для отписки от ViewModel
             this.Unloaded += MeasurementView_Unloaded;
         }
+
         private void SerialNumberTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             TextBox serialNumberTextBox = sender as TextBox;
@@ -37,6 +35,7 @@ namespace WPF_LCD_Test.Views
                 serialNumberTextBox.Text = model.SerialNumber;
             }
         }
+
         // --- Обработчик события DataContextChanged этого UserControl ---
         private void MeasurementView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
@@ -54,7 +53,6 @@ namespace WPF_LCD_Test.Views
                 newViewModel.RequestClearInputFocus += ViewModel_RequestClearInputFocus;
             }
 
-            
             // Теперь ViewModel доступен через this.DataContext или sender.DataContext
         }
 
@@ -105,9 +103,7 @@ namespace WPF_LCD_Test.Views
         // --- Обработчик события запроса очистки фокуса ввода ---
         private void ViewModel_RequestClearInputFocus(object sender, EventArgs e)
         {
-
             this.Focus();
- 
         }
 
         private void UserControl_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -129,7 +125,7 @@ namespace WPF_LCD_Test.Views
 
             // Если фокус находится на элементе ввода, просто выходим,
             // позволяя элементу ввода обработать нажатие клавиши
-            
+
             if (isInputControlFocused)
             {
                 return;
@@ -250,6 +246,3 @@ namespace WPF_LCD_Test.Views
         }
     }
 }
-    
-
-

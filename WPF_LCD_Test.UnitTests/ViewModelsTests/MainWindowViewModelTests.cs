@@ -1,12 +1,7 @@
-﻿using NUnit.Framework;
-using Moq;
-using System;
-using System.Threading.Tasks;
-using WPF_LCD_Test.Commands;
+﻿using Moq;
+using MvvmHelpers; // Для BaseViewModel
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.ViewModels;
-using WPF_LCD_Test.UnitTests.Mocks; // Добавим для использования MockViewModels
-using MvvmHelpers; // Для BaseViewModel
 
 namespace WPF_LCD_Test.UnitTests.ViewModels
 {
@@ -31,7 +26,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             _mockDialogService = new Mock<IDialogService>();
             _mockLocalizationService = new Mock<ILocalizationService>();
             _mockSettingsService = new Mock<ISettingsService>();
-            _mockDispatcher = new Mock<IDispatcher>(); 
+            _mockDispatcher = new Mock<IDispatcher>();
 
             // Инициализация ViewModel с моками
             _viewModel = new MainWindowViewModel(
@@ -119,7 +114,6 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                 _mockSettingsService.Object,
                 null
             ), "Should throw for dispatcher");
-
         }
 
         // --- Тесты навигации ---

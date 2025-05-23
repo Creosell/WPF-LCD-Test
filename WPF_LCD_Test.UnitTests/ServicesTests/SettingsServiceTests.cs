@@ -1,12 +1,9 @@
 ﻿// В WPF_LCD_Test.UnitTests/ServicesTests/SettingsServiceTests.cs
 
-using NUnit.Framework;
-using System.IO;
+using System.Reflection; // Обязательно для рефлексии
 using System.Text.Json;
 using WPF_LCD_Test.Models; // Убедитесь, что эта ссылка есть
 using WPF_LCD_Test.Services;
-using System;
-using System.Reflection; // Обязательно для рефлексии
 
 namespace WPF_LCD_Test.UnitTests.ServicesTests
 {
@@ -108,7 +105,6 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             // !!! ВАЖНОЕ ИЗМЕНЕНИЕ ЗДЕСЬ !!!
             Assert.That(savedSettings.AutoConnectEnabled, Is.EqualTo(true), "AutoConnectEnabled по умолчанию должен быть 'true' согласно обновленной модели.");
         }
-
 
         [Test]
         public void LoadSettings_FileExists_LoadsSettings()

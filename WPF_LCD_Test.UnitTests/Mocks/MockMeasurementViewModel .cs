@@ -1,7 +1,6 @@
 ﻿// В папке UnitTests/Mocks/TestViewModels.cs (или в любом удобном месте)
 
 using MvvmHelpers; // Если BaseViewModel оттуда
-using System;
 using WPF_LCD_Test.Interfaces;
 
 namespace WPF_LCD_Test.UnitTests.Mocks

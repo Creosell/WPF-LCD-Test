@@ -1,10 +1,7 @@
 ﻿// В проекте WPF_LCD_Test.UnitTests (создайте новую папку, например, ConvertersTests)
 // Файл CustomDateTimeConverterTests.cs
 
-using NUnit.Framework;
-using System;
 using System.Text.Json;
-using System.Globalization;
 using WPF_LCD_Test.Converters; // Используем пространство имен вашего конвертера
 
 namespace WPF_LCD_Test.UnitTests.ConvertersTests

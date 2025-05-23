@@ -2,8 +2,8 @@
 // В файле LocalizationService.cs
 
 using System.Globalization;
-using static WPF_LCD_Test.Resources.Resources; // Убедись, что это пространство имен соответствует твоим .resx файлам
 using WPF_LCD_Test.Interfaces; // Для ILocalizationService
+using static WPF_LCD_Test.Resources.Resources; // Убедись, что это пространство имен соответствует твоим .resx файлам
 
 // Добавьте using для ResourceManager, если его нет
 

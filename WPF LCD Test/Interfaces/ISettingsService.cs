@@ -1,7 +1,6 @@
 ﻿// В папке Interfaces
 // Файл ISettingsService.cs
 
-using System;
 using WPF_LCD_Test.Models; // Ссылка на вашу модель AppSettings
 
 namespace WPF_LCD_Test.Interfaces

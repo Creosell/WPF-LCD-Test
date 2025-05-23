@@ -21,7 +21,6 @@
     WindowStyle="None"
     mc:Ignorable="d">
 
-
     <Window.Resources>
         <Style x:Key="NavigationButtonStyle" TargetType="RadioButton">
             <Setter Property="Background" Value="Transparent" />
@@ -68,9 +67,7 @@
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Foreground" Value="#A0A0A0" />
                             </Trigger>
-
                         </ControlTemplate.Triggers>
-
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -83,8 +80,6 @@
             </Style.Triggers>
         </Style>
     </Window.Resources>
-
-
 
     <Grid>
         <Grid.RowDefinitions>
@@ -108,14 +103,12 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-
             <Image
                 Grid.Column="0"
                 Width="20"
                 Height="20"
                 Margin="5"
                 Source="/Images/AppIcon.ico" />
-
 
             <TextBlock
                 Grid.Column="1"
@@ -124,7 +117,6 @@
                 FontSize="14"
                 Foreground="White"
                 Text="{Binding Title, RelativeSource={RelativeSource AncestorType=Window}}" />
-
 
             <StackPanel
                 Grid.Column="2"
@@ -227,7 +219,6 @@
                         </StackPanel>
                     </RadioButton.Content>
                 </RadioButton>
-
             </Grid>
         </Border>
 
@@ -235,6 +226,5 @@
             Grid.Row="1"
             Grid.Column="1"
             Content="{Binding CurrentPageViewModel}" />
-
     </Grid>
 </Window>

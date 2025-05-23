@@ -2,20 +2,15 @@
 // Файл MainWindowViewModel.cs
 
 // --- Usings для доступа к другим частям проекта и библиотекам ---
-using System.Collections.ObjectModel; // Для ObservableCollection (для логов, статусов)
-using System.Diagnostics;
-using System.Globalization; // Для CultureInfo (если нужно для форматирования в VM)
-using System.IO;
-using System.Text.RegularExpressions; // Для валидации серийного номера
-using System.Windows;
-using System.Windows.Input; // Для интерфейса ICommand
-using System.Windows.Threading;
 using MvvmHelpers;
+using System.Globalization; // Для CultureInfo (если нужно для форматирования в VM)
+using System.Text.RegularExpressions; // Для валидации серийного номера
+using System.Windows.Input; // Для интерфейса ICommand
 using WPF_LCD_Test.Commands; // Для класса RelayCommand и BaseViewModel
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models; // Для классов Model (Measurement, DeviceUnderTest)
-using static WPF_LCD_Test.Resources.Resources;
 using WPF_LCD_Test.Services; // Для сервисов (IFileService, IDialogService, ILocalizationService)
+using static WPF_LCD_Test.Resources.Resources;
 
 // Класс ViewModel для MainWindow. Наследует от BaseViewModel для уведомлений UI.
 // Реализует IDisposable для очистки ресурсов (отписка от событий).
@@ -98,7 +93,6 @@ namespace WPF_LCD_Test.ViewModels
                 }
             }
         }
-
 
         // Время измерения в секундах
         public int MeasurementTime
@@ -317,7 +311,8 @@ namespace WPF_LCD_Test.ViewModels
             {
                 _isDeviceConnecting = true;
                 // Вызываем асинхронный метод Сервиса. Результат и статус придут через события.
-                if(!await _colorMeasurementService.ConnectAsync()){
+                if (!await _colorMeasurementService.ConnectAsync())
+                {
                     _isDeviceConnecting = false;
                     ExecuteDisconnect(); //Если калибровка была неуспешной, отключаем прибор
                 }
@@ -370,13 +365,12 @@ namespace WPF_LCD_Test.ViewModels
                 if (IsDeviceConnected)
                 {
                     _isDeviceCalibrating = true;
-                    if(!await _colorMeasurementService.CalibrateZeroAsync())
+                    if (!await _colorMeasurementService.CalibrateZeroAsync())
                     {
                         _isDeviceCalibrating = false;
                         ExecuteDisconnect(); //Если калибровка была неуспешной, отключаем прибор
                         _dialogService.ShowMessage($"{ErrAtCalibration}", $"{Err}");
                     }
-                    
                 }
             }
             catch (Exception)
@@ -606,7 +600,7 @@ namespace WPF_LCD_Test.ViewModels
                             CultureInfo.InvariantCulture
                         );
 
-                        measuredValuesDisplay = 
+                        measuredValuesDisplay =
                             $"x={xFormatted}, y={yFormatted}, Lv={LvFormatted}, T={TFormatted}";
 
                         AddLogMessage($"{Result} '{measurementName}': {measuredValuesDisplay}");

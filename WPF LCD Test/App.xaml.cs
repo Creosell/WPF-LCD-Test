@@ -1,14 +1,12 @@
 ﻿// В файле App.xaml.cs
 
-
+using System.Diagnostics;
 using System.Windows;
 using WPF_LCD_Test.Interfaces;
-using WPF_LCD_Test.Views;
-using WPF_LCD_Test.ViewModels;
 using WPF_LCD_Test.Models;
-using System.Diagnostics;
 using WPF_LCD_Test.Services;
-
+using WPF_LCD_Test.ViewModels;
+using WPF_LCD_Test.Views;
 
 namespace WPF_LCD_Test
 {
@@ -16,12 +14,12 @@ namespace WPF_LCD_Test
     {
         // Объявите приватные поля для сервисов, если они нужны на уровне App (например, LocalizationService)
 
-        IColorMeasurementService colorMeasurementService = new ColorMeasurementService(); // Реализация сервиса прибора
-        IFileService fileService = new FileService(); // Реализация сервиса файлов
-        IDialogService dialogService = new DialogService(); // Реализация сервиса диалогов
-        ISettingsService settingsService = SettingsService.Instance; // Получаем синглтон сервиса настроек (если он синглтон)
-        ILocalizationService localizationService = LocalizationService.Instance; // Получаем синглтон сервиса локализации (если он синглтон)
-        IDispatcher dispatcher = new WpfDispatcher(); // Реализация обертки для Dispatcher (если нужна)
+        private IColorMeasurementService colorMeasurementService = new ColorMeasurementService(); // Реализация сервиса прибора
+        private IFileService fileService = new FileService(); // Реализация сервиса файлов
+        private IDialogService dialogService = new DialogService(); // Реализация сервиса диалогов
+        private ISettingsService settingsService = SettingsService.Instance; // Получаем синглтон сервиса настроек (если он синглтон)
+        private ILocalizationService localizationService = LocalizationService.Instance; // Получаем синглтон сервиса локализации (если он синглтон)
+        private IDispatcher dispatcher = new WpfDispatcher(); // Реализация обертки для Dispatcher (если нужна)
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
@@ -62,6 +60,7 @@ namespace WPF_LCD_Test
             // 7. Показываем главное окно
             mainWindow.Show();
         }
+
         public static void CheckCurrentAppLanguage()
         {
             // Устанавливаем эту культуру для текущего потока из пула
@@ -108,7 +107,6 @@ namespace WPF_LCD_Test
 
                 ResourceDictionary newLanguageDictionary = new ResourceDictionary() { Source = new Uri(resourcePathToLoad, UriKind.RelativeOrAbsolute) };
                 Application.Current.Resources.MergedDictionaries.Add(newLanguageDictionary);
-
             }
             catch (Exception ex)
             {
@@ -116,7 +114,7 @@ namespace WPF_LCD_Test
             }
         }
 
-         protected override void OnExit(ExitEventArgs e)
+        protected override void OnExit(ExitEventArgs e)
         {
             // Очистка сервисов, если они Disposable и создаются здесь
             (colorMeasurementService as IDisposable)?.Dispose();

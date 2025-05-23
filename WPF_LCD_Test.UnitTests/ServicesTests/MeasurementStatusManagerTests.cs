@@ -1,12 +1,6 @@
 ﻿// WPF_LCD_Test.UnitTests/ServicesTests/MeasurementStatusServiceTests.cs
 
-using NUnit.Framework;
-using System.Linq;
-using System.Collections.ObjectModel;
-using WPF_LCD_Test.Interfaces;
-using WPF_LCD_Test.ViewModels;
 using System.Reflection; // Обязательно для рефлексии
-using System; // Обязательно для Lazy
 using WPF_LCD_Test.Services; // Убедитесь, что это пространство имен соответствует вашему проекту
 
 namespace WPF_LCD_Test.UnitTests.ServicesTests

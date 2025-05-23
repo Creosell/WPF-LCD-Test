@@ -1,14 +1,7 @@
-﻿using System;
+﻿using Moq;
 using System.Globalization;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
-using Moq;
-using NUnit.Framework; // Использование NUnit
 using WPF_LCD_Test.Interfaces;
-using WPF_LCD_Test.Models;
-using WPF_LCD_Test.Resources; // Для использования ресурсов
 using WPF_LCD_Test.Services;
 
 // Это заглушка для LocalizationService.Instance, если он статичен и вызывает проблемы в тестах.
@@ -18,7 +11,8 @@ internal class MockLocalizationService
 {
     // Используем внутренний статический класс, чтобы избежать конфликтов имен
     // и чтобы он был доступен только в сборке тестов.
-    private MockLocalizationService() { } // Приватный конструктор для синглтона
+    private MockLocalizationService()
+    { } // Приватный конструктор для синглтона
 
     public static MockLocalizationService Instance { get; } = new MockLocalizationService();
     public CultureInfo CurrentCulture { get; set; } = CultureInfo.InvariantCulture;

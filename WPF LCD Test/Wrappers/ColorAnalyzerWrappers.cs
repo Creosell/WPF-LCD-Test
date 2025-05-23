@@ -1,6 +1,5 @@
-﻿using System;
+﻿using CA200SRVRLib; // Прямая ссылка на COM-библиотеку
 using System.Runtime.InteropServices;
-using CA200SRVRLib; // Прямая ссылка на COM-библиотеку
 using WPF_LCD_Test.Interfaces; // Наши объединенные интерфейсы
 
 namespace WPF_LCD_Test.Services.Wrappers

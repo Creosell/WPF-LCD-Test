@@ -1,15 +1,8 @@
 ﻿// В папке Services
 // В новом файле MeasurementStatusService.cs
 
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel; // Для ObservableCollection
-using System.Linq;
-using System.Text.Json.Serialization;
-using System.Windows.Media;
-using MvvmHelpers;
 using WPF_LCD_Test.Models;
-using WPF_LCD_Test.ViewModels; // Убедитесь, что пространство имен вашего ViewModel доступно
 
 namespace WPF_LCD_Test.Services // Или Managers, в зависимости от вашей структуры
 {
@@ -33,6 +26,7 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
 
         // Конструктор: инициализирует коллекцию и создает все объекты статусов
         public const string TopLeftLocationName = "TopLeft";
+
         public const string TopCenterLocationName = "TopCenter";
         public const string TopRightLocationName = "TopRight";
         public const string MiddleLeftLocationName = "MiddleLeft";
@@ -59,8 +53,6 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
         public MeasurementStatusViewModel? GreenColorStatus { get; }
         public MeasurementStatusViewModel? BlueColorStatus { get; }
         public MeasurementStatusViewModel? BlackColorStatus { get; }
-
-     
 
         private MeasurementStatusService()
         {
@@ -95,39 +87,51 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
                     case TopLeftLocationName:
                         TopLeftStatus = status;
                         break;
+
                     case TopCenterLocationName:
                         TopCenterStatus = status;
                         break;
+
                     case TopRightLocationName:
                         TopRightStatus = status;
                         break;
+
                     case MiddleLeftLocationName:
                         MiddleLeftStatus = status;
                         break;
+
                     case CenterLocationName:
                         CenterStatus = status;
                         break;
+
                     case MiddleRightLocationName:
                         MiddleRightStatus = status;
                         break;
+
                     case BottomLeftLocationName:
                         BottomLeftStatus = status;
                         break;
+
                     case BottomCenterLocationName:
                         BottomCenterStatus = status;
                         break;
+
                     case BottomRightLocationName:
                         BottomRightStatus = status;
                         break;
+
                     case RedColorLocationName:
                         RedColorStatus = status;
                         break;
+
                     case GreenColorLocationName:
                         GreenColorStatus = status;
                         break;
+
                     case BlueColorLocationName:
                         BlueColorStatus = status;
                         break;
+
                     case BlackColorLocationName:
                         BlackColorStatus = status;
                         break;

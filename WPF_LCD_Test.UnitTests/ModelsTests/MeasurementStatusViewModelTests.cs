@@ -1,10 +1,9 @@
 ﻿// В проекте WPF_LCD_Test.UnitTests (папка ModelsTests)
 // Файл MeasurementStatusViewModelTests.cs
 
-using NUnit.Framework;
-using WPF_LCD_Test.Models; // Для MeasurementStatusViewModel
-using System.Windows.Media; // Для Brush
 using System.ComponentModel; // Для INotifyPropertyChanged
+using System.Windows.Media; // Для Brush
+using WPF_LCD_Test.Models; // Для MeasurementStatusViewModel
 
 namespace WPF_LCD_Test.UnitTests.ModelsTests
 {

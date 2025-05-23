@@ -1,7 +1,6 @@
 ﻿// В папке Interfaces
 // Файл IFile.cs
 using System.IO;
-using System.Threading.Tasks;
 
 namespace WPF_LCD_Test.Interfaces
 {

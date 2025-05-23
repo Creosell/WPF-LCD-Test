@@ -18,17 +18,20 @@ namespace WPF_LCD_Test.Services
     {
         // Приватные поля для хранения путей
         private string _applicationBasePath;
+
         private string _baseFolderPath;
         private readonly string _workFolerName = "data";
 
-         // Внедряемые зависимости
+        // Внедряемые зависимости
         private readonly IDirectory _directory;
+
         private readonly IFile _file;
-        private readonly IPath _path; 
-        private readonly ILocalizationService _localizationService; 
+        private readonly IPath _path;
+        private readonly ILocalizationService _localizationService;
 
         // Публичные свойства из интерфейса
         public string BaseFolderPath => _baseFolderPath;
+
         public string WorkFolderName => _workFolerName;
 
         // Опции для ЗАГРУЗКИ настроек (десериализация)
@@ -40,6 +43,7 @@ namespace WPF_LCD_Test.Services
 
         // События из интерфейса
         public event EventHandler<string> StatusMessage;
+
         public event EventHandler<bool> SaveOperationCompleted;
 
         // Конструктор сервиса для продакшн-кода (использует обертки по умолчанию)
@@ -113,7 +117,7 @@ namespace WPF_LCD_Test.Services
                 string filePath = _path.Combine(BaseFolderPath, fileName); // Путь - базовая папка + имя файла
 
                 // Сериализуем объект DeviceUnderTest в JSON
-                
+
                 string jsonString = JsonSerializer.Serialize(device, _saveSerializerOptions); // Сериализуем объект Модели
 
                 // Асинхронно записываем JSON строку в файл

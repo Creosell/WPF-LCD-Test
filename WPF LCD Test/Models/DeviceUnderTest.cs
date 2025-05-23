@@ -2,7 +2,6 @@
 using WPF_LCD_Test.Converters;
 using static WPF_LCD_Test.Resources.Resources;
 
-
 namespace WPF_LCD_Test.Models // Пространство имен должно быть в папке Models
 {
     // Делаем класс публичным, чтобы к нему можно было обращаться из ViewModel/Interfaces

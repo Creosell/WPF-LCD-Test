@@ -1,12 +1,12 @@
-﻿using System;
-
-namespace WPF_LCD_Test.Interfaces
+﻿namespace WPF_LCD_Test.Interfaces
 {
     // Интерфейс для корневого объекта CA200SRVRLib.Ca200
     public interface IColorAnalyzer200 : IDisposable
     {
         IColorAnalyzer SingleCa { get; }
+
         void AutoConnect();
+
         // Убрали void Disconnect(); так как он не освобождает порт как нужно
         // Добавьте сюда другие методы/свойства Ca200, если они используются
     }
@@ -18,11 +18,16 @@ namespace WPF_LCD_Test.Interfaces
         IColorAnalyzerMemory Memory { get; }
 
         void CalZero();
+
         int SyncMode { get; set; }
         int AveragingMode { get; set; }
+
         void SetAnalogRange(float Range1, float Range2);
-        int DisplayMode { get; set;}
+
+        int DisplayMode { get; set; }
+
         void Measure();
+
         // Добавьте другие методы/свойства Ca, если они используются
     }
 

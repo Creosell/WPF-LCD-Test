@@ -37,7 +37,6 @@
         </Style>
     </UserControl.Resources>
 
-
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="40*" />
@@ -290,12 +289,9 @@
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding Path=(services:MeasurementStatusService.Instance).BlackColorStatus.MeasuredValuesString}" />
                     </Grid>
-
                 </Grid>
             </Grid>
         </Grid>
-
-
 
         <TextBox
             x:Name="LogTextBox"
@@ -321,11 +317,6 @@
                     <MenuItem Command="{Binding ClearLogCommand}" Header="{DynamicResource ClearLogWindow}" />
                     <Separator />
                     <MenuItem Command="ApplicationCommands.SelectAll" />
-
-
-
-
-
                 </ContextMenu>
             </TextBox.ContextMenu>
         </TextBox>
@@ -365,13 +356,5 @@
                     Content="{DynamicResource ClearFieldsButton}" />
             </StackPanel>
         </Grid>
-
-
-
-
-
-
-
-
     </Grid>
 </UserControl>

@@ -1,9 +1,8 @@
 ﻿// В проекте WPF_LCD_Test.UnitTests (папка ModelsTests)
 // Файл MeasurementTests.cs
 
-using NUnit.Framework;
-using WPF_LCD_Test.Models; // Для класса Measurement
 using System.Globalization; // Для CultureInfo
+using WPF_LCD_Test.Models; // Для класса Measurement
 
 namespace WPF_LCD_Test.UnitTests.ModelsTests
 {

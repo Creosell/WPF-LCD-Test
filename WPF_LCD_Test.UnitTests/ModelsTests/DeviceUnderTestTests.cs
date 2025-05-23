@@ -1,9 +1,6 @@
 ﻿// В проекте WPF_LCD_Test.UnitTests (папка ModelsTests)
 // Файл DeviceUnderTestTests.cs
 
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using WPF_LCD_Test.Models; // Для DeviceUnderTest и Measurement
 using static WPF_LCD_Test.Resources.Resources; // Для доступа к SnCantBeEmpty
 
@@ -32,7 +29,7 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
         }
 
         // Тест для конструктора с пустым или null серийным номером
-        
+
         [TestCase("")]
         [TestCase(" ")]
         public void Constructor_WithInvalidSerialNumber_ThrowsArgumentException(string invalidSerialNumber)

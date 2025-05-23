@@ -1,11 +1,10 @@
 ﻿using Moq;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Globalization;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
 using WPF_LCD_Test.Services; // Добавляем using для доступа к MeasurementStatusService
 using WPF_LCD_Test.ViewModels;
+
 // Это важно: позволяет получить доступ к свойствам Resources.resx напрямую (например, IncorrectMeasTimeFormat)
 using static WPF_LCD_Test.Resources.Resources;
 
@@ -52,7 +51,6 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             _mockLocalizationService.Setup(l => l.GetString(It.IsAny<string>())).Returns((string key) => key);
             _mockLocalizationService.Setup(l => l.GetString(It.IsAny<string>(), It.IsAny<object[]>())).Returns((string key, object[] args) => key + string.Join("", args));
 
-
             _viewModel = new MeasurementViewModel(
                 _mockColorMeasurementService.Object,
                 _mockFileService.Object,
@@ -61,70 +59,65 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                 _mockDispatcher.Object
             );
 
-
-        
-
-
-        // Настройка LocalizationService:
-        // Мокируем сервис локализации, чтобы он возвращал реальные значения из Resources.resx
-        _mockLocalizationService.Setup(l => l.GetString(It.IsAny<string>()))
-                                    .Returns((string key) =>
-                                    {
-                                        switch (key)
+            // Настройка LocalizationService:
+            // Мокируем сервис локализации, чтобы он возвращал реальные значения из Resources.resx
+            _mockLocalizationService.Setup(l => l.GetString(It.IsAny<string>()))
+                                        .Returns((string key) =>
                                         {
-                                            case nameof(ConnectingCA): return ConnectingCA;
-                                            case nameof(ConnectedCA): return ConnectedCA;
-                                            case nameof(DisconnectedCA): return DisconnectedCA;
-                                            case nameof(Err): return Err;
-                                            case nameof(FillSN): return FillSN;
-                                            case nameof(NoSNErr): return NoSNErr;
-                                            case nameof(TestStartInfo): return TestStartInfo;
-                                            case nameof(Result): return Result;
-                                            case nameof(NoData): return NoData;
-                                            case nameof(LvIsTooLow): return LvIsTooLow;
-                                            case nameof(CheckProbe): return CheckProbe;
-                                            case nameof(InvalidResultErr): return InvalidResultErr;
-                                            case nameof(ColorServiceErr): return ColorServiceErr;
-                                            case nameof(ColorAnalyzerErr): return ColorAnalyzerErr;
-                                            case nameof(UnexpectedMeasurementErr): return UnexpectedMeasurementErr;
-                                            case nameof(Saving): return Saving;
-                                            case nameof(SaveJSONErrDeviceIsEmpty): return SaveJSONErrDeviceIsEmpty;
-                                            case nameof(SavingNotFullWarning): return SavingNotFullWarning;
-                                            case nameof(Warning): return Warning;
-                                            case nameof(SaveCanceled): return SaveCanceled;
-                                            case nameof(SaveJSONErrForSN): return SaveJSONErrForSN;
-                                            case nameof(CleanFieldWarning): return CleanFieldWarning;
-                                            case nameof(ClearFieldsDone): return ClearFieldsDone;
-                                            case nameof(ErrMsgLangSwitchFailed): return ErrMsgLangSwitchFailed;
-                                            case nameof(IncorrectFormatForSNErr): return IncorrectFormatForSNErr;
-                                            case nameof(SerialNumber): return SerialNumber;
-                                            case nameof(AlreadyActivated): return AlreadyActivated;
-                                            case nameof(IncorrectMeasTimeFormat): return IncorrectMeasTimeFormat;
-                                            case nameof(CurrentMeasurementTime): return CurrentMeasurementTime;
-                                            case nameof(Seconds): return Seconds;
-                                            case nameof(ViewModelClearing): return ViewModelClearing;
-                                            case nameof(ViewModelCleared): return ViewModelCleared;
-                                            case nameof(RunExternalAppNotFoundErr): return RunExternalAppNotFoundErr;
-                                            case nameof(RunExternalAppUnexpectedErr): return RunExternalAppUnexpectedErr;
-                                            case nameof(ErrAtCalibration): return ErrAtCalibration;
-                                            case nameof(ErrUnexpected): return ErrUnexpected;
-                                            case nameof(Measuring): return Measuring;
-                                            case nameof(ResultsSaved): return ResultsSaved;
-                                            case nameof(ConnectionError): return ConnectionError;
-                                            case nameof(ErrReleaseConnectionCA): return ErrReleaseConnectionCA;
-                                            case nameof(MeasureWihoutConnectionError): return MeasureWihoutConnectionError;
-                                            case nameof(MakeZeroCalibration): return MakeZeroCalibration;
-                                            case nameof(ZeroCalibratedCA): return ZeroCalibratedCA;
-                                            case nameof(WorkFolderCreatedForSN): return WorkFolderCreatedForSN;
-                                            case nameof(CalibratedCA): return CalibratedCA;
-                                            case nameof(NotCalibratedCa): return NotCalibratedCa;
-                                            case nameof(TestFormatString): return TestFormatString;
-                                            case nameof(BadConnection): return BadConnection;
-                                            case nameof(ZeroCalibration): return ZeroCalibration;
-                                            default: return $"{key}";
-                                        }
-                                    });
-
+                                            switch (key)
+                                            {
+                                                case nameof(ConnectingCA): return ConnectingCA;
+                                                case nameof(ConnectedCA): return ConnectedCA;
+                                                case nameof(DisconnectedCA): return DisconnectedCA;
+                                                case nameof(Err): return Err;
+                                                case nameof(FillSN): return FillSN;
+                                                case nameof(NoSNErr): return NoSNErr;
+                                                case nameof(TestStartInfo): return TestStartInfo;
+                                                case nameof(Result): return Result;
+                                                case nameof(NoData): return NoData;
+                                                case nameof(LvIsTooLow): return LvIsTooLow;
+                                                case nameof(CheckProbe): return CheckProbe;
+                                                case nameof(InvalidResultErr): return InvalidResultErr;
+                                                case nameof(ColorServiceErr): return ColorServiceErr;
+                                                case nameof(ColorAnalyzerErr): return ColorAnalyzerErr;
+                                                case nameof(UnexpectedMeasurementErr): return UnexpectedMeasurementErr;
+                                                case nameof(Saving): return Saving;
+                                                case nameof(SaveJSONErrDeviceIsEmpty): return SaveJSONErrDeviceIsEmpty;
+                                                case nameof(SavingNotFullWarning): return SavingNotFullWarning;
+                                                case nameof(Warning): return Warning;
+                                                case nameof(SaveCanceled): return SaveCanceled;
+                                                case nameof(SaveJSONErrForSN): return SaveJSONErrForSN;
+                                                case nameof(CleanFieldWarning): return CleanFieldWarning;
+                                                case nameof(ClearFieldsDone): return ClearFieldsDone;
+                                                case nameof(ErrMsgLangSwitchFailed): return ErrMsgLangSwitchFailed;
+                                                case nameof(IncorrectFormatForSNErr): return IncorrectFormatForSNErr;
+                                                case nameof(SerialNumber): return SerialNumber;
+                                                case nameof(AlreadyActivated): return AlreadyActivated;
+                                                case nameof(IncorrectMeasTimeFormat): return IncorrectMeasTimeFormat;
+                                                case nameof(CurrentMeasurementTime): return CurrentMeasurementTime;
+                                                case nameof(Seconds): return Seconds;
+                                                case nameof(ViewModelClearing): return ViewModelClearing;
+                                                case nameof(ViewModelCleared): return ViewModelCleared;
+                                                case nameof(RunExternalAppNotFoundErr): return RunExternalAppNotFoundErr;
+                                                case nameof(RunExternalAppUnexpectedErr): return RunExternalAppUnexpectedErr;
+                                                case nameof(ErrAtCalibration): return ErrAtCalibration;
+                                                case nameof(ErrUnexpected): return ErrUnexpected;
+                                                case nameof(Measuring): return Measuring;
+                                                case nameof(ResultsSaved): return ResultsSaved;
+                                                case nameof(ConnectionError): return ConnectionError;
+                                                case nameof(ErrReleaseConnectionCA): return ErrReleaseConnectionCA;
+                                                case nameof(MeasureWihoutConnectionError): return MeasureWihoutConnectionError;
+                                                case nameof(MakeZeroCalibration): return MakeZeroCalibration;
+                                                case nameof(ZeroCalibratedCA): return ZeroCalibratedCA;
+                                                case nameof(WorkFolderCreatedForSN): return WorkFolderCreatedForSN;
+                                                case nameof(CalibratedCA): return CalibratedCA;
+                                                case nameof(NotCalibratedCa): return NotCalibratedCa;
+                                                case nameof(TestFormatString): return TestFormatString;
+                                                case nameof(BadConnection): return BadConnection;
+                                                case nameof(ZeroCalibration): return ZeroCalibration;
+                                                default: return $"{key}";
+                                            }
+                                        });
 
             // Создаем ViewModel, передавая ему моки сервисов
             _viewModel = new MeasurementViewModel(
@@ -150,7 +143,6 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             Assert.That(_viewModel.IsSerialNumberConfirmed, Is.False);
             Assert.That(_viewModel.IsMeasurementButtonsEnabled, Is.False);
             Assert.That(_viewModel.LogText, Is.Empty);
-            
         }
 
         // --- Тесты для ZeroCalibrationCommand ---
@@ -171,7 +163,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             // 2. Мокируем CalibrateZeroAsync И имитируем вызовы событий StatusMessage и CalibrationStatusChanged
             _mockColorMeasurementService.Setup(s => s.CalibrateZeroAsync())
                 .Returns(Task.FromResult(true)) // Возвращаем успешный результат операции
-                .Callback(() => {
+                .Callback(() =>
+                {
                     // Имитируем вызов события StatusMessage в начале калибровки
                     _mockColorMeasurementService.Raise(
                         s => s.StatusMessage += null,
@@ -193,8 +186,6 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                         _mockLocalizationService.Object.GetString(ZeroCalibratedCA) // ВТОРОЕ СООБЩЕНИЕ
                     );
                 });
-
-
 
             // Act
             _viewModel.ZeroCalibrationCommand.Execute(null);
@@ -225,16 +216,16 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             _mockColorMeasurementService.Setup(s => s.IsDeviceConnected).Returns(true);
             _viewModel.IsDeviceConnected = true;
 
-
             // Мокируем CalibrateZeroAsync И имитируем вызовы событий StatusMessage и CalibrationStatusChanged
             _mockColorMeasurementService.Setup(s => s.CalibrateZeroAsync())
                 .Returns(Task.FromResult(false)) // Возвращаем успешный результат операции
-                .Callback(() => {
+                .Callback(() =>
+                {
                     // Имитируем вызов события StatusMessage в начале калибровки
                     _mockColorMeasurementService.Raise(
                         s => s.StatusMessage += null,
                         _mockColorMeasurementService.Object,
-                        _mockLocalizationService.Object.GetString(CalibratingZeroCA) 
+                        _mockLocalizationService.Object.GetString(CalibratingZeroCA)
                     );
 
                     // Имитируем вызов события StatusMessage после успешной калибровки
@@ -256,7 +247,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         }
 
         // --- Тесты для SaveResultsCommand ---
-        
+
         [Test]
         public async Task SaveResultsCommand_Execute_SavesResultsAndLogs()
         {
@@ -291,7 +282,6 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                 It.IsAny<string>()
             )).ReturnsAsync(true);
 
-
             // Act
             _viewModel.SaveResultsCommand.Execute(null); // Вызываем команду
 
@@ -311,7 +301,6 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                         $"Log should contain the successful save message from FileService. Current logs: {_viewModel.LogText}");
             Assert.That(_viewModel.LogText, Does.Contain(SavedToJSON),
                         $"Log should contain the successful save message from FileService. Current logs: {_viewModel.LogText}");
-
 
             // Проверяем, что также есть сообщения "Current SN is: TESTSN" и "Saving..."
             Assert.That(_viewModel.LogText, Does.Contain(string.Format(_mockLocalizationService.Object.GetString(CurrentSN), testSn)),
@@ -350,14 +339,12 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                                 throw new IOException("Simulated save error for test."); // Бросаем исключение
                             });
 
-
             // Act
             _viewModel.SaveResultsCommand.Execute(null); // Вызываем команду
 
             // Ждем, пока команда завершит свою асинхронную часть
             bool finished = commandFinishedEvent.Wait(TimeSpan.FromSeconds(5));
             Assert.That(finished, Is.True, "Command did not complete its async operation within the timeout.");
-
 
             // Assert
             // 1. Проверяем, что _mockFileService.SaveDeviceDataToJsonAsync был вызван ровно один раз.
@@ -383,7 +370,6 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                 It.IsAny<string>()
             ), Times.Once);
         }
-
 
         [Test]
         public void SaveResultsCommand_CanExecute_ReturnsFalse_WhenEmptyDevice()
@@ -615,8 +601,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             ), Times.Once);
             // Проверяем, что лог не содержит сообщения об успешном применении времени
             Assert.That(_viewModel.LogText.Contains($"{CurrentMeasurementTime}:"), Is.False);
-        }                                                                                                                                       
-      
+        }
 
         [Test]
         public void ApplyMeasurementTimeCommand_Execute_HandlesNegativeInput()
@@ -860,7 +845,6 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                 It.Is<string>(msg => msg.Contains(_mockLocalizationService.Object.GetString(ErrMsgLangSwitchFailed))),
                 It.Is<string>(title => title == _mockLocalizationService.Object.GetString(Err))
             ), Times.Once);
-
         }
 
         // --- Тесты для NewDeviceUnderTestCommand ---

@@ -1,9 +1,8 @@
 ﻿// В проекте WPF_LCD_Test.UnitTests (создайте новую папку, например, ModelsTests)
 // Файл AppSettingsTests.cs
 
-using NUnit.Framework;
-using WPF_LCD_Test.Models; // Используем пространство имен вашей модели
 using System.Text.Json; // Для тестов сериализации
+using WPF_LCD_Test.Models; // Используем пространство имен вашей модели
 
 namespace WPF_LCD_Test.UnitTests.ModelsTests
 {

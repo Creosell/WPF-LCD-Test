@@ -1,12 +1,7 @@
-﻿using NUnit.Framework;
-using Moq;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Moq;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
 using WPF_LCD_Test.ViewModels;
-using System.Collections.ObjectModel; // Для ObservableCollection
 
 namespace WPF_LCD_Test.UnitTests.ViewModels
 {
@@ -67,7 +62,6 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             ));
             // Добавьте проверку ParamName, если это необходимо
             Assert.That(ex1.ParamName, Is.EqualTo("settingsService"), "ParamName should be 'settingsService'");
-
 
             // Тест для localizationService
             var ex2 = Assert.Throws<ArgumentNullException>(() => new SettingsViewModel(
