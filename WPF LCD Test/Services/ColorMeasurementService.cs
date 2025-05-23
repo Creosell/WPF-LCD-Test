@@ -258,7 +258,7 @@ namespace WPF_LCD_Test.Services
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing)
+        public virtual void Dispose(bool disposing)
         {
             if (disposing)
             {
