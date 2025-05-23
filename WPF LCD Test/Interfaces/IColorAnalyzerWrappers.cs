@@ -1,69 +1,45 @@
-﻿// В папке Interfaces
-// Файл IColorAnalyzerWrappers.cs
-
-using System;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace WPF_LCD_Test.Interfaces
 {
-    /// <summary>
-    /// Интерфейс для обертки объекта Ca200 из библиотеки CA200SRVRLib.
-    /// Предоставляет методы и свойства для управления главным контроллером анализатора цвета.
-    /// </summary>
-    public interface IColorAnalyzer200
+    // Интерфейс для корневого объекта CA200SRVRLib.Ca200
+    public interface IColorAnalyzer200 : IDisposable
     {
-        // Свойство для доступа к обернутому Ca-объекту
         IColorAnalyzer SingleCa { get; }
-
-        // Методы, соответствующие Ca200-объекту
         void AutoConnect();
-        // Добавьте другие методы Ca200, которые вы используете (например, Close)
+        // Убрали void Disconnect(); так как он не освобождает порт как нужно
+        // Добавьте сюда другие методы/свойства Ca200, если они используются
     }
 
-    /// <summary>
-    /// Интерфейс для обертки объекта Ca (SingleCa) из библиотеки CA200SRVRLib.
-    /// Предоставляет методы и свойства для управления одним анализатором цвета.
-    /// </summary>
+    // Интерфейс для объекта CA200SRVRLib.Ca (получается через Ca200.SingleCa)
     public interface IColorAnalyzer
     {
-        // Свойства, соответствующие Ca-объекту
+        IColorAnalyzerProbe SingleProbe { get; }
+        IColorAnalyzerMemory Memory { get; }
+
+        void CalZero();
         int SyncMode { get; set; }
         int AveragingMode { get; set; }
-        int DisplayMode { get; set; }
-
-        // Добавим свойство для доступа к Probe, если это необходимо
-        // Пример: если у Ca.SingleProbe есть свойства sx, sy, Lv, T
-        IColorAnalyzerProbe SingleProbe { get; }
-
-        // Методы, соответствующие Ca-объекту
-        void CalZero();
+        void SetAnalogRange(float Range1, float Range2);
+        int DisplayMode { get; set;}
         void Measure();
-        void SetAnalogRange(float displayRange, float measureRange);
-
-        // Управление памятью, если есть
-        IColorAnalyzerMemory Memory { get; }
+        // Добавьте другие методы/свойства Ca, если они используются
     }
 
-    /// <summary>
-    /// Интерфейс для обертки объекта Probe (SingleProbe) внутри Ca.
-    /// </summary>
+    // Интерфейс для объекта CA200SRVRLib.Probe (получается через Ca.SingleProbe)
     public interface IColorAnalyzerProbe
     {
         double sx { get; }
         double sy { get; }
         double Lv { get; }
         double T { get; }
-        // Добавьте другие свойства, которые вам нужны из Probe
+        // Добавьте другие свойства Probe, если они используются
     }
 
-    /// <summary>
-    /// Интерфейс для обертки объекта Memory (Memory) внутри Ca.
-    /// </summary>
+    // Интерфейс для объекта CA200SRVRLib.Memory (получается через Ca.Memory)
     public interface IColorAnalyzerMemory
     {
         int ChannelNO { get; set; }
-        // Добавьте другие свойства/методы, если они используются (например, Load, Save)
+        // Добавьте другие свойства/методы Memory, если они используются
     }
-
-    
 }

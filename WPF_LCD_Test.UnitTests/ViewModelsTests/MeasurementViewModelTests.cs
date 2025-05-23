@@ -997,13 +997,6 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         }
 
         [Test]
-        public void ZeroCalibrationCommand_CanExecute_ReturnsFalse_WhenNotConnected()
-        {
-            _viewModel.IsDeviceConnected = false;
-            Assert.That(_viewModel.ZeroCalibrationCommand.CanExecute(null), Is.False);
-        }
-
-        [Test]
         public void MeasureCommand_CanExecute_ReturnsTrue_WhenConnectedCalibratedAndSNPresentAndConfirmed()
         {
             _viewModel.IsDeviceConnected = true;

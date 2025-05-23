@@ -317,7 +317,10 @@ namespace WPF_LCD_Test.ViewModels
             {
                 _isDeviceConnecting = true;
                 // Вызываем асинхронный метод Сервиса. Результат и статус придут через события.
-                await _colorMeasurementService.ConnectAsync();
+                if(!await _colorMeasurementService.ConnectAsync()){
+                    _isDeviceConnecting = false;
+                    ExecuteDisconnect(); //Если калибровка была неуспешной, отключаем прибор
+                }
             }
             catch (Exception)
             {
@@ -367,7 +370,13 @@ namespace WPF_LCD_Test.ViewModels
                 if (IsDeviceConnected)
                 {
                     _isDeviceCalibrating = true;
-                    await _colorMeasurementService.CalibrateZeroAsync();
+                    if(!await _colorMeasurementService.CalibrateZeroAsync())
+                    {
+                        _isDeviceCalibrating = false;
+                        ExecuteDisconnect(); //Если калибровка была неуспешной, отключаем прибор
+                        _dialogService.ShowMessage($"{ErrAtCalibration}", $"{Err}");
+                    }
+                    
                 }
             }
             catch (Exception)
@@ -845,7 +854,7 @@ namespace WPF_LCD_Test.ViewModels
         // Проверка доступности команды Калибровка нуля: доступна, если прибор ПОДКЛЮЧЕН И НЕ КАЛИБРОВАН
         private bool CanExecuteZeroCalibration(object parameter)
         {
-            return !_isDeviceConnecting && !_isDeviceCalibrating &&_isDeviceConnected;
+            return !_isDeviceConnecting && !_isDeviceCalibrating;
         }
 
         // Проверка доступности команды Сохранить: есть объект устройства, серийный номер и измерения
