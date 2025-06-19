@@ -42,7 +42,7 @@ namespace WPF_LCD_Test.Converters // Используйте соответств
         {
             // !!! Форматируем DateTime в нужный строковый формат !!!
             // Пример: "yyyy-MM-dd HH:mm:ss" (год-месяц-день час:минута:секунда)
-            string formattedDate = value.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+            string formattedDate = value.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture);
 
             // Записываем отформатированную строку в JSON
             writer.WriteStringValue(formattedDate);

@@ -18,7 +18,7 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
             string location = "TestLocation";
 
             // Act
-            MeasurementStatusViewModel vm = new MeasurementStatusViewModel(location);
+            MeasurementStatus vm = new MeasurementStatus(location);
 
             // Assert
             Assert.That(vm.Location, Is.EqualTo(location), "Location should be initialized correctly.");
@@ -32,7 +32,7 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
         public void DefaultConstructor_InitializesCorrectly()
         {
             // Act
-            MeasurementStatusViewModel vm = new MeasurementStatusViewModel();
+            MeasurementStatus vm = new MeasurementStatus();
 
             // Assert
             Assert.That(vm.Location, Is.EqualTo("Unknown"), "Location should be 'Unknown' by default.");
@@ -46,7 +46,7 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
         public void Location_CanBeSetAndGet()
         {
             // Arrange
-            MeasurementStatusViewModel vm = new MeasurementStatusViewModel();
+            MeasurementStatus vm = new MeasurementStatus();
             string newLocation = "NewTestLocation";
 
             // Act
@@ -63,7 +63,7 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
         public void StatusColor_ReturnsCorrectBrushBasedOnIsPassed(bool? isPassedValue, Type expectedBrushType, string expectedColorName)
         {
             // Arrange
-            MeasurementStatusViewModel vm = new MeasurementStatusViewModel();
+            MeasurementStatus vm = new MeasurementStatus();
 
             // Act
             vm.IsPassed = isPassedValue;
@@ -82,17 +82,17 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
         public void IsPassed_SetProperty_RaisesPropertyChangedForIsPassedAndStatusColor()
         {
             // Arrange
-            MeasurementStatusViewModel vm = new MeasurementStatusViewModel(); // IsPassed is initially null
+            MeasurementStatus vm = new MeasurementStatus(); // IsPassed is initially null
             int isPassedChangedCount = 0;
             int statusColorChangedCount = 0;
 
             ((INotifyPropertyChanged)vm).PropertyChanged += (sender, e) =>
             {
-                if (e.PropertyName == nameof(MeasurementStatusViewModel.IsPassed))
+                if (e.PropertyName == nameof(MeasurementStatus.IsPassed))
                 {
                     isPassedChangedCount++;
                 }
-                else if (e.PropertyName == nameof(MeasurementStatusViewModel.StatusColor))
+                else if (e.PropertyName == nameof(MeasurementStatus.StatusColor))
                 {
                     statusColorChangedCount++;
                 }
@@ -129,12 +129,12 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
         public void MeasuredValuesString_SetProperty_RaisesPropertyChanged()
         {
             // Arrange
-            MeasurementStatusViewModel vm = new MeasurementStatusViewModel();
+            MeasurementStatus vm = new MeasurementStatus();
             int changedCount = 0;
 
             ((INotifyPropertyChanged)vm).PropertyChanged += (sender, e) =>
             {
-                if (e.PropertyName == nameof(MeasurementStatusViewModel.MeasuredValuesString))
+                if (e.PropertyName == nameof(MeasurementStatus.MeasuredValuesString))
                 {
                     changedCount++;
                 }

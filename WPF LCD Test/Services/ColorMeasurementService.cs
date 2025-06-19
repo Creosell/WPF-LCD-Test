@@ -32,7 +32,7 @@ namespace WPF_LCD_Test.Services
         private const int UniverslaSyncMode = 3; //UNIV sync.
 
         //Measuring rate modes
-        private const int SlowMeasuringMode = 0; //
+        private const int SlowMeasuringMode = 0; //Slow
 
         private const int FastMeasuringMode = 1; //Fast
         private const int AutoMeasuringMode = 2; //Auto

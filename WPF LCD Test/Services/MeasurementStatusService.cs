@@ -22,7 +22,7 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
 
         // --- Конец реализации Lazy Singleton ---
         // Публичная коллекция статусов, к которой будут обращаться другие классы
-        public ObservableCollection<MeasurementStatusViewModel> AllMeasurementButtonStatuses { get; }
+        public ObservableCollection<MeasurementStatus> AllMeasurementButtonStatuses { get; }
 
         // Конструктор: инициализирует коллекцию и создает все объекты статусов
         public const string TopLeftLocationName = "TopLeft";
@@ -40,19 +40,19 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
         public const string BlueColorLocationName = "BlueColor";
         public const string BlackColorLocationName = "BlackColor";
 
-        public MeasurementStatusViewModel? TopLeftStatus { get; }
-        public MeasurementStatusViewModel? TopCenterStatus { get; }
-        public MeasurementStatusViewModel? TopRightStatus { get; }
-        public MeasurementStatusViewModel? MiddleLeftStatus { get; }
-        public MeasurementStatusViewModel? CenterStatus { get; }
-        public MeasurementStatusViewModel? MiddleRightStatus { get; }
-        public MeasurementStatusViewModel? BottomLeftStatus { get; }
-        public MeasurementStatusViewModel? BottomCenterStatus { get; }
-        public MeasurementStatusViewModel? BottomRightStatus { get; }
-        public MeasurementStatusViewModel? RedColorStatus { get; }
-        public MeasurementStatusViewModel? GreenColorStatus { get; }
-        public MeasurementStatusViewModel? BlueColorStatus { get; }
-        public MeasurementStatusViewModel? BlackColorStatus { get; }
+        public MeasurementStatus? TopLeftStatus { get; }
+        public MeasurementStatus? TopCenterStatus { get; }
+        public MeasurementStatus? TopRightStatus { get; }
+        public MeasurementStatus? MiddleLeftStatus { get; }
+        public MeasurementStatus? CenterStatus { get; }
+        public MeasurementStatus? MiddleRightStatus { get; }
+        public MeasurementStatus? BottomLeftStatus { get; }
+        public MeasurementStatus? BottomCenterStatus { get; }
+        public MeasurementStatus? BottomRightStatus { get; }
+        public MeasurementStatus? RedColorStatus { get; }
+        public MeasurementStatus? GreenColorStatus { get; }
+        public MeasurementStatus? BlueColorStatus { get; }
+        public MeasurementStatus? BlackColorStatus { get; }
 
         private MeasurementStatusService()
         {
@@ -78,7 +78,7 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
 
             foreach (var location in locations)
             {
-                var status = new MeasurementStatusViewModel(location); // Создаем экземпляр статуса
+                var status = new MeasurementStatus(location); // Создаем экземпляр статуса
                 AllMeasurementButtonStatuses.Add(status); // Добавляем в коллекцию
 
                 // Присваиваем созданный объект статусному свойству в этом менеджере
@@ -140,7 +140,7 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
         }
 
         // Опционально: Метод для удобного поиска статуса по имени локации
-        public MeasurementStatusViewModel? GetStatusByLocation(string location)
+        public MeasurementStatus? GetStatusByLocation(string location)
         {
             // Используем LINQ для поиска первого статуса с совпадающим именем локации
             return AllMeasurementButtonStatuses.FirstOrDefault(s => s.Location == location);

@@ -971,10 +971,8 @@ namespace WPF_LCD_Test.ViewModels
         {
             // 1. Ищем нужный объект MeasurementStatusViewModel в коллекции по его Location
             //    Используем LINQ FirstOrDefault(). Он вернет первый найденный элемент или null, если не найден.
-            MeasurementStatusViewModel statusToUpdate =
-                MeasurementStatusService.Instance.AllMeasurementButtonStatuses.FirstOrDefault(s =>
-                    s.Location == location
-                );
+            MeasurementStatus statusToUpdate =
+                MeasurementStatusService.Instance.AllMeasurementButtonStatuses.FirstOrDefault(s => s.Location == location);
 
             // 2. Проверяем, был ли найден объект статуса
             if (statusToUpdate != null)
@@ -1002,7 +1000,7 @@ namespace WPF_LCD_Test.ViewModels
         {
             // Сбрасываем свойства у каждого публичного объекта статуса
             foreach (
-                MeasurementStatusViewModel measurementStatusViewModel in MeasurementStatusService
+                MeasurementStatus measurementStatusViewModel in MeasurementStatusService
                     .Instance
                     .AllMeasurementButtonStatuses
             )

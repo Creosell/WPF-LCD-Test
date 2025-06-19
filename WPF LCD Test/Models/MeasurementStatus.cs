@@ -4,7 +4,7 @@ using System.Windows.Media;
 
 namespace WPF_LCD_Test.Models
 {
-    public class MeasurementStatusViewModel : BaseViewModel // Наследует от BaseViewModel
+    public class MeasurementStatus : BaseViewModel // Наследует от BaseViewModel
     {
         public string Location { get; set; } // Имя точки измерения
 
@@ -57,7 +57,7 @@ namespace WPF_LCD_Test.Models
         }
 
         // Конструктор с параметром (имя точки) для удобства инициализации
-        public MeasurementStatusViewModel(string location)
+        public MeasurementStatus(string location)
         {
             Location = location;
             IsPassed = null; // Изначально не измерено
@@ -65,7 +65,7 @@ namespace WPF_LCD_Test.Models
         }
 
         // Конструктор по умолчанию (может быть полезен для XAML дизайнера или сериализации)
-        public MeasurementStatusViewModel() // Оставь, если хочешь использовать как отдельный класс
+        public MeasurementStatus() // Оставь, если хочешь использовать как отдельный класс
         {
             Location = "Unknown";
             IsPassed = null;
