@@ -23,11 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="config\color_space.yaml" />
-    <None Remove="config\data_path.yaml" />
-    <None Remove="config\expected_result.yaml" />
-    <None Remove="config\main.yaml" />
-    <None Remove="config\tests.yaml" />
     <None Remove="Images\ButtonsIcons\cropped-logo46.png" />
     <None Remove="Images\ButtonsIcons\SettingsViewIcon.png" />
     <None Remove="Images\WindowsHeaderButtons\close-thick.png" />
@@ -46,24 +41,6 @@
       <Isolated>false</Isolated>
       <EmbedInteropTypes>true</EmbedInteropTypes>
     </COMReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="config\color_space.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="config\data_path.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="config\expected_result.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="config\main.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="config\tests.yaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>

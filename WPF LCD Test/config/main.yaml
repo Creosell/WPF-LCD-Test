@@ -1,7 +1,0 @@
-Task:
-  test:
-    type: Full_test
-  color_space:
-    type: sRGB, NTSC
-
-
