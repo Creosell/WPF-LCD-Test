@@ -1,4 +1,4 @@
 TODO:
-- Add calibration and connection status
 - Add counter for DUT
-- Add page for work with results in folder
+- Add page for work with results in folder (select and delete/archive)
+- Adjust rules for different colors (max brightness for black, xy coordinates for colors)
