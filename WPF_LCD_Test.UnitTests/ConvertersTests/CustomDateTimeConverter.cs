@@ -30,8 +30,8 @@ namespace WPF_LCD_Test.UnitTests.ConvertersTests
             string jsonString = JsonSerializer.Serialize(testObject, options);
 
             // Assert
-            string expectedJson = "{\"TestDateTime\":\"2023-05-20 10:30:45\"}";
-            Assert.That(jsonString, Is.EqualTo(expectedJson), "DateTime should be serialized to 'yyyy-MM-dd HH:mm:ss' format.");
+            string expectedJson = "{\"TestDateTime\":\"20230520_103045\"}";
+            Assert.That(jsonString, Is.EqualTo(expectedJson), "DateTime should be serialized to 'yyyyMMdd_HHmmss' format.");
         }
 
         [Test]
