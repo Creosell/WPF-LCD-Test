@@ -45,24 +45,19 @@ namespace WPF_LCD_Test.Services
         // Событие, которое будет срабатывать при смене языка
         public event EventHandler LanguageChanged;
 
-        // !!! ИЗМЕНИТЕ ЭТО СВОЙСТВО, ЧТОБЫ ОНО ВОЗВРАЩАЛО ХРАНИМУЮ В СЕРВИСЕ КУЛЬТУРУ !!!
-        // Оно ДОЛЖНО возвращать значение поля _applicationCulture, а не культуру текущего потока.
-        public CultureInfo CurrentCulture => _applicationCulture; // <-- ВОЗВРАЩАЕМ ХРАНИМУЮ КУЛЬТУРУ
+        public CultureInfo CurrentCulture => _applicationCulture;
 
         // Метод для установки нового языка
         public void SetLanguage(string cultureCode)
         {
-            // Keep the try-catch blocks and Debug.WriteLine if desired for debugging
-            // Debug.WriteLine($"LocalizationService: Попытка установки языка на {cultureCode}");
+
             try
             {
                 CultureInfo culture = new CultureInfo(cultureCode);
 
-                // Устанавливаем культуру для ТЕКУЩЕГО потока (это важно для UI привязок DynamicResource)
                 Thread.CurrentThread.CurrentCulture = culture;
                 Thread.CurrentThread.CurrentUICulture = culture;
 
-                // !!! СОХРАНЯЕМ УСТАНОВЛЕННУЮ КУЛЬТУРУ В ПОЛЕ СЕРВИСА !!!
                 _applicationCulture = culture; // Сохраняем культуру, которую установили
 
                 OnLanguageChanged();

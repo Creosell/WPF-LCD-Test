@@ -880,6 +880,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Press the “Zero Calibration” button to connect the color analyzer and fill in the SN to start the measurements.
+        /// </summary>
+        public static string WelcomeMessage {
+            get {
+                return ResourceManager.GetString("WelcomeMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A working folder has been created to store the results.
         /// </summary>
         public static string WorkFolderCreated {

@@ -253,6 +253,8 @@ namespace WPF_LCD_Test.ViewModels
                 ColorMeasurementService_CalibrationStatusChanged(sender, isCalibrated); // Подписка на событие калибровки
             //_localizationService.LanguageChanged += LocalizationService_LanguageChanged; // <-- Эта строка должна быть
 
+            AddLogMessage(WelcomeMessage);
+
             // Инициализация начального состояния UI и команд
             //MeasurementButtonsStatusInit(); // Инициализация статусов для каждой точки измерения
             //RequieredMeasurementButtonsInit();
@@ -354,6 +356,7 @@ namespace WPF_LCD_Test.ViewModels
             CheckCurrentAppLanguage();
             if (!CanExecuteZeroCalibration(parameter))
                 return;
+
             try
             {
                 if (!IsDeviceConnected)
@@ -372,6 +375,7 @@ namespace WPF_LCD_Test.ViewModels
                         _dialogService.ShowMessage($"{ErrAtCalibration}", $"{Err}");
                     }
                 }
+
             }
             catch (Exception)
             {
@@ -784,7 +788,7 @@ namespace WPF_LCD_Test.ViewModels
             {
                 ExecuteClearFields(parameter);
             }
-            ResetMeasurementStatuses();
+            UpdateMeasurementButtonsState();
         }
 
         public void ExecuteClearLog()

@@ -405,4 +405,7 @@
   <data name="RunExternalAppInvalidPathErr" xml:space="preserve">
     <value>调用外部程序的路径不正确</value>
   </data>
+  <data name="WelcomeMessage" xml:space="preserve">
+    <value>按 “零点校准 ”按钮连接色彩分析仪，填写 SN 开始测量</value>
+  </data>
 </root>

@@ -28,6 +28,12 @@ namespace WPF_LCD_Test
             // 1. Загружаем настройки
             AppSettings appSettings = settingsService.LoadSettings();
 
+            // 6. Инициализация локализации (после создания сервиса локализации)
+            localizationService.LanguageChanged += LocalizationService_LanguageChanged; // Если App сам обрабатывает смену словаря, подписка здесь
+
+            // Устанавливаем язык по умолчанию (это вызовет SetLanguage в сервисе,
+            localizationService.SetLanguage(appSettings.LanguageCultureCode);
+
             // 2. Создаем экземпляр ГЛАВНОГО ViewModel приложения (оболочки)
             MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(
                 colorMeasurementService,
@@ -51,11 +57,6 @@ namespace WPF_LCD_Test
                 (mainWindow.DataContext as IDisposable)?.Dispose();
             };
 
-            // 6. Инициализация локализации (после создания сервиса локализации)
-            localizationService.LanguageChanged += LocalizationService_LanguageChanged; // Если App сам обрабатывает смену словаря, подписка здесь
-
-            // Устанавливаем язык по умолчанию (это вызовет SetLanguage в сервисе,
-            localizationService.SetLanguage(appSettings.LanguageCultureCode);
 
             // 7. Показываем главное окно
             mainWindow.Show();

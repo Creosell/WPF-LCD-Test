@@ -405,4 +405,7 @@
   <data name="RunExternalAppInvalidPathErr" xml:space="preserve">
     <value>Incorrect path for calling an external program</value>
   </data>
+  <data name="WelcomeMessage" xml:space="preserve">
+    <value>Press the “Zero Calibration” button to connect the color analyzer and fill in the SN to start the measurements</value>
+  </data>
 </root>

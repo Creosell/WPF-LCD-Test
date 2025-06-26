@@ -74,7 +74,7 @@
         明确的结果
     </system:String>
     <system:String x:Key="NewDeviceUnderTestButton">
-        新的 DUT
+        保存结果
     </system:String>
     <system:String x:Key="ClearLogWindow">
         清除日志窗口

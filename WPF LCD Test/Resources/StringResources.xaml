@@ -76,7 +76,7 @@
         Clear results
     </system:String>
     <system:String x:Key="NewDeviceUnderTestButton">
-        New DUT
+        Save results
     </system:String>
     <system:String x:Key="ClearLogWindow">
         Clear log window
