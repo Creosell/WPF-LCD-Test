@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
-using WPF_LCD_Test.Services.Wrappers;
+using WPF_LCD_Test.Wrappers;
 using static WPF_LCD_Test.Resources.Resources;
 
 namespace WPF_LCD_Test.Services
@@ -72,7 +72,7 @@ namespace WPF_LCD_Test.Services
 
         public bool IsDeviceCalibrated => _isDeviceCalibrated;
 
-        public ColorMeasurementService() : this(new ColorAnalyzer200Wrapper())
+        public ColorMeasurementService()
         {
         }
 
@@ -87,6 +87,8 @@ namespace WPF_LCD_Test.Services
             await Task.Run(() => // Выполняем потенциально блокирующий COM вызов в фоновом потоке
             {
                 CheckCurrentAppLanguage(); // Проверяем текущую культуру приложения
+
+                _objCa200 = new ColorAnalyzer200Wrapper();
 
                 try
                 {

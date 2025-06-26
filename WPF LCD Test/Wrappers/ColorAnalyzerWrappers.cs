@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using WPF_LCD_Test.Interfaces; // Наши объединенные интерфейсы
 
-namespace WPF_LCD_Test.Services.Wrappers
+namespace WPF_LCD_Test.Wrappers
 {
     /// <summary>
     /// Обёртка для объекта CA200SRVRLib.Memory, реализующая IColorAnalyzerMemory.
