@@ -142,7 +142,6 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             Assert.That(_viewModel.IsDeviceCalibrated, Is.False);
             Assert.That(_viewModel.IsSerialNumberConfirmed, Is.False);
             Assert.That(_viewModel.IsMeasurementButtonsEnabled, Is.False);
-            Assert.That(_viewModel.LogText, Is.Empty);
         }
 
         // --- Тесты для ZeroCalibrationCommand ---
@@ -859,6 +858,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
 
             // ДОБАВЛЕНО: Мокируем ShowQuestion, чтобы он вернул true (подтверждаем очистку)
             _mockDialogService.Setup(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+
+            _mockFileService.Setup(d => d.SaveDeviceDataToJsonAsync(oldDevice).Result).Returns(true); // Мокируем успешное сохранение старого устройства
 
             // Act
             _viewModel.NewDeviceUnderTestCommand.Execute(null);

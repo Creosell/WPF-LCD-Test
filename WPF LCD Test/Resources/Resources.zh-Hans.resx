@@ -132,6 +132,9 @@
   <data name="CleanFieldWarning" xml:space="preserve">
     <value>您确定要清除所有字段？</value>
   </data>
+  <data name="CleanFieldWarningAfterSave" xml:space="preserve">
+    <value>结果已保存。 清除所有字段？</value>
+  </data>
   <data name="ConnectedCA" xml:space="preserve">
     <value>已连接</value>
   </data>

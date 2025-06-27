@@ -132,6 +132,9 @@
   <data name="CleanFieldWarning" xml:space="preserve">
     <value>Are you sure you want to clear all fields?</value>
   </data>
+  <data name="CleanFieldWarningAfterSave" xml:space="preserve">
+    <value>Results are saved. Clear all fields?</value>
+  </data>
   <data name="ConnectedCA" xml:space="preserve">
     <value>Connected</value>
   </data>

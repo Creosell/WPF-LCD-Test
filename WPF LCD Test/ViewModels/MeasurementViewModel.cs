@@ -393,11 +393,13 @@ namespace WPF_LCD_Test.ViewModels
         }
 
         // Реализация асинхронной команды сохранения результатов
-        private async Task ExecuteSaveResultsAsync(object parameter)
+        private async Task<bool> ExecuteSaveResultsAsync(object parameter)
         {
+            bool result = false;
+
             CheckCurrentAppLanguage();
             if (!CanExecuteSaveResults(parameter))
-                return;
+                return result;
 
             AddLogMessage($"{Saving}");
 
@@ -411,7 +413,7 @@ namespace WPF_LCD_Test.ViewModels
                 )
                 {
                     _dialogService.ShowMessage($"{SaveJSONErrDeviceIsEmpty}", $"{Err}");
-                    return;
+                    return result;
                 }
 
                 // Проверяем полноту измерений и запрашиваем подтверждение, если не все собраны
@@ -424,29 +426,24 @@ namespace WPF_LCD_Test.ViewModels
                     if (!confirmSave)
                     {
                         AddLogMessage($"{SaveCanceled}");
-                        return;
+                        return result;
                     }
                 }
 
                 // Вызываем асинхронный метод Сервиса Файлов для сохранения в JSON
                 // FileService сам отправит сообщения в лог через StatusMessage
-                bool saveSuccess = await _fileService.SaveDeviceDataToJsonAsync(_currentDevice);
+                if (await _fileService.SaveDeviceDataToJsonAsync(_currentDevice))
+                {
+                    result = true;
+                }
 
-                //if (saveSuccess)
-                //{
-                //    _dialogService.ShowMessage($"{ResultsSaved}", $"{Saved}");
-                //}
-                //else
-                //{
-                //    _dialogService.ShowMessage($"{SaveJSONErrForSN}", $"{Err}");
-                //}
             }
             catch (Exception ex)
             {
                 AddLogMessage($"{ErrUnexpected}: {ex.Message}");
                 _dialogService.ShowMessage($"{SaveJSONErrForSN}: {ex.Message}", $"{Err}");
             }
-            // Доступность команды Сохранить обновится в ExecuteClearFields или по UpdateCommandsCanExecute
+            return result;
         }
 
         // Реализация синхронной команды очистки полей
@@ -456,8 +453,13 @@ namespace WPF_LCD_Test.ViewModels
             if (!CanExecuteClearFields(parameter))
                 return; // Хотя обычно всегда true
 
+            string approveQuestion = CleanFieldWarning; // Сообщение для подтверждения очистки
+            if (parameter.Equals("CalledFromNewDeviceMethod"))
+            {
+                approveQuestion =CleanFieldWarningAfterSave;
+            }
             // Запрашиваем подтверждение очистки
-            bool confirm = _dialogService.ShowQuestion($"{CleanFieldWarning}", $"{Warning}");
+            bool confirm = _dialogService.ShowQuestion(approveQuestion, $"{Warning}");
 
             if (confirm)
             {
@@ -777,17 +779,11 @@ namespace WPF_LCD_Test.ViewModels
 
         private async Task ExecuteNewDeviceUnderTest(object parameter)
         {
-            // Здесь можно добавить логику для создания нового устройства
-            // Например, сбросить все статусы и очистить лог
+            if (await ExecuteSaveResultsAsync(parameter)) // Сохраняем результаты, если команда доступна
+            {
+                ExecuteClearFields("CalledFromNewDeviceMethod"); // Очищаем поля, если сохранение прошло успешно
+            }
 
-            if (CanExecuteSaveResults(parameter))
-            {
-                await ExecuteSaveResultsAsync(parameter); // Сохраняем результаты, если команда доступна
-            }
-            if (CanExecuteClearFields(parameter))
-            {
-                ExecuteClearFields(parameter);
-            }
             UpdateMeasurementButtonsState();
         }
 

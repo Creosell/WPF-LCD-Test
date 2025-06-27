@@ -75,7 +75,7 @@ namespace WPF_LCD_Test.Services
         public ColorMeasurementService()
         {
         }
-
+        // Конструктор для тестов
         public ColorMeasurementService(IColorAnalyzer200 ca200Wrapper)
         {
             _objCa200 = ca200Wrapper ?? throw new ArgumentNullException(nameof(ca200Wrapper));
@@ -88,7 +88,11 @@ namespace WPF_LCD_Test.Services
             {
                 CheckCurrentAppLanguage(); // Проверяем текущую культуру приложения
 
-                _objCa200 = new ColorAnalyzer200Wrapper();
+                if (_objCa200 == null)
+                {
+                    _objCa200 = new ColorAnalyzer200Wrapper();
+                }
+
 
                 try
                 {

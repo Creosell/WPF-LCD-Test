@@ -187,6 +187,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Results are saved. Clear all fields?.
+        /// </summary>
+        public static string CleanFieldWarningAfterSave {
+            get {
+                return ResourceManager.GetString("CleanFieldWarningAfterSave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Clear fields.
         /// </summary>
         public static string ClearFieldsButton {
