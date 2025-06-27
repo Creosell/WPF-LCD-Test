@@ -454,9 +454,11 @@ namespace WPF_LCD_Test.ViewModels
                 return; // Хотя обычно всегда true
 
             string approveQuestion = CleanFieldWarning; // Сообщение для подтверждения очистки
+
+            // Если очистка вызвана из метода NewDeviceUnderTest, используем другое сообщение
             if (parameter.Equals("CalledFromNewDeviceMethod"))
             {
-                approveQuestion =CleanFieldWarningAfterSave;
+                approveQuestion = CleanFieldWarningAfterSave;
             }
             // Запрашиваем подтверждение очистки
             bool confirm = _dialogService.ShowQuestion(approveQuestion, $"{Warning}");
