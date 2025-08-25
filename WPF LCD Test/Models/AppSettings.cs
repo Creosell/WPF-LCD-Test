@@ -1,4 +1,4 @@
-﻿// В папке Models (или создайте новую папку Settings и поместите туда)
+﻿// В папке Models
 // Файл AppSettings.cs
 
 using System.Text.Json.Serialization; // Для атрибута JsonPropertyName

@@ -1,4 +1,7 @@
-﻿using MvvmHelpers;
+﻿// В папке Models
+// Файл MeasurementStatus.cs
+
+using MvvmHelpers;
 using System.Text.Json.Serialization;
 using System.Windows.Media;
 

@@ -1,4 +1,4 @@
-﻿// В новом файле ViewModels
+﻿// В папке ViewModels
 // Файл MainWindowViewModel.cs
 
 using MvvmHelpers;

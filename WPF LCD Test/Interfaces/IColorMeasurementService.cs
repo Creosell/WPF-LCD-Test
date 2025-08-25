@@ -1,4 +1,7 @@
-﻿using WPF_LCD_Test.Models;
+﻿// В папке Interfaces
+// Файл IColorMeasurementService.cs
+
+using WPF_LCD_Test.Models;
 
 namespace WPF_LCD_Test.Interfaces
 {

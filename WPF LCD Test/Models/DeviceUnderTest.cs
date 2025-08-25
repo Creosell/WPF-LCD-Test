@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿// В папке Models
+// Файл DeviceUnderTest.cs
+using System.Text.Json.Serialization;
 using WPF_LCD_Test.Converters;
 using static WPF_LCD_Test.Resources.Resources;
 

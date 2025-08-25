@@ -1,4 +1,7 @@
-﻿using System.Text.Json;
+﻿// В папке Converters
+// Файл MeasurementJsonConverter.cs
+
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using WPF_LCD_Test.Models; // Убедись, что пространство имен класса Measurement доступно
 using WPF_LCD_Test.Services;

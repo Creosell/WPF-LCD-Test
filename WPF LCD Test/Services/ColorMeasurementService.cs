@@ -1,6 +1,5 @@
 ﻿// В папке Services
-// Файл ColorMeasurementService.cs (реализация IColorMeasurementService)
-
+// Файл ColorMeasurementService.cs
 using System.Globalization;
 using System.Runtime.InteropServices;
 using WPF_LCD_Test.Interfaces;

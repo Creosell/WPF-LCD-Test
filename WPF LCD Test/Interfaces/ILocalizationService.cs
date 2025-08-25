@@ -1,4 +1,7 @@
-﻿using System.Globalization;
+﻿// В папке Interfaces
+// Файл ILocalizationService.cs
+
+using System.Globalization;
 
 namespace WPF_LCD_Test.Interfaces
 {

@@ -1,4 +1,4 @@
-﻿// В папке Interfaces (или Utilities)
+﻿// В папке Wrappers
 // Файл MessageBoxWrapper.cs
 using System.Windows;
 using WPF_LCD_Test.Interfaces;

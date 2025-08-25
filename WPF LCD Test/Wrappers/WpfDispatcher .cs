@@ -1,5 +1,6 @@
-﻿// В файле Services/WpfDispatcher.cs (или в другом подходящем месте)
-using System.Windows; // Для Application.Current
+﻿// В папке Wrappers
+//Файл WpfDispatcher.cs
+using System.Windows;
 using WPF_LCD_Test.Interfaces;
 
 namespace WPF_LCD_Test.Services
@@ -8,9 +9,7 @@ namespace WPF_LCD_Test.Services
     {
         public bool CheckAccess()
         {
-            // Убедитесь, что Application.Current не null, прежде чем получать доступ к Dispatcher
-            // В реальном приложении WPF Application.Current будет установлен
-            return Application.Current?.Dispatcher?.CheckAccess() ?? true; // Если Application.Current null, предполагаем, что мы уже в UI потоке для безопасности
+            return Application.Current?.Dispatcher?.CheckAccess() ?? true;
         }
 
         public void Invoke(Action action)

@@ -1,4 +1,6 @@
-﻿using CA200SRVRLib; // Прямая ссылка на COM-библиотеку
+﻿// В папке Wrappers
+// Файл ColorAnalyzerWrapper.cs
+using CA200SRVRLib; // Прямая ссылка на COM-библиотеку
 using System.Runtime.InteropServices;
 using WPF_LCD_Test.Interfaces; // Наши объединенные интерфейсы
 

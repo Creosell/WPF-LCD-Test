@@ -1,5 +1,5 @@
 ﻿// В папке ViewModels
-// Файл MainWindowViewModel.cs
+// Файл MeasurementViewModel.cs
 
 // --- Usings для доступа к другим частям проекта и библиотекам ---
 using MvvmHelpers;
@@ -456,7 +456,7 @@ namespace WPF_LCD_Test.ViewModels
             string approveQuestion = CleanFieldWarning; // Сообщение для подтверждения очистки
 
             // Если очистка вызвана из метода NewDeviceUnderTest, используем другое сообщение
-            if (parameter.Equals("CalledFromNewDeviceMethod"))
+            if (parameter!=null && parameter.Equals("CalledFromNewDeviceMethod"))
             {
                 approveQuestion = CleanFieldWarningAfterSave;
             }

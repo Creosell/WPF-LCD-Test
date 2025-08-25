@@ -1,4 +1,5 @@
-﻿// В файле Interfaces/IDispatcher.cs (или в другом подходящем месте)
+﻿// В папке Interfaces
+// Файл IDispatcher.cs
 namespace WPF_LCD_Test.Interfaces
 {
     public interface IDispatcher

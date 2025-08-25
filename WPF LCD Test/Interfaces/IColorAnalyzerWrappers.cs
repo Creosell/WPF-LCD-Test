@@ -1,4 +1,7 @@
-﻿namespace WPF_LCD_Test.Interfaces
+﻿// В папке Interfaces
+// Файл IColorAnalyzerWrapper.cs
+
+namespace WPF_LCD_Test.Interfaces
 {
     // Интерфейс для корневого объекта CA200SRVRLib.Ca200
     public interface IColorAnalyzer200 : IDisposable
