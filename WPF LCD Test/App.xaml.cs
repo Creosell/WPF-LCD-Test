@@ -7,6 +7,10 @@ using WPF_LCD_Test.Models;
 using WPF_LCD_Test.Services;
 using WPF_LCD_Test.ViewModels;
 using WPF_LCD_Test.Views;
+using System.ComponentModel;
+using System.Globalization;
+using System.Threading;
+using System.Linq;
 
 namespace WPF_LCD_Test
 {
@@ -83,7 +87,7 @@ namespace WPF_LCD_Test
             // Логика выбора пути к словарю в зависимости от cultureCode
             if (cultureCode == "en")
             {
-                resourcePathToLoad = "/Resources/StringResources.en.xaml"; // Или просто defaultResourcePath, если базовый - английский
+                resourcePathToLoad = "/Resources/StringResources.xaml"; // Или просто defaultResourcePath, если базовый - английский
             }
             else if (cultureCode == "zh-Hans")
             {

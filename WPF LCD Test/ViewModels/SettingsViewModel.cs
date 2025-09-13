@@ -137,7 +137,7 @@ namespace WPF_LCD_Test.ViewModels
         // Simplified 'new' expressions in PopulateAvailableLanguages method
         private void PopulateAvailableLanguages()
         {
-            AvailableLanguages.Add(new() { DisplayName = Resources.Resources.English, CultureCode = "en" });
+            AvailableLanguages.Add(new() { DisplayName = Resources.Resources.English, CultureCode = "" });
             AvailableLanguages.Add(new() { DisplayName = Resources.Resources.Chinese, CultureCode = "zh-Hans" });
 
             // TODO: Add other languages if supported

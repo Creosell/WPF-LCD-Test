@@ -1,82 +1,82 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <RootNamespace>WPF_LCD_Test</RootNamespace>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <UseWPF>true</UseWPF>
+	<OutputType>WinExe</OutputType>
+	<TargetFramework>net8.0-windows</TargetFramework>
+	<RootNamespace>WPF_LCD_Test</RootNamespace>
+	<Nullable>enable</Nullable>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<UseWPF>true</UseWPF>
 	  <ApplicationIcon>Images\AppIcon.ico</ApplicationIcon>
   
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Tools\**" />
-    <Compile Remove="WPF_LCD_Test.UnitTests\**" />
-    <EmbeddedResource Remove="Tools\**" />
-    <EmbeddedResource Remove="WPF_LCD_Test.UnitTests\**" />
-    <None Remove="Tools\**" />
-    <None Remove="WPF_LCD_Test.UnitTests\**" />
-    <Page Remove="Tools\**" />
-    <Page Remove="WPF_LCD_Test.UnitTests\**" />
+	<Compile Remove="Tools\**" />
+	<Compile Remove="WPF_LCD_Test.UnitTests\**" />
+	<EmbeddedResource Remove="Tools\**" />
+	<EmbeddedResource Remove="WPF_LCD_Test.UnitTests\**" />
+	<None Remove="Tools\**" />
+	<None Remove="WPF_LCD_Test.UnitTests\**" />
+	<Page Remove="Tools\**" />
+	<Page Remove="WPF_LCD_Test.UnitTests\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Images\ButtonsIcons\cropped-logo46.png" />
-    <None Remove="Images\ButtonsIcons\SettingsViewIcon.png" />
-    <None Remove="Images\WindowsHeaderButtons\close-thick.png" />
-    <None Remove="Images\WindowsHeaderButtons\dock-window.png" />
-    <None Remove="Images\WindowsHeaderButtons\window-maximize.png" />
-    <None Remove="Images\WindowsHeaderButtons\window-minimize.png" />
+	<None Remove="Images\ButtonsIcons\cropped-logo46.png" />
+	<None Remove="Images\ButtonsIcons\SettingsViewIcon.png" />
+	<None Remove="Images\WindowsHeaderButtons\close-thick.png" />
+	<None Remove="Images\WindowsHeaderButtons\dock-window.png" />
+	<None Remove="Images\WindowsHeaderButtons\window-maximize.png" />
+	<None Remove="Images\WindowsHeaderButtons\window-minimize.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <COMReference Include="CA200SRVRLib">
-      <WrapperTool>tlbimp</WrapperTool>
-      <VersionMinor>1</VersionMinor>
-      <VersionMajor>1</VersionMajor>
-      <Guid>81480671-9287-43d4-8a21-f0cb0157077f</Guid>
-      <Lcid>0</Lcid>
-      <Isolated>false</Isolated>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
-    </COMReference>
+	<COMReference Include="CA200SRVRLib">
+	  <WrapperTool>tlbimp</WrapperTool>
+	  <VersionMinor>1</VersionMinor>
+	  <VersionMajor>1</VersionMajor>
+	  <Guid>81480671-9287-43d4-8a21-f0cb0157077f</Guid>
+	  <Lcid>0</Lcid>
+	  <Isolated>false</Isolated>
+	  <EmbedInteropTypes>true</EmbedInteropTypes>
+	</COMReference>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MaterialDesignThemes" Version="5.2.2-ci976" />
-    <PackageReference Include="Refractored.MvvmHelpers" Version="1.6.2" />
+	<PackageReference Include="MaterialDesignThemes" Version="5.2.2-ci976" />
+	<PackageReference Include="Refractored.MvvmHelpers" Version="1.6.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Images\ButtonsIcons\MeasurementViewIcon.png" />
-    <Resource Include="Images\ButtonsIcons\SettingsViewIcon.png" />
-    <Resource Include="Images\AppIcon.ico" />
-    <Resource Include="Images\WindowsHeaderButtons\close-thick.png" />
-    <Resource Include="Images\WindowsHeaderButtons\dock-window.png" />
-    <Resource Include="Images\WindowsHeaderButtons\window-maximize.png" />
-    <Resource Include="Images\WindowsHeaderButtons\window-minimize.png" />
+	<Resource Include="Images\ButtonsIcons\MeasurementViewIcon.png" />
+	<Resource Include="Images\ButtonsIcons\SettingsViewIcon.png" />
+	<Resource Include="Images\AppIcon.ico" />
+	<Resource Include="Images\WindowsHeaderButtons\close-thick.png" />
+	<Resource Include="Images\WindowsHeaderButtons\dock-window.png" />
+	<Resource Include="Images\WindowsHeaderButtons\window-maximize.png" />
+	<Resource Include="Images\WindowsHeaderButtons\window-minimize.png" />
+	<Resource Include="Resources\StringResources.xaml">
+	  <Generator>MSBuild:Compile</Generator>
+	</Resource>
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Resources\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
+	<Compile Update="Resources\Resources.Designer.cs">
+	  <DesignTime>True</DesignTime>
+	  <AutoGen>True</AutoGen>
+	  <DependentUpon>Resources.resx</DependentUpon>
+	</Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Resources\Resources.en.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Resources.zh-Hans.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
+	<EmbeddedResource Update="Resources\Resources.resx">
+	  <Generator>PublicResXFileCodeGenerator</Generator>
+	  <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+	</EmbeddedResource>
+	<EmbeddedResource Update="Resources\Resources.zh-Hans.resx">
+	  <Generator>PublicResXFileCodeGenerator</Generator>
+	</EmbeddedResource>
   </ItemGroup>
 
 </Project>
