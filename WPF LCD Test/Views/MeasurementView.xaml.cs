@@ -73,17 +73,6 @@ namespace WPF_LCD_Test.Views
             // которые могут привести к утечкам памяти.
         }
 
-        private void MeasurementTimeTextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            TextBox measurementTimeTextBox = sender as TextBox;
-
-            if (this.DataContext is MeasurementViewModel model)
-            {
-                // Convert the integer MeasurementTime to a string before assigning it to the TextBox
-                measurementTimeTextBox.Text = model.MeasurementTime.ToString();
-            }
-        }
-
         // --- Обработчик события изменения коллекции лога ---
         private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {

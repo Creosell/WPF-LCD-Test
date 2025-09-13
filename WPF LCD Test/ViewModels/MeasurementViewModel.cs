@@ -33,8 +33,6 @@ namespace WPF_LCD_Test.ViewModels
 
         private bool _isSerialNumberConfirmed = false;
 
-        private int _measurementTime;
-
         //private ObservableCollection<string> _logMessages; // Коллекция сообщений для лога UI (UI ListBox/ListView)
         private bool _isMeasurementButtonsEnabled; // Флаг доступности кнопок измерений (UI IsEnabled)
 
@@ -42,23 +40,10 @@ namespace WPF_LCD_Test.ViewModels
         private bool _isDeviceCalibrated; // Флаг статуса калибровки прибора (UI индикатор)
         public bool _isDeviceConnecting;
         public bool _isDeviceCalibrating;
-
-        // private double _measurementProgress; // Если хотим показывать прогресс измерения (UI ProgressBar)
-
-        // --- Приватные поля для хранения состояния и статусов ---
         public event EventHandler RequestClearInputFocus;
+        public int MeasurementTime { get; set; } = 2; // #Todo
 
-        // Список ожидаемых измерений по именам точек (из WinForms measurementButtons)
-        // Этот список может быть загружен из конфигурации или констант
-
-        // В классе MainWindowViewModel (рядом с другими свойствами)
-
-        // Публичные свойства для статуса каждой точки измерения
-
-        // Константы валидации и значения по умолчанию
         private const string SerialNumberPattern = "^[a-zA-Z0-9]*$"; // Pattern for using only letters and digits
-
-        private const int DefaultMeasurementTime = 2;
 
         // --- Публичные Свойства ViewModel (для привязки в XAML) ---
 
@@ -91,23 +76,6 @@ namespace WPF_LCD_Test.ViewModels
                     UpdateCommandsCanExecute();
                     UpdateMeasurementButtonsState(); // Ваша логика
                 }
-            }
-        }
-
-        // Время измерения в секундах
-        public int MeasurementTime
-        {
-            get => _measurementTime;
-            set
-            {
-                if (value <= 0)
-                {
-                    OnPropertyChanged(); // Уведомляем UI о текущем значении поля (_measurementTime)
-                    return; // Выходим из сеттера
-                }
-
-                // Если значение валидно и отличается, используем SetProperty
-                if (SetProperty(ref _measurementTime, value)) { }
             }
         }
 
@@ -179,7 +147,6 @@ namespace WPF_LCD_Test.ViewModels
         public ICommand SwitchLanguageCommand { get; private set; } // Принимает параметр (код языка)
         public ICommand MeasureCommand { get; private set; } // Принимает параметр (имя точки измерения)
         public ICommand ApplySerialNumberCommand { get; private set; } // Применяет введенный SN
-        public ICommand ApplyMeasurementTimeCommand { get; private set; } // Применяет введенное время
         public ICommand NewDeviceUnderTestCommand { get; private set; } // Создает новое устройство под тестирование
         public ICommand LaunchExternalProgramCommand { get; } // Запускает внешнюю программу (например, для тестирования)
 
@@ -205,7 +172,6 @@ namespace WPF_LCD_Test.ViewModels
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
             // Инициализация свойств по умолчанию (как при старте приложения)
-            _measurementTime = DefaultMeasurementTime;
             _serialNumber = ""; // Пустая строка по умолчанию
 
             // Инициализация команд, связывая их с методами Execute/CanExecute
@@ -235,10 +201,6 @@ namespace WPF_LCD_Test.ViewModels
             ApplySerialNumberCommand = new RelayCommand(
                 ExecuteApplySerialNumber,
                 CanExecuteApplySerialNumber
-            ); // Синхронная команда
-            ApplyMeasurementTimeCommand = new RelayCommand(
-                ExecuteApplyMeasurementTime,
-                CanExecuteApplyMeasurementTime
             ); // Синхронная команда
 
             // Подписка на события сервисов, чтобы ViewModel мог реагировать на их активность
@@ -467,7 +429,6 @@ namespace WPF_LCD_Test.ViewModels
             {
                 // Очистка свойств ViewModel
                 SerialNumber = ""; // Сеттер обновит UI и вызовет UpdateMeasurementButtonsState/UpdateCommandsCanExecute
-                MeasurementTime = DefaultMeasurementTime; // Сеттер обновит UI и запишет в лог
 
                 // Сброс текущего объекта Модели DeviceUnderTest
                 _currentDevice = null;
@@ -567,7 +528,7 @@ namespace WPF_LCD_Test.ViewModels
                 // Передаем время измерения из свойства ViewModel
                 // Сервис выполнит усреднение и вернет Measurement
                 Measurement resultMeasurement = await _colorMeasurementService.MeasureAsync(
-                    _measurementTime
+                    MeasurementTime
                 );
 
                 // 3. Обработка результата измерения, валидация, форматирование
@@ -747,37 +708,6 @@ namespace WPF_LCD_Test.ViewModels
             UpdateCommandsCanExecute();
         }
 
-        // Реализация команды для применения введенного Времени измерения (например, по Enter)
-        private void ExecuteApplyMeasurementTime(object parameter)
-        {
-            CheckCurrentAppLanguage();
-            try
-            {
-                var enteredMeasurementTime = parameter as string;
-
-                if (string.IsNullOrWhiteSpace(enteredMeasurementTime))
-                {
-                    _dialogService.ShowMessage($"{IncorrectMeasTimeFormat}", $"{Err}");
-                    return;
-                }
-
-                int measurementTime = int.Parse(enteredMeasurementTime); // Пробуем преобразовать строку в число
-                if (measurementTime <= 0)
-                {
-                    _dialogService.ShowMessage($"{IncorrectMeasTimeFormat}", $"{Err}");
-                }
-                else
-                {
-                    MeasurementTime = measurementTime;
-                    AddLogMessage($"{CurrentMeasurementTime}: {MeasurementTime} {Seconds}");
-                    RequestClearInputFocus?.Invoke(this, EventArgs.Empty); // Запрос на очистку фокуса ввода времени измерения
-                }
-            }
-            catch
-            {
-                _dialogService.ShowMessage($"{IncorrectMeasTimeFormat}", $"{Err}");
-            }
-        }
 
         private async Task ExecuteNewDeviceUnderTest(object parameter)
         {
@@ -894,15 +824,6 @@ namespace WPF_LCD_Test.ViewModels
             //return !string.IsNullOrWhiteSpace(parameter as string) && Regex.IsMatch(parameter as string, SerialNumberPattern);
         }
 
-        // Проверка доступности команды ApplyMeasurementTime: доступна, если время в поле валидно (например, > 0)
-        private bool CanExecuteApplyMeasurementTime(object parameter)
-        {
-            // Команда доступна, если свойство MeasurementTime (которое привязано к TextBox) > 0
-            // Валидация уже происходит в сеттере свойства.
-            //return MeasurementTime > 0; // Используем публичное свойство
-            return true;
-        }
-
         private bool CanExecuteNewDeviceUnderTest(object paramater)
         {
             return _currentDevice != null
@@ -959,7 +880,6 @@ namespace WPF_LCD_Test.ViewModels
             ((RelayCommand)MeasureCommand)?.RaiseCanExecuteChanged();
             ((RelayCommand)SaveResultsCommand)?.RaiseCanExecuteChanged();
             ((RelayCommand)ApplySerialNumberCommand)?.RaiseCanExecuteChanged();
-            ((RelayCommand)ApplyMeasurementTimeCommand)?.RaiseCanExecuteChanged();
             ((RelayCommand)NewDeviceUnderTestCommand)?.RaiseCanExecuteChanged();
         }
 
@@ -1102,7 +1022,6 @@ namespace WPF_LCD_Test.ViewModels
             _currentDevice = null;
 
             _serialNumber = string.Empty; // Сбрасываем серийный номер
-            _measurementTime = DefaultMeasurementTime; // Сбрасываем время измерения
             _isDeviceConnected = false; // Сбрасываем статус подключения
             _isDeviceCalibrated = false;// Сбрасываем статус калибровки
             _isSerialNumberConfirmed = false; // Сбрасываем флаг подтверждения серийного номера

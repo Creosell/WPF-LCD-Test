@@ -440,7 +440,6 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             // Arrange
             _viewModel.AddLogMessage("Some log message");
             _viewModel.SerialNumber = "123";
-            _viewModel.MeasurementTime = 5;
             _viewModel.IsDeviceConnected = true;
             _viewModel.IsDeviceCalibrated = true;
             _viewModel.IsSerialNumberConfirmed = true;
@@ -456,7 +455,6 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
 
             // Assert
             Assert.That(_viewModel.SerialNumber, Is.Empty);
-            Assert.That(_viewModel.MeasurementTime, Is.EqualTo(2));
             Assert.That(_viewModel.IsDeviceConnected, Is.True);
             Assert.That(_viewModel.IsDeviceCalibrated, Is.True);
             Assert.That(_viewModel.IsSerialNumberConfirmed, Is.False);
@@ -555,102 +553,6 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                 It.Is<string>(title => title == Err)
             ), Times.Once);
             Assert.That(_viewModel.IsSerialNumberConfirmed, Is.False);
-        }
-
-        // --- Тесты для ApplyMeasurementTimeCommand ---
-        [Test]
-        public void ApplyMeasurementTimeCommand_Execute_AppliesValidTime()
-        {
-            // Arrange
-            // Команда ожидает строковый параметр, поэтому устанавливаем его здесь.
-            string expectedTime = "10"; // <--- Это было ключевое изменение
-            _viewModel._currentDevice = new DeviceUnderTest("123"); // Убедимся, что _currentDevice не null
-
-            // Act
-            // Передаем строковое значение времени в качестве параметра команды
-            _viewModel.ApplyMeasurementTimeCommand.Execute(expectedTime); // <--- Это было ключевое изменение
-
-            // Assert
-            // Проверяем, что свойство MeasurementTime было обновлено командой до 10 (int).
-            Assert.That(_viewModel.MeasurementTime, Is.EqualTo(10));
-
-            // С учетом вашей реализации AddLogMessage и мока ILocalizationService (который возвращает ключи ресурсов),
-            // ожидаемая строка в логе будет "CurrentMeasurementTime: 10 Seconds".
-            // Проверяем наличие всей ожидаемой строки в логе.
-            Assert.That(_viewModel.LogText.Contains($"{CurrentMeasurementTime}: 10 {Seconds}"), Is.True);
-
-            // Можно также проверить, что диалог НЕ был показан для этого случая
-            _mockDialogService.Verify(d => d.ShowMessage(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-        }
-
-        // Дополнительные тесты для обработки некорректного ввода, основанные на вашей реализации:
-        [Test]
-        public void ApplyMeasurementTimeCommand_Execute_EmptyInput()
-        {
-            // Arrange
-            string emptyInput = "";
-
-            // Act
-            _viewModel.ApplyMeasurementTimeCommand.Execute(emptyInput);
-
-            // Assert
-            _mockDialogService.Verify(d => d.ShowMessage(
-                It.Is<string>(msg => msg.Contains(IncorrectMeasTimeFormat)),
-                It.Is<string>(title => title.Contains(Err))
-            ), Times.Once);
-            // Проверяем, что лог не содержит сообщения об успешном применении времени
-            Assert.That(_viewModel.LogText.Contains($"{CurrentMeasurementTime}:"), Is.False);
-        }
-
-        [Test]
-        public void ApplyMeasurementTimeCommand_Execute_HandlesNegativeInput()
-        {
-            // Arrange
-            string negativeInput = "-5";
-
-            // Act
-            _viewModel.ApplyMeasurementTimeCommand.Execute(negativeInput);
-
-            // Assert
-            _mockDialogService.Verify(d => d.ShowMessage(
-                It.Is<string>(msg => msg.Contains(IncorrectMeasTimeFormat)),
-                It.Is<string>(title => title.Contains(Err))
-            ), Times.Once);
-            Assert.That(_viewModel.LogText.Contains(CurrentMeasurementTime), Is.False);
-        }
-
-        [Test]
-        public void ApplyMeasurementTimeCommand_Execute_HandlesZeroInput()
-        {
-            // Arrange
-            string zeroInput = "0";
-
-            // Act
-            _viewModel.ApplyMeasurementTimeCommand.Execute(zeroInput);
-
-            // Assert
-            _mockDialogService.Verify(d => d.ShowMessage(
-                It.Is<string>(msg => msg.Contains(IncorrectMeasTimeFormat)),
-                It.Is<string>(title => title.Contains(Err))
-            ), Times.Once);
-            Assert.That(_viewModel.LogText.Contains(CurrentMeasurementTime), Is.False);
-        }
-
-        [Test]
-        public void ApplyMeasurementTimeCommand_Execute_HandlesNonNumericInput()
-        {
-            // Arrange
-            string nonNumericInput = "abc";
-
-            // Act
-            _viewModel.ApplyMeasurementTimeCommand.Execute(nonNumericInput);
-
-            // Assert
-            _mockDialogService.Verify(d => d.ShowMessage(
-                It.Is<string>(msg => msg.Contains(IncorrectMeasTimeFormat)),
-                It.Is<string>(title => title.Contains(Err))
-            ), Times.Once);
-            Assert.That(_viewModel.LogText.Contains(CurrentMeasurementTime), Is.False);
         }
 
         // --- Тесты для MeasureCommand ---

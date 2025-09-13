@@ -100,8 +100,8 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             var savedSettings = JsonSerializer.Deserialize<AppSettings>(jsonContent);
 
             Assert.That(savedSettings, Is.Not.Null);
-            Assert.That(savedSettings.LanguageCultureCode, Is.EqualTo("en"), "LanguageCultureCode по умолчанию должен быть 'en'.");
-            Assert.That(savedSettings.DevicePort, Is.EqualTo("COM1"), "DevicePort по умолчанию должен быть 'COM1'.");
+            Assert.That(savedSettings.LanguageCultureCode, Is.EqualTo(""), "LanguageCultureCode по умолчанию должен быть ''.");
+            Assert.That(savedSettings.MeasurementTime, Is.EqualTo(2), "MeasurementTime по умолчанию должен быть '2'.");
             // !!! ВАЖНОЕ ИЗМЕНЕНИЕ ЗДЕСЬ !!!
             Assert.That(savedSettings.AutoConnectEnabled, Is.EqualTo(true), "AutoConnectEnabled по умолчанию должен быть 'true' согласно обновленной модели.");
         }
@@ -113,7 +113,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             var expectedSettings = new AppSettings
             {
                 LanguageCultureCode = "fr",
-                DevicePort = "COM3",
+                MeasurementTime = 3,
                 AutoConnectEnabled = true
             };
             string jsonContent = JsonSerializer.Serialize(expectedSettings, new JsonSerializerOptions { WriteIndented = true });
@@ -126,7 +126,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             // Assert
             Assert.That(loadedSettings, Is.Not.Null, "Загруженные настройки не должны быть null.");
             Assert.That(loadedSettings.LanguageCultureCode, Is.EqualTo(expectedSettings.LanguageCultureCode), "Загруженный LanguageCultureCode должен совпадать.");
-            Assert.That(loadedSettings.DevicePort, Is.EqualTo(expectedSettings.DevicePort), "Загруженный DevicePort должен совпадать.");
+            Assert.That(loadedSettings.MeasurementTime, Is.EqualTo(expectedSettings.MeasurementTime), "Загруженный MeasurementTime должен совпадать.");
             Assert.That(loadedSettings.AutoConnectEnabled, Is.EqualTo(expectedSettings.AutoConnectEnabled), "Загруженный AutoConnectEnabled должен совпадать.");
         }
 
@@ -143,8 +143,8 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             // Assert
             Assert.That(loadedSettings, Is.Not.Null, "Загруженные настройки не должны быть null.");
             // Проверяем, что вернулись значения по умолчанию из-за ошибки JSON
-            Assert.That(loadedSettings.LanguageCultureCode, Is.EqualTo("en"), "LanguageCultureCode должен быть 'en' из-за ошибки JSON.");
-            Assert.That(loadedSettings.DevicePort, Is.EqualTo("COM1"), "DevicePort должен быть 'COM1' из-за ошибки JSON.");
+            Assert.That(loadedSettings.LanguageCultureCode, Is.EqualTo(""), "LanguageCultureCode должен быть '' из-за ошибки JSON.");
+            Assert.That(loadedSettings.MeasurementTime, Is.EqualTo(2), "MeasurementTime должен быть 2 из-за ошибки JSON.");
             Assert.That(loadedSettings.AutoConnectEnabled, Is.EqualTo(true), "AutoConnectEnabled должен быть 'true' из-за ошибки JSON.");
         }
 
@@ -155,7 +155,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             var settingsToSave = new AppSettings
             {
                 LanguageCultureCode = "de",
-                DevicePort = "COM5",
+                MeasurementTime = 3,
                 AutoConnectEnabled = true
             };
 
@@ -170,7 +170,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
 
             Assert.That(loadedSettings, Is.Not.Null);
             Assert.That(loadedSettings.LanguageCultureCode, Is.EqualTo(settingsToSave.LanguageCultureCode), "Сохраненный LanguageCultureCode должен совпадать.");
-            Assert.That(loadedSettings.DevicePort, Is.EqualTo(settingsToSave.DevicePort), "Сохраненный DevicePort должен совпадать.");
+            Assert.That(loadedSettings.MeasurementTime, Is.EqualTo(settingsToSave.MeasurementTime), "Сохраненный DevicePort должен совпадать.");
             Assert.That(loadedSettings.AutoConnectEnabled, Is.EqualTo(settingsToSave.AutoConnectEnabled), "Сохраненный AutoConnectEnabled должен совпадать.");
         }
 

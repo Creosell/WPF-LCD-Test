@@ -185,10 +185,10 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public void GetString_ReturnsLocalizedValue()
         {
             // Arrange
-            _localizationService.SetLanguage("en"); // Устанавливаем английский
+            _localizationService.SetLanguage(""); // Устанавливаем английский
             string expectedEnglish = Resources.Resources.ResourceManager.GetString(
                 "Err",
-                new CultureInfo("en")
+                new CultureInfo("")
             );
 
             // Actually, we are using the key "Err" for the test, which is a different key in the .resx file.
@@ -219,12 +219,12 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         {
             // Arrange
             // Используем ключ "TestFormatString" из .resx
-            _localizationService.SetLanguage("en");
+            _localizationService.SetLanguage("");
             string expectedFormatted = string.Format(
-                new CultureInfo("en"),
+                new CultureInfo(""),
                 WPF_LCD_Test.Resources.Resources.ResourceManager.GetString(
                     "TestFormatString",
-                    new CultureInfo("en")
+                    new CultureInfo("")
                 ),
                 "MyValue"
             );
