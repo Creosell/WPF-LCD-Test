@@ -20,7 +20,7 @@ namespace WPF_LCD_Test.ViewModels
         private string _languageCultureCode;
         private LanguageOption _selectedLanguage;
 
-        public ICommand ApplyMeasurementTimeCommand { get; private set; } // Применяет введенное время
+        public ICommand ApplyMeasurementTimeCommand { get; private set; }
 
         public bool AutoConnectEnabled
         {
@@ -79,11 +79,13 @@ namespace WPF_LCD_Test.ViewModels
         {
             _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+            _dialogService = App.Current is App app && app.MainWindow?.DataContext is IDialogService ds ? ds : null;
 
             PopulateAvailableLanguages();
 
             SaveSettingsCommand = new RelayCommand(ExecuteSaveSettings);
             CancelSettingsCommand = new RelayCommand(ExecuteCancelSettings);
+            ApplyMeasurementTimeCommand = new RelayCommand(ApplyMeasurementTime);
 
             LoadSettings();
 
@@ -162,6 +164,8 @@ namespace WPF_LCD_Test.ViewModels
             {
                 _settingsService.SaveSettings(settingsToSave);
                 Debug.WriteLine("SettingsViewModel: Настройки сохранены.");
+                // Notify UI if MeasurementTime changed
+                OnPropertyChanged(nameof(MeasurementTime));
             }
             catch (Exception ex)
             {
@@ -169,31 +173,22 @@ namespace WPF_LCD_Test.ViewModels
             }
         }
 
-        private void ExecuteApplyMeasurementTime(object parameter)
+        private void ApplyMeasurementTime(object parameter)
         {
             try
             {
                 var enteredMeasurementTime = parameter as string;
 
-                if (string.IsNullOrWhiteSpace(enteredMeasurementTime))
+                if (string.IsNullOrWhiteSpace(enteredMeasurementTime) || !int.TryParse(enteredMeasurementTime, out int measurementTime) || measurementTime <= 0)
                 {
-                    _dialogService.ShowMessage($"{IncorrectMeasTimeFormat}", $"{Err}");
+                    _dialogService?.ShowMessage($"{IncorrectMeasTimeFormat}", $"{Err}");
                     return;
                 }
-
-                int measurementTime = int.Parse(enteredMeasurementTime); // Пробуем преобразовать строку в число
-                if (measurementTime <= 0)
-                {
-                    _dialogService.ShowMessage($"{IncorrectMeasTimeFormat}", $"{Err}");
-                }
-                else
-                {
-                    MeasurementTime = measurementTime;
-                }
+                MeasurementTime = measurementTime;
             }
             catch
             {
-                _dialogService.ShowMessage($"{IncorrectMeasTimeFormat}", $"{Err}");
+                _dialogService?.ShowMessage($"{IncorrectMeasTimeFormat}", $"{Err}");
             }
         }
 

@@ -28,11 +28,12 @@
                     x:Name="MeasurementTimeTextBox"
                     MinWidth="40"
                     Foreground="White"
-                    Text="{Binding MeasurementTime, UpdateSourceTrigger=Explicit}">
+                    Text="{Binding MeasurementTime, UpdateSourceTrigger=Explicit, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                    LostFocus="MeasurementTimeTextBox_LostFocus">
                     <TextBox.InputBindings>
                         <KeyBinding
                             Key="Enter"
-                            Command="{Binding DataContext.ApplyMeasurementTimeCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            Command="{Binding ApplyMeasurementTimeCommand}"
                             CommandParameter="{Binding Text, ElementName=MeasurementTimeTextBox}" />
                     </TextBox.InputBindings>
                 </TextBox>

@@ -62,6 +62,10 @@ namespace WPF_LCD_Test.Services
             // Добавьте другие опции, нужные для сохранения
         };
 
+        // --- Event for MeasurementTime changes ---
+        public static event EventHandler<int>? MeasurementTimeChanged;
+        private static int? _lastMeasurementTime;
+
         // Метод загрузки настроек (ваш текущий код для этого метода)
         public AppSettings LoadSettings()
         {
@@ -116,6 +120,10 @@ namespace WPF_LCD_Test.Services
                 }
             }
 
+            if (_lastMeasurementTime == null)
+            {
+                _lastMeasurementTime = settings.MeasurementTime;
+            }
             return settings;
         }
 
@@ -127,6 +135,13 @@ namespace WPF_LCD_Test.Services
                 Debug.WriteLine("SettingsService Ошибка: Невозможно сохранить настройки. Объект AppSettings равен null.");
                 return;
             }
+
+            // --- Raise event if MeasurementTime changed ---
+            if (_lastMeasurementTime != null && _lastMeasurementTime != settings.MeasurementTime)
+            {
+                MeasurementTimeChanged?.Invoke(this, settings.MeasurementTime);
+            }
+            _lastMeasurementTime = settings.MeasurementTime;
 
             try
             {

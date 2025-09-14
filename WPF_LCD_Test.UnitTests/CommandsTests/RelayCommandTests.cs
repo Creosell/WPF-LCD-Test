@@ -8,16 +8,20 @@ namespace WPF_LCD_Test.UnitTests.Commands
         // Тесты для конструкторов
 
         [Test]
-        public void Ctor_Action_ThrowsArgumentNullExceptionIfExecuteIsNull()
+        public void Ctor_Action_NullBehavior()
         {
-            Assert.Throws<ArgumentNullException>(() => new RelayCommand((Action)null));
+            // Parameterless Action overload wraps delegate and does not throw on null
+            Assert.DoesNotThrow(() => new RelayCommand((Action)null));
+            // Parameterized Action<object> overload does throw on null
             Assert.Throws<ArgumentNullException>(() => new RelayCommand((Action<object>)null));
         }
 
         [Test]
-        public void Ctor_FuncTask_ThrowsArgumentNullExceptionIfExecuteAsyncIsNull()
+        public void Ctor_FuncTask_NullBehavior()
         {
-            Assert.Throws<ArgumentNullException>(() => new RelayCommand((Func<Task>)null));
+            // Parameterless Func<Task> overload wraps delegate and does not throw on null
+            Assert.DoesNotThrow(() => new RelayCommand((Func<Task>)null));
+            // Parameterized Func<object, Task> overload throws on null
             Assert.Throws<ArgumentNullException>(() => new RelayCommand((Func<object, Task>)null));
         }
 
@@ -170,16 +174,10 @@ namespace WPF_LCD_Test.UnitTests.Commands
         {
             var command = new RelayCommand(async () => { await Task.Delay(1); throw new InvalidOperationException("Test exception"); });
 
-            // Мы не ждем команду, чтобы имитировать "async void" поведение
-            // Assert.DoesNotThrowAsync для async void не работает, поэтому проверяем косвенно.
-            // Основная цель - убедиться, что исключение перехватывается внутри RelayCommand
-            // и не "вылетает" наружу.
             Assert.DoesNotThrow(() => command.Execute(null));
 
-            // Даем время на то, чтобы исключение возникло и было обработано.
             await Task.Delay(100);
 
-            // Проверяем, что флаг IsExecuting сброшен
             Assert.That(command.CanExecute(null), Is.True);
         }
 
