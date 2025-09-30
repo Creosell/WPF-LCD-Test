@@ -790,7 +790,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             _viewModel.ExecuteApplySerialNumber(_viewModel.SerialNumber); // Устанавливаем SN и подтверждаем
 
             _mockColorMeasurementService.Setup(s => s.MeasureAsync(It.IsAny<int>()))
-                                        .Returns(Task.FromResult((Models.Measurement)null));
+                                        .Returns(Task.FromResult((Measurement)null));
 
             // Act
             _viewModel.MeasureCommand.Execute(MeasurementStatusService.CenterLocationName);

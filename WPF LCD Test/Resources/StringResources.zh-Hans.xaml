@@ -12,6 +12,12 @@
     </system:String>
 
     <!--  MeasurementView keys  -->
+    <system:String x:Key="TV">
+        TV
+    </system:String>
+    <system:String x:Key="DeviceConfiguration">
+        设备配置
+    </system:String>
     <system:String x:Key="English">
         English
     </system:String>
@@ -63,6 +69,9 @@
     </system:String>
     <system:String x:Key="BluePoint">
         B.蓝色
+    </system:String>
+    <system:String x:Key="WhitePoint">
+        W. White
     </system:String>
     <system:String x:Key="BlackPoint">
         0. 黑色

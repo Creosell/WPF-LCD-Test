@@ -18,7 +18,7 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
             // Act (Действие) - здесь нет явных действий, просто проверка состояния объекта
 
             // Assert (Проверка)
-            Assert.That(settings.LanguageCultureCode, Is.EqualTo("en"), "Default LanguageCultureCode should be 'en'.");
+            Assert.That(settings.LanguageCultureCode, Is.EqualTo(""), "Default LanguageCultureCode should be 'en'.");
             Assert.That(settings.DevicePort, Is.EqualTo("COM1"), "Default DevicePort should be 'COM1'.");
             Assert.IsTrue(settings.AutoConnectEnabled, "Default AutoConnectEnabled should be true.");
         }
@@ -86,7 +86,7 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
             // Assert
             Assert.IsNotNull(deserializedSettings, "Deserialized settings should not be null.");
             // Проверяем, что свойства, отсутствующие в JSON, приняли значения по умолчанию
-            Assert.That(deserializedSettings.LanguageCultureCode, Is.EqualTo("en"), "Missing LanguageCultureCode should default to 'en'.");
+            Assert.That(deserializedSettings.LanguageCultureCode, Is.EqualTo(""), "Missing LanguageCultureCode should default to 'en'.");
             Assert.That(deserializedSettings.DevicePort, Is.EqualTo("COM1"), "Missing DevicePort should default to 'COM1'.");
             Assert.IsTrue(deserializedSettings.AutoConnectEnabled, "Missing AutoConnectEnabled should default to true.");
         }

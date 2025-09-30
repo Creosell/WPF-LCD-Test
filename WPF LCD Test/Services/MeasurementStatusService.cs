@@ -38,7 +38,9 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
         public const string RedColorLocationName = "RedColor";
         public const string GreenColorLocationName = "GreenColor";
         public const string BlueColorLocationName = "BlueColor";
+        public const string WhiteColorLocationName = "WhiteColor";
         public const string BlackColorLocationName = "BlackColor";
+        
 
         public MeasurementStatus? TopLeftStatus { get; }
         public MeasurementStatus? TopCenterStatus { get; }
@@ -53,6 +55,7 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
         public MeasurementStatus? GreenColorStatus { get; }
         public MeasurementStatus? BlueColorStatus { get; }
         public MeasurementStatus? BlackColorStatus { get; }
+        public MeasurementStatus? WhiteColorStatus { get; }
 
         private MeasurementStatusService()
         {
@@ -73,6 +76,7 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
                 RedColorLocationName,
                 GreenColorLocationName,
                 BlueColorLocationName,
+                WhiteColorLocationName,
                 BlackColorLocationName,
             };
 
@@ -130,6 +134,10 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
 
                     case BlueColorLocationName:
                         BlueColorStatus = status;
+                        break;
+
+                    case WhiteColorLocationName:
+                        WhiteColorStatus = status;
                         break;
 
                     case BlackColorLocationName:

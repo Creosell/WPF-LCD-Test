@@ -85,7 +85,7 @@ namespace WPF_LCD_Test
             string resourcePathToLoad = defaultResourcePath;
 
             // Логика выбора пути к словарю в зависимости от cultureCode
-            if (cultureCode == "en")
+            if (cultureCode == "")
             {
                 resourcePathToLoad = "/Resources/StringResources.xaml"; // Или просто defaultResourcePath, если базовый - английский
             }

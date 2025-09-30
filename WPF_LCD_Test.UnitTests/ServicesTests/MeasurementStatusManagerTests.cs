@@ -88,6 +88,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
                 MeasurementStatusService.RedColorLocationName,
                 MeasurementStatusService.GreenColorLocationName,
                 MeasurementStatusService.BlueColorLocationName,
+                MeasurementStatusService.WhiteColorLocationName,
                 MeasurementStatusService.BlackColorLocationName
             };
 

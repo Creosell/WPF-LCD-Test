@@ -232,6 +232,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Configuration directory not found.
+        /// </summary>
+        public static string ConfigDirNotFound {
+            get {
+                return ResourceManager.GetString("ConfigDirNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Connected.
         /// </summary>
         public static string ConnectedCA {

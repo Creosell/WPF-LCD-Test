@@ -13,11 +13,17 @@ namespace WPF_LCD_Test.Models // Пространство имен должно 
 
         public string SerialNumber { get; set; } // Серийный номер - данные устройства
 
+        public string DeviceConfiguration { get; set; } = "DefaultConfig";
+
+        public bool IsTV { get; set; } = false;
+
         [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime MeasurementDateTime { get; set; }
 
         // Список измерений. Это основная коллекция данных.
         public List<Measurement> Measurements { get; set; }
+
+
 
         // Конструктор
         public DeviceUnderTest(string serialNumber)
@@ -46,6 +52,14 @@ namespace WPF_LCD_Test.Models // Пространство имен должно 
             }
 
             Measurements.Add(newMeasurement);
+        }
+
+        public override string ToString()
+        {
+            var measurementsStr = Measurements != null && Measurements.Count > 0
+                ? string.Join("; ", Measurements.Select(m => m.ToString()))
+                : "None";
+            return $"Device SN: {SerialNumber}, Config: {DeviceConfiguration}, IsTV: {IsTV}, Measured at: {MeasurementDateTime}, Measurements: [{measurementsStr}]";
         }
     }
 }
