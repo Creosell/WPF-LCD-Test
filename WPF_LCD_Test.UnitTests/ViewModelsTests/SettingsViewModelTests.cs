@@ -21,8 +21,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             // Настроим мок SettingsService для возврата настроек по умолчанию
             _mockSettingsService.Setup(s => s.LoadSettings()).Returns(new AppSettings
             {
-                LanguageCultureCode = "",
-                MeasurementTime = 2,
+                LanguageCultureCode = "en",
+                DevicePort = "COM1",
                 AutoConnectEnabled = true
             });
 
@@ -79,18 +79,18 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             _mockSettingsService.Verify(s => s.LoadSettings(), Times.Once());
 
             // Проверяем, что свойства ViewModel правильно обновлены
-            Assert.That(_viewModel.MeasurementTime, Is.EqualTo(2));
+            Assert.That(_viewModel.DevicePort, Is.EqualTo("COM1"));
             Assert.That(_viewModel.AutoConnectEnabled, Is.True);
-            Assert.That(_viewModel.LanguageCultureCode, Is.EqualTo(""));
-            Assert.That(_viewModel.SelectedLanguage?.CultureCode, Is.EqualTo(""));
+            Assert.That(_viewModel.LanguageCultureCode, Is.EqualTo("en"));
+            Assert.That(_viewModel.SelectedLanguage?.CultureCode, Is.EqualTo("en"));
         }
 
         [Test]
         public void Ctor_PopulatesAvailableLanguages()
         {
             Assert.That(_viewModel.AvailableLanguages, Is.Not.Empty);
-            Assert.That(_viewModel.AvailableLanguages.Count, Is.EqualTo(2)); // "" и "zh-Hans"
-            Assert.That(_viewModel.AvailableLanguages.Any(l => l.CultureCode == ""), Is.True);
+            Assert.That(_viewModel.AvailableLanguages.Count, Is.EqualTo(2)); // "en" и "zh-Hans"
+            Assert.That(_viewModel.AvailableLanguages.Any(l => l.CultureCode == "en"), Is.True);
             Assert.That(_viewModel.AvailableLanguages.Any(l => l.CultureCode == "zh-Hans"), Is.True);
         }
 
@@ -146,11 +146,11 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             // Сбрасываем выбранный язык в null
             _viewModel.SelectedLanguage = null;
 
-            // Проверим, что LanguageCultureCode сброшен на "" (из вашего кода)
-            Assert.That(_viewModel.LanguageCultureCode, Is.EqualTo(""));
+            // Проверим, что LanguageCultureCode сброшен на "en" (из вашего кода)
+            Assert.That(_viewModel.LanguageCultureCode, Is.EqualTo("en"));
             // Убедимся, что SetLanguage НЕ вызывается с null или пустым значением, если ваша логика этого требует
-            // В вашем коде: _localizationService.SetLanguage(LanguageCultureCode); будет вызван с ""
-            _mockLocalizationService.Verify(l => l.SetLanguage(""), Times.Once());
+            // В вашем коде: _localizationService.SetLanguage(LanguageCultureCode); будет вызван с "en"
+            _mockLocalizationService.Verify(l => l.SetLanguage("en"), Times.Once());
         }
 
         // --- Тесты команд ---
@@ -165,7 +165,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         public void SaveSettingsCommand_Execute_SavesCurrentSettings()
         {
             // Arrange
-            _viewModel.MeasurementTime = 3;
+            _viewModel.DevicePort = "COM3";
             _viewModel.AutoConnectEnabled = false;
             var newLang = new SettingsViewModel.LanguageOption { DisplayName = "Chinese", CultureCode = "zh-Hans" };
             _viewModel.SelectedLanguage = newLang; // Это уже вызовет SaveLanguageToSettings
@@ -176,7 +176,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             // Assert
             // Проверим, что SaveSettings был вызван сервисом
             _mockSettingsService.Verify(s => s.SaveSettings(It.Is<AppSettings>(
-                settings => settings.MeasurementTime == 3 &&
+                settings => settings.DevicePort == "COM3" &&
                             settings.AutoConnectEnabled == false &&
                             settings.LanguageCultureCode == "zh-Hans"
             )), Times.Once());
@@ -213,15 +213,15 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         {
             // Arrange
             // Изменяем настройки в ViewModel
-            _viewModel.MeasurementTime = 3;
+            _viewModel.DevicePort = "COM_CHANGED";
             _viewModel.AutoConnectEnabled = false;
             _viewModel.SelectedLanguage = new SettingsViewModel.LanguageOption { DisplayName = "Chinese", CultureCode = "zh-Hans" };
 
             // Настраиваем мок для возврата исходных настроек
             _mockSettingsService.Setup(s => s.LoadSettings()).Returns(new AppSettings
             {
-                LanguageCultureCode = "",
-                MeasurementTime = 2,
+                LanguageCultureCode = "en",
+                DevicePort = "COM1",
                 AutoConnectEnabled = true
             });
 
@@ -233,10 +233,10 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             _mockSettingsService.Verify(s => s.LoadSettings(), Times.Exactly(2)); // Один раз в конструкторе, один раз при отмене
 
             // Проверяем, что свойства ViewModel вернулись к исходным
-            Assert.That(_viewModel.MeasurementTime, Is.EqualTo(2));
+            Assert.That(_viewModel.DevicePort, Is.EqualTo("COM1"));
             Assert.That(_viewModel.AutoConnectEnabled, Is.True);
-            Assert.That(_viewModel.LanguageCultureCode, Is.EqualTo(""));
-            Assert.That(_viewModel.SelectedLanguage?.CultureCode, Is.EqualTo(""));
+            Assert.That(_viewModel.LanguageCultureCode, Is.EqualTo("en"));
+            Assert.That(_viewModel.SelectedLanguage?.CultureCode, Is.EqualTo("en"));
         }
 
         // --- Тесты IDisposable ---

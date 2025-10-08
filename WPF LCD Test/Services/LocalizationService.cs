@@ -30,7 +30,7 @@ namespace WPF_LCD_Test.Services
         private LocalizationService()
         {
             // Это вызовет SetLanguage, который установит культуру потока и сохранит ее в _applicationCulture
-            SetLanguage(""); // Устанавливаем язык по умолчанию при старте
+            SetLanguage("en"); // Устанавливаем язык по умолчанию при старте
         }
 
         // Публичное статическое свойство для получения единственного экземпляра

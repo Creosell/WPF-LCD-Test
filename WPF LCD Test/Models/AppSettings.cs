@@ -13,10 +13,10 @@ namespace WPF_LCD_Test.Models // Или WPF_LCD_Test.Settings
         /// <summary>
 
         [JsonPropertyName("languageCultureCode")]
-        public string LanguageCultureCode { get; set; } = "";
+        public string LanguageCultureCode { get; set; } = "en";
 
-        [JsonPropertyName("measurementTime")]
-        public int MeasurementTime { get; set; } = 2;
+        [JsonPropertyName("devicePort")]
+        public string DevicePort { get; set; } = "COM1";
 
         [JsonPropertyName("autoConnectEnabled")]
         public bool AutoConnectEnabled { get; set; } = true;
