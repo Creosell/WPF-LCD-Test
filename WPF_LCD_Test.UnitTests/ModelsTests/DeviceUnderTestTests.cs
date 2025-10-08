@@ -144,5 +144,34 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
             Assert.That(retrievedList, Is.SameAs(externalList), "The retrieved list should be the same instance as the set one.");
             Assert.That(retrievedList, Has.Count.EqualTo(1));
         }
+
+        [Test]
+        public void ToString_ReturnsNone_WhenNoMeasurements()
+        {
+            var device = new DeviceUnderTest("SN123");
+            var result = device.ToString();
+            StringAssert.Contains("Measurements: [None]", result);
+        }
+
+        [Test]
+        public void ToString_ReturnsMeasurementString_WhenOneMeasurement()
+        {
+            var device = new DeviceUnderTest("SN123");
+            device.AddMeasurement(new Measurement("WhiteColor", 0.1, 0.2, 100, 5000));
+            var result = device.ToString();
+            StringAssert.Contains("Location: WhiteColor", result);
+            StringAssert.DoesNotContain("None", result);
+        }
+
+        [Test]
+        public void ToString_ReturnsAllMeasurements_WhenMultipleMeasurements()
+        {
+            var device = new DeviceUnderTest("SN123");
+            device.AddMeasurement(new Measurement("WhiteColor", 0.1, 0.2, 100, 5000));
+            device.AddMeasurement(new Measurement("BlackColor", 0.3, 0.4, 50, 6000));
+            var result = device.ToString();
+            StringAssert.Contains("Location: WhiteColor", result);
+            StringAssert.Contains("Location: BlackColor", result);
+        }
     }
 }

@@ -11,6 +11,12 @@
     </system:String>
 
     <!--  MeasurementView keys  -->
+    <system:String x:Key="TV">
+        TV
+    </system:String>
+    <system:String x:Key="DeviceConfiguration">
+        Device Configuration
+    </system:String>
     <system:String x:Key="BadConnection">
         Unsuccessful connection. Try to restart color analyzer
     </system:String>
@@ -65,6 +71,9 @@
     </system:String>
     <system:String x:Key="BluePoint">
         B. Blue
+    </system:String>
+    <system:String x:Key="WhitePoint">
+        W. White
     </system:String>
     <system:String x:Key="BlackPoint">
         0. Black

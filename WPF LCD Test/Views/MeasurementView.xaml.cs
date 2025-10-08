@@ -157,6 +157,7 @@ namespace WPF_LCD_Test.Views
                     case Key.R: measurementPointName = "RedColor"; break;
                     case Key.G: measurementPointName = "GreenColor"; break;
                     case Key.B: measurementPointName = "BlueColor"; break;
+                    case Key.W: measurementPointName = "WhiteColor"; break;
 
                     case Key.NumPad1: measurementPointName = "TopLeft"; break;
                     case Key.NumPad2: measurementPointName = "TopCenter"; break;
@@ -215,6 +216,7 @@ namespace WPF_LCD_Test.Views
                         current is Menu ||       // Элемент меню
                         current is MenuItem ||   // Отдельный пункт меню
                         current is ComboBox ||   // Выпадающий список
+                        current is ComboBoxItem || // Элемент выпадающего списка
                         current is CheckBox ||   // Флажок
                         current is RadioButton || // Переключатель
                         current is Slider ||     // Слайдер

@@ -8,47 +8,38 @@ using WPF_LCD_Test.Interfaces;
 
 namespace WPF_LCD_Test.ViewModels
 {
-    // ViewModel для главного окна (оболочки приложения)
-    // Он будет управлять навигацией между ViewModel "страниц"
-    public class MainWindowViewModel : BaseViewModel, IDisposable // Оставляем IDisposable для очистки
+    // ViewModel для главного окна приложения, управляет навигацией между страницами
+    public class MainWindowViewModel : BaseViewModel, IDisposable
     {
-        // --- ЗАВИСИМОСТИ: Оставьте только те сервисы, которые нужны в оболочке или для создания других ViewModel !!! ---
-        // Сервисы, которые будут переданы в конструкторы ViewModel страниц.
-        // MainWindowViewModel действует как "фабрика" или композиционный корень для ViewModel страниц.
+        // Сервисы для передачи в ViewModel страниц
         private readonly IColorMeasurementService _colorMeasurementService;
-
         private readonly IFileService _fileService;
-        private readonly IDialogService _dialogService; // Возможно, нужен для общеприложениевых диалогов
-        private readonly ILocalizationService _localizationService; // Нужен для смены языка и подписки
+        private readonly IDialogService _dialogService;
+        private readonly ILocalizationService _localizationService;
         private readonly ISettingsService _settingService;
-        private readonly IDispatcher _dispatcher; // Возможно, нужен для работы с UI потоками
+        private readonly IDispatcher _dispatcher;
         private BaseViewModel _currentPageViewModel;
         private string _currentPageIdentifier;
-        private MeasurementViewModel? _measurementViewModel; // Используем Nullable Reference Types ?
+        private MeasurementViewModel? _measurementViewModel;
         private SettingsViewModel? _settingsViewModel;
 
-        // Геттеры и сеттеры для текущей страницы
+        // Текущий идентификатор страницы
         public string CurrentPageIdentifier
         {
             get => _currentPageIdentifier;
-            private set => SetProperty(ref _currentPageIdentifier, value); // Используем SetProperty для уведомления UI
+            private set => SetProperty(ref _currentPageIdentifier, value);
         }
 
+        // Текущий ViewModel страницы
         public BaseViewModel CurrentPageViewModel
         {
             get => _currentPageViewModel;
-            set
-            {
-                // Устанавливаем новый ViewModel страницы (из хранимых экземпляров)
-                SetProperty(ref _currentPageViewModel, value);
-            }
+            set => SetProperty(ref _currentPageViewModel, value);
         }
 
         public ICommand NavigateCommand { get; }
 
-        // --- КОНСТРУКТОР ---
-        // В конструкторе инициализируем сервисы и команды оболочки.
-        // Изначально устанавливаем первую страницу.
+        // Конструктор: инициализация сервисов, команд и стартовой страницы
         public MainWindowViewModel(
             IColorMeasurementService colorMeasurementService,
             IFileService fileService,
@@ -57,95 +48,63 @@ namespace WPF_LCD_Test.ViewModels
             ISettingsService settingsService,
             IDispatcher dispatcher) : base()
         {
-            // Инициализация зависимостей
             _colorMeasurementService = colorMeasurementService ?? throw new ArgumentNullException(nameof(colorMeasurementService));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
-            _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService)); // Сохраняем для общеприложениевых диалогов
+            _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
-            _settingService = settingsService ?? throw new ArgumentNullException(nameof(settingsService)); // Сохраняем для доступа к настройкам
-            _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher)); // Сохраняем для работы с UI потоками
-
-            // Инициализация команд оболочки
-            // Команда NavigateCommand принимает параметр (string pageName)
+            _settingService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+            _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
             NavigateCommand = new RelayCommand(ExecuteNavigate, CanExecuteNavigate);
-
-            // При запуске приложения автоматически переходим на страницу измерений.
             ExecuteNavigate("Measurement");
         }
 
-        // --- МЕТОДЫ ВЫПОЛНЕНИЯ КОМАНД ОБОЛОЧКИ (Execute... и CanExecute...) ---
+        // Проверяет возможность навигации
+        private bool CanExecuteNavigate(object parameter) => true;
 
-        // Логика проверки возможности выполнения навигации
-        private bool CanExecuteNavigate(object parameter)
-        {
-            return true;
-        }
-
-        // Логика выполнения навигации - Создает ViewModel нужной страницы
+        // Выполняет навигацию между страницами
         private void ExecuteNavigate(object parameter)
         {
             string? pageName = parameter as string;
-
             if (string.IsNullOrEmpty(pageName)) return;
-
-            // CurrentPageIdentifier = pageName; // Если используется для подсветки
-
-            // --- Логика использования ХРАНИМЫХ экземпляров ViewModel !!! ---
-            BaseViewModel? targetViewModel = null; // Используем Nullable Reference Types
-
+            BaseViewModel? targetViewModel = null;
             switch (pageName)
             {
                 case "Measurement":
-
                     _measurementViewModel ??= new MeasurementViewModel(
-                            _colorMeasurementService,
-                            _fileService,
-                            _dialogService,
-                            _localizationService,
-                            _dispatcher
-                        );
-
+                        _colorMeasurementService,
+                        _fileService,
+                        _dialogService,
+                        _localizationService,
+                        _dispatcher
+                    );
                     targetViewModel = _measurementViewModel;
                     break;
-
                 case "Settings":
-
                     _settingsViewModel ??= new SettingsViewModel(_settingService, _localizationService);
-
                     targetViewModel = _settingsViewModel;
                     break;
-
                 default:
                     _measurementViewModel ??= new MeasurementViewModel(
-                            _colorMeasurementService,
-                            _fileService,
-                            _dialogService,
-                            _localizationService,
-                            _dispatcher
-                        );
+                        _colorMeasurementService,
+                        _fileService,
+                        _dialogService,
+                        _localizationService,
+                        _dispatcher
+                    );
+                    targetViewModel = _measurementViewModel;
                     break;
             }
-
-            // !!! Устанавливаем CurrentPageViewModel в найденный или созданный экземпляр !!!
-            // Сеттер CurrentPageViewModel больше НЕ вызывает Dispose().
-            if (targetViewModel != null && targetViewModel != _currentPageViewModel) // Проверяем, что есть что установить и это не текущий ViewModel
+            if (targetViewModel != null && targetViewModel != _currentPageViewModel)
             {
                 CurrentPageViewModel = targetViewModel;
             }
         }
 
-        // --- IDisposable ---
-        // Важно: при уничтожении MainWindowViewModel (например, при закрытии окна),
-        // нужно очистить текущий ViewModel страницы, если он реализует IDisposable.
-        // Также отписаться от событий сервисов, на которые подписан ТОЛЬКО MainWindowViewModel.
+        // Освобождает ресурсы текущей страницы
         public void Dispose()
         {
-            // Очищаем текущий ViewModel страницы, если он Disposable.
-            // Это важно, чтобы ViewModel страницы мог отписаться от событий сервисов и освободить ресурсы.
             (CurrentPageViewModel as IDisposable)?.Dispose();
-
-            // TODO: Если MainWindowViewModel подписывался на другие глобальные события, отпишитесь здесь.
-            GC.SuppressFinalize(this); // Вызываем сборщик мусора, если нужно
+            GC.SuppressFinalize(this);
         }
     }
 }

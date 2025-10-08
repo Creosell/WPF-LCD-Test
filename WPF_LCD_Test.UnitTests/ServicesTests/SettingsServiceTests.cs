@@ -100,7 +100,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             var savedSettings = JsonSerializer.Deserialize<AppSettings>(jsonContent);
 
             Assert.That(savedSettings, Is.Not.Null);
-            Assert.That(savedSettings.LanguageCultureCode, Is.EqualTo("en"), "LanguageCultureCode по умолчанию должен быть 'en'.");
+            Assert.That(savedSettings.LanguageCultureCode, Is.EqualTo(""), "LanguageCultureCode по умолчанию должен быть 'en'.");
             Assert.That(savedSettings.DevicePort, Is.EqualTo("COM1"), "DevicePort по умолчанию должен быть 'COM1'.");
             // !!! ВАЖНОЕ ИЗМЕНЕНИЕ ЗДЕСЬ !!!
             Assert.That(savedSettings.AutoConnectEnabled, Is.EqualTo(true), "AutoConnectEnabled по умолчанию должен быть 'true' согласно обновленной модели.");
@@ -143,7 +143,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             // Assert
             Assert.That(loadedSettings, Is.Not.Null, "Загруженные настройки не должны быть null.");
             // Проверяем, что вернулись значения по умолчанию из-за ошибки JSON
-            Assert.That(loadedSettings.LanguageCultureCode, Is.EqualTo("en"), "LanguageCultureCode должен быть 'en' из-за ошибки JSON.");
+            Assert.That(loadedSettings.LanguageCultureCode, Is.EqualTo(""), "LanguageCultureCode должен быть 'en' из-за ошибки JSON.");
             Assert.That(loadedSettings.DevicePort, Is.EqualTo("COM1"), "DevicePort должен быть 'COM1' из-за ошибки JSON.");
             Assert.That(loadedSettings.AutoConnectEnabled, Is.EqualTo(true), "AutoConnectEnabled должен быть 'true' из-за ошибки JSON.");
         }
