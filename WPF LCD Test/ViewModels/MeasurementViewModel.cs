@@ -594,7 +594,7 @@ namespace WPF_LCD_Test.ViewModels
         private bool CanExecuteClearFields(object parameter) => true;
         private bool CanExecuteSwitchLanguage(object parameter) => parameter is string languageCode && !string.IsNullOrWhiteSpace(languageCode);
         private bool CanExecuteMeasure(object parameter) => IsDeviceConnected && !_isDeviceCalibrating && !_isDeviceConnecting && IsDeviceCalibrated && SerialNumber != "" && (MeasurementTime > 0);
-        private bool CanExecuteApplySerialNumber(object parameter) => !string.IsNullOrWhiteSpace(parameter as string) && Regex.IsMatch(parameter as string, SerialNumberPattern);
+        private bool CanExecuteApplySerialNumber(object parameter) => !string.IsNullOrWhiteSpace(parameter as string);
         private bool CanExecuteApplyMeasurementTime(object parameter) => MeasurementTime > 0;
 
         // Добавляет сообщение в лог
