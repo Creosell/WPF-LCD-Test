@@ -45,8 +45,8 @@
 
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="40*" />
-                <ColumnDefinition Width="60*" />
+                <ColumnDefinition Width="45*" />
+                <ColumnDefinition Width="55*" />
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0">
@@ -87,7 +87,7 @@
                             Foreground="White" />
                         <ComboBox
                             x:Name="DeviceConfigurationComboBox"
-                            MinWidth="150"
+                            MinWidth="200"
                             MinHeight="20"
                             Margin="5"
                             HorizontalAlignment="Center"
@@ -108,7 +108,7 @@
                             Foreground="#E5FFFFFF" />
                         <TextBox
                             x:Name="SerialNumberTextBox"
-                            MinWidth="180"
+                            MinWidth="200"
                             Margin="5"
                             VerticalAlignment="Center"
                             Foreground="White"

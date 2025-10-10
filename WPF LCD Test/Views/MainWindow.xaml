@@ -11,7 +11,7 @@
     Title="LCD Test Tool"
     Width="1000"
     Height="600"
-    MinWidth="1000"
+    MinWidth="1100"
     MinHeight="600"
     d:DataContext="{d:DesignInstance Type=viewmodel:SettingsViewModel}"
     AllowsTransparency="True"
