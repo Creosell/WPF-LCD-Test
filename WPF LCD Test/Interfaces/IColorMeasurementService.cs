@@ -1,36 +1,20 @@
-﻿// В папке Interfaces
-// Файл IColorMeasurementService.cs
-
+﻿using System;
+using System.Threading.Tasks;
 using WPF_LCD_Test.Models;
 
 namespace WPF_LCD_Test.Interfaces
 {
-    // Интерфейс для сервиса управления колориметром
-    public interface IColorMeasurementService : IDisposable // Сервис тоже может требовать освобождения ресурсов
+    public interface IColorMeasurementService : IDisposable
     {
-        // Свойства состояния устройства, доступные для чтения
         bool IsDeviceConnected { get; }
-
         bool IsDeviceCalibrated { get; }
-
-        // Методы для команд UI
-        Task<bool> ConnectAsync(); // Асинхронная операция для подключения
-
+        Task<bool> ConnectAsync();
         void Disconnect();
-
-        Task<bool> CalibrateZeroAsync(); // Асинхронная операция для калибровки
-
-        // Метод для выполнения измерения
-        Task<Measurement> MeasureAsync(int measurmentTime); // Асинхронная операция, возвращает объект Measurement
-
-        // События для оповещения ViewModel об изменении состояния или ходе выполнения
-        // Например, чтобы обновить UI или лог
+        Task<bool> CalibrateZeroAsync();
+        Task<Measurement> MeasureAsync(int measurmentTime);
         event EventHandler<bool> ConnectionStatusChanged;
-
         event EventHandler<bool> CalibrationStatusChanged;
-
-        event EventHandler<string> StatusMessage; // Для отправки сообщений в лог UI
-
-        event EventHandler<double> MeasurementProgress; // Если измерение занимает время
+        event EventHandler<string> StatusMessage;
+        event EventHandler<double> MeasurementProgress;
     }
 }

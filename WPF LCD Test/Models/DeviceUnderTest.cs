@@ -1,62 +1,38 @@
-﻿// В папке Models
-// Файл DeviceUnderTest.cs
+﻿using System;
 using System.Text.Json.Serialization;
 using WPF_LCD_Test.Converters;
 using static WPF_LCD_Test.Resources.Resources;
 
-namespace WPF_LCD_Test.Models // Пространство имен должно быть в папке Models
+namespace WPF_LCD_Test.Models
 {
-    // Делаем класс публичным, чтобы к нему можно было обращаться из ViewModel/Interfaces
-    public class DeviceUnderTest // Было internal, лучше сделать public
+    public class DeviceUnderTest
     {
-        // Поля и свойства
-
-        public string SerialNumber { get; set; } // Серийный номер - данные устройства
-
+        public string SerialNumber { get; set; }
         public string DeviceConfiguration { get; set; } = "DefaultConfig";
-
-        public bool IsTV { get; set; } = false;
-
+        public bool IsTV { get; set; }
         [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime MeasurementDateTime { get; set; }
-
-        // Список измерений. Это основная коллекция данных.
         public List<Measurement> Measurements { get; set; }
 
-
-
-        // Конструктор
         public DeviceUnderTest(string serialNumber)
         {
             if (string.IsNullOrWhiteSpace(serialNumber))
-            {
-                // В Модели лучше выбрасывать исключение при некорректных входных данных
                 throw new ArgumentException($"{SnCantBeEmpty}", nameof(serialNumber));
-            }
             SerialNumber = serialNumber;
             MeasurementDateTime = DateTime.Now;
-            Measurements = [];
+            Measurements = new List<Measurement>();
         }
 
-        // Метод добавления измерения
         public void AddMeasurement(Measurement newMeasurement)
         {
             ArgumentNullException.ThrowIfNull(newMeasurement);
-
-            // Логика замены существующего измерения по Location - это бизнес-логика Модели, оставляем здесь
-            Measurement existingMeasurement = Measurements.Find(deviceMeasurement => deviceMeasurement.Location == newMeasurement.Location);
-
-            if (existingMeasurement != null)
-            {
-                Measurements.Remove(existingMeasurement);
-            }
-
+            Measurements.RemoveAll(m => m.Location == newMeasurement.Location);
             Measurements.Add(newMeasurement);
         }
 
         public override string ToString()
         {
-            var measurementsStr = Measurements != null && Measurements.Count > 0
+            var measurementsStr = Measurements?.Any() == true
                 ? string.Join("; ", Measurements.Select(m => m.ToString()))
                 : "None";
             return $"Device SN: {SerialNumber}, Config: {DeviceConfiguration}, IsTV: {IsTV}, Measured at: {MeasurementDateTime}, Measurements: [{measurementsStr}]";

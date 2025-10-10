@@ -1,13 +1,9 @@
-﻿// В папке Services
-// В файле LocalizationService.cs
-
-using System.Globalization;
+﻿using System.Globalization;
 using WPF_LCD_Test.Interfaces;
 using static WPF_LCD_Test.Resources.Resources;
 
 namespace WPF_LCD_Test.Services
 {
-    // Сервис локализации приложения
     public class LocalizationService : ILocalizationService
     {
         public event EventHandler<string> StatusMessage;
@@ -15,13 +11,12 @@ namespace WPF_LCD_Test.Services
         private CultureInfo _applicationCulture;
         private LocalizationService()
         {
-            SetLanguage(""); // Язык по умолчанию
+            SetLanguage("");
         }
         public static ILocalizationService Instance => _lazyInstance.Value;
         public event EventHandler LanguageChanged;
         public CultureInfo CurrentCulture => _applicationCulture;
 
-        // Устанавливает язык приложения
         public void SetLanguage(string cultureCode)
         {
             try
@@ -42,7 +37,6 @@ namespace WPF_LCD_Test.Services
             }
         }
 
-        // Получает локализованную строку по ключу
         public string GetString(string key)
         {
             if (ResourceManager == null)
@@ -50,6 +44,7 @@ namespace WPF_LCD_Test.Services
                 StatusMessage?.Invoke(this, $"{ErrUnexpected}:  null!");
                 return $"!{key}!";
             }
+            
             string result = ResourceManager.GetString(key, _applicationCulture);
             if (result == null)
             {
@@ -59,7 +54,6 @@ namespace WPF_LCD_Test.Services
             return result;
         }
 
-        // Получает локализованную строку с форматированием
         public string GetString(string key, params object[] args)
         {
             string format = GetString(key);
@@ -78,7 +72,6 @@ namespace WPF_LCD_Test.Services
             }
         }
 
-        // Вызывает событие смены языка
         protected virtual void OnLanguageChanged()
         {
             LanguageChanged?.Invoke(this, EventArgs.Empty);

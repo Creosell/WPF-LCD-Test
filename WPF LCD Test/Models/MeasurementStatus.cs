@@ -1,78 +1,50 @@
-﻿// В папке Models
-// Файл MeasurementStatus.cs
-
-using MvvmHelpers;
+﻿using MvvmHelpers;
 using System.Text.Json.Serialization;
 using System.Windows.Media;
 
 namespace WPF_LCD_Test.Models
 {
-    public class MeasurementStatus : BaseViewModel // Наследует от BaseViewModel
+    public class MeasurementStatus : BaseViewModel
     {
-        public string Location { get; set; } // Имя точки измерения
+        public string Location { get; set; }
 
-        private bool? _isPassed; // Статус измерения: null - не измерено, true - успешно, false - ошибка
-
+        private bool? _isPassed;
         public bool? IsPassed
         {
             get => _isPassed;
             set
             {
-                // !!! Используем SetProperty. SetProperty возвращает true, если значение ДЕЙСТВИТЕЛЬНО изменилось. !!!
-                // Если значение изменилось (SetProperty вернул true), выполняем дополнительную логику.
                 if (SetProperty(ref _isPassed, value))
-                {
-                    // Если IsPassed изменилось, уведомляем UI об этом (это делает SetProperty).
-                    // И дополнительно уведомляем, что свойство StatusColor тоже могло измениться,
-                    // так как оно вычисляется на основе IsPassed.
                     OnPropertyChanged(nameof(StatusColor));
-                }
             }
         }
 
-        // Свойство для определения цвета в UI (привязка к Background кнопки/TextBlock)
-        // Возвращает WPF Brush
-        [JsonIgnore] // Обычно это свойство не нужно сохранять в JSON, т.к. оно связано с представлением
+        [JsonIgnore]
         public Brush StatusColor
         {
-            get
+            get => IsPassed switch
             {
-                if (IsPassed == true) return Brushes.DarkGreen; // Успех
-                if (IsPassed == false) return Brushes.DarkRed;      // Ошибка
-                return Brushes.DimGray; // По умолчанию (не измерено)
-            }
+                true => Brushes.DarkGreen,
+                false => Brushes.DarkRed,
+                _ => Brushes.DimGray
+            };
         }
 
-        // Свойство для отображения измеренных значений рядом с точкой в UI
-        private string _measuredValuesString;
-
+        private string _measuredValuesString = "";
         public string MeasuredValuesString
         {
             get => _measuredValuesString;
-            set
-            {
-                if (_measuredValuesString != value)
-                {
-                    _measuredValuesString = value;
-                    OnPropertyChanged(); // Уведомляем UI об изменении текста
-                }
-            }
+            set => SetProperty(ref _measuredValuesString, value);
         }
 
-        // Конструктор с параметром (имя точки) для удобства инициализации
         public MeasurementStatus(string location)
         {
             Location = location;
-            IsPassed = null; // Изначально не измерено
-            MeasuredValuesString = ""; // Изначально пусто
         }
 
-        // Конструктор по умолчанию (может быть полезен для XAML дизайнера или сериализации)
-        public MeasurementStatus() // Оставь, если хочешь использовать как отдельный класс
+        public MeasurementStatus()
         {
             Location = "Unknown";
-            IsPassed = null;
-            MeasuredValuesString = "";
         }
     }
 }

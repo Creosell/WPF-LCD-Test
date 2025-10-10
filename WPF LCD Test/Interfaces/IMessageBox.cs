@@ -1,6 +1,4 @@
-﻿// В папке Interfaces
-// Файл IMessageBox.cs
-using System.Windows; // Для MessageBoxResult, MessageBoxButton, MessageBoxImage
+﻿using System.Windows;
 
 namespace WPF_LCD_Test.Interfaces
 {
