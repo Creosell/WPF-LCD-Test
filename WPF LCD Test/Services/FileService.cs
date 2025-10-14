@@ -1,105 +1,87 @@
-﻿// В папке Services
-// Файл FileService.cs (реализация IFileService)
-
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
-using System.IO; // Для работы с файлами и папками
-using System.Text.Json; // Для сериализации в JSON
+using System.IO;
+using System.Text.Json;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
 using WPF_LCD_Test.Wrappers;
 using static WPF_LCD_Test.Resources.Resources;
 
-// using System.Globalization; // Если потребуется для форматирования чисел при сохранении CSV
 namespace WPF_LCD_Test.Services
 {
-    // Класс, реализующий интерфейс сервиса работы с файлами
+    // Implementation of file operations service. Dependencies are injected via traditional constructor.
     public class FileService : IFileService
     {
-        // Приватные поля для хранения путей
-        private string _applicationBasePath;
-
-        private string _baseFolderPath;
+        // Private fields for internal state and paths.
         private readonly string _workFolerName = "data";
+        private string _applicationBasePath;
+        private string _baseFolderPath;
 
-        // Внедряемые зависимости
+        // Injected dependencies (wrappers for file/directory system).
         private readonly IDirectory _directory;
-
         private readonly IFile _file;
         private readonly IPath _path;
         private readonly ILocalizationService _localizationService;
 
-        // Публичные свойства из интерфейса
+        // Public properties with concise expression bodies.
         public string BaseFolderPath => _baseFolderPath;
-
         public string WorkFolderName => _workFolerName;
 
-        // Опции для ЗАГРУЗКИ настроек (десериализация)
+        // Options for JSON serialization (pretty-printed output).
         private static readonly JsonSerializerOptions _saveSerializerOptions = new()
         {
             WriteIndented = true
-            // Добавьте другие опции, нужные для загрузки
         };
 
-        // События из интерфейса
-        public event EventHandler<string> StatusMessage;
+        public event EventHandler<string>? StatusMessage;
+        public event EventHandler<bool>? SaveOperationCompleted;
 
-        public event EventHandler<bool> SaveOperationCompleted;
-
-        // Конструктор сервиса для продакшн-кода (использует обертки по умолчанию)
+        // Default constructor calls the parameterized constructor with production dependencies.
         public FileService() : this(new DirectoryWrapper(), new FileWrapper(), new PathWrapper(), AppDomain.CurrentDomain.BaseDirectory, LocalizationService.Instance)
         {
         }
 
-        // Конструктор для внедрения зависимостей (для тестов)
-        // и для возможности указания базового пути (для тестов)
+        // Parameterized constructor for Dependency Injection (DI).
         public FileService(IDirectory directory, IFile file, IPath path, string applicationBasePath, ILocalizationService localizationService)
         {
-            _directory = directory;
-            _file = file;
-            _path = path;
-            _applicationBasePath = applicationBasePath; // Теперь базовый путь можно передавать
-            _localizationService = localizationService;
+            // Use tuple assignment for concise dependency initialization.
+            (_directory, _file, _path, _applicationBasePath, _localizationService) = (directory, file, path, applicationBasePath, localizationService);
 
             InitializeWorkingFolders();
-            _localizationService = localizationService;
         }
 
-        // Метод инициализации рабочих папок (реализация)
+        // Initializes the application's working directory.
         public void InitializeWorkingFolders()
         {
             try
             {
-                // Используем _path.Combine вместо Path.Combine
                 _baseFolderPath = _path.Combine(_applicationBasePath, _workFolerName);
 
-                // Проверяем и создаем базовую папку, если ее нет
-                // Используем _directory.Exists и _directory.CreateDirectory
+                // Creates the base directory if it doesn't exist.
                 if (!_directory.Exists(_baseFolderPath))
                 {
                     _directory.CreateDirectory(_baseFolderPath);
-                    StatusMessage?.Invoke(this, $"{WorkFolderCreated}: {_baseFolderPath}"); // Сообщение
+                    StatusMessage?.Invoke(this, $"{WorkFolderCreated}: {_baseFolderPath}");
                 }
             }
             catch (Exception ex)
             {
-                StatusMessage?.Invoke(this, $"{WorkingFolderInitErr}: {ex.Message}"); // Сообщение об ошибке
+                StatusMessage?.Invoke(this, $"{WorkingFolderInitErr}: {ex.Message}");
             }
         }
 
+        // Sets the current thread culture for correct localization in async operations.
         private static void CheckCurrentAppLanguage()
         {
-            CultureInfo culture = LocalizationService.Instance.CurrentCulture; // Получаем текущую культуру из сервиса локализации
-
-            // Устанавливаем эту культуру для текущего потока из пула
+            var culture = LocalizationService.Instance.CurrentCulture;
             Thread.CurrentThread.CurrentCulture = culture;
             Thread.CurrentThread.CurrentUICulture = culture;
         }
 
-        // Метод сохранения данных устройства в JSON (реализация)
-        public async Task<bool> SaveDeviceDataToJsonAsync(DeviceUnderTest device)
+        // Asynchronously saves all device measurement data to a single JSON file.
+        public async Task<bool> SaveDeviceDataToJsonAsync(DeviceUnderTest? device)
         {
-            CheckCurrentAppLanguage(); // Проверяем текущий язык приложения
+            CheckCurrentAppLanguage();
             if (device == null)
             {
                 StatusMessage?.Invoke(this, $"{SaveJSONErrDeviceIsEmpty}");
@@ -109,41 +91,34 @@ namespace WPF_LCD_Test.Services
 
             try
             {
-                // Определяем путь к папке для этого устройства по серийному номеру
-                string serialNumberFolderPath = _path.Combine(BaseFolderPath, device.SerialNumber);
+                string fileName = $"{device.SerialNumber}.json";
+                string filePath = _path.Combine(BaseFolderPath, fileName);
 
-                // Определяем путь к JSON файлу
-                string fileName = $"{device.SerialNumber}.json"; // Имя файла основано на серийном номере
-                string filePath = _path.Combine(BaseFolderPath, fileName); // Путь - базовая папка + имя файла
+                string jsonString = JsonSerializer.Serialize(device, _saveSerializerOptions);
 
-                // Сериализуем объект DeviceUnderTest в JSON
+                await _file.WriteAllTextAsync(filePath, jsonString);
 
-                string jsonString = JsonSerializer.Serialize(device, _saveSerializerOptions); // Сериализуем объект Модели
-
-                // Асинхронно записываем JSON строку в файл
-                await _file.WriteAllTextAsync(filePath, jsonString); // Используем асинхронный метод записи
-
-                StatusMessage?.Invoke(this, $"{ResultsForSN} {device.SerialNumber} {SavedToJSON}: {filePath}"); // Сообщение об успехе
+                StatusMessage?.Invoke(this, $"{ResultsForSN} {device.SerialNumber} {SavedToJSON}: {filePath}");
                 SaveOperationCompleted?.Invoke(this, true);
-                return true; // Успех
+                return true;
             }
             catch (Exception ex)
             {
-                StatusMessage?.Invoke(this, $"{SaveJSONErrForSN} {device.SerialNumber}: {ex.Message}"); // Сообщение об ошибке
+                StatusMessage?.Invoke(this, $"{SaveJSONErrForSN} {device.SerialNumber}: {ex.Message}");
                 SaveOperationCompleted?.Invoke(this, false);
-                return false; // Ошибка
+                return false;
             }
         }
 
-        // Метод сохранения отдельного измерения в CSV (реализация)
+        // Asynchronously saves a single measurement's data string to a CSV file.
         public async Task<bool> SaveMeasurementToCsvAsync(string measurementCsvString, string measurementLocationName, string serialNumber)
         {
-            CheckCurrentAppLanguage(); // Проверяем текущий язык приложения
+            CheckCurrentAppLanguage();
 
+            // Input validation checks for required fields.
             if (string.IsNullOrWhiteSpace(serialNumber))
             {
                 StatusMessage?.Invoke(this, $"{CsvSnErr}");
-                // OnSaveOperationCompleted?.Invoke(this, false); // Может быть, не нужно оповещать о завершении каждого CSV
                 return false;
             }
             if (string.IsNullOrWhiteSpace(measurementCsvString))
@@ -159,52 +134,42 @@ namespace WPF_LCD_Test.Services
 
             try
             {
-                // Определяем путь к папке для этого устройства
                 string serialNumberFolderPath = _path.Combine(BaseFolderPath, serialNumber);
 
-                // Убеждаемся, что папка устройства существует
+                // Create device-specific subfolder if it doesn't exist.
                 if (!_directory.Exists(serialNumberFolderPath))
                 {
                     _directory.CreateDirectory(serialNumberFolderPath);
-                    StatusMessage?.Invoke(this, $"{WorkFolderCreatedForSN}: {serialNumberFolderPath}"); // Сообщение
+                    StatusMessage?.Invoke(this, $"{WorkFolderCreatedForSN}: {serialNumberFolderPath}");
                 }
 
-                // Определяем путь к CSV файлу (используя имя локации)
-                string fileName = $"{measurementLocationName}.csv"; // Имя файла по локации
+                string fileName = $"{measurementLocationName}.csv";
                 string filePath = _path.Combine(serialNumberFolderPath, fileName);
 
-                // Асинхронно записываем CSV строку в файл
-                await _file.WriteAllTextAsync(filePath, measurementCsvString); // Сохраняем уже готовую CSV строку
-
-                // OnStatusMessage?.Invoke(this, $"Измерение '{measurementLocationName}' сохранено в CSV: {filePath}"); // Может быть слишком много сообщений для лога
-                // OnSaveOperationCompleted?.Invoke(this, true); // Может быть, не нужно оповещать о завершении каждого CSV
-                return true; // Успех
+                await _file.WriteAllTextAsync(filePath, measurementCsvString);
+                return true; // Return success inside the try block for clearer logic flow.
             }
             catch (Exception ex)
             {
-                StatusMessage?.Invoke(this, $"{ErrCSV} '{measurementLocationName}' (SN {serialNumber}): {ex.Message}"); // Сообщение об ошибке
-                                                                                                                        // OnSaveOperationCompleted?.Invoke(this, false); // Может быть, не нужно оповещать о завершении каждого CSV
-                return false; // Ошибка
+                StatusMessage?.Invoke(this, $"{ErrCSV} '{measurementLocationName}' (SN {serialNumber}): {ex.Message}");
+                return false;
             }
         }
 
+        // Executes an external program located in the application's base directory.
         public bool RunExternalProgram(string executableName)
         {
-            // Построение полного пути к исполняемому файлу
-            string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            string executablePath = Path.Combine(appDirectory, executableName);
+            // Conciseness: Use early returns for checks.
+            string executablePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, executableName);
 
-            if (!File.Exists(executablePath))
-            {
-                return false;
-            }
+            if (!File.Exists(executablePath)) return false;
 
             try
             {
                 Process.Start(executablePath);
                 return true;
             }
-            catch (Exception ex)
+            catch // Catching any exception during process start (e.g., file access denied).
             {
                 return false;
             }

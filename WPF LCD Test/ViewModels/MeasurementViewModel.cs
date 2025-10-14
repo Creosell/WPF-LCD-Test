@@ -36,6 +36,24 @@ namespace WPF_LCD_Test.ViewModels
         public event EventHandler RequestClearInputFocus;
         private const string SerialNumberPattern = "^[a-zA-Z0-9]*$";
         private string _logText = string.Empty;
+        private int _measurementMaxAttempts = 2;
+        private int _measurementAttemptCounter = 0;
+
+
+        // Keys and values for Measurement Validation
+        private const double ColorCoordinatesTolerance = 0.2;
+        private static readonly string RedColorLocation = MeasurementStatusService.Instance.RedColorStatus.Location;
+        private static readonly string GreenColorLocation = MeasurementStatusService.Instance.GreenColorStatus.Location;
+        private static readonly string BlueColorLocation = MeasurementStatusService.Instance.BlueColorStatus.Location;
+        private static readonly string WhiteColorLocation = MeasurementStatusService.Instance.WhiteColorStatus.Location;
+        private static readonly string BlackColorLocation = MeasurementStatusService.Instance.BlackColorStatus.Location;
+        private static readonly Dictionary<string, (double x, double y)> primariesNTSC = new()
+        {
+         {RedColorLocation, (x: 0.67, y: 0.33)},
+         {GreenColorLocation, (x: 0.21, y: 0.71)},
+         {BlueColorLocation, (x: 0.14, y: 0.08)},
+         {WhiteColorLocation, (x: 0.3127, y: 0.3290)}
+         };
 
         public bool IsTvCheckboxChecked
         {
@@ -373,11 +391,12 @@ namespace WPF_LCD_Test.ViewModels
 
         private async Task ExecuteMeasureAsync(object parameter)
         {
-            CheckCurrentAppLanguage();
-            if (parameter is not string measurementName || !CanExecuteMeasure(parameter))
+            if (parameter is not string measurementLocation || !CanExecuteMeasure(parameter))
                 return;
 
-            UpdateMeasurementStatus(measurementName, null, $"{Measuring}");
+            CheckCurrentAppLanguage();
+            UpdateMeasurementStatus(measurementLocation, null, $"{Measuring}");
+
             try
             {
                 if (_currentDevice == null || _currentDevice.SerialNumber != SerialNumber)
@@ -385,61 +404,114 @@ namespace WPF_LCD_Test.ViewModels
                     if (string.IsNullOrWhiteSpace(SerialNumber))
                     {
                         _dialogService.ShowMessage($"{FillSN}", $"{Err}");
-                        UpdateMeasurementStatus(measurementName, false, $"{NoSNErr}");
+                        UpdateMeasurementStatus(measurementLocation, false, $"{NoSNErr}");
                         return;
                     }
                     _currentDevice = new DeviceUnderTest(SerialNumber);
                     AddLogMessage($"{TestStartInfo}: {_currentDevice.SerialNumber}");
                     ResetMeasurementStatuses();
-                    UpdateMeasurementStatus(measurementName, null, $"{Measuring}");
+                    UpdateMeasurementStatus(measurementLocation, null, $"{Measuring}");
                 }
 
-                var resultMeasurement = await _colorMeasurementService.MeasureAsync(_measurementTime);
+                var measurement = await _colorMeasurementService.MeasureAsync(_measurementTime);
                 bool isMeasurementSuccess = false;
-                string measuredValuesDisplay = $"{NoData}";
+                string messageWithMeasuredValues = $"{NoData}";
 
-                if (resultMeasurement != null && resultMeasurement.IsValid)
+                if (measurement != null && measurement.IsValid)
                 {
-                    bool lvValidationPassed = measurementName == MeasurementStatusService.Instance.BlackColorStatus.Location || resultMeasurement.Lv >= 10;
+                    measurement.Location = measurementLocation;
+                    var (MeasurementValidationPassed, MeasurementValidationMessage) = MeasurementValidation(measurement);
 
-                    if (lvValidationPassed)
+                    if (MeasurementValidationPassed)
                     {
-                        string xFormatted = resultMeasurement.x.ToString("F3", CultureInfo.InvariantCulture);
-                        string yFormatted = resultMeasurement.y.ToString("F3", CultureInfo.InvariantCulture);
-                        string LvFormatted = measurementName == MeasurementStatusService.Instance.BlackColorStatus.Location
-                            ? resultMeasurement.Lv.ToString("F6", CultureInfo.InvariantCulture)
-                            : resultMeasurement.Lv.ToString("F1", CultureInfo.InvariantCulture);
-                        string TFormatted = resultMeasurement.T.ToString("F0", CultureInfo.InvariantCulture);
-                        measuredValuesDisplay = $"x={xFormatted}, y={yFormatted}, Lv={LvFormatted}, T={TFormatted}";
-                        AddLogMessage($"{Result} '{measurementName}': {measuredValuesDisplay}");
-                        resultMeasurement.Location = measurementName;
-                        _currentDevice.AddMeasurement(resultMeasurement);
+                        var (xFormatted, yFormatted, LvFormatted, TFormatted) = FormatMeasurement(measurement);
+                        messageWithMeasuredValues = $"x={xFormatted}, y={yFormatted}, Lv={LvFormatted}, T={TFormatted}";
+                        AddLogMessage($"{Result} '{measurement.Location}': {messageWithMeasuredValues}");
+                        _currentDevice.AddMeasurement(measurement);
                         isMeasurementSuccess = true;
                     }
                     else
                     {
-                        AddLogMessage($"{LvIsTooLow}: {resultMeasurement.Lv:F1}. {CheckProbe}");
-                        resultMeasurement.IsValid = false;
-                        measuredValuesDisplay = $"{LvIsTooLow}: {resultMeasurement.Lv:F1}";
+                        AddLogMessage(MeasurementValidationMessage);
+                        measurement.IsValid = false;
+                        messageWithMeasuredValues = $"{LvIsTooLow}: {measurement.Lv:F1}";
                     }
                 }
                 else
                 {
-                    measuredValuesDisplay = resultMeasurement != null && !resultMeasurement.IsValid
+                    messageWithMeasuredValues = measurement != null && !measurement.IsValid
                         ? $"{InvalidResultErr}"
                         : $"{ColorAnalyzerErr}";
-                    AddLogMessage($"{ColorServiceErr} '{measurementName}'.");
+                    AddLogMessage($"{ColorServiceErr} '{measurementLocation}'.");
                 }
 
-                UpdateMeasurementStatus(measurementName, isMeasurementSuccess, measuredValuesDisplay);
+                UpdateMeasurementStatus(measurementLocation, isMeasurementSuccess, messageWithMeasuredValues);
                 UpdateCommandsCanExecute();
             }
             catch (Exception ex)
             {
-                _dialogService.ShowMessage($"{UnexpectedMeasurementErr} '{measurementName}': {ex.Message}", $"{Err}");
-                UpdateMeasurementStatus(measurementName, false, $"{Err}: {ex.Message}");
+                _dialogService.ShowMessage($"{UnexpectedMeasurementErr} '{measurementLocation}': {ex.Message}", $"{Err}");
+                UpdateMeasurementStatus(measurementLocation, false, $"{Err}: {ex.Message}");
                 UpdateCommandsCanExecute();
             }
+        }
+
+        private static (string xFormatted, string yFormatted, string LvFormatted, string TFormatted) FormatMeasurement(Measurement measurement)
+        {
+            string xFormatted = measurement.x.ToString("F3", CultureInfo.InvariantCulture);
+            string yFormatted = measurement.y.ToString("F3", CultureInfo.InvariantCulture);
+            string LvFormatted = measurement.Location == BlackColorLocation
+                ? measurement.Lv.ToString("F6", CultureInfo.InvariantCulture)
+                : measurement.Lv.ToString("F1", CultureInfo.InvariantCulture);
+            string TFormatted = measurement.T.ToString("F0", CultureInfo.InvariantCulture);
+
+            return (xFormatted, yFormatted, LvFormatted, TFormatted);
+        }
+
+        private static (bool result, string message) MeasurementValidation(Measurement measurement)
+        {
+            bool result = false;
+            string message = $"{ErrMeasurementValidation}";
+
+            // Brightness check for measurement
+            if (!measurement.Location.Equals(BlackColorLocation) && measurement.Lv <= 5)
+            {
+                message = $"{LvIsTooLow}: {measurement.Lv:F1}. {CheckProbe}";
+                return (result, message);
+            }
+            else if (measurement.Location.Equals(BlackColorLocation) && measurement.Lv >= 5)
+            {
+                message = $"{LvIsTooHigh}. Brightness: {measurement.Lv:F1}.";
+                return (result, message);
+            }
+
+            // Skip non-target measurements
+            if (!primariesNTSC.TryGetValue(measurement.Location, out var target))
+            {
+                result = true;
+                message = SkippedMeasurementValidaton;
+                return (result, message);
+            }
+
+            double minX = target.x - ColorCoordinatesTolerance;
+            double maxX = target.x + ColorCoordinatesTolerance;
+            double minY = target.y - ColorCoordinatesTolerance;
+            double maxY = target.y + ColorCoordinatesTolerance;
+
+            result = measurement.x >= minX && measurement.x <= maxX &&
+                   measurement.y >= minY && measurement.y <= maxY;
+
+            if (result is false)
+            {
+                message = $"{ErrMeasurementOutOfRange}: '{measurement.Location}'. {PleaseTryToMeasureAgain}. " +
+                          $"Got x: {measurement.x:F3}, y: {measurement.y:F3}.";
+            }
+            else
+            {
+                message = MeasurementValidationPassed;
+            }
+
+            return (result, message);
         }
 
         public void ExecuteApplySerialNumber(object parameter)

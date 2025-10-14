@@ -786,7 +786,6 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             _viewModel.IsDeviceCalibrated = true;
             _viewModel.SerialNumber = "FAILSN";
             _viewModel.MeasurementTime = 1;
-            // _viewModel.InitializeViewModel(); // Убрано, так как этого метода нет в ViewModel
             _viewModel.ExecuteApplySerialNumber(_viewModel.SerialNumber); // Устанавливаем SN и подтверждаем
 
             _mockColorMeasurementService.Setup(s => s.MeasureAsync(It.IsAny<int>()))

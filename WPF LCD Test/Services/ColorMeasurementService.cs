@@ -1,6 +1,4 @@
-﻿// В папке Services
-// Файл ColorMeasurementService.cs
-using System.Globalization;
+﻿using System.Globalization;
 using System.Runtime.InteropServices;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
@@ -9,158 +7,142 @@ using static WPF_LCD_Test.Resources.Resources;
 
 namespace WPF_LCD_Test.Services
 {
+    // Service class for handling all communications and measurements with the Color Analyzer device.
     public class ColorMeasurementService : IDisposable, IColorMeasurementService
     {
         private IColorAnalyzer200? _objCa200;
-        private IColorAnalyzer? _objCa = null;
+        private IColorAnalyzer? _objCa = null; // Analyzer object (e.g., SingleCa property from CA-200).
         private bool _isDeviceConnected = false;
         private bool _isDeviceCalibrated = false;
 
-        //Color analyzer constants
-        //Remote modes
+        // Color analyzer constants (Remote modes)
         private const int RemoteModeOFF = 0;
-
         private const int RemoteModeON = 1;
         private const int RemoteModeLOCKED = 2;
 
-        //Sync modes
-        private const int NtscSync = 0; //NTSC sync.
+        // Sync modes
+        private const int NtscSync = 0; // NTSC sync.
+        private const int PalSync = 1; // PAL sync.
+        private const int ExtSync = 2; // EXT sync.
+        private const int UniverslaSyncMode = 3; // UNIV sync.
 
-        private const int PalSync = 1; //PAL sync.
-        private const int ExtSync = 2; //EXT sync.
-        private const int UniverslaSyncMode = 3; //UNIV sync.
+        // Measuring rate modes
+        private const int SlowMeasuringMode = 0; // Slow
+        private const int FastMeasuringMode = 1; // Fast
+        private const int AutoMeasuringMode = 2; // Auto
 
-        //Measuring rate modes
-        private const int SlowMeasuringMode = 0; //Slow
+        // Analog display range constant.
+        private const double DefaultDisplayRange = 2.5;
 
-        private const int FastMeasuringMode = 1; //Fast
-        private const int AutoMeasuringMode = 2; //Auto
-
-        //Analog display range
-        //This value sets the display range of the targeted CA-310 unit's analog display
-        //Available to set the range every 1 steps among 10 to 99 and every 0.1 steps among 0.1 to 9.9
-        private const double DefaultDisplayRange = 2.5; // Analog display range 2.5% units.
-
-        //Display and measurement modes
-        private const int LvxyDisplayMode = 0; //Mode for measuring x, y, Lv
-
-        private const int TdudvDisplayMode = 1; //Tdudv
-        private const int NoDisplayMode = 2; //Analyzer mode (no display)
-        private const int GDisplayMode = 3; //Analyzer mode (G standard)
-        private const int RDisplayMode = 4; //Analyzer mode (R standard)
-        private const int uvDisplayMode = 5; //u'v'
-        private const int FmaDisplayMode = 6; //FMA flicker - Contrast flicker method
-        private const int XYZDisplayMode = 7; //XYZ
-        private const int JeitaDisplayMode = 8; //JEITA flicker*2 - JEITA flicker method
-
-        //Memory channels
-        //This property selects a memory channel for the CA-200 unit, or returns the current selection
-        //Note that the property's channel argument identifies the channel by its channel number on the CA-310 unit.
-        //Range setting:0~99ch
-        //private const int ZeroChannel = 0; //Konica Minolta calibration memory channel
+        // Display and measurement modes
+        private const int LvxyDisplayMode = 0; // Mode for measuring x, y, Lv
+        private const int TdudvDisplayMode = 1; // Tdudv
+        private const int NoDisplayMode = 2; // Analyzer mode (no display)
+        private const int GDisplayMode = 3; // Analyzer mode (G standard)
+        private const int RDisplayMode = 4; // Analyzer mode (R standard)
+        private const int uvDisplayMode = 5; // u'v'
+        private const int FmaDisplayMode = 6; // FMA flicker - Contrast flicker method
+        private const int XYZDisplayMode = 7; // XYZ
+        private const int JeitaDisplayMode = 8; // JEITA flicker*2 - JEITA flicker method
 
         public event EventHandler<bool>? ConnectionStatusChanged;
-
         public event EventHandler<bool>? CalibrationStatusChanged;
-
         public event EventHandler<string>? StatusMessage;
-
         public event EventHandler<double>? MeasurementProgress;
 
+        // Use expression body for simple properties.
         public bool IsDeviceConnected => _isDeviceConnected;
-
         public bool IsDeviceCalibrated => _isDeviceCalibrated;
 
         public ColorMeasurementService()
         {
         }
-        // Конструктор для тестов
+
+        // Constructor for injecting a mock/wrapper dependency.
         public ColorMeasurementService(IColorAnalyzer200 ca200Wrapper)
         {
             _objCa200 = ca200Wrapper ?? throw new ArgumentNullException(nameof(ca200Wrapper));
         }
 
+        // Asynchronously attempts to connect to the color analyzer device.
         public async Task<bool> ConnectAsync()
-
         {
-            await Task.Run(() => // Выполняем потенциально блокирующий COM вызов в фоновом потоке
+            await Task.Run(() =>
             {
-                CheckCurrentAppLanguage(); // Проверяем текущую культуру приложения
+                CheckCurrentAppLanguage();
 
                 if (_objCa200 == null)
                 {
                     _objCa200 = new ColorAnalyzer200Wrapper();
                 }
 
-
                 try
                 {
-                    if (!_isDeviceConnected && _objCa200 != null)
+                    if (!_isDeviceConnected)
                     {
                         StatusMessage?.Invoke(this, ConnectingCA);
 
-                        _objCa200.AutoConnect(); // Блокирующий вызов COM
+                        _objCa200.AutoConnect();
                         _objCa = _objCa200.SingleCa;
 
                         _isDeviceConnected = true;
-                        ConnectionStatusChanged?.Invoke(this, _isDeviceConnected); // Оповещаем ViewModel об изменении статуса
-                        StatusMessage?.Invoke(this, ConnectedCA); // Отправляем сообщение
+                        ConnectionStatusChanged?.Invoke(this, _isDeviceConnected);
+                        StatusMessage?.Invoke(this, ConnectedCA);
                     }
                 }
                 catch (COMException ex)
                 {
-                    StatusMessage?.Invoke(this, $"{ConnectionError}:    {ex.Message}"); // Отправляем ошибку
-                    _isDeviceConnected = false; // Обновляем статус
-                    ConnectionStatusChanged?.Invoke(this, _isDeviceConnected); // Оповещаем ViewModel
+                    StatusMessage?.Invoke(this, $"{ConnectionError}: {ex.Message}");
+                    _isDeviceConnected = false;
+                    ConnectionStatusChanged?.Invoke(this, _isDeviceConnected);
                 }
-                catch (Exception ex) // Ловим другие возможные исключения
+                catch (Exception ex)
                 {
                     StatusMessage?.Invoke(this, $"{ConnectionError}: {ex.Message}");
                     _isDeviceConnected = false;
                     ConnectionStatusChanged?.Invoke(this, _isDeviceConnected);
                 }
             });
-            return _isDeviceConnected; // Возвращаем статус подключения
+            return _isDeviceConnected;
         }
 
-        private void Disconnect()
-        {
-            Dispose(true);
-        }
+        // Calls the internal Dispose method for disconnection (expression-bodied member).
+        private void Disconnect() => Dispose(true);
 
+        // Asynchronously performs a zero calibration of the device.
         public async Task<bool> CalibrateZeroAsync()
         {
-            bool success = false;
+            var success = false;
             await Task.Run(() =>
             {
-                CheckCurrentAppLanguage(); // Проверяем текущую культуру приложения
+                CheckCurrentAppLanguage();
                 try
                 {
-                    StatusMessage?.Invoke(this, (CalibratingZeroCA)); // Сообщение
+                    StatusMessage?.Invoke(this, CalibratingZeroCA);
                     if (_objCa200 != null)
                     {
-                        _objCa200.SingleCa.CalZero(); // Блокирующий вызов COM
+                        _objCa200.SingleCa.CalZero();
 
-                        _objCa200.SingleCa.SyncMode = (int)UniverslaSyncMode;
-                        _objCa200.SingleCa.AveragingMode = (int)AutoMeasuringMode;
+                        // Configure the device settings after calibration.
+                        _objCa200.SingleCa.SyncMode = UniverslaSyncMode;
+                        _objCa200.SingleCa.AveragingMode = AutoMeasuringMode;
                         _objCa200.SingleCa.SetAnalogRange(Convert.ToSingle(DefaultDisplayRange), Convert.ToSingle(DefaultDisplayRange));
-                        _objCa200.SingleCa.DisplayMode = (int)LvxyDisplayMode;
+                        _objCa200.SingleCa.DisplayMode = LvxyDisplayMode;
                     }
-                    _isDeviceCalibrated = true; // Обновляем статус
-                    CalibrationStatusChanged?.Invoke(this, _isDeviceCalibrated); // Оповещаем
-                    StatusMessage?.Invoke(this, (ZeroCalibratedCA)); // Сообщение
-                    success = true; // Успех
+                    _isDeviceCalibrated = true;
+                    CalibrationStatusChanged?.Invoke(this, _isDeviceCalibrated);
+                    StatusMessage?.Invoke(this, ZeroCalibratedCA);
+                    success = true;
                 }
-                catch (COMException ex) // Ловим ошибки COM
+                catch (COMException ex)
                 {
-                    StatusMessage?.Invoke(this, (CheckConnectionCA) + $": {ex.Message}");
-                    _isDeviceCalibrated = false; // Обновляем статус
-                    CalibrationStatusChanged?.Invoke(this, _isDeviceCalibrated); // Оповещаем
-                                                                                 // Не пробрасываем исключение, обрабатываем внутри сервиса
+                    StatusMessage?.Invoke(this, $"{CheckConnectionCA}: {ex.Message}");
+                    _isDeviceCalibrated = false;
+                    CalibrationStatusChanged?.Invoke(this, _isDeviceCalibrated);
                 }
                 catch (Exception ex)
-                {  // Ловим другие ошибки
-                    StatusMessage?.Invoke(this, (ErrAtCalibration) + $": {ex.Message}");
+                {
+                    StatusMessage?.Invoke(this, $"{ErrAtCalibration}: {ex.Message}");
                     _isDeviceCalibrated = false;
                     CalibrationStatusChanged?.Invoke(this, _isDeviceCalibrated);
                 }
@@ -168,77 +150,80 @@ namespace WPF_LCD_Test.Services
             return success;
         }
 
+        // Asynchronously performs a series of measurements and calculates the average.
         public async Task<Measurement> MeasureAsync(int measurementTime)
         {
-            Measurement result = new(); // Создаем объект результата
-            await Task.Run(async () => // Выполняем в фоновом потоке
+            var result = new Measurement();
+            await Task.Run(async () =>
             {
-                CheckCurrentAppLanguage(); // Проверяем текущую культуру приложения
+                CheckCurrentAppLanguage();
                 try
                 {
                     if (!_isDeviceConnected)
                     {
-                        StatusMessage?.Invoke(this, (MeasureWihoutConnectionError));
-                        result.IsValid = false; // Отмечаем результат как невалидный
-                        return; // Выходим из лямбды
+                        StatusMessage?.Invoke(this, MeasureWihoutConnectionError);
+                        result.IsValid = false;
+                        return;
                     }
-                    if (!_isDeviceCalibrated) // Проверяем калибровку
+                    if (!_isDeviceCalibrated)
                     {
-                        StatusMessage?.Invoke(this, (MakeZeroCalibration));
-                        result.IsValid = false; // Отмечаем результат как невалидный
-                        return; // Выходим из лямбды
+                        StatusMessage?.Invoke(this, MakeZeroCalibration);
+                        result.IsValid = false;
+                        return;
                     }
 
-                    StatusMessage?.Invoke(this, (Measuring)); // Сообщение
+                    StatusMessage?.Invoke(this, Measuring);
 
-                    // Переносим цикл
-                    double[] xValues = new double[measurementTime];
-                    double[] yValues = new double[measurementTime];
-                    double[] LvValues = new double[measurementTime];
-                    double[] TValues = new double[measurementTime];
+                    // Initialize arrays to store measurement results.
+                    var xValues = new double[measurementTime];
+                    var yValues = new double[measurementTime];
+                    var LvValues = new double[measurementTime];
+                    var TValues = new double[measurementTime];
 
-                    for (int i = 0; i < measurementTime; i++)
+                    for (var i = 0; i < measurementTime; i++)
                     {
                         try
                         {
                             if (_objCa200 != null)
                             {
-                                _objCa200.SingleCa.Measure(); // Блокирующий вызов COM
-                                xValues[i] = _objCa200.SingleCa.SingleProbe.sx;
-                                yValues[i] = _objCa200.SingleCa.SingleProbe.sy;
-                                LvValues[i] = _objCa200.SingleCa.SingleProbe.Lv;
-                                TValues[i] = _objCa200.SingleCa.SingleProbe.T;
+                                _objCa200.SingleCa.Measure();
+                                var probe = _objCa200.SingleCa.SingleProbe; // Cache probe for conciseness.
+                                xValues[i] = probe.sx;
+                                yValues[i] = probe.sy;
+                                LvValues[i] = probe.Lv;
+                                TValues[i] = probe.T;
                             }
-                            MeasurementProgress?.Invoke(this, (double)(i + 1) / measurementTime * 100); // Прогресс в процентах
+                            // Report progress based on completion percentage.
+                            MeasurementProgress?.Invoke(this, (double)(i + 1) / measurementTime * 100);
                         }
                         catch (COMException measureEx)
                         {
-                            StatusMessage?.Invoke(this, (ErrorAtMeasuringIteration) + $"{i}: {measureEx.Message}");
-                            continue;
+                            StatusMessage?.Invoke(this, $"{ErrorAtMeasuringIteration}{i}: {measureEx.Message}");
+                            continue; // Continue to the next iteration on failure.
                         }
                         catch (Exception measureEx)
                         {
-                            StatusMessage?.Invoke(this, (ErrorAtMeasuringIteration) + $"{i}: {measureEx.Message}");
+                            StatusMessage?.Invoke(this, $"{ErrorAtMeasuringIteration}{i}: {measureEx.Message}");
                             continue;
                         }
 
+                        // Delay between measurements.
                         if (i < measurementTime - 1)
                         {
-                            await Task.Delay(1000); // Асинхронная задержка между измерениями
+                            await Task.Delay(1000);
                         }
                     }
 
-                    result.x = xValues.Average();           // Устанавливаем X
-                    result.y = yValues.Average();          // Устанавливаем Y
-                    result.Lv = LvValues.Average();     // Устанавливаем Lv
-                    result.T = TValues.Average();        // Устанавливаем T
-                    result.IsValid = true;        // Помечаем как валидное (если выполнение дошло до сюда)
-
-                    //StatusMessage?.Invoke(this, "Измерения завершены."); // Сообщение
+                    // Calculate the average of all valid measurements.
+                    result.x = xValues.Average();
+                    result.y = yValues.Average();
+                    result.Lv = LvValues.Average();
+                    result.T = TValues.Average();
+                    result.IsValid = true;
                 }
                 catch (Exception ex)
                 {
-                    StatusMessage?.Invoke(this, (ErrUnexpected) + $": {ex.Message}");
+                    StatusMessage?.Invoke(this, $"{ErrUnexpected}: {ex.Message}");
                     result.IsValid = false;
                 }
             });
@@ -246,17 +231,19 @@ namespace WPF_LCD_Test.Services
             return result;
         }
 
+        // IDisposable implementation (explicit interface member).
         void IDisposable.Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        // The core method for resource cleanup.
         public virtual void Dispose(bool disposing)
         {
             if (disposing)
             {
-                StatusMessage?.Invoke(this, (DisconnectingCA)); // Сообщение
+                StatusMessage?.Invoke(this, DisconnectingCA);
 
                 if (_objCa200 != null)
                 {
@@ -264,29 +251,26 @@ namespace WPF_LCD_Test.Services
                     _objCa200 = null;
                 }
 
+                // Update connection and calibration status after disposal.
                 _isDeviceConnected = false;
-                ConnectionStatusChanged?.Invoke(this, _isDeviceConnected); // Оповещаем
+                ConnectionStatusChanged?.Invoke(this, _isDeviceConnected);
                 _isDeviceCalibrated = false;
-                CalibrationStatusChanged?.Invoke(this, _isDeviceCalibrated); // Оповещаем
-                StatusMessage?.Invoke(this, (DisconnectedCA)); // Сообщение
+                CalibrationStatusChanged?.Invoke(this, _isDeviceCalibrated);
+                StatusMessage?.Invoke(this, DisconnectedCA);
             }
         }
 
-        ~ColorMeasurementService()
-        {
-            Dispose(false);
-        }
+        // Finalizer calls Dispose(false) if Dispose(true) was not called.
+        ~ColorMeasurementService() => Dispose(false);
 
-        void IColorMeasurementService.Disconnect()
-        {
-            Disconnect();
-        }
+        // IColorMeasurementService Disconnect implementation uses the private method (expression-bodied member).
+        void IColorMeasurementService.Disconnect() => Disconnect();
 
+        // Helper method to ensure the correct culture for resource strings on background threads.
         private static void CheckCurrentAppLanguage()
         {
-            CultureInfo culture = LocalizationService.Instance.CurrentCulture; // Получаем текущую культуру из сервиса локализации
+            var culture = LocalizationService.Instance.CurrentCulture;
 
-            // Устанавливаем эту культуру для текущего потока из пула
             Thread.CurrentThread.CurrentCulture = culture;
             Thread.CurrentThread.CurrentUICulture = culture;
         }

@@ -414,4 +414,22 @@
   <data name="ConfigDirNotFound" xml:space="preserve">
     <value>Configuration directory not found</value>
   </data>
+  <data name="ErrMeasurementValidation" xml:space="preserve">
+    <value>Unknown error in measurement validation</value>
+  </data>
+  <data name="SkippedMeasurementValidaton" xml:space="preserve">
+    <value>Measurement validation is skipped</value>
+  </data>
+  <data name="LvIsTooHigh" xml:space="preserve">
+    <value>Brightness for black color unexpectedly high, please check color analyzer position</value>
+  </data>
+  <data name="ErrMeasurementOutOfRange" xml:space="preserve">
+    <value>Measurement is out of expected range for this color</value>
+  </data>
+  <data name="MeasurementValidationPassed" xml:space="preserve">
+    <value>Measurement validation successfully passed</value>
+  </data>
+  <data name="PleaseTryToMeasureAgain" xml:space="preserve">
+    <value>Please, try to measure again</value>
+  </data>
 </root>

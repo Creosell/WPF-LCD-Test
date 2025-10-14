@@ -394,6 +394,24 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Measurement is out of expected range for this color.
+        /// </summary>
+        public static string ErrMeasurementOutOfRange {
+            get {
+                return ResourceManager.GetString("ErrMeasurementOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown error in measurement validation.
+        /// </summary>
+        public static string ErrMeasurementValidation {
+            get {
+                return ResourceManager.GetString("ErrMeasurementValidation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to switch language.
         /// </summary>
         public static string ErrMsgLangSwitchFailed {
@@ -538,6 +556,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Brightness for black color unexpectedly high, please check color analyzer position.
+        /// </summary>
+        public static string LvIsTooHigh {
+            get {
+                return ResourceManager.GetString("LvIsTooHigh", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Caution: The measured brightness Lv is too low.
         /// </summary>
         public static string LvIsTooLow {
@@ -579,6 +606,15 @@ namespace WPF_LCD_Test.Resources {
         public static string MeasurementTimeSec {
             get {
                 return ResourceManager.GetString("MeasurementTimeSec", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Measurement validation successfully passed.
+        /// </summary>
+        public static string MeasurementValidationPassed {
+            get {
+                return ResourceManager.GetString("MeasurementValidationPassed", resourceCulture);
             }
         }
         
@@ -651,6 +687,15 @@ namespace WPF_LCD_Test.Resources {
         public static string NotCalibratedCa {
             get {
                 return ResourceManager.GetString("NotCalibratedCa", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please, try to measure again.
+        /// </summary>
+        public static string PleaseTryToMeasureAgain {
+            get {
+                return ResourceManager.GetString("PleaseTryToMeasureAgain", resourceCulture);
             }
         }
         
@@ -804,6 +849,15 @@ namespace WPF_LCD_Test.Resources {
         public static string SerialNumber {
             get {
                 return ResourceManager.GetString("SerialNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Measurement validation is skipped.
+        /// </summary>
+        public static string SkippedMeasurementValidaton {
+            get {
+                return ResourceManager.GetString("SkippedMeasurementValidaton", resourceCulture);
             }
         }
         
