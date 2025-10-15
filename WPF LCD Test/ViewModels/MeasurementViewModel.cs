@@ -245,7 +245,7 @@ namespace WPF_LCD_Test.ViewModels
             if (allStatusPoints == null || !allStatusPoints.Any())
                 return false;
 
-            return allStatusPoints.All(status => status.Location == "WhiteColor" && !_currentDevice.IsTV ||
+            return allStatusPoints.All(status => status.Location == MeasurementLocation.WhiteColor.ToString() && !_currentDevice.IsTV ||
                 _currentDevice.Measurements.Any(measurement => measurement.Location == status.Location));
         }
 

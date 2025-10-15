@@ -5,6 +5,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using WPF_LCD_Test.ViewModels; // Убедись, что используешь пространство имен твоего ViewModel
+using WPF_LCD_Test.Models;
 
 namespace WPF_LCD_Test.Views
 {
@@ -143,32 +144,22 @@ namespace WPF_LCD_Test.Views
                 // WPF использует перечисление Key.
                 switch (e.Key)
                 {
-                    case Key.D1: measurementPointName = "TopLeft"; break;
-                    case Key.D2: measurementPointName = "TopCenter"; break;
-                    case Key.D3: measurementPointName = "TopRight"; break;
-                    case Key.D4: measurementPointName = "MiddleLeft"; break;
-                    case Key.D5: measurementPointName = "Center"; break;
-                    case Key.D6: measurementPointName = "MiddleRight"; break;
-                    case Key.D7: measurementPointName = "BottomLeft"; break;
-                    case Key.D8: measurementPointName = "BottomCenter"; break;
-                    case Key.D9: measurementPointName = "BottomRight"; break;
-                    case Key.D0: measurementPointName = "BlackColor"; break;
+                    case Key.D1: case Key.NumPad1: measurementPointName = MeasurementLocation.TopLeft.ToString(); break;
+                    case Key.D2: case Key.NumPad2: measurementPointName = MeasurementLocation.TopCenter.ToString(); break;
+                    case Key.D3: case Key.NumPad3: measurementPointName = MeasurementLocation.TopRight.ToString(); break;
+                    case Key.D4: case Key.NumPad4: measurementPointName = MeasurementLocation.MiddleLeft.ToString(); break;
+                    case Key.D5: case Key.NumPad5: measurementPointName = MeasurementLocation.Center.ToString(); break;
+                    case Key.D6: case Key.NumPad6: measurementPointName = MeasurementLocation.MiddleRight.ToString(); break;
+                    case Key.D7: case Key.NumPad7: measurementPointName = MeasurementLocation.BottomLeft.ToString(); break;
+                    case Key.D8: case Key.NumPad8: measurementPointName = MeasurementLocation.BottomCenter.ToString(); break;
+                    case Key.D9: case Key.NumPad9: measurementPointName = MeasurementLocation.BottomRight.ToString(); break;
 
-                    case Key.R: measurementPointName = "RedColor"; break;
-                    case Key.G: measurementPointName = "GreenColor"; break;
-                    case Key.B: measurementPointName = "BlueColor"; break;
-                    case Key.W: measurementPointName = "WhiteColor"; break;
+                    case Key.R: measurementPointName = MeasurementLocation.RedColor.ToString(); break;
+                    case Key.G: measurementPointName = MeasurementLocation.GreenColor.ToString(); break;
+                    case Key.B: measurementPointName = MeasurementLocation.BlueColor.ToString(); break;
+                    case Key.W: measurementPointName = MeasurementLocation.WhiteColor.ToString(); break;
+                    case Key.D0: case Key.NumPad0: measurementPointName = MeasurementLocation.BlackColor.ToString(); break;
 
-                    case Key.NumPad1: measurementPointName = "TopLeft"; break;
-                    case Key.NumPad2: measurementPointName = "TopCenter"; break;
-                    case Key.NumPad3: measurementPointName = "TopRight"; break;
-                    case Key.NumPad4: measurementPointName = "MiddleLeft"; break;
-                    case Key.NumPad5: measurementPointName = "Center"; break;
-                    case Key.NumPad6: measurementPointName = "MiddleRight"; break;
-                    case Key.NumPad7: measurementPointName = "BottomLeft"; break;
-                    case Key.NumPad8: measurementPointName = "BottomCenter"; break;
-                    case Key.NumPad9: measurementPointName = "BottomRight"; break;
-                    case Key.NumPad0: measurementPointName = "BlackColor"; break;
                 }
 
                 // Если нажатая клавиша соответствует одной из точек измерения (т.е. measurementPointName != null)
