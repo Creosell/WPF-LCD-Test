@@ -757,10 +757,10 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
 
             // Настраиваем мок ColorMeasurementService для возврата тестовых данных
             _mockColorMeasurementService.Setup(s => s.MeasureAsync(It.IsAny<int>()))
-                                         .Returns(Task.FromResult(new Measurement { Location = MeasurementStatusService.CenterLocationName, IsValid = true, x = 0.331, y = 0.322, Lv = 200, T = 6000 }));
+                                         .Returns(Task.FromResult(new Measurement { Location = MeasurementLocation.Center.ToString(), IsValid = true, x = 0.331, y = 0.322, Lv = 200, T = 6000 }));
 
             // Act
-            _viewModel.MeasureCommand.Execute(MeasurementStatusService.CenterLocationName); // Передаем параметр (например, Location)
+            _viewModel.MeasureCommand.Execute(MeasurementLocation.Center.ToString()); // Передаем параметр (например, Location)
             await Task.Delay(100); // Даем время для завершения асинхронной операции
 
             // Assert
@@ -771,11 +771,11 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             _mockDialogService.Verify(d => d.ShowMessage(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
 
             // 3. Проверяем, что лог содержит сообщение об успешном измерении.
-            Assert.That(_viewModel.LogText, Does.Contain($"{Result} '{MeasurementStatusService.CenterLocationName}': x=0.331, y=0.322, Lv=200.0, T=6000"));
+            Assert.That(_viewModel.LogText, Does.Contain($"{Result} '{MeasurementLocation.Center.ToString()}': x=0.331, y=0.322, Lv=200.0, T=6000"));
 
             // 4. Проверяем, что измерения были добавлены в CurrentDevice.
             Assert.That(_viewModel._currentDevice.Measurements.Count, Is.GreaterThan(0));
-            Assert.That(_viewModel._currentDevice.Measurements.Any(m => m.Location == MeasurementStatusService.CenterLocationName), Is.True);
+            Assert.That(_viewModel._currentDevice.Measurements.Any(m => m.Location == MeasurementLocation.Center.ToString()), Is.True);
         }
 
         [Test]
@@ -792,7 +792,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                                         .Returns(Task.FromResult((Measurement)null));
 
             // Act
-            _viewModel.MeasureCommand.Execute(MeasurementStatusService.CenterLocationName);
+            _viewModel.MeasureCommand.Execute(MeasurementLocation.Center.ToString());
             await Task.Delay(100); // Ждем завершения асинхронной операции
 
             // Assert
@@ -853,7 +853,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             _viewModel.ExecuteApplySerialNumber("OLDSN"); // Создаем старое устройство
             Assert.That(_viewModel._currentDevice, Is.Not.Null);
             var oldDevice = _viewModel._currentDevice;
-            oldDevice.AddMeasurement(new Models.Measurement { Location = MeasurementStatusService.CenterLocationName, IsValid = true, x = 0.331, y = 0.322, Lv = 200, T = 6000 });
+            oldDevice.AddMeasurement(new Models.Measurement { Location = MeasurementLocation.Center.ToString(), IsValid = true, x = 0.331, y = 0.322, Lv = 200, T = 6000 });
 
             // ДОБАВЛЕНО: Мокируем ShowQuestion, чтобы он вернул true (подтверждаем очистку)
             _mockDialogService.Setup(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>())).Returns(true);

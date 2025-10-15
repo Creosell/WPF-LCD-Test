@@ -41,17 +41,12 @@ namespace WPF_LCD_Test.ViewModels
         // Keys and values for Measurement Validation
         private const int MaxMeasurementAttemptsBeforeConfirm = 1;
         private const double ColorCoordinatesTolerance = 0.1;
-        private static readonly string RedColorLocation = MeasurementStatusService.Instance.RedColorStatus.Location;
-        private static readonly string GreenColorLocation = MeasurementStatusService.Instance.GreenColorStatus.Location;
-        private static readonly string BlueColorLocation = MeasurementStatusService.Instance.BlueColorStatus.Location;
-        private static readonly string WhiteColorLocation = MeasurementStatusService.Instance.WhiteColorStatus.Location;
-        private static readonly string BlackColorLocation = MeasurementStatusService.Instance.BlackColorStatus.Location;
         private static readonly Dictionary<string, (double x, double y)> primariesNTSC = new()
         {
-         {RedColorLocation, (x: 0.67, y: 0.33)},
-         {GreenColorLocation, (x: 0.21, y: 0.71)},
-         {BlueColorLocation, (x: 0.14, y: 0.08)},
-         {WhiteColorLocation, (x: 0.3127, y: 0.3290)}
+         {MeasurementLocation.RedColor.ToString(), (x: 0.67, y: 0.33)},
+         {MeasurementLocation.GreenColor.ToString(), (x: 0.21, y: 0.71)},
+         {MeasurementLocation.BlueColor.ToString(), (x: 0.14, y: 0.08)},
+         {MeasurementLocation.WhiteColor.ToString(), (x: 0.3127, y: 0.3290)}
          };
         private static readonly Dictionary<string, int> _measurementAttemptCountersMap = new();
 
@@ -414,7 +409,7 @@ namespace WPF_LCD_Test.ViewModels
 
         private async Task ExecuteMeasureAsync(object parameter)
         {
-            if (parameter is not string measurementLocation || !CanExecuteMeasure(parameter))
+            if (parameter.ToString() is not string measurementLocation || !CanExecuteMeasure(parameter))
                 return;
 
             bool isMeasurementSuccess = false;
@@ -465,7 +460,7 @@ namespace WPF_LCD_Test.ViewModels
                     }
                     else if (currentAttempt < MaxMeasurementAttemptsBeforeConfirm)
                     {
-                        string retryMessage = $"{MeasurementValidationMessage}. \n{PleaseTryToMeasureAgain}.";
+                        string retryMessage = $"{MeasurementValidationMessage} \n{PleaseTryToMeasureAgain}";
 
                         IncrementAttemptCount(measurementLocation);
                         _dialogService.ShowMessage(retryMessage, $"{Warning}");
@@ -484,7 +479,7 @@ namespace WPF_LCD_Test.ViewModels
                         }
                         else
                         {
-                            messageWithMeasuredValues = $"{SaveCanceled}.";
+                            messageWithMeasuredValues = $"{SaveCanceled}";
                         }
                         AddLogMessage(messageWithMeasuredValues);
                         ResetAttemptCount(measurement.Location);
@@ -515,7 +510,7 @@ namespace WPF_LCD_Test.ViewModels
         {
             string xFormatted = measurement.x.ToString("F3", CultureInfo.InvariantCulture);
             string yFormatted = measurement.y.ToString("F3", CultureInfo.InvariantCulture);
-            string LvFormatted = measurement.Location == BlackColorLocation
+            string LvFormatted = measurement.Location.Equals(MeasurementLocation.BlackColor.ToString())
                 ? measurement.Lv.ToString("F6", CultureInfo.InvariantCulture)
                 : measurement.Lv.ToString("F1", CultureInfo.InvariantCulture);
             string TFormatted = measurement.T.ToString("F0", CultureInfo.InvariantCulture);
@@ -529,25 +524,22 @@ namespace WPF_LCD_Test.ViewModels
             string message = $"{ErrMeasurementValidation}";
 
             // Brightness check for measurement
-            if (!measurement.Location.Equals(BlackColorLocation) && measurement.Lv <= 5)
+            if (!measurement.Location.Equals(MeasurementLocation.BlackColor.ToString()) && measurement.Lv <= 5)
             {
                 message = $"{LvIsTooLow}: {measurement.Lv:F1}. {CheckProbe}";
                 return (result, message);
             }
-            else if (measurement.Location.Equals(BlackColorLocation) && measurement.Lv >= 5)
+            else if (measurement.Location.Equals(MeasurementLocation.BlackColor.ToString()) && measurement.Lv >= 5)
             {
-                message = $"{LvIsTooHigh}. Brightness: {measurement.Lv:F1}.";
+                message = $"{LvIsTooHigh}. \nBrightness: {measurement.Lv:F1}";
                 return (result, message);
             }
-
 
 
             // Skip non-target measurements
             if (!primariesNTSC.TryGetValue(measurement.Location, out var target))
             {
-                result = true;
-                message = SkippedMeasurementValidaton;
-                return (result, message);
+                target = primariesNTSC[MeasurementLocation.WhiteColor.ToString()];
             }
 
             double minX = target.x - ColorCoordinatesTolerance;
@@ -561,7 +553,7 @@ namespace WPF_LCD_Test.ViewModels
             if (result is false)
             {
                 message = $"{ErrMeasurementOutOfRange}: '{measurement.Location}'.\n" +
-                          $"Got x: {measurement.x:F3}, y: {measurement.y:F3}.";
+                          $"Got x: {measurement.x:F3}, y: {measurement.y:F3}";
             }
             else
             {
