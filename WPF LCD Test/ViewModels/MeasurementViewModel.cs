@@ -36,12 +36,11 @@ namespace WPF_LCD_Test.ViewModels
         public event EventHandler RequestClearInputFocus;
         private const string SerialNumberPattern = "^[a-zA-Z0-9]*$";
         private string _logText = string.Empty;
-        private int _measurementMaxAttempts = 2;
-        private int _measurementAttemptCounter = 0;
 
 
         // Keys and values for Measurement Validation
-        private const double ColorCoordinatesTolerance = 0.2;
+        private const int MaxMeasurementAttemptsBeforeConfirm = 1;
+        private const double ColorCoordinatesTolerance = 0.1;
         private static readonly string RedColorLocation = MeasurementStatusService.Instance.RedColorStatus.Location;
         private static readonly string GreenColorLocation = MeasurementStatusService.Instance.GreenColorStatus.Location;
         private static readonly string BlueColorLocation = MeasurementStatusService.Instance.BlueColorStatus.Location;
@@ -54,6 +53,28 @@ namespace WPF_LCD_Test.ViewModels
          {BlueColorLocation, (x: 0.14, y: 0.08)},
          {WhiteColorLocation, (x: 0.3127, y: 0.3290)}
          };
+        private static readonly Dictionary<string, int> _measurementAttemptCountersMap = new();
+
+        private int GetAttemptCount(string location)
+        {
+            _measurementAttemptCountersMap.TryGetValue(location, out int count);
+            return count;
+        }
+
+        private void IncrementAttemptCount(string location)
+        {
+            if (!_measurementAttemptCountersMap.TryAdd(location, 1))
+            {
+                _measurementAttemptCountersMap[location]++;
+            }
+        }
+
+        private void ResetAttemptCount(string location)
+        {
+            _measurementAttemptCountersMap[location] = 0;
+        }
+
+
 
         public bool IsTvCheckboxChecked
         {
@@ -194,6 +215,8 @@ namespace WPF_LCD_Test.ViewModels
             UpdateCommandsCanExecute();
             UpdateMeasurementButtonsState();
         }
+
+
 
         private void InitializeDeviceConfigurations()
         {
@@ -394,8 +417,19 @@ namespace WPF_LCD_Test.ViewModels
             if (parameter is not string measurementLocation || !CanExecuteMeasure(parameter))
                 return;
 
+            bool isMeasurementSuccess = false;
+            string messageWithMeasuredValues = $"{NoData}";
             CheckCurrentAppLanguage();
             UpdateMeasurementStatus(measurementLocation, null, $"{Measuring}");
+
+            void ApplyMeasurementResult(Measurement measurement)
+            {
+                var (xFormatted, yFormatted, LvFormatted, TFormatted) = FormatMeasurement(measurement);
+                messageWithMeasuredValues = $"x={xFormatted}, y={yFormatted}, Lv={LvFormatted}, T={TFormatted}";
+                AddLogMessage($"{Result} '{measurement.Location}': {messageWithMeasuredValues}");
+                _currentDevice.AddMeasurement(measurement);
+                isMeasurementSuccess = true;
+            }
 
             try
             {
@@ -404,9 +438,11 @@ namespace WPF_LCD_Test.ViewModels
                     if (string.IsNullOrWhiteSpace(SerialNumber))
                     {
                         _dialogService.ShowMessage($"{FillSN}", $"{Err}");
-                        UpdateMeasurementStatus(measurementLocation, false, $"{NoSNErr}");
+                        messageWithMeasuredValues = $"{NoSNErr}";
+                        UpdateMeasurementStatus(measurementLocation, isMeasurementSuccess, messageWithMeasuredValues);
                         return;
                     }
+
                     _currentDevice = new DeviceUnderTest(SerialNumber);
                     AddLogMessage($"{TestStartInfo}: {_currentDevice.SerialNumber}");
                     ResetMeasurementStatuses();
@@ -414,27 +450,44 @@ namespace WPF_LCD_Test.ViewModels
                 }
 
                 var measurement = await _colorMeasurementService.MeasureAsync(_measurementTime);
-                bool isMeasurementSuccess = false;
-                string messageWithMeasuredValues = $"{NoData}";
 
                 if (measurement != null && measurement.IsValid)
                 {
                     measurement.Location = measurementLocation;
                     var (MeasurementValidationPassed, MeasurementValidationMessage) = MeasurementValidation(measurement);
+                    int currentAttempt = GetAttemptCount(measurement.Location);
+
 
                     if (MeasurementValidationPassed)
                     {
-                        var (xFormatted, yFormatted, LvFormatted, TFormatted) = FormatMeasurement(measurement);
-                        messageWithMeasuredValues = $"x={xFormatted}, y={yFormatted}, Lv={LvFormatted}, T={TFormatted}";
-                        AddLogMessage($"{Result} '{measurement.Location}': {messageWithMeasuredValues}");
-                        _currentDevice.AddMeasurement(measurement);
-                        isMeasurementSuccess = true;
+                        ApplyMeasurementResult(measurement);
+                        ResetAttemptCount(measurement.Location);
+                    }
+                    else if (currentAttempt < MaxMeasurementAttemptsBeforeConfirm)
+                    {
+                        string retryMessage = $"{MeasurementValidationMessage}. \n{PleaseTryToMeasureAgain}.";
+
+                        IncrementAttemptCount(measurementLocation);
+                        _dialogService.ShowMessage(retryMessage, $"{Warning}");
+                        messageWithMeasuredValues = $"Failed measurement for location: {measurementLocation}.\n (Attempt {currentAttempt + 1}). {PleaseTryToMeasureAgain}";
+                        AddLogMessage(messageWithMeasuredValues);
                     }
                     else
                     {
-                        AddLogMessage(MeasurementValidationMessage);
-                        measurement.IsValid = false;
-                        messageWithMeasuredValues = $"{LvIsTooLow}: {measurement.Lv:F1}";
+                        bool confirmed = _dialogService.ShowQuestion($"{SaveNotCorrectResultQuestion}\n" +
+                            $"{MeasurementValidationMessage}.\n", $"{Warning}");
+
+                        if (confirmed)
+                        {
+                            ApplyMeasurementResult(measurement);
+                            messageWithMeasuredValues = $"{ResultsSaved} '{measurement.Location}'. \nValidation message: {MeasurementValidationMessage}";
+                        }
+                        else
+                        {
+                            messageWithMeasuredValues = $"{SaveCanceled}.";
+                        }
+                        AddLogMessage(messageWithMeasuredValues);
+                        ResetAttemptCount(measurement.Location);
                     }
                 }
                 else
@@ -444,14 +497,16 @@ namespace WPF_LCD_Test.ViewModels
                         : $"{ColorAnalyzerErr}";
                     AddLogMessage($"{ColorServiceErr} '{measurementLocation}'.");
                 }
-
-                UpdateMeasurementStatus(measurementLocation, isMeasurementSuccess, messageWithMeasuredValues);
-                UpdateCommandsCanExecute();
             }
             catch (Exception ex)
             {
                 _dialogService.ShowMessage($"{UnexpectedMeasurementErr} '{measurementLocation}': {ex.Message}", $"{Err}");
-                UpdateMeasurementStatus(measurementLocation, false, $"{Err}: {ex.Message}");
+                isMeasurementSuccess = false;
+                messageWithMeasuredValues = $"{Err}: {ex.Message}";
+            }
+            finally
+            {
+                UpdateMeasurementStatus(measurementLocation, isMeasurementSuccess, messageWithMeasuredValues);
                 UpdateCommandsCanExecute();
             }
         }
@@ -485,6 +540,8 @@ namespace WPF_LCD_Test.ViewModels
                 return (result, message);
             }
 
+
+
             // Skip non-target measurements
             if (!primariesNTSC.TryGetValue(measurement.Location, out var target))
             {
@@ -503,7 +560,7 @@ namespace WPF_LCD_Test.ViewModels
 
             if (result is false)
             {
-                message = $"{ErrMeasurementOutOfRange}: '{measurement.Location}'. {PleaseTryToMeasureAgain}. " +
+                message = $"{ErrMeasurementOutOfRange}: '{measurement.Location}'.\n" +
                           $"Got x: {measurement.x:F3}, y: {measurement.y:F3}.";
             }
             else
@@ -626,7 +683,7 @@ namespace WPF_LCD_Test.ViewModels
         private bool CanExecuteNewDeviceUnderTest(object parameter) => _currentDevice != null && !string.IsNullOrWhiteSpace(_currentDevice.SerialNumber) && _currentDevice.Measurements.Count > 0;
         private bool CanExecuteClearFields(object parameter) => true;
         private bool CanExecuteSwitchLanguage(object parameter) => parameter is string languageCode && !string.IsNullOrWhiteSpace(languageCode);
-        private bool CanExecuteMeasure(object parameter) => IsDeviceConnected && !_isDeviceCalibrating && !_isDeviceConnecting && IsDeviceCalibrated && !string.IsNullOrEmpty(SerialNumber) && MeasurementTime > 0;
+        private bool CanExecuteMeasure(object parameter) => IsDeviceConnected && !_isDeviceCalibrating && !_isDeviceConnecting && IsDeviceCalibrated && !string.IsNullOrWhiteSpace(SerialNumber) && MeasurementTime > 0;
         private bool CanExecuteApplySerialNumber(object parameter) => !string.IsNullOrWhiteSpace(parameter as string);
         private bool CanExecuteApplyMeasurementTime(object parameter) => MeasurementTime > 0;
 
@@ -655,10 +712,10 @@ namespace WPF_LCD_Test.ViewModels
             ((RelayCommand)NewDeviceUnderTestCommand)?.RaiseCanExecuteChanged();
         }
 
-        private void UpdateMeasurementStatus(string location, bool? isPassed, string measuredValuesString = null)
+        private void UpdateMeasurementStatus(string location, bool? isPassed, string measuredValuesString)
         {
             var statusToUpdate = MeasurementStatusService.Instance.AllMeasurementButtonStatuses.FirstOrDefault(s => s.Location == location);
-            if (statusToUpdate != null)
+            if (statusToUpdate is not null)
             {
                 statusToUpdate.IsPassed = isPassed;
                 statusToUpdate.MeasuredValuesString = measuredValuesString;

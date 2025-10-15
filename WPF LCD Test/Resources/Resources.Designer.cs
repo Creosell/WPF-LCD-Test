@@ -808,6 +808,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Result for this point still looks incorrect. Save anyway?.
+        /// </summary>
+        public static string SaveNotCorrectResultQuestion {
+            get {
+                return ResourceManager.GetString("SaveNotCorrectResultQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Save results.
         /// </summary>
         public static string SaveResultsButton {

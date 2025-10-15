@@ -433,4 +433,7 @@
   <data name="PleaseTryToMeasureAgain" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
+  <data name="SaveNotCorrectResultQuestion" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
 </root>

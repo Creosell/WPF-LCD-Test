@@ -26,7 +26,6 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
 
         // Конструктор: инициализирует коллекцию и создает все объекты статусов
         public const string TopLeftLocationName = "TopLeft";
-
         public const string TopCenterLocationName = "TopCenter";
         public const string TopRightLocationName = "TopRight";
         public const string MiddleLeftLocationName = "MiddleLeft";
@@ -85,6 +84,7 @@ namespace WPF_LCD_Test.Services // Или Managers, в зависимости о
                 var status = new MeasurementStatus(location); // Создаем экземпляр статуса
                 AllMeasurementButtonStatuses.Add(status); // Добавляем в коллекцию
 
+                
                 // Присваиваем созданный объект статусному свойству в этом менеджере
                 switch (location)
                 {

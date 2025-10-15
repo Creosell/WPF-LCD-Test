@@ -432,4 +432,7 @@
   <data name="PleaseTryToMeasureAgain" xml:space="preserve">
     <value>Please, try to measure again</value>
   </data>
+  <data name="SaveNotCorrectResultQuestion" xml:space="preserve">
+    <value>Result for this point still looks incorrect. Save anyway?</value>
+  </data>
 </root>
