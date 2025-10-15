@@ -52,7 +52,7 @@ namespace WPF_LCD_Test.UnitTests.ConvertersTests
             // x, y округлены до 3 знаков
             // Lv округлено до 8 знаков (т.к. Location = BlackColorLocationName)
             // T округлено до 0 знаков
-            string expectedJson = "{\"TestMeasurement\":{\"Location\":\"BlackColor\",\"x\":1.235,\"y\":2.346,\"Lv\":0,\"T\":21}}";
+            string expectedJson = "{\"TestMeasurement\":{\"Location\":\"BlackColor\",\"x\":1.235,\"y\":2.346,\"Lv\":1.2E-07,\"T\":21}}";
             Assert.That(jsonString, Is.EqualTo(expectedJson), "Lv should be rounded to 8 decimal places for BlackColorLocation.");
         }
 
