@@ -412,7 +412,7 @@
     <value>Press the “Zero Calibration” button to connect the color analyzer and fill in the SN to start the measurements</value>
   </data>
   <data name="ConfigDirNotFound" xml:space="preserve">
-    <value>Configuration directory not found</value>
+    <value>Configurations directory not found</value>
   </data>
   <data name="ErrMeasurementValidation" xml:space="preserve">
     <value>Unknown error in measurement validation</value>
@@ -433,6 +433,21 @@
     <value>Please, try to measure again</value>
   </data>
   <data name="SaveNotCorrectResultQuestion" xml:space="preserve">
-    <value>Result for this point still looks incorrect. Save anyway?</value>
+    <value>The result for this measurement point still appears to be incorrect. Do you want to save it anyway?</value>
+  </data>
+  <data name="FailedMeasurementForLocation" xml:space="preserve">
+    <value>Failed measurement for location</value>
+  </data>
+  <data name="Attempt" xml:space="preserve">
+    <value>Attempt</value>
+  </data>
+  <data name="ValidationMessage" xml:space="preserve">
+    <value>Validation message</value>
+  </data>
+  <data name="Actual" xml:space="preserve">
+    <value>Actual</value>
+  </data>
+  <data name="Brightness" xml:space="preserve">
+    <value>Brightness</value>
   </data>
 </root>

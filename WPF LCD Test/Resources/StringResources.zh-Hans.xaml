@@ -71,7 +71,7 @@
         B.蓝色
     </system:String>
     <system:String x:Key="WhitePoint">
-        W. White
+        W. 白色
     </system:String>
     <system:String x:Key="BlackPoint">
         0. 黑色

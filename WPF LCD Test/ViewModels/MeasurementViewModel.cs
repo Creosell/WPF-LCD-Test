@@ -464,7 +464,7 @@ namespace WPF_LCD_Test.ViewModels
 
                         IncrementAttemptCount(measurementLocation);
                         _dialogService.ShowMessage(retryMessage, $"{Warning}");
-                        messageWithMeasuredValues = $"Failed measurement for location: {measurementLocation}.\n (Attempt {currentAttempt + 1}). {PleaseTryToMeasureAgain}";
+                        messageWithMeasuredValues = $"{FailedMeasurementForLocation}: {measurementLocation}.\n ({Attempt} {currentAttempt + 1}). {PleaseTryToMeasureAgain}";
                         AddLogMessage(messageWithMeasuredValues);
                     }
                     else
@@ -475,7 +475,7 @@ namespace WPF_LCD_Test.ViewModels
                         if (confirmed)
                         {
                             ApplyMeasurementResult(measurement);
-                            messageWithMeasuredValues = $"{ResultsSaved} '{measurement.Location}'. \nValidation message: {MeasurementValidationMessage}";
+                            messageWithMeasuredValues = $"{ResultsSaved} '{measurement.Location}'. \n {ValidationMessage}: {MeasurementValidationMessage}";
                         }
                         else
                         {
@@ -531,12 +531,19 @@ namespace WPF_LCD_Test.ViewModels
             }
             else if (measurement.Location.Equals(MeasurementLocation.BlackColor.ToString()) && measurement.Lv >= 5)
             {
-                message = $"{LvIsTooHigh}. \nBrightness: {measurement.Lv:F1}";
+                message = $"{LvIsTooHigh}. \n {Brightness}: {measurement.Lv:F1}";
+                return (result, message);
+            }
+            else if (measurement.Location.Equals(MeasurementLocation.BlackColor.ToString()) && measurement.Lv <= 5)
+            {
+                // For black color only checking Lv value
+                result = true;
+                message = MeasurementValidationPassed;
                 return (result, message);
             }
 
 
-            // Skip non-target measurements
+            // Measurement for brightness uniformity are measured on white color only, so checking only x and y coordinates for white color
             if (!primariesNTSC.TryGetValue(measurement.Location, out var target))
             {
                 target = primariesNTSC[MeasurementLocation.WhiteColor.ToString()];
@@ -553,7 +560,7 @@ namespace WPF_LCD_Test.ViewModels
             if (result is false)
             {
                 message = $"{ErrMeasurementOutOfRange}: '{measurement.Location}'.\n" +
-                          $"Got x: {measurement.x:F3}, y: {measurement.y:F3}";
+                          $"{Actual} x: {measurement.x:F3}, y: {measurement.y:F3}";
             }
             else
             {

@@ -61,11 +61,29 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Actual.
+        /// </summary>
+        public static string Actual {
+            get {
+                return ResourceManager.GetString("Actual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to already activated.
         /// </summary>
         public static string AlreadyActivated {
             get {
                 return ResourceManager.GetString("AlreadyActivated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Attempt.
+        /// </summary>
+        public static string Attempt {
+            get {
+                return ResourceManager.GetString("Attempt", resourceCulture);
             }
         }
         
@@ -120,6 +138,15 @@ namespace WPF_LCD_Test.Resources {
         public static string BottomRightPoint {
             get {
                 return ResourceManager.GetString("BottomRightPoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Brightness.
+        /// </summary>
+        public static string Brightness {
+            get {
+                return ResourceManager.GetString("Brightness", resourceCulture);
             }
         }
         
@@ -232,7 +259,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Configuration directory not found.
+        ///   Looks up a localized string similar to Configurations directory not found.
         /// </summary>
         public static string ConfigDirNotFound {
             get {
@@ -471,6 +498,15 @@ namespace WPF_LCD_Test.Resources {
         public static string ErrUnexpected {
             get {
                 return ResourceManager.GetString("ErrUnexpected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed measurement for location.
+        /// </summary>
+        public static string FailedMeasurementForLocation {
+            get {
+                return ResourceManager.GetString("FailedMeasurementForLocation", resourceCulture);
             }
         }
         
@@ -808,7 +844,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Result for this point still looks incorrect. Save anyway?.
+        ///   Looks up a localized string similar to The result for this measurement point still appears to be incorrect. Do you want to save it anyway?.
         /// </summary>
         public static string SaveNotCorrectResultQuestion {
             get {
@@ -930,6 +966,15 @@ namespace WPF_LCD_Test.Resources {
         public static string UnexpectedMeasurementErr {
             get {
                 return ResourceManager.GetString("UnexpectedMeasurementErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Validation message.
+        /// </summary>
+        public static string ValidationMessage {
+            get {
+                return ResourceManager.GetString("ValidationMessage", resourceCulture);
             }
         }
         

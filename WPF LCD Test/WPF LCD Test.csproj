@@ -80,9 +80,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="config\device_configs\15iA.yaml">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
+    <Folder Include="data\" />
   </ItemGroup>
 
 </Project>
