@@ -39,7 +39,8 @@ namespace WPF_LCD_Test.Services
         // Default Constructor uses production wrappers
         public UploadService() : this(new DirectoryWrapper(), new PathWrapper()) { }
 
-        // Core implementation: Scans local files and manages the upload process.
+
+        // --- ОБНОВЛЕННЫЙ МЕТОД: Управляет параллельной выгрузкой ---
         public async Task<bool> UploadReportsAsync()
         {
             var uploadItems = ScanLocalFolders();
@@ -50,24 +51,38 @@ namespace WPF_LCD_Test.Services
                 return true;
             }
 
-            bool allSucceeded = true;
-            int uploadedCount = 0;
+            // 1. Создаем список задач (Tasks) для параллельного выполнения
+            var uploadTasks = new List<Task<bool>>();
 
-            foreach (var item in uploadItems)
+            foreach (var batch in uploadItems)
             {
-                // Execute upload for the entire batch (all files in the item)
-                if (await ExecuteCliUpload(item))
+                // Для каждого файла в пакете создаем отдельную задачу выгрузки
+                foreach (var localPath in batch.LocalFilesToUpload)
                 {
-                    uploadedCount += item.LocalFilesToUpload.Count;
-                }
-                else
-                {
-                    allSucceeded = false;
-                    StatusMessage?.Invoke(this, $"UploadService: One or more files failed in batch to {item.ReportRemoteDirectory}");
+                    var uploadTask = ExecuteSingleFileUploadAsync(localPath, batch.ReportRemoteDirectory);
+                    uploadTasks.Add(uploadTask);
                 }
             }
 
-            StatusMessage?.Invoke(this, $"Upload process finished. Total files uploaded: {uploadedCount}.");
+            StatusMessage?.Invoke(this, $"UploadService: Starting parallel upload of {uploadTasks.Count} files...");
+
+            // 2. Ожидаем завершения ВСЕХ задач одновременно
+            // Результатом будет массив bool, указывающий на успех каждой отдельной выгрузки.
+            bool[] results = await Task.WhenAll(uploadTasks);
+
+            // 3. Анализ результатов
+            bool allSucceeded = results.All(r => r);
+            int failedCount = results.Count(r => !r);
+
+            if (allSucceeded)
+            {
+                StatusMessage?.Invoke(this, $"Upload process finished successfully. Total files uploaded: {results.Length}.");
+            }
+            else
+            {
+                StatusMessage?.Invoke(this, $"Upload process finished with failures. Total files failed: {failedCount}.");
+            }
+
             return allSucceeded;
         }
 
@@ -228,5 +243,59 @@ namespace WPF_LCD_Test.Services
             }
             return itemSuccess;
         }
+
+        // --- НОВЫЙ МЕТОД: Создает и запускает Task для выгрузки одного файла ---
+        private async Task<bool> ExecuteSingleFileUploadAsync(string localPathArg, string remoteDir)
+        {
+            var fileName = _path.GetFileName(localPathArg);
+
+            // Remote path is the directory + filename
+            var remoteFullPath = remoteDir + fileName;
+            var cleanRemoteFullPath = remoteFullPath.Replace('\\', '/'); // CRITICAL FIX for WebDAV
+
+            // Arguments: upload -l LOCAL_FILE -r REMOTE_FULL_PATH
+            var arguments = $"upload -l \"{localPathArg}\" -r \"{cleanRemoteFullPath}\" -f";
+
+            StatusMessage?.Invoke(this, $"UploadService: Starting upload of {fileName}");
+
+            try
+            {
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = UploadCliName,
+                        Arguments = arguments,
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true
+                    }
+                };
+
+                // Запуск процесса асинхронно
+                await Task.Run(() => process.Start());
+                await process.WaitForExitAsync();
+
+                if (process.ExitCode == 0)
+                {
+                    StatusMessage?.Invoke(this, $"UploadService: Upload successful for {fileName}");
+                    return true;
+                }
+                else
+                {
+                    string errorOutput = await process.StandardError.ReadToEndAsync();
+                    StatusMessage?.Invoke(this, $"UploadService: CLI Error for {fileName} (Code {process.ExitCode}): {errorOutput}");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage?.Invoke(this, $"UploadService: Failed to execute CLI for {fileName}: {ex.Message}");
+                return false;
+            }
+        }
+
+
     }
 }
