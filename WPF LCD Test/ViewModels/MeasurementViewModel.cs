@@ -21,6 +21,7 @@ namespace WPF_LCD_Test.ViewModels
         private readonly IDialogService _dialogService;
         private readonly ILocalizationService _localizationService;
         private readonly IDispatcher _dispatcher;
+        private readonly IUploadService _uploadService;
         public DeviceUnderTest? _currentDevice;
         private string _serialNumber = "";
         private bool _isSerialNumberConfirmed;
@@ -175,19 +176,22 @@ namespace WPF_LCD_Test.ViewModels
         public ICommand ApplyMeasurementTimeCommand { get; }
         public ICommand NewDeviceUnderTestCommand { get; }
         public ICommand LaunchExternalProgramCommand { get; }
+        public ICommand UploadReportsCommand { get; }
 
         public MeasurementViewModel(
             IColorMeasurementService colorMeasurementService,
             IFileService fileService,
             IDialogService dialogService,
             ILocalizationService localizationService,
-            IDispatcher dispatcher)
+            IDispatcher dispatcher,
+            IUploadService uploadService)
         {
             _colorMeasurementService = colorMeasurementService ?? throw new ArgumentNullException(nameof(colorMeasurementService));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+            _uploadService = uploadService ?? throw new ArgumentNullException(nameof(uploadService));
 
             ZeroCalibrationCommand = new RelayCommand(ExecuteZeroCalibrationAsync, CanExecuteZeroCalibration);
             SaveResultsCommand = new RelayCommand(ExecuteSaveResultsAsync, CanExecuteSaveResults);
@@ -199,11 +203,13 @@ namespace WPF_LCD_Test.ViewModels
             MeasureCommand = new RelayCommand(ExecuteMeasureAsync, CanExecuteMeasure);
             ApplySerialNumberCommand = new RelayCommand(ExecuteApplySerialNumber, CanExecuteApplySerialNumber);
             ApplyMeasurementTimeCommand = new RelayCommand(ExecuteApplyMeasurementTime, CanExecuteApplyMeasurementTime);
+            UploadReportsCommand = new RelayCommand(ExecuteUploadReportsAsync);
 
             _colorMeasurementService.StatusMessage += ColorMeasurementService_StatusMessage;
             _fileService.StatusMessage += FileService_StatusMessage;
             _colorMeasurementService.ConnectionStatusChanged += ColorMeasurementService_ConnectionStatusChanged;
             _colorMeasurementService.CalibrationStatusChanged += ColorMeasurementService_CalibrationStatusChanged;
+            _uploadService.StatusMessage += (sender, message) => AddLogMessage(message);
 
             AddLogMessage(WelcomeMessage);
             InitializeDeviceConfigurations();
@@ -675,6 +681,36 @@ namespace WPF_LCD_Test.ViewModels
             }
         }
 
+        // MeasurementViewModel.cs
+
+        private async Task ExecuteUploadReportsAsync(object parameter)
+        {
+            
+            // 1. Получение currentDeviceName
+            string currentDeviceName = _choosedDeviceConfiguration;
+
+            if (string.IsNullOrEmpty(currentDeviceName))
+            {
+                _dialogService.ShowMessage($"Cannot start upload: Device name is unknown.", "Error");
+                return;
+            }
+
+            // 2. Вызов сервиса выгрузки
+            AddLogMessage($"Starting reports upload...");
+
+            // UploadService будет возвращать true/false и отправлять детальный статус через событие
+            bool success = await _uploadService.UploadReportsAsync();
+
+            if (success)
+            {
+                AddLogMessage($"Upload process completed successfully!");
+            }
+            else
+            {
+                AddLogMessage($"Upload process failed. Check log for details.");
+            }
+        }
+
         private bool CanExecuteConnect() => !IsDeviceConnected && !_isDeviceCalibrating && !_isDeviceConnecting;
         private bool CanExecuteDisconnect() => !_isDeviceConnecting && !_isDeviceCalibrating;
         private bool CanExecuteZeroCalibration(object parameter) => !_isDeviceConnecting && !_isDeviceCalibrating;
@@ -753,6 +789,11 @@ namespace WPF_LCD_Test.ViewModels
             _fileService.StatusMessage -= FileService_StatusMessage;
             _colorMeasurementService.ConnectionStatusChanged -= ColorMeasurementService_ConnectionStatusChanged;
             _colorMeasurementService.CalibrationStatusChanged -= ColorMeasurementService_CalibrationStatusChanged;
+
+            if (_uploadService is not null)
+            {
+                _uploadService.StatusMessage -= (sender, message) => AddLogMessage(message);
+            }
 
             (_colorMeasurementService as IDisposable)?.Dispose();
             (_fileService as IDisposable)?.Dispose();

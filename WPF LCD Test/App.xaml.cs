@@ -24,6 +24,7 @@ namespace WPF_LCD_Test
         private ISettingsService settingsService = SettingsService.Instance; // Получаем синглтон сервиса настроек (если он синглтон)
         private ILocalizationService localizationService = LocalizationService.Instance; // Получаем синглтон сервиса локализации (если он синглтон)
         private IDispatcher dispatcher = new WpfDispatcher(); // Реализация обертки для Dispatcher (если нужна)
+        private IUploadService uploadService = new UploadService(); // Реализация сервиса загрузки отчетов
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
@@ -45,6 +46,7 @@ namespace WPF_LCD_Test
                 dialogService,
                 localizationService,
                 settingsService,
+                uploadService,
                 dispatcher
             );
 

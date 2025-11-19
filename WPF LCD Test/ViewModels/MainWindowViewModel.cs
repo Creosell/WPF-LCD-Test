@@ -18,6 +18,7 @@ namespace WPF_LCD_Test.ViewModels
         private readonly ILocalizationService _localizationService;
         private readonly ISettingsService _settingService;
         private readonly IDispatcher _dispatcher;
+        private readonly IUploadService _uploadService;
         private BaseViewModel _currentPageViewModel;
         private string _currentPageIdentifier;
         private MeasurementViewModel? _measurementViewModel;
@@ -46,6 +47,7 @@ namespace WPF_LCD_Test.ViewModels
             IDialogService dialogService,
             ILocalizationService localizationService,
             ISettingsService settingsService,
+            IUploadService uploadService,
             IDispatcher dispatcher) : base()
         {
             _colorMeasurementService = colorMeasurementService ?? throw new ArgumentNullException(nameof(colorMeasurementService));
@@ -54,6 +56,7 @@ namespace WPF_LCD_Test.ViewModels
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _settingService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+            _uploadService = uploadService ?? throw new ArgumentNullException(nameof(uploadService));
             NavigateCommand = new RelayCommand(ExecuteNavigate, CanExecuteNavigate);
             ExecuteNavigate("Measurement");
         }
@@ -75,7 +78,8 @@ namespace WPF_LCD_Test.ViewModels
                         _fileService,
                         _dialogService,
                         _localizationService,
-                        _dispatcher
+                        _dispatcher,
+                        _uploadService
                     );
                     targetViewModel = _measurementViewModel;
                     break;
@@ -89,7 +93,8 @@ namespace WPF_LCD_Test.ViewModels
                         _fileService,
                         _dialogService,
                         _localizationService,
-                        _dispatcher
+                        _dispatcher,
+                        _uploadService
                     );
                     targetViewModel = _measurementViewModel;
                     break;

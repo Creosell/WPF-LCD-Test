@@ -16,5 +16,10 @@ namespace WPF_LCD_Test.Wrappers
         {
             Directory.CreateDirectory(path);
         }
+
+        public IEnumerable<string> EnumerateFiles(string path, string searchPattern, SearchOption searchOption)
+        {
+            return Directory.EnumerateFiles(path, searchPattern, searchOption);
+        }
     }
 }

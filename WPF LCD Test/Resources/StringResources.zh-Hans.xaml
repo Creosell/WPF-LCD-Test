@@ -91,6 +91,9 @@
     <system:String x:Key="ReportButton">
         创建报告
     </system:String>
+    <system:String x:Key="UploadButton">
+        上传报告
+    </system:String>
 
     <!--  SettingsView keys  -->
     <system:String x:Key="DevicePortLabel">

@@ -11,5 +11,10 @@ namespace WPF_LCD_Test.Wrappers
         {
             return Path.Combine(paths);
         }
+
+        public string GetFileName(string path)
+        {
+            return Path.GetFileName(path);
+        }
     }
 }
