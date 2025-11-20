@@ -1,6 +1,7 @@
 ﻿using MvvmHelpers;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -37,6 +38,14 @@ namespace WPF_LCD_Test.ViewModels
         public event EventHandler RequestClearInputFocus;
         private const string SerialNumberPattern = "^[a-zA-Z0-9]*$";
         private string _logText = string.Empty;
+
+        private enum ReportExitCode
+        {
+            Success = 0,
+            GeneralError = 1,
+            NoDataFound = 2,
+            ConfigError = 3
+        }
 
 
         // Keys and values for Measurement Validation
@@ -659,29 +668,84 @@ namespace WPF_LCD_Test.ViewModels
 
         private void ExecuteLaunchExternalProgramCommand(object parameter)
         {
-            if (parameter is not string executableName || string.IsNullOrWhiteSpace(executableName))
-            {
-                _dialogService.ShowMessage(_localizationService.GetString(RunExternalAppNotFoundErr), _localizationService.GetString(Err));
-                AddLogMessage($"{_localizationService.GetString(RunExternalAppNotFoundErr)}");
-                return;
-            }
-
             try
             {
-                if (!_fileService.RunExternalProgram(executableName))
+                var appDir = AppDomain.CurrentDomain.BaseDirectory;
+                var exePath = Path.Combine(appDir, "ReportGenerator.exe");
+
+                if (!File.Exists(exePath))
                 {
-                    _dialogService.ShowMessage(_localizationService.GetString(RunExternalAppNotFoundErr), _localizationService.GetString(Err));
-                    AddLogMessage($"{_localizationService.GetString(RunExternalAppNotFoundErr)}: {executableName}");
+                    AddLogMessage($"{RunExternalAppNotFoundErr}: {exePath}");
+                    return;
                 }
+
+                AddLogMessage("Starting report generation...");
+
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = exePath,
+                        WorkingDirectory = appDir,
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true
+                    }
+                };
+
+                var errorOutput = new System.Text.StringBuilder();
+
+                // Capture stderr to show details only if something goes wrong
+                process.ErrorDataReceived += (s, e) =>
+                {
+                    if (!string.IsNullOrEmpty(e.Data)) errorOutput.AppendLine(e.Data);
+                };
+
+                process.Start();
+
+                // Drain streams to prevent deadlocks
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+
+                // Wait for exit asynchronously
+                Task.Run(() =>
+                {
+                    process.WaitForExit();
+                    var exitCode = (ReportExitCode)process.ExitCode;
+                    process.Dispose();
+
+                    string message;
+                    bool isError = false;
+
+                    switch (exitCode)
+                    {
+                        case ReportExitCode.Success:
+                            message = "Report generated successfully.";
+                            break;
+                        case ReportExitCode.NoDataFound:
+                            message = "Warning: No data found for report generation.";
+                            isError = true;
+                            break;
+                        case ReportExitCode.ConfigError:
+                            message = "Error: Invalid report configuration.";
+                            isError = true;
+                            break;
+                        case ReportExitCode.GeneralError:
+                        default:
+                            message = $"Report generation failed (Code: {(int)exitCode}).";
+                            isError = true;
+                            break;
+                    }
+
+                    AddLogMessage($"{message}");
+                });
             }
             catch (Exception ex)
             {
-                AddLogMessage($"{_localizationService.GetString(RunExternalAppUnexpectedErr)}: {ex.Message}");
-                _dialogService.ShowMessage($"{_localizationService.GetString(RunExternalAppUnexpectedErr)}: {ex.Message}", _localizationService.GetString(Err));
+                AddLogMessage($"{RunExternalAppUnexpectedErr}: {ex.Message}");
             }
         }
-
-        // MeasurementViewModel.cs
 
         private async Task ExecuteUploadReportsAsync(object parameter)
         {

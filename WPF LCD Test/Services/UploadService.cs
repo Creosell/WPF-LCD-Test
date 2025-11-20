@@ -47,7 +47,7 @@ namespace WPF_LCD_Test.Services
 
             if (!uploadItems.Any())
             {
-                StatusMessage?.Invoke(this, "UploadService: No reports found for upload.");
+                StatusMessage?.Invoke(this, "No reports found for upload.");
                 return true;
             }
 
@@ -64,7 +64,7 @@ namespace WPF_LCD_Test.Services
                 }
             }
 
-            StatusMessage?.Invoke(this, $"UploadService: Starting parallel upload of {uploadTasks.Count} files...");
+            StatusMessage?.Invoke(this, $"Starting parallel upload of {uploadTasks.Count} files...");
 
             // 2. Ожидаем завершения ВСЕХ задач одновременно
             // Результатом будет массив bool, указывающий на успех каждой отдельной выгрузки.
@@ -104,7 +104,7 @@ namespace WPF_LCD_Test.Services
             // 1. Scan ZIP archives (Primary source for metadata and batch creation)
             if (!_directory.Exists(archivePath))
             {
-                StatusMessage?.Invoke(this, $"UploadService: Archive folder not found: {archivePath}");
+                StatusMessage?.Invoke(this, $"Archive folder not found: {archivePath}");
                 return reports;
             }
 
@@ -151,7 +151,7 @@ namespace WPF_LCD_Test.Services
                     // Store the item using its unique base filename as the key
                     uploadBatches[baseFileName] = uploadItem;
 
-                    StatusMessage?.Invoke(this, $"UploadService: Created batch for '{baseFileName}'");
+                    StatusMessage?.Invoke(this, $"Created batch for '{baseFileName}'");
                 }
             }
 
@@ -181,67 +181,8 @@ namespace WPF_LCD_Test.Services
             // Convert the dictionary values back to a list of batches
             reports = uploadBatches.Values.ToList();
 
-            StatusMessage?.Invoke(this, $"UploadService: Ready to upload {reports.Count} batches, containing {reports.Sum(b => b.LocalFilesToUpload.Count)} files.");
+            StatusMessage?.Invoke(this, $"Ready to upload {reports.Count} batches, containing {reports.Sum(b => b.LocalFilesToUpload.Count)} files.");
             return reports;
-        }
-
-        // Executes the external CLI program for ALL files in a single batch.
-        private async Task<bool> ExecuteCliUpload(UploadReportItem item)
-        {
-            bool itemSuccess = true;
-
-            // Iterate through every file found (ZIP, HTML, PDF, etc.)
-            foreach (var localPathArg in item.LocalFilesToUpload)
-            {
-                var fileName = _path.GetFileName(localPathArg);
-
-                // Remote path is the unique directory + filename (e.g., SCT/.../20251118/file.zip)
-                var remoteFullPath = item.ReportRemoteDirectory + fileName;
-
-                // CRITICAL FIX: Ensure remote path uses FORWARD SLASHES for WebDAV
-                var cleanRemoteFullPath = remoteFullPath.Replace('\\', '/');
-
-                // Arguments: upload -l LOCAL_FILE -r REMOTE_FULL_PATH
-                var arguments = $"upload -l \"{localPathArg}\" -r \"{cleanRemoteFullPath}\" -f";
-
-                StatusMessage?.Invoke(this, $"UploadService: Starting upload of {fileName}");
-
-                try
-                {
-                    var process = new Process
-                    {
-                        StartInfo = new ProcessStartInfo
-                        {
-                            FileName = UploadCliName,
-                            Arguments = arguments,
-                            UseShellExecute = false,
-                            RedirectStandardOutput = true,
-                            RedirectStandardError = true,
-                            CreateNoWindow = true
-                        }
-                    };
-
-                    await Task.Run(() => process.Start());
-                    await process.WaitForExitAsync();
-
-                    if (process.ExitCode != 0)
-                    {
-                        string errorOutput = await process.StandardError.ReadToEndAsync();
-                        StatusMessage?.Invoke(this, $"UploadService: CLI Error for {fileName} (Code {process.ExitCode}): {errorOutput}");
-                        itemSuccess = false;
-                    }
-                    else
-                    {
-                        StatusMessage?.Invoke(this, $"UploadService: Upload successful for {fileName}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    StatusMessage?.Invoke(this, $"UploadService: Failed to execute CLI for {fileName}: {ex.Message}");
-                    itemSuccess = false;
-                }
-            }
-            return itemSuccess;
         }
 
         // --- НОВЫЙ МЕТОД: Создает и запускает Task для выгрузки одного файла ---
@@ -256,7 +197,7 @@ namespace WPF_LCD_Test.Services
             // Arguments: upload -l LOCAL_FILE -r REMOTE_FULL_PATH
             var arguments = $"upload -l \"{localPathArg}\" -r \"{cleanRemoteFullPath}\" -f";
 
-            StatusMessage?.Invoke(this, $"UploadService: Starting upload of {fileName}");
+            StatusMessage?.Invoke(this, $"Starting upload of {fileName}");
 
             try
             {
@@ -279,19 +220,19 @@ namespace WPF_LCD_Test.Services
 
                 if (process.ExitCode == 0)
                 {
-                    StatusMessage?.Invoke(this, $"UploadService: Upload successful for {fileName}");
+                    StatusMessage?.Invoke(this, $"Upload successful for {fileName}");
                     return true;
                 }
                 else
                 {
                     string errorOutput = await process.StandardError.ReadToEndAsync();
-                    StatusMessage?.Invoke(this, $"UploadService: CLI Error for {fileName} (Code {process.ExitCode}): {errorOutput}");
+                    StatusMessage?.Invoke(this, $"CLI Error for {fileName} (Code {process.ExitCode}): {errorOutput}");
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                StatusMessage?.Invoke(this, $"UploadService: Failed to execute CLI for {fileName}: {ex.Message}");
+                StatusMessage?.Invoke(this, $"Failed to execute CLI for {fileName}: {ex.Message}");
                 return false;
             }
         }
