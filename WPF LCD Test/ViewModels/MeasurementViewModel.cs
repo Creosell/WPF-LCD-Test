@@ -749,8 +749,8 @@ namespace WPF_LCD_Test.ViewModels
 
         private async Task ExecuteUploadReportsAsync(object parameter)
         {
-            
-            // 1. Получение currentDeviceName
+
+            // 1. Get currentDeviceName
             string currentDeviceName = _choosedDeviceConfiguration;
 
             if (string.IsNullOrEmpty(currentDeviceName))
@@ -759,17 +759,13 @@ namespace WPF_LCD_Test.ViewModels
                 return;
             }
 
-            // 2. Вызов сервиса выгрузки
+            // 2. Call upload service
             AddLogMessage($"Starting reports upload...");
 
-            // UploadService будет возвращать true/false и отправлять детальный статус через событие
+            // UploadService returns true/false and sends detailed status via event
             bool success = await _uploadService.UploadReportsAsync();
 
-            if (success)
-            {
-                AddLogMessage($"Upload process completed successfully!");
-            }
-            else
+            if (!success)
             {
                 AddLogMessage($"Upload process failed. Check log for details.");
             }

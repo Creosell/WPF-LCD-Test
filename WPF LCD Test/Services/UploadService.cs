@@ -39,8 +39,7 @@ namespace WPF_LCD_Test.Services
         // Default Constructor uses production wrappers
         public UploadService() : this(new DirectoryWrapper(), new PathWrapper()) { }
 
-
-        // --- ОБНОВЛЕННЫЙ МЕТОД: Управляет параллельной выгрузкой ---
+        // --- UPDATED METHOD: Manages parallel upload and deletion ---
         public async Task<bool> UploadReportsAsync()
         {
             var uploadItems = ScanLocalFolders();
@@ -51,32 +50,60 @@ namespace WPF_LCD_Test.Services
                 return true;
             }
 
-            // 1. Создаем список задач (Tasks) для параллельного выполнения
+            // 1. Create a list of Tasks
             var uploadTasks = new List<Task<bool>>();
 
             foreach (var batch in uploadItems)
             {
-                // Для каждого файла в пакете создаем отдельную задачу выгрузки
                 foreach (var localPath in batch.LocalFilesToUpload)
                 {
-                    var uploadTask = ExecuteSingleFileUploadAsync(localPath, batch.ReportRemoteDirectory);
-                    uploadTasks.Add(uploadTask);
+                    // Capture variables for the closure
+                    string currentPath = localPath;
+                    string remoteDir = batch.ReportRemoteDirectory;
+
+                    // Define a task that includes Upload AND Deletion logic
+                    var processingTask = Task.Run(async () =>
+                    {
+                        // A. Execute the upload
+                        bool success = await ExecuteSingleFileUploadAsync(currentPath, remoteDir);
+
+                        // B. Delete local file if upload succeeded
+                        if (success)
+                        {
+                            try
+                            {
+                                if (File.Exists(currentPath))
+                                {
+                                    File.Delete(currentPath);
+                                    // Log only if needed to avoid spam, or use Debug/Trace
+                                    Debug.Print($"Deleted local file: {Path.GetFileName(currentPath)}");
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                StatusMessage?.Invoke(this, $"Warning: Failed to delete {Path.GetFileName(currentPath)}: {ex.Message}");
+                            }
+                        }
+
+                        return success;
+                    });
+
+                    uploadTasks.Add(processingTask);
                 }
             }
 
             StatusMessage?.Invoke(this, $"Starting parallel upload of {uploadTasks.Count} files...");
 
-            // 2. Ожидаем завершения ВСЕХ задач одновременно
-            // Результатом будет массив bool, указывающий на успех каждой отдельной выгрузки.
+            // 2. Wait for ALL tasks to complete (upload + deletion)
             bool[] results = await Task.WhenAll(uploadTasks);
 
-            // 3. Анализ результатов
+            // 3. Analyze results
             bool allSucceeded = results.All(r => r);
             int failedCount = results.Count(r => !r);
 
             if (allSucceeded)
             {
-                StatusMessage?.Invoke(this, $"Upload process finished successfully. Total files uploaded: {results.Length}.");
+                StatusMessage?.Invoke(this, $"Upload process finished successfully. Total files uploaded & deleted: {results.Length}.");
             }
             else
             {
@@ -180,8 +207,11 @@ namespace WPF_LCD_Test.Services
 
             // Convert the dictionary values back to a list of batches
             reports = uploadBatches.Values.ToList();
-
-            StatusMessage?.Invoke(this, $"Ready to upload {reports.Count} batches, containing {reports.Sum(b => b.LocalFilesToUpload.Count)} files.");
+            if (reports.Count>0)
+            {
+                StatusMessage?.Invoke(this, $"Ready to upload {reports.Count} batches, containing {reports.Sum(b => b.LocalFilesToUpload.Count)} files.");
+            }
+            
             return reports;
         }
 
