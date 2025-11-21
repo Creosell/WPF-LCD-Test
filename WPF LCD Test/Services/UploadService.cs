@@ -22,7 +22,8 @@ namespace WPF_LCD_Test.Services
         private const string UploadCliName = "Nextcloud_CLI.exe";
         private const string ArchiveFolderName = "report_archive";
         private const string ResultsFolderName = "results";
-        private const string RemoteBasePath = "SCT"; // Fixed part of the remote path
+        private const string UploadedReportsFolderName = "uploaded_reports";
+        private const string RemoteBasePath = "SCT";
 
         // Regex pattern to parse the filename: (Group 1: DeviceName)_(Group 2: YYYYMMDD_HHMM).zip
         private const string FilenameRegexPattern = @"^(.+?)_(\d{8}_\d{4})\.zip$";
@@ -46,8 +47,16 @@ namespace WPF_LCD_Test.Services
 
             if (!uploadItems.Any())
             {
-                StatusMessage?.Invoke(this, "No reports found for upload.");
+                StatusMessage?.Invoke(this, NoReportsFoundForUpload);
                 return true;
+            }
+
+            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var uploadedReportsDir = Path.Combine(baseDir, UploadedReportsFolderName);
+
+            if (!Directory.Exists(uploadedReportsDir))
+            {
+                Directory.CreateDirectory(uploadedReportsDir);
             }
 
             // 1. Create a list of Tasks
@@ -60,6 +69,8 @@ namespace WPF_LCD_Test.Services
                     // Capture variables for the closure
                     string currentPath = localPath;
                     string remoteDir = batch.ReportRemoteDirectory;
+
+                    string destinationFolder = uploadedReportsDir;
 
                     // Define a task that includes Upload AND Deletion logic
                     var processingTask = Task.Run(async () =>
@@ -74,14 +85,30 @@ namespace WPF_LCD_Test.Services
                             {
                                 if (File.Exists(currentPath))
                                 {
-                                    File.Delete(currentPath);
-                                    // Log only if needed to avoid spam, or use Debug/Trace
-                                    Debug.Print($"Deleted local file: {Path.GetFileName(currentPath)}");
+                                    string fileName = Path.GetFileName(currentPath);
+                                    string extension = Path.GetExtension(currentPath).ToLower();
+
+                                    if (extension == ".zip")
+                                    {
+                                        string destPath = Path.Combine(destinationFolder, fileName);
+
+                                        if (File.Exists(destPath))
+                                        {
+                                            File.Delete(destPath);
+                                        }
+
+                                        File.Move(currentPath, destPath);
+                                        Debug.Print($"Moved archive to: {destPath}");
+                                    }
+                                    else
+                                    {
+                                        File.Delete(currentPath);
+                                    }
                                 }
                             }
                             catch (Exception ex)
                             {
-                                StatusMessage?.Invoke(this, $"Warning: Failed to delete {Path.GetFileName(currentPath)}: {ex.Message}");
+                                StatusMessage?.Invoke(this, $"{WarningFailedToCleanup} {Path.GetFileName(currentPath)}: {ex.Message}");
                             }
                         }
 
@@ -92,7 +119,7 @@ namespace WPF_LCD_Test.Services
                 }
             }
 
-            StatusMessage?.Invoke(this, $"Starting parallel upload of {uploadTasks.Count} files...");
+            StatusMessage?.Invoke(this, $"{StartingParallelUploadOf} {uploadTasks.Count} {Files}...");
 
             // 2. Wait for ALL tasks to complete (upload + deletion)
             bool[] results = await Task.WhenAll(uploadTasks);
@@ -103,11 +130,12 @@ namespace WPF_LCD_Test.Services
 
             if (allSucceeded)
             {
-                StatusMessage?.Invoke(this, $"Upload process finished successfully. Total files uploaded & deleted: {results.Length}.");
+                StatusMessage?.Invoke(this, $"{UploadedSuccessfully}: {results.Length}.");
+                StatusMessage?.Invoke(this, $"{CopyOfUploadedArchivesInFolder}: '{UploadedReportsFolderName}'.");
             }
             else
             {
-                StatusMessage?.Invoke(this, $"Upload process finished with failures. Total files failed: {failedCount}.");
+                StatusMessage?.Invoke(this, $"{UploadFinishedWithFail}: {failedCount}.");
             }
 
             return allSucceeded;
@@ -131,7 +159,7 @@ namespace WPF_LCD_Test.Services
             // 1. Scan ZIP archives (Primary source for metadata and batch creation)
             if (!_directory.Exists(archivePath))
             {
-                StatusMessage?.Invoke(this, $"Archive folder not found: {archivePath}");
+                StatusMessage?.Invoke(this, $"{ArchiveFolderNotFound}: {archivePath}");
                 return reports;
             }
 
@@ -178,7 +206,7 @@ namespace WPF_LCD_Test.Services
                     // Store the item using its unique base filename as the key
                     uploadBatches[baseFileName] = uploadItem;
 
-                    StatusMessage?.Invoke(this, $"Created batch for '{baseFileName}'");
+                    StatusMessage?.Invoke(this, $"{CreatedBatchFor} '{baseFileName}'");
                 }
             }
 
@@ -209,7 +237,7 @@ namespace WPF_LCD_Test.Services
             reports = uploadBatches.Values.ToList();
             if (reports.Count>0)
             {
-                StatusMessage?.Invoke(this, $"Ready to upload {reports.Count} batches, containing {reports.Sum(b => b.LocalFilesToUpload.Count)} files.");
+                StatusMessage?.Invoke(this, $"{ReadyToUpload} {reports.Count} {Batches}, {Containing} {reports.Sum(b => b.LocalFilesToUpload.Count)} {Files}.");
             }
             
             return reports;
@@ -227,7 +255,7 @@ namespace WPF_LCD_Test.Services
             // Arguments: upload -l LOCAL_FILE -r REMOTE_FULL_PATH
             var arguments = $"upload -l \"{localPathArg}\" -r \"{cleanRemoteFullPath}\" -f";
 
-            StatusMessage?.Invoke(this, $"Starting upload of {fileName}");
+            StatusMessage?.Invoke(this, $"{StartingUploadOf} {fileName}");
 
             try
             {
@@ -250,19 +278,19 @@ namespace WPF_LCD_Test.Services
 
                 if (process.ExitCode == 0)
                 {
-                    StatusMessage?.Invoke(this, $"Upload successful for {fileName}");
+                    StatusMessage?.Invoke(this, $"{UploadSuccessfulFor} {fileName}");
                     return true;
                 }
                 else
                 {
                     string errorOutput = await process.StandardError.ReadToEndAsync();
-                    StatusMessage?.Invoke(this, $"CLI Error for {fileName} (Code {process.ExitCode}): {errorOutput}");
+                    StatusMessage?.Invoke(this, $"{CLI_ErrorFor} {fileName} ({Code} {process.ExitCode}): {errorOutput}");
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                StatusMessage?.Invoke(this, $"Failed to execute CLI for {fileName}: {ex.Message}");
+                StatusMessage?.Invoke(this, $"{FailedToExecuteCLI} {fileName}: {ex.Message}");
                 return false;
             }
         }

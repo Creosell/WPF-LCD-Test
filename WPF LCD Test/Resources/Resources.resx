@@ -450,4 +450,55 @@
   <data name="Brightness" xml:space="preserve">
     <value>Brightness</value>
   </data>
+  <data name="NoReportsFoundForUpload" xml:space="preserve">
+    <value>No reports found for upload.</value>
+  </data>
+  <data name="WarningFailedToCleanup" xml:space="preserve">
+    <value>Warning: Failed to cleanup</value>
+  </data>
+  <data name="StartingParallelUploadOf" xml:space="preserve">
+    <value>Starting parallel upload of</value>
+  </data>
+  <data name="Files" xml:space="preserve">
+    <value>files</value>
+  </data>
+  <data name="UploadedSuccessfully" xml:space="preserve">
+    <value>Uploaded successfully. Total files uploaded</value>
+  </data>
+  <data name="CopyOfUploadedArchivesInFolder" xml:space="preserve">
+    <value>Copy of uploaded report archives in folder</value>
+  </data>
+  <data name="UploadFinishedWithFail" xml:space="preserve">
+    <value>Upload process finished with failures. Total files failed</value>
+  </data>
+  <data name="ArchiveFolderNotFound" xml:space="preserve">
+    <value>Archive folder not found</value>
+  </data>
+  <data name="CreatedBatchFor" xml:space="preserve">
+    <value>Created batch for</value>
+  </data>
+  <data name="ReadyToUpload" xml:space="preserve">
+    <value>Ready to upload</value>
+  </data>
+  <data name="Batches" xml:space="preserve">
+    <value>batches</value>
+  </data>
+  <data name="Containing" xml:space="preserve">
+    <value>containing</value>
+  </data>
+  <data name="StartingUploadOf" xml:space="preserve">
+    <value>Starting upload of</value>
+  </data>
+  <data name="UploadSuccessfulFor" xml:space="preserve">
+    <value>Upload successful for</value>
+  </data>
+  <data name="CLI_ErrorFor" xml:space="preserve">
+    <value>CLI Error for</value>
+  </data>
+  <data name="Code" xml:space="preserve">
+    <value>Code</value>
+  </data>
+  <data name="FailedToExecuteCLI" xml:space="preserve">
+    <value>Failed to execute CLI for</value>
+  </data>
 </root>

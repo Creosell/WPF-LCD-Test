@@ -79,6 +79,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Archive folder not found.
+        /// </summary>
+        public static string ArchiveFolderNotFound {
+            get {
+                return ResourceManager.GetString("ArchiveFolderNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Attempt.
         /// </summary>
         public static string Attempt {
@@ -93,6 +102,15 @@ namespace WPF_LCD_Test.Resources {
         public static string BadConnection {
             get {
                 return ResourceManager.GetString("BadConnection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to batches.
+        /// </summary>
+        public static string Batches {
+            get {
+                return ResourceManager.GetString("Batches", resourceCulture);
             }
         }
         
@@ -241,6 +259,24 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to CLI Error for.
+        /// </summary>
+        public static string CLI_ErrorFor {
+            get {
+                return ResourceManager.GetString("CLI_ErrorFor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Code.
+        /// </summary>
+        public static string Code {
+            get {
+                return ResourceManager.GetString("Code", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Color analyzer error :(.
         /// </summary>
         public static string ColorAnalyzerErr {
@@ -300,6 +336,33 @@ namespace WPF_LCD_Test.Resources {
         public static string ConnectionReleasedCA {
             get {
                 return ResourceManager.GetString("ConnectionReleasedCA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to containing.
+        /// </summary>
+        public static string Containing {
+            get {
+                return ResourceManager.GetString("Containing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy of uploaded report archives in folder.
+        /// </summary>
+        public static string CopyOfUploadedArchivesInFolder {
+            get {
+                return ResourceManager.GetString("CopyOfUploadedArchivesInFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Created batch for.
+        /// </summary>
+        public static string CreatedBatchFor {
+            get {
+                return ResourceManager.GetString("CreatedBatchFor", resourceCulture);
             }
         }
         
@@ -511,6 +574,24 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to execute CLI for.
+        /// </summary>
+        public static string FailedToExecuteCLI {
+            get {
+                return ResourceManager.GetString("FailedToExecuteCLI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to files.
+        /// </summary>
+        public static string Files {
+            get {
+                return ResourceManager.GetString("Files", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please fill the SN first!.
         /// </summary>
         public static string FillSN {
@@ -709,6 +790,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No reports found for upload..
+        /// </summary>
+        public static string NoReportsFoundForUpload {
+            get {
+                return ResourceManager.GetString("NoReportsFoundForUpload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No SN.
         /// </summary>
         public static string NoSNErr {
@@ -732,6 +822,15 @@ namespace WPF_LCD_Test.Resources {
         public static string PleaseTryToMeasureAgain {
             get {
                 return ResourceManager.GetString("PleaseTryToMeasureAgain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ready to upload.
+        /// </summary>
+        public static string ReadyToUpload {
+            get {
+                return ResourceManager.GetString("ReadyToUpload", resourceCulture);
             }
         }
         
@@ -916,6 +1015,24 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Starting parallel upload of.
+        /// </summary>
+        public static string StartingParallelUploadOf {
+            get {
+                return ResourceManager.GetString("StartingParallelUploadOf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting upload of.
+        /// </summary>
+        public static string StartingUploadOf {
+            get {
+                return ResourceManager.GetString("StartingUploadOf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This is a test with a number: {0}.
         /// </summary>
         public static string TestFormatString {
@@ -970,6 +1087,33 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Uploaded successfully. Total files uploaded.
+        /// </summary>
+        public static string UploadedSuccessfully {
+            get {
+                return ResourceManager.GetString("UploadedSuccessfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upload process finished with failures. Total files failed.
+        /// </summary>
+        public static string UploadFinishedWithFail {
+            get {
+                return ResourceManager.GetString("UploadFinishedWithFail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upload successful for.
+        /// </summary>
+        public static string UploadSuccessfulFor {
+            get {
+                return ResourceManager.GetString("UploadSuccessfulFor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Validation message.
         /// </summary>
         public static string ValidationMessage {
@@ -1002,6 +1146,15 @@ namespace WPF_LCD_Test.Resources {
         public static string Warning {
             get {
                 return ResourceManager.GetString("Warning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Warning: Failed to cleanup.
+        /// </summary>
+        public static string WarningFailedToCleanup {
+            get {
+                return ResourceManager.GetString("WarningFailedToCleanup", resourceCulture);
             }
         }
         
