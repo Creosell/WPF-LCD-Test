@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
 using WPF_LCD_Test.Commands;
@@ -12,9 +13,9 @@ using WPF_LCD_Test.Services;
 using static WPF_LCD_Test.Resources.Resources;
 
 namespace WPF_LCD_Test.ViewModels
-{
-    public partial class MeasurementViewModel : BaseViewModel, IDisposable
     {
+    public partial class MeasurementViewModel : BaseViewModel, IDisposable
+        {
         private readonly IColorMeasurementService _colorMeasurementService;
         private readonly IFileService _fileService;
         private readonly IDialogService _dialogService;
@@ -38,14 +39,15 @@ namespace WPF_LCD_Test.ViewModels
         public event EventHandler RequestClearInputFocus;
         private const string SerialNumberPattern = "^[a-zA-Z0-9]*$";
         private string _logText = string.Empty;
+        private readonly LogHandler _logHandler;
 
         private enum ReportExitCode
-        {
+            {
             Success = 0,
             GeneralError = 1,
             NoDataFound = 2,
             ConfigError = 3
-        }
+            }
 
 
         // Keys and values for Measurement Validation
@@ -61,139 +63,139 @@ namespace WPF_LCD_Test.ViewModels
         private static readonly Dictionary<string, int> _measurementAttemptCountersMap = new();
 
         private int GetAttemptCount(string location)
-        {
+            {
             _measurementAttemptCountersMap.TryGetValue(location, out int count);
             return count;
-        }
+            }
 
         private void IncrementAttemptCount(string location)
-        {
-            if (!_measurementAttemptCountersMap.TryAdd(location, 1))
             {
+            if (!_measurementAttemptCountersMap.TryAdd(location, 1))
+                {
                 _measurementAttemptCountersMap[location]++;
+                }
             }
-        }
 
         private void ResetAttemptCount(string location)
-        {
+            {
             _measurementAttemptCountersMap[location] = 0;
-        }
+            }
 
 
 
         public bool IsTvCheckboxChecked
-        {
+            {
             get => _isTvCheckboxChecked;
             set => SetProperty(ref _isTvCheckboxChecked, value);
-        }
+            }
 
         public string SelectedDeviceConfiguration
-        {
+            {
             get => _choosedDeviceConfiguration;
             set => SetProperty(ref _choosedDeviceConfiguration, value);
-        }
+            }
 
         public string SerialNumber
-        {
+            {
             get => _serialNumber;
             set
-            {
-                if (SetProperty(ref _serialNumber, value))
                 {
+                if (SetProperty(ref _serialNumber, value))
+                    {
                     UpdateMeasurementButtonsState();
                     UpdateCommandsCanExecute();
+                    }
                 }
             }
-        }
 
         public bool IsSerialNumberConfirmed
-        {
+            {
             get => _isSerialNumberConfirmed;
             set
-            {
-                if (SetProperty(ref _isSerialNumberConfirmed, value))
                 {
+                if (SetProperty(ref _isSerialNumberConfirmed, value))
+                    {
                     UpdateCommandsCanExecute();
                     UpdateMeasurementButtonsState();
+                    }
                 }
             }
-        }
 
         public bool IsReportGenerating
-        {
+            {
             get => _isReportGenerating;
             set
-            {
-                if (SetProperty(ref _isReportGenerating, value))
                 {
+                if (SetProperty(ref _isReportGenerating, value))
+                    {
                     UpdateCommandsCanExecute();
+                    }
                 }
             }
-        }
 
         public bool IsUploadingReports
-        {
+            {
             get => _isUploadingReports;
             set
-            {
-                if (SetProperty(ref _isUploadingReports, value))
                 {
+                if (SetProperty(ref _isUploadingReports, value))
+                    {
                     UpdateCommandsCanExecute();
+                    }
                 }
             }
-        }
 
         public int MeasurementTime
-        {
+            {
             get => _measurementTime;
             set
-            {
+                {
                 if (value > 0)
                     SetProperty(ref _measurementTime, value);
                 else
                     OnPropertyChanged();
+                }
             }
-        }
 
         public string LogText
-        {
+            {
             get => _logText;
             set => SetProperty(ref _logText, value);
-        }
+            }
 
         public bool IsMeasurementButtonsEnabled
-        {
+            {
             get => _isMeasurementButtonsEnabled;
             set => SetProperty(ref _isMeasurementButtonsEnabled, value);
-        }
+            }
 
         public bool IsDeviceConnected
-        {
+            {
             get => _isDeviceConnected;
             set
-            {
-                if (SetProperty(ref _isDeviceConnected, value))
                 {
+                if (SetProperty(ref _isDeviceConnected, value))
+                    {
                     UpdateCommandsCanExecute();
                     UpdateMeasurementButtonsState();
                     OnPropertyChanged(nameof(DeviceConnectionStatusText));
+                    }
                 }
             }
-        }
 
         public bool IsDeviceCalibrated
-        {
+            {
             get => _isDeviceCalibrated;
             set
-            {
-                if (SetProperty(ref _isDeviceCalibrated, value))
                 {
+                if (SetProperty(ref _isDeviceCalibrated, value))
+                    {
                     UpdateCommandsCanExecute();
                     UpdateMeasurementButtonsState();
                     OnPropertyChanged(nameof(DeviceCalibrationStatusText));
+                    }
                 }
             }
-        }
 
         public string DeviceConnectionStatusText => _isDeviceConnected ? ConnectedCA : DisconnectedCA;
         public string DeviceCalibrationStatusText => _isDeviceCalibrated ? CalibratedCA : NotCalibratedCa;
@@ -218,13 +220,14 @@ namespace WPF_LCD_Test.ViewModels
             ILocalizationService localizationService,
             IDispatcher dispatcher,
             IUploadService uploadService)
-        {
+            {
             _colorMeasurementService = colorMeasurementService ?? throw new ArgumentNullException(nameof(colorMeasurementService));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
             _uploadService = uploadService ?? throw new ArgumentNullException(nameof(uploadService));
+            _logHandler = new LogHandler(_localizationService, AddLogMessage);
 
             ZeroCalibrationCommand = new RelayCommand(ExecuteZeroCalibrationAsync, CanExecuteZeroCalibration);
             SaveResultsCommand = new RelayCommand(ExecuteSaveResultsAsync, CanExecuteSaveResults);
@@ -235,27 +238,27 @@ namespace WPF_LCD_Test.ViewModels
             ReportGenerateCommand = new RelayCommand(ExecuteReportGenerateCommand, CanExecuteReportGenerateCommand);
             MeasureCommand = new RelayCommand(ExecuteMeasureAsync, CanExecuteMeasure);
             ApplySerialNumberCommand = new RelayCommand(ExecuteApplySerialNumber, CanExecuteApplySerialNumber);
-            ApplyMeasurementTimeCommand = new RelayCommand(ExecuteApplyMeasurementTime, CanExecuteApplyMeasurementTime);
+            //ApplyMeasurementTimeCommand = new RelayCommand(ExecuteApplyMeasurementTime, CanExecuteApplyMeasurementTime);
             UploadReportsCommand = new RelayCommand(ExecuteUploadReportsAsync, CanExecuteUploadReportsAsync);
 
             _colorMeasurementService.StatusMessage += ColorMeasurementService_StatusMessage;
             _fileService.StatusMessage += FileService_StatusMessage;
             _colorMeasurementService.ConnectionStatusChanged += ColorMeasurementService_ConnectionStatusChanged;
             _colorMeasurementService.CalibrationStatusChanged += ColorMeasurementService_CalibrationStatusChanged;
-            _uploadService.StatusMessage += (sender, message) => AddLogMessage(message);
+            _uploadService.StatusMessage += (sender, message) => Log(message);
 
-            AddLogMessage(WelcomeMessage);
+            Log(WelcomeMessage);
             InitializeDeviceConfigurations();
             UpdateCommandsCanExecute();
             UpdateMeasurementButtonsState();
-        }
+            }
 
 
 
         private void InitializeDeviceConfigurations()
-        {
-            try
             {
+            try
+                {
                 if (!Directory.Exists(CONFIGS_DIR))
                     Directory.CreateDirectory(CONFIGS_DIR);
 
@@ -267,16 +270,16 @@ namespace WPF_LCD_Test.ViewModels
                 if (DeviceConfigurations.Any())
                     SelectedDeviceConfiguration = DeviceConfigurations.First();
                 else
-                    AddLogMessage($"{ConfigDirNotFound}: {CONFIGS_DIR}");
-            }
+                    Log(ConfigDirNotFound, [CONFIGS_DIR]);
+                }
             catch (Exception ex)
-            {
-                AddLogMessage($"{ErrUnexpected}: {ex.Message}");
+                {
+                Log(ErrUnexpected, [ex.Message]);
+                }
             }
-        }
 
         public bool AreAllStatusesRepresentedInMeasurements()
-        {
+            {
             if (_currentDevice?.Measurements == null || _currentDevice.Measurements.Count == 0)
                 return false;
 
@@ -286,119 +289,119 @@ namespace WPF_LCD_Test.ViewModels
 
             return allStatusPoints.All(status => status.Location == MeasurementLocation.WhiteColor.ToString() && !_currentDevice.IsTV ||
                 _currentDevice.Measurements.Any(measurement => measurement.Location == status.Location));
-        }
+            }
 
         private async Task ExecuteConnectAsync()
-        {
+            {
             if (!CanExecuteConnect())
                 return;
 
             try
-            {
+                {
                 _isDeviceConnecting = true;
                 if (!await _colorMeasurementService.ConnectAsync())
                     ExecuteDisconnect();
-            }
+                }
             catch
-            {
+                {
                 ExecuteDisconnect();
-            }
+                }
             finally
-            {
+                {
                 _isDeviceConnecting = false;
+                }
             }
-        }
 
         private void ExecuteDisconnect()
-        {
+            {
             if (!CanExecuteDisconnect())
                 return;
 
             try
-            {
+                {
                 _colorMeasurementService.Disconnect();
-            }
+                }
             catch (Exception ex)
-            {
+                {
                 _dialogService.ShowMessage($"{ErrUnexpected}: {ex.Message}", $"{Err}");
-            }
+                }
             UpdateCommandsCanExecute();
             UpdateMeasurementButtonsState();
-        }
+            }
 
         private async Task ExecuteZeroCalibrationAsync(object parameter)
-        {
+            {
             CheckCurrentAppLanguage();
             if (!CanExecuteZeroCalibration(parameter))
                 return;
 
             try
-            {
+                {
                 if (!IsDeviceConnected)
                     await ExecuteConnectAsync();
 
                 if (IsDeviceConnected)
-                {
+                    {
                     _isDeviceCalibrating = true;
                     if (!await _colorMeasurementService.CalibrateZeroAsync())
-                    {
+                        {
                         ExecuteDisconnect();
                         _dialogService.ShowMessage($"{ErrAtCalibration}", $"{Err}");
+                        }
                     }
                 }
-            }
             catch
-            {
+                {
                 ExecuteDisconnect();
                 _dialogService.ShowMessage($"{ErrAtCalibration}", $"{Err}");
-            }
+                }
             finally
-            {
+                {
                 _isDeviceCalibrating = false;
-            }
+                }
             UpdateCommandsCanExecute();
             UpdateMeasurementButtonsState();
-        }
+            }
 
         private async Task<bool> ExecuteSaveResultsAsync(object parameter)
-        {
+            {
             CheckCurrentAppLanguage();
             if (!CanExecuteSaveResults(parameter))
                 return false;
 
-            AddLogMessage($"{Saving}");
+            Log(Saving);
             try
-            {
-                if (_currentDevice == null || string.IsNullOrWhiteSpace(_currentDevice.SerialNumber) || _currentDevice.Measurements.Count == 0)
                 {
+                if (_currentDevice == null || string.IsNullOrWhiteSpace(_currentDevice.SerialNumber) || _currentDevice.Measurements.Count == 0)
+                    {
                     _dialogService.ShowMessage($"{SaveJSONErrDeviceIsEmpty}", $"{Err}");
                     return false;
-                }
+                    }
 
                 _currentDevice.DeviceConfiguration = SelectedDeviceConfiguration;
                 _currentDevice.IsTV = IsTvCheckboxChecked;
 
                 if (!AreAllStatusesRepresentedInMeasurements())
-                {
-                    if (!_dialogService.ShowQuestion($"{SavingNotFullWarning}", $"{Warning}"))
                     {
-                        AddLogMessage($"{SaveCanceled}");
+                    if (!_dialogService.ShowQuestion($"{SavingNotFullWarning}", $"{Warning}"))
+                        {
+                        Log(SaveCanceled);
                         return false;
+                        }
                     }
-                }
 
                 return await _fileService.SaveDeviceDataToJsonAsync(_currentDevice);
-            }
+                }
             catch (Exception ex)
-            {
-                AddLogMessage($"{ErrUnexpected}: {ex.Message}");
+                {
+                Log(ErrUnexpected, [ex.Message]);
                 _dialogService.ShowMessage($"{SaveJSONErrForSN}: {ex.Message}", $"{Err}");
                 return false;
+                }
             }
-        }
 
         private void ExecuteClearFields(object parameter)
-        {
+            {
             CheckCurrentAppLanguage();
             if (!CanExecuteClearFields(parameter))
                 return;
@@ -407,47 +410,47 @@ namespace WPF_LCD_Test.ViewModels
                 ? CleanFieldWarningAfterSave
                 : CleanFieldWarning;
 
-            if (_dialogService.ShowQuestion(approveQuestion, $"{Warning}"))
-            {
+            if (_dialogService.ShowQuestion(approveQuestion, Warning))
+                {
                 SerialNumber = "";
                 MeasurementTime = 2;
                 _currentDevice = null;
                 IsSerialNumberConfirmed = false;
                 ResetMeasurementStatuses();
-                AddLogMessage($"{ClearFieldsDone}");
+                Log(ClearFieldsDone);
                 UpdateCommandsCanExecute();
                 UpdateMeasurementButtonsState();
+                }
             }
-        }
 
         private void ExecuteSwitchLanguage(object parameter)
-        {
+            {
             if (!CanExecuteSwitchLanguage(parameter))
                 return;
 
             if (parameter is string languageCode && !string.IsNullOrWhiteSpace(languageCode))
-            {
-                try
                 {
+                try
+                    {
                     _localizationService.SetLanguage(languageCode);
                     CheckCurrentAppLanguage();
-                }
+                    }
                 catch (Exception ex)
-                {
+                    {
                     _dialogService.ShowMessage($"{ErrMsgLangSwitchFailed}: {ex.Message}", $"{Err}");
+                    }
                 }
             }
-        }
 
         private static void CheckCurrentAppLanguage()
-        {
+            {
             var culture = LocalizationService.Instance.CurrentCulture;
             Thread.CurrentThread.CurrentCulture = culture;
             Thread.CurrentThread.CurrentUICulture = culture;
-        }
+            }
 
         private async Task ExecuteMeasureAsync(object parameter)
-        {
+            {
             if (parameter.ToString() is not string measurementLocation || !CanExecuteMeasure(parameter))
                 return;
 
@@ -457,96 +460,96 @@ namespace WPF_LCD_Test.ViewModels
             UpdateMeasurementStatus(measurementLocation, null, $"{Measuring}");
 
             void ApplyMeasurementResult(Measurement measurement)
-            {
+                {
                 var (xFormatted, yFormatted, LvFormatted, TFormatted) = FormatMeasurement(measurement);
                 messageWithMeasuredValues = $"x={xFormatted}, y={yFormatted}, Lv={LvFormatted}, T={TFormatted}";
-                AddLogMessage($"{Result} '{measurement.Location}': {messageWithMeasuredValues}");
+                Log(MeasurementResult, [measurement.Location, messageWithMeasuredValues]);
                 _currentDevice.AddMeasurement(measurement);
                 isMeasurementSuccess = true;
-            }
+                }
 
             try
-            {
-                if (_currentDevice == null || _currentDevice.SerialNumber != SerialNumber)
                 {
-                    if (string.IsNullOrWhiteSpace(SerialNumber))
+                if (_currentDevice == null || _currentDevice.SerialNumber != SerialNumber)
                     {
+                    if (string.IsNullOrWhiteSpace(SerialNumber))
+                        {
                         _dialogService.ShowMessage($"{FillSN}", $"{Err}");
                         messageWithMeasuredValues = $"{NoSNErr}";
                         UpdateMeasurementStatus(measurementLocation, isMeasurementSuccess, messageWithMeasuredValues);
                         return;
-                    }
+                        }
 
                     _currentDevice = new DeviceUnderTest(SerialNumber);
-                    AddLogMessage($"{TestStartInfo}: {_currentDevice.SerialNumber}");
+                    Log(TestStartInfo,[_currentDevice.SerialNumber]);
                     ResetMeasurementStatuses();
                     UpdateMeasurementStatus(measurementLocation, null, $"{Measuring}");
-                }
+                    }
 
                 var measurement = await _colorMeasurementService.MeasureAsync(_measurementTime);
 
                 if (measurement != null && measurement.IsValid)
-                {
+                    {
                     measurement.Location = measurementLocation;
                     var (MeasurementValidationPassed, MeasurementValidationMessage) = MeasurementValidation(measurement);
                     int currentAttempt = GetAttemptCount(measurement.Location);
 
 
                     if (MeasurementValidationPassed)
-                    {
+                        {
                         ApplyMeasurementResult(measurement);
                         ResetAttemptCount(measurement.Location);
-                    }
+                        }
                     else if (currentAttempt < MaxMeasurementAttemptsBeforeConfirm)
-                    {
+                        {
                         string retryMessage = $"{MeasurementValidationMessage} \n{PleaseTryToMeasureAgain}";
 
                         IncrementAttemptCount(measurementLocation);
                         _dialogService.ShowMessage(retryMessage, $"{Warning}");
                         messageWithMeasuredValues = $"{FailedMeasurementForLocation}: {measurementLocation}.\n ({Attempt} {currentAttempt + 1}). {PleaseTryToMeasureAgain}";
-                        AddLogMessage(messageWithMeasuredValues);
-                    }
+                        Log(messageWithMeasuredValues);
+                        }
                     else
-                    {
+                        {
                         bool confirmed = _dialogService.ShowQuestion($"{SaveNotCorrectResultQuestion}\n" +
                             $"{MeasurementValidationMessage}.\n", $"{Warning}");
 
                         if (confirmed)
-                        {
+                            {
                             ApplyMeasurementResult(measurement);
                             messageWithMeasuredValues = $"{ResultsSaved} '{measurement.Location}'. \n {ValidationMessage}: {MeasurementValidationMessage}";
-                        }
+                            }
                         else
-                        {
+                            {
                             messageWithMeasuredValues = $"{SaveCanceled}";
-                        }
-                        AddLogMessage(messageWithMeasuredValues);
+                            }
+                        Log(messageWithMeasuredValues);
                         ResetAttemptCount(measurement.Location);
+                        }
                     }
-                }
                 else
-                {
+                    {
                     messageWithMeasuredValues = measurement != null && !measurement.IsValid
                         ? $"{InvalidResultErr}"
                         : $"{ColorAnalyzerErr}";
-                    AddLogMessage($"{ColorServiceErr} '{measurementLocation}'.");
+                    Log(ColorServiceErr, [measurementLocation]);
+                    }
                 }
-            }
             catch (Exception ex)
-            {
+                {
                 _dialogService.ShowMessage($"{UnexpectedMeasurementErr} '{measurementLocation}': {ex.Message}", $"{Err}");
                 isMeasurementSuccess = false;
                 messageWithMeasuredValues = $"{Err}: {ex.Message}";
-            }
+                }
             finally
-            {
+                {
                 UpdateMeasurementStatus(measurementLocation, isMeasurementSuccess, messageWithMeasuredValues);
                 UpdateCommandsCanExecute();
+                }
             }
-        }
 
         private static (string xFormatted, string yFormatted, string LvFormatted, string TFormatted) FormatMeasurement(Measurement measurement)
-        {
+            {
             string xFormatted = measurement.x.ToString("F3", CultureInfo.InvariantCulture);
             string yFormatted = measurement.y.ToString("F3", CultureInfo.InvariantCulture);
             string LvFormatted = measurement.Location.Equals(MeasurementLocation.BlackColor.ToString())
@@ -555,38 +558,38 @@ namespace WPF_LCD_Test.ViewModels
             string TFormatted = measurement.T.ToString("F0", CultureInfo.InvariantCulture);
 
             return (xFormatted, yFormatted, LvFormatted, TFormatted);
-        }
+            }
 
         private static (bool result, string message) MeasurementValidation(Measurement measurement)
-        {
+            {
             bool result = false;
             string message = $"{ErrMeasurementValidation}";
 
             // Brightness check for measurement
             if (!measurement.Location.Equals(MeasurementLocation.BlackColor.ToString()) && measurement.Lv <= 5)
-            {
+                {
                 message = $"{LvIsTooLow}: {measurement.Lv:F1}. {CheckProbe}";
                 return (result, message);
-            }
+                }
             else if (measurement.Location.Equals(MeasurementLocation.BlackColor.ToString()) && measurement.Lv >= 5)
-            {
+                {
                 message = $"{LvIsTooHigh}. \n {Brightness}: {measurement.Lv:F1}";
                 return (result, message);
-            }
+                }
             else if (measurement.Location.Equals(MeasurementLocation.BlackColor.ToString()) && measurement.Lv <= 5)
-            {
+                {
                 // For black color only checking Lv value
                 result = true;
                 message = MeasurementValidationPassed;
                 return (result, message);
-            }
+                }
 
 
             // Measurement for brightness uniformity are measured on white color only, so checking only x and y coordinates for white color
             if (!primariesNTSC.TryGetValue(measurement.Location, out var target))
-            {
+                {
                 target = primariesNTSC[MeasurementLocation.WhiteColor.ToString()];
-            }
+                }
 
             double minX = target.x - ColorCoordinatesTolerance;
             double maxX = target.x + ColorCoordinatesTolerance;
@@ -597,127 +600,127 @@ namespace WPF_LCD_Test.ViewModels
                    measurement.y >= minY && measurement.y <= maxY;
 
             if (result is false)
-            {
+                {
                 message = $"{ErrMeasurementOutOfRange}: '{measurement.Location}'.\n" +
                           $"{Actual} x: {measurement.x:F3}, y: {measurement.y:F3}";
-            }
+                }
             else
-            {
+                {
                 message = MeasurementValidationPassed;
-            }
+                }
 
             return (result, message);
-        }
+            }
 
         public void ExecuteApplySerialNumber(object parameter)
-        {
+            {
             CheckCurrentAppLanguage();
             if (!CanExecuteApplySerialNumber(parameter) || parameter is not string enteredSerialNumber)
                 return;
 
             if (SerialNumberRegex().IsMatch(enteredSerialNumber))
-            {
+                {
                 SerialNumber = enteredSerialNumber;
                 IsSerialNumberConfirmed = true;
-                AddLogMessage($"{CurrentSN}: {SerialNumber}");
+                Log(CurrentSN, [SerialNumber]);
                 RequestClearInputFocus?.Invoke(this, EventArgs.Empty);
-            }
+                }
             else
-            {
+                {
                 IsSerialNumberConfirmed = false;
                 _dialogService.ShowMessage($"{IncorrectFormatForSNErr}", $"{Err}");
                 return;
-            }
+                }
 
             if (_currentDevice == null || _currentDevice.SerialNumber != SerialNumber)
-            {
-                try
                 {
+                try
+                    {
                     _currentDevice = new DeviceUnderTest(SerialNumber);
                     ResetMeasurementStatuses();
-                }
+                    }
                 catch (ArgumentException ex)
-                {
+                    {
                     IsSerialNumberConfirmed = false;
-                    AddLogMessage($"{Err}: {ex.Message}");
+                    Log(ErrWithArg, [ex.Message]);
                     _dialogService.ShowMessage(ex.Message, $"{Err} SN");
                     SerialNumber = "";
                     _currentDevice = null;
                     UpdateMeasurementButtonsState();
+                    }
                 }
-            }
             else
-            {
-                AddLogMessage($"{Resources.Resources.SerialNumber} {SerialNumber}' {AlreadyActivated}");
-            }
+                {
+                Log(SerialNumber, [AlreadyActivated]);
+                }
             UpdateMeasurementButtonsState();
             UpdateCommandsCanExecute();
-        }
-
-        private void ExecuteApplyMeasurementTime(object parameter)
-        {
-            CheckCurrentAppLanguage();
-            if (parameter is not string enteredMeasurementTime || string.IsNullOrWhiteSpace(enteredMeasurementTime))
-            {
-                _dialogService.ShowMessage($"{IncorrectMeasTimeFormat}", $"{Err}");
-                return;
             }
 
-            try
-            {
-                int measurementTime = int.Parse(enteredMeasurementTime);
-                if (measurementTime <= 0)
-                    _dialogService.ShowMessage($"{IncorrectMeasTimeFormat}", $"{Err}");
-                else
-                {
-                    MeasurementTime = measurementTime;
-                    AddLogMessage($"{CurrentMeasurementTime}: {MeasurementTime} {Seconds}");
-                    RequestClearInputFocus?.Invoke(this, EventArgs.Empty);
-                }
-            }
-            catch
-            {
-                _dialogService.ShowMessage($"{IncorrectMeasTimeFormat}", $"{Err}");
-            }
-        }
+        //private void ExecuteApplyMeasurementTime(object parameter)
+        //    {
+        //    CheckCurrentAppLanguage();
+        //    if (parameter is not string enteredMeasurementTime || string.IsNullOrWhiteSpace(enteredMeasurementTime))
+        //        {
+        //        _dialogService.ShowMessage($"{IncorrectMeasTimeFormat}", $"{Err}");
+        //        return;
+        //        }
+
+        //    try
+        //        {
+        //        int measurementTime = int.Parse(enteredMeasurementTime);
+        //        if (measurementTime <= 0)
+        //            _dialogService.ShowMessage($"{IncorrectMeasTimeFormat}", $"{Err}");
+        //        else
+        //            {
+        //            MeasurementTime = measurementTime;
+        //            AddLogMessage($"{CurrentMeasurementTime}: {MeasurementTime} {Seconds}");
+        //            RequestClearInputFocus?.Invoke(this, EventArgs.Empty);
+        //            }
+        //        }
+        //    catch
+        //        {
+        //        _dialogService.ShowMessage($"{IncorrectMeasTimeFormat}", $"{Err}");
+        //        }
+        //    }
 
         private async Task ExecuteNewDeviceUnderTest(object parameter)
-        {
+            {
             if (await ExecuteSaveResultsAsync(parameter))
                 ExecuteClearFields("CalledFromNewDeviceMethod");
             UpdateMeasurementButtonsState();
-        }
+            }
 
         public void ExecuteClearLog() => LogText = string.Empty;
 
         private void ExecuteReportGenerateCommand(object parameter)
-        {
-            try
             {
+            try
+                {
                 var appDir = AppDomain.CurrentDomain.BaseDirectory;
                 var exePath = Path.Combine(appDir, "ReportGenerator.exe");
 
                 if (!File.Exists(exePath))
-                {
-                    AddLogMessage($"{RunExternalAppNotFoundErr}: {exePath}");
+                    {
+                    Log(RunExternalAppNotFoundErr, [exePath]);
                     return;
-                }
+                    }
 
-                AddLogMessage($"{StartingReportGeneration}");
+                Log(StartingReportGeneration);
                 IsReportGenerating = true; // Блокируем кнопку
 
                 var process = new Process
-                {
-                    StartInfo = new ProcessStartInfo
                     {
+                    StartInfo = new ProcessStartInfo
+                        {
                         FileName = exePath,
                         WorkingDirectory = appDir,
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
                         CreateNoWindow = true
-                    }
-                };
+                        }
+                    };
 
                 var errorOutput = new System.Text.StringBuilder();
 
@@ -734,7 +737,7 @@ namespace WPF_LCD_Test.ViewModels
                 Task.Run(() =>
                 {
                     try
-                    {
+                        {
                         process.WaitForExit();
                         var exitCode = (ReportExitCode)process.ExitCode;
                         process.Dispose();
@@ -743,7 +746,7 @@ namespace WPF_LCD_Test.ViewModels
                         bool isError = false;
 
                         switch (exitCode)
-                        {
+                            {
                             case ReportExitCode.Success:
                                 message = $"{ReportGeneratedSuccessfully}";
                                 break;
@@ -760,58 +763,58 @@ namespace WPF_LCD_Test.ViewModels
                                 message = $"{ReportGenerationFailed} ({Code}: {(int)exitCode}).";
                                 isError = true;
                                 break;
-                        }
+                            }
 
-                        AddLogMessage($"{message}");
-                    }
+                        Log(message);
+                        }
                     catch (Exception ex)
-                    {
-                        AddLogMessage($"{ErrorInBackgroundTask}: {ex.Message}");
-                    }
+                        {
+                        Log(ErrorInBackgroundTask,[ex.Message]);
+                        }
                     finally
-                    {
+                        {
                         ExecuteThreadInUI(() => IsReportGenerating = false);
-                    }
+                        }
                 });
-            }
+                }
             catch (Exception ex)
-            {
-                AddLogMessage($"{RunExternalAppUnexpectedErr}: {ex.Message}");
+                {
+                Log(RunExternalAppUnexpectedErr, [ex.Message]);
                 IsReportGenerating = false;
+                }
             }
-        }
 
         private async Task ExecuteUploadReportsAsync(object parameter)
-        {
+            {
             // 1. Get currentDeviceName
             string currentDeviceName = _choosedDeviceConfiguration;
 
             if (string.IsNullOrEmpty(currentDeviceName))
-            {
+                {
                 _dialogService.ShowMessage($"{CantStartUpload}", $"{Err}");
                 return;
-            }
+                }
 
             // 2. Call upload service
-            AddLogMessage($"{StartingReportUploading}");
+            Log(StartingReportUploading);
             IsUploadingReports = true;
 
             try
-            {
+                {
                 // UploadService returns true/false and sends detailed status via event
                 bool success = await _uploadService.UploadReportsAsync();
 
                 if (!success)
-                {
-                    AddLogMessage($"{UploadFailed}");
+                    {
+                    Log(UploadFailed);
+                    }
                 }
-            }
             finally
-            {
+                {
                 IsUploadingReports = false;
-            }
+                }
 
-        }
+            }
 
         private bool CanExecuteConnect() => !IsDeviceConnected && !_isDeviceCalibrating && !_isDeviceConnecting;
         private bool CanExecuteDisconnect() => !_isDeviceConnecting && !_isDeviceCalibrating;
@@ -822,59 +825,75 @@ namespace WPF_LCD_Test.ViewModels
         private bool CanExecuteSwitchLanguage(object parameter) => parameter is string languageCode && !string.IsNullOrWhiteSpace(languageCode);
         private bool CanExecuteMeasure(object parameter) => IsDeviceConnected && !_isDeviceCalibrating && !_isDeviceConnecting && IsDeviceCalibrated && !string.IsNullOrWhiteSpace(SerialNumber) && MeasurementTime > 0;
         private bool CanExecuteApplySerialNumber(object parameter) => !string.IsNullOrWhiteSpace(parameter as string);
-        private bool CanExecuteApplyMeasurementTime(object parameter) => MeasurementTime > 0;
+        //private bool CanExecuteApplyMeasurementTime(object parameter) => MeasurementTime > 0;
         private bool CanExecuteReportGenerateCommand(object parameter) => !IsReportGenerating;
         private bool CanExecuteUploadReportsAsync(object parameter) => !IsUploadingReports;
 
-        public void AddLogMessage(string message)
-        {
-            if (!string.IsNullOrEmpty(message))
+
+        // Wrapper for LogHandler. Requires explicit array for arguments.
+        // Usage: Log(Resources.Key, new[] { arg1, arg2 });
+        private void Log(string messageOrKey, object[]? args = null, [CallerArgumentExpression("messageOrKey")] string? resourceName = null)
             {
-                string timestamp = DateTime.Now.ToString("HH:mm:ss");
-                LogText += $"{timestamp} {message}{Environment.NewLine}";
+            _logHandler.Log(messageOrKey, args, resourceName);
             }
-        }
+
+
+        public void AddLogMessage(string message)
+            {
+            AppendToLog(message);
+            }
+
+        // Общая приватная часть для записи в строку
+        private void AppendToLog(string message)
+            {
+            if (!string.IsNullOrEmpty(message))
+                {
+                string timestamp = DateTime.Now.ToString("HH:mm:ss");
+                // Обновление свойства UI
+                LogText += $"{timestamp} {message}{Environment.NewLine}";
+                }
+            }
 
         private void UpdateMeasurementButtonsState()
-        {
+            {
             IsMeasurementButtonsEnabled = IsDeviceConnected && IsDeviceCalibrated && !string.IsNullOrWhiteSpace(SerialNumber);
-            (MeasureCommand as RelayCommand)?.RaiseCanExecuteChanged();
-        }
+            ( MeasureCommand as RelayCommand )?.RaiseCanExecuteChanged();
+            }
 
         private void UpdateCommandsCanExecute()
-        {
-            ((RelayCommand)ZeroCalibrationCommand)?.RaiseCanExecuteChanged();
-            ((RelayCommand)MeasureCommand)?.RaiseCanExecuteChanged();
-            ((RelayCommand)SaveResultsCommand)?.RaiseCanExecuteChanged();
-            ((RelayCommand)ApplySerialNumberCommand)?.RaiseCanExecuteChanged();
-            ((RelayCommand)ApplyMeasurementTimeCommand)?.RaiseCanExecuteChanged();
-            ((RelayCommand)NewDeviceUnderTestCommand)?.RaiseCanExecuteChanged();
-            ((RelayCommand)ReportGenerateCommand)?.RaiseCanExecuteChanged();
-            ((RelayCommand)UploadReportsCommand)?.RaiseCanExecuteChanged();
-        }
+            {
+            ( (RelayCommand)ZeroCalibrationCommand )?.RaiseCanExecuteChanged();
+            ( (RelayCommand)MeasureCommand )?.RaiseCanExecuteChanged();
+            ( (RelayCommand)SaveResultsCommand )?.RaiseCanExecuteChanged();
+            ( (RelayCommand)ApplySerialNumberCommand )?.RaiseCanExecuteChanged();
+            //( (RelayCommand)ApplyMeasurementTimeCommand )?.RaiseCanExecuteChanged();
+            ( (RelayCommand)NewDeviceUnderTestCommand )?.RaiseCanExecuteChanged();
+            ( (RelayCommand)ReportGenerateCommand )?.RaiseCanExecuteChanged();
+            ( (RelayCommand)UploadReportsCommand )?.RaiseCanExecuteChanged();
+            }
 
         private void UpdateMeasurementStatus(string location, bool? isPassed, string measuredValuesString)
-        {
+            {
             var statusToUpdate = MeasurementStatusService.Instance.AllMeasurementButtonStatuses.FirstOrDefault(s => s.Location == location);
             if (statusToUpdate is not null)
-            {
+                {
                 statusToUpdate.IsPassed = isPassed;
                 statusToUpdate.MeasuredValuesString = measuredValuesString;
-            }
+                }
             else
-            {
-                AddLogMessage($"{MeasButStatusErr}: '{location}'");
+                {
+                Log(MeasButStatusErr, [location]);
+                }
             }
-        }
 
         private static void ResetMeasurementStatuses()
-        {
-            foreach (var status in MeasurementStatusService.Instance.AllMeasurementButtonStatuses)
             {
+            foreach (var status in MeasurementStatusService.Instance.AllMeasurementButtonStatuses)
+                {
                 status.IsPassed = null;
                 status.MeasuredValuesString = "";
+                }
             }
-        }
 
         private void ColorMeasurementService_StatusMessage(object? sender, string message) =>
             ExecuteThreadInUI(() => AddLogMessage(message));
@@ -889,21 +908,21 @@ namespace WPF_LCD_Test.ViewModels
             ExecuteThreadInUI(() => { IsDeviceConnected = isConnected; UpdateCommandsCanExecute(); });
 
         public void Dispose()
-        {
-            AddLogMessage($"{ViewModelClearing}");
+            {
+            Log(ViewModelClearing);
             _colorMeasurementService.StatusMessage -= ColorMeasurementService_StatusMessage;
             _fileService.StatusMessage -= FileService_StatusMessage;
             _colorMeasurementService.ConnectionStatusChanged -= ColorMeasurementService_ConnectionStatusChanged;
             _colorMeasurementService.CalibrationStatusChanged -= ColorMeasurementService_CalibrationStatusChanged;
 
             if (_uploadService is not null)
-            {
+                {
                 _uploadService.StatusMessage -= (sender, message) => AddLogMessage(message);
-            }
+                }
 
-            (_colorMeasurementService as IDisposable)?.Dispose();
-            (_fileService as IDisposable)?.Dispose();
-            (_dialogService as IDisposable)?.Dispose();
+            ( _colorMeasurementService as IDisposable )?.Dispose();
+            ( _fileService as IDisposable )?.Dispose();
+            ( _dialogService as IDisposable )?.Dispose();
 
             ExecuteClearLog();
             _currentDevice = null;
@@ -914,18 +933,18 @@ namespace WPF_LCD_Test.ViewModels
             _isSerialNumberConfirmed = false;
             _isMeasurementButtonsEnabled = false;
             GC.SuppressFinalize(this);
-            AddLogMessage($"{ViewModelCleared}");
-        }
+            Log(ViewModelCleared);
+            }
 
         private void ExecuteThreadInUI(Action action)
-        {
+            {
             if (_dispatcher.CheckAccess())
                 action.Invoke();
             else
                 _dispatcher.BeginInvoke(action);
-        }
+            }
 
         [GeneratedRegex(SerialNumberPattern)]
         public static partial Regex SerialNumberRegex();
+        }
     }
-}

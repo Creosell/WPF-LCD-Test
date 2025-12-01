@@ -148,7 +148,7 @@
     <value>Current measurement time is</value>
   </data>
   <data name="CurrentSN" xml:space="preserve">
-    <value>Current SN is</value>
+    <value>Current SN: {0}</value>
   </data>
   <data name="Err" xml:space="preserve">
     <value>Error</value>
@@ -181,7 +181,7 @@
     <value>Invalid input, please enter a number. Measurement time set to default</value>
   </data>
   <data name="ErrUnexpected" xml:space="preserve">
-    <value>An unexpected error occurred</value>
+    <value>An unexpected error occurred: {0}</value>
   </data>
   <data name="FillSN" xml:space="preserve">
     <value>Please fill the SN first!</value>
@@ -328,7 +328,7 @@
     <value>A folder has been created for the device with SN</value>
   </data>
   <data name="TestStartInfo" xml:space="preserve">
-    <value>Testing of the device with SN has begun</value>
+    <value>Testing of the device with SN has begun: {0}</value>
   </data>
   <data name="NoSNErr" xml:space="preserve">
     <value>No SN</value>
@@ -339,14 +339,14 @@
   <data name="LvIsTooLow" xml:space="preserve">
     <value>Caution: The measured brightness Lv is too low</value>
   </data>
-  <data name="Result" xml:space="preserve">
-    <value>Result</value>
+  <data name="MeasurementResult" xml:space="preserve">
+    <value>Result for {0}: {1}</value>
   </data>
   <data name="InvalidResultErr" xml:space="preserve">
     <value>Invalid result</value>
   </data>
   <data name="ColorServiceErr" xml:space="preserve">
-    <value>Error: The service did not return a measurement result for</value>
+    <value>Error: The service did not return a measurement result for {0}</value>
   </data>
   <data name="ColorAnalyzerErr" xml:space="preserve">
     <value>Color analyzer error :(</value>
@@ -391,10 +391,10 @@
     <value>The serial number cannot be empty</value>
   </data>
   <data name="RunExternalAppNotFoundErr" xml:space="preserve">
-    <value>Error: External program file not found</value>
+    <value>Error: External program file not found in {0}</value>
   </data>
   <data name="RunExternalAppUnexpectedErr" xml:space="preserve">
-    <value>Error when launching an external program</value>
+    <value>Error when launching an external program: {0}</value>
   </data>
   <data name="CalibratedCA" xml:space="preserve">
     <value>Calibrated</value>
@@ -412,7 +412,7 @@
     <value>Press the “Zero Calibration” button to connect the color analyzer and fill in the SN to start the measurements</value>
   </data>
   <data name="ConfigDirNotFound" xml:space="preserve">
-    <value>Configurations directory not found</value>
+    <value>Configurations directory not found: {0}</value>
   </data>
   <data name="ErrMeasurementValidation" xml:space="preserve">
     <value>Unknown error in measurement validation</value>
@@ -454,31 +454,31 @@
     <value>No reports found for upload.</value>
   </data>
   <data name="WarningFailedToCleanup" xml:space="preserve">
-    <value>Warning: Failed to cleanup</value>
+    <value>Warning: Failed to cleanup {0}. Error: {1}</value>
   </data>
   <data name="StartingParallelUploadOf" xml:space="preserve">
-    <value>Starting parallel upload of</value>
+    <value>Starting parallel upload of {0} files</value>
   </data>
   <data name="Files" xml:space="preserve">
     <value>files</value>
   </data>
   <data name="UploadedSuccessfully" xml:space="preserve">
-    <value>Uploaded successfully. Total files uploaded</value>
+    <value>Uploaded successfully. Total files uploaded: {0}</value>
   </data>
   <data name="CopyOfUploadedArchivesInFolder" xml:space="preserve">
-    <value>Copy of uploaded report archives in folder</value>
+    <value>Copy of uploaded report archives in folder: {0}</value>
   </data>
   <data name="UploadFinishedWithFail" xml:space="preserve">
-    <value>Upload process finished with failures. Total files failed</value>
+    <value>Upload process finished with failures. Total files failed: {0}</value>
   </data>
   <data name="ArchiveFolderNotFound" xml:space="preserve">
-    <value>Archive folder not found</value>
+    <value>Archive folder not found in {0}</value>
   </data>
   <data name="CreatedBatchFor" xml:space="preserve">
-    <value>Created batch for</value>
+    <value>Created batch for {0}</value>
   </data>
   <data name="ReadyToUpload" xml:space="preserve">
-    <value>Ready to upload</value>
+    <value>Ready to upload: {0}</value>
   </data>
   <data name="Batches" xml:space="preserve">
     <value>batches</value>
@@ -487,19 +487,19 @@
     <value>containing</value>
   </data>
   <data name="StartingUploadOf" xml:space="preserve">
-    <value>Starting upload of</value>
+    <value>Starting upload of {0}</value>
   </data>
   <data name="UploadSuccessfulFor" xml:space="preserve">
-    <value>Upload successful for</value>
+    <value>Upload successful for {0}</value>
   </data>
   <data name="CLI_ErrorFor" xml:space="preserve">
-    <value>CLI Error for</value>
+    <value>CLI Upload Error for file: {0}. Exit code: {1}. Error: {2}</value>
   </data>
   <data name="Code" xml:space="preserve">
     <value>Code</value>
   </data>
   <data name="FailedToExecuteCLI" xml:space="preserve">
-    <value>Failed to execute CLI for</value>
+    <value>Failed to execute CLI for {0}. Error: {1}</value>
   </data>
   <data name="StartingReportGeneration" xml:space="preserve">
     <value>Starting report generation...</value>
@@ -517,7 +517,7 @@
     <value>Report generation failed</value>
   </data>
   <data name="ErrorInBackgroundTask" xml:space="preserve">
-    <value>Error in background task</value>
+    <value>Error in background task: {0}</value>
   </data>
   <data name="CantStartUpload" xml:space="preserve">
     <value>Cannot start upload: Device name is unknown</value>
@@ -527,5 +527,8 @@
   </data>
   <data name="UploadFailed" xml:space="preserve">
     <value>Upload process failed</value>
+  </data>
+  <data name="ErrWithArg" xml:space="preserve">
+    <value>Error: {0}</value>
   </data>
 </root>

@@ -79,7 +79,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Archive folder not found.
+        ///   Looks up a localized string similar to Archive folder not found in {0}.
         /// </summary>
         public static string ArchiveFolderNotFound {
             get {
@@ -268,7 +268,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CLI Error for.
+        ///   Looks up a localized string similar to CLI Upload Error for file: {0}. Exit code: {1}. Error: {2}.
         /// </summary>
         public static string CLI_ErrorFor {
             get {
@@ -295,7 +295,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: The service did not return a measurement result for.
+        ///   Looks up a localized string similar to Error: The service did not return a measurement result for {0}.
         /// </summary>
         public static string ColorServiceErr {
             get {
@@ -304,7 +304,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Configurations directory not found.
+        ///   Looks up a localized string similar to Configurations directory not found: {0}.
         /// </summary>
         public static string ConfigDirNotFound {
             get {
@@ -358,7 +358,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Copy of uploaded report archives in folder.
+        ///   Looks up a localized string similar to Copy of uploaded report archives in folder: {0}.
         /// </summary>
         public static string CopyOfUploadedArchivesInFolder {
             get {
@@ -367,7 +367,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Created batch for.
+        ///   Looks up a localized string similar to Created batch for {0}.
         /// </summary>
         public static string CreatedBatchFor {
             get {
@@ -421,7 +421,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Current SN is.
+        ///   Looks up a localized string similar to Current SN: {0}.
         /// </summary>
         public static string CurrentSN {
             get {
@@ -529,7 +529,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error in background task.
+        ///   Looks up a localized string similar to Error in background task: {0}.
         /// </summary>
         public static string ErrorInBackgroundTask {
             get {
@@ -574,11 +574,20 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An unexpected error occurred.
+        ///   Looks up a localized string similar to An unexpected error occurred: {0}.
         /// </summary>
         public static string ErrUnexpected {
             get {
                 return ResourceManager.GetString("ErrUnexpected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: {0}.
+        /// </summary>
+        public static string ErrWithArg {
+            get {
+                return ResourceManager.GetString("ErrWithArg", resourceCulture);
             }
         }
         
@@ -592,7 +601,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to execute CLI for.
+        ///   Looks up a localized string similar to Failed to execute CLI for {0}. Error: {1}.
         /// </summary>
         public static string FailedToExecuteCLI {
             get {
@@ -745,6 +754,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Result for {0}: {1}.
+        /// </summary>
+        public static string MeasurementResult {
+            get {
+                return ResourceManager.GetString("MeasurementResult", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Measurement time (s):.
         /// </summary>
         public static string MeasurementTimeSec {
@@ -862,7 +880,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ready to upload.
+        ///   Looks up a localized string similar to Ready to upload: {0}.
         /// </summary>
         public static string ReadyToUpload {
             get {
@@ -898,15 +916,6 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Result.
-        /// </summary>
-        public static string Result {
-            get {
-                return ResourceManager.GetString("Result", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Results for SN.
         /// </summary>
         public static string ResultsForSN {
@@ -934,7 +943,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: External program file not found.
+        ///   Looks up a localized string similar to Error: External program file not found in {0}.
         /// </summary>
         public static string RunExternalAppNotFoundErr {
             get {
@@ -943,7 +952,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error when launching an external program.
+        ///   Looks up a localized string similar to Error when launching an external program: {0}.
         /// </summary>
         public static string RunExternalAppUnexpectedErr {
             get {
@@ -1069,7 +1078,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Starting parallel upload of.
+        ///   Looks up a localized string similar to Starting parallel upload of {0} files.
         /// </summary>
         public static string StartingParallelUploadOf {
             get {
@@ -1096,7 +1105,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Starting upload of.
+        ///   Looks up a localized string similar to Starting upload of {0}.
         /// </summary>
         public static string StartingUploadOf {
             get {
@@ -1114,7 +1123,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Testing of the device with SN has begun.
+        ///   Looks up a localized string similar to Testing of the device with SN has begun: {0}.
         /// </summary>
         public static string TestStartInfo {
             get {
@@ -1159,7 +1168,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Uploaded successfully. Total files uploaded.
+        ///   Looks up a localized string similar to Uploaded successfully. Total files uploaded: {0}.
         /// </summary>
         public static string UploadedSuccessfully {
             get {
@@ -1177,7 +1186,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Upload process finished with failures. Total files failed.
+        ///   Looks up a localized string similar to Upload process finished with failures. Total files failed: {0}.
         /// </summary>
         public static string UploadFinishedWithFail {
             get {
@@ -1186,7 +1195,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Upload successful for.
+        ///   Looks up a localized string similar to Upload successful for {0}.
         /// </summary>
         public static string UploadSuccessfulFor {
             get {
@@ -1231,7 +1240,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Warning: Failed to cleanup.
+        ///   Looks up a localized string similar to Warning: Failed to cleanup {0}. Error: {1}.
         /// </summary>
         public static string WarningFailedToCleanup {
             get {

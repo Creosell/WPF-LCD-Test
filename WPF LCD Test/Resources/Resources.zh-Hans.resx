@@ -148,7 +148,7 @@
     <value>当前测量时间为</value>
   </data>
   <data name="CurrentSN" xml:space="preserve">
-    <value>目前的 SN 为</value>
+    <value>当前序列号：{0}</value>
   </data>
   <data name="Err" xml:space="preserve">
     <value>错误</value>
@@ -181,7 +181,7 @@
     <value>输入无效，请输入数字。测量时间设置为默认值</value>
   </data>
   <data name="ErrUnexpected" xml:space="preserve">
-    <value>发生意外错误</value>
+    <value>发生意外错误: {0}</value>
   </data>
   <data name="FillSN" xml:space="preserve">
     <value>请先填写 SN！</value>
@@ -328,7 +328,7 @@
     <value>已经为带有SN的设备创建了一个文件夹</value>
   </data>
   <data name="TestStartInfo" xml:space="preserve">
-    <value>用SN对设备进行测试已经开始</value>
+    <value>用SN对设备进行测试已经开始: {0}</value>
   </data>
   <data name="NoSNErr" xml:space="preserve">
     <value>没有sn</value>
@@ -339,14 +339,14 @@
   <data name="LvIsTooLow" xml:space="preserve">
     <value>注意：测得的亮度LV太低</value>
   </data>
-  <data name="Result" xml:space="preserve">
-    <value>结果</value>
+  <data name="MeasurementResult" xml:space="preserve">
+    <value>结果为 {0}: {1}</value>
   </data>
   <data name="InvalidResultErr" xml:space="preserve">
     <value>结果无效</value>
   </data>
   <data name="ColorServiceErr" xml:space="preserve">
-    <value>错误：该服务未返回测量结果</value>
+    <value>错误：该服务未返回测量结果 {0}</value>
   </data>
   <data name="ColorAnalyzerErr" xml:space="preserve">
     <value>颜色分析仪错误:(</value>
@@ -391,10 +391,10 @@
     <value>序列号不能为空</value>
   </data>
   <data name="RunExternalAppNotFoundErr" xml:space="preserve">
-    <value>错误： 未找到外部程序文件</value>
+    <value>错误：在 {0} 中未找到外部程序文件</value>
   </data>
   <data name="RunExternalAppUnexpectedErr" xml:space="preserve">
-    <value>启动外部程序时出错</value>
+    <value>启动外部程序时出错: {0}</value>
   </data>
   <data name="CalibratedCA" xml:space="preserve">
     <value>校准</value>
@@ -412,7 +412,7 @@
     <value>按 “零点校准 ”按钮连接色彩分析仪，填写 SN 开始测量</value>
   </data>
   <data name="ConfigDirNotFound" xml:space="preserve">
-    <value>未找到配置目录</value>
+    <value>未找到配置目录 : {0}</value>
   </data>
   <data name="ErrMeasurementValidation" xml:space="preserve">
     <value>测量验证中出现未知错误</value>
@@ -450,84 +450,11 @@
   <data name="Brightness" xml:space="preserve">
     <value>亮度</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="NoReportsFoundForUpload" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="WarningFailedToCleanup" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="StartingParallelUploadOf" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Files" xml:space="preserve">
-    <value>文件</value>
-  </data>
-  <data name="UploadedSuccessfully" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="CopyOfUploadedArchivesInFolder" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="UploadFinishedWithFail" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="ArchiveFolderNotFound" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="CreatedBatchFor" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="ReadyToUpload" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Batches" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Containing" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="StartingUploadOf" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="UploadSuccessfulFor" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="CLI_ErrorFor" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="Code" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="FailedToExecuteCLI" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
   <data name="NoReportsFoundForUpload" xml:space="preserve">
     <value>未找到可供上传的报告。</value>
   </data>
-  <data name="WarningFailedToCleanup" xml:space="preserve">
-    <value>警告：清理失败</value>
-  </data>
-  <data name="StartingParallelUploadOf" xml:space="preserve">
-    <value>开始并行上传</value>
-  </data>
-  <data name="UploadedSuccessfully" xml:space="preserve">
-    <value>上传成功。上传的文件总数</value>
-  </data>
-  <data name="CopyOfUploadedArchivesInFolder" xml:space="preserve">
-    <value>文件夹中上传的报告档案的副本</value>
-  </data>
-  <data name="UploadFinishedWithFail" xml:space="preserve">
-    <value>上传过程因失败而结束。失败的文件总数</value>
-  </data>
-  <data name="ArchiveFolderNotFound" xml:space="preserve">
-    <value>找不到存档文件夹</value>
-  </data>
-  <data name="CreatedBatchFor" xml:space="preserve">
-    <value>已创建批次</value>
-  </data>
-  <data name="ReadyToUpload" xml:space="preserve">
-    <value>准备上传</value>
+  <data name="Files" xml:space="preserve">
+    <value>文件</value>
   </data>
   <data name="Batches" xml:space="preserve">
     <value>批次</value>
@@ -535,20 +462,8 @@
   <data name="Containing" xml:space="preserve">
     <value>含有</value>
   </data>
-  <data name="StartingUploadOf" xml:space="preserve">
-    <value>开始上传</value>
-  </data>
-  <data name="UploadSuccessfulFor" xml:space="preserve">
-    <value>上传成功</value>
-  </data>
-  <data name="CLI_ErrorFor" xml:space="preserve">
-    <value>CLI 错误为</value>
-  </data>
   <data name="Code" xml:space="preserve">
     <value>代码</value>
-  </data>
-  <data name="FailedToExecuteCLI" xml:space="preserve">
-    <value>无法执行 CLI</value>
   </data>
   <data name="StartingReportGeneration" xml:space="preserve">
     <value>开始生成报告...</value>
@@ -566,7 +481,7 @@
     <value>报告生成失败</value>
   </data>
   <data name="ErrorInBackgroundTask" xml:space="preserve">
-    <value>后台任务出错</value>
+    <value>后台任务出错: {0}</value>
   </data>
   <data name="CantStartUpload" xml:space="preserve">
     <value>无法开始上传：设备名称未知</value>
@@ -576,5 +491,44 @@
   </data>
   <data name="UploadFailed" xml:space="preserve">
     <value>上传过程失败</value>
+  </data>
+  <data name="ErrWithArg" xml:space="preserve">
+    <value>错误: {0}</value>
+  </data>
+  <data name="WarningFailedToCleanup" xml:space="preserve">
+    <value>警告：无法清理 {0}。错误：{1}</value>
+  </data>
+  <data name="StartingParallelUploadOf" xml:space="preserve">
+    <value>开始并行上传 {0} 个文件</value>
+  </data>
+  <data name="UploadedSuccessfully" xml:space="preserve">
+    <value>上传成功。上传的文件总数：{0}</value>
+  </data>
+  <data name="CopyOfUploadedArchivesInFolder" xml:space="preserve">
+    <value>文件夹中上传的报告存档的副本：{0}</value>
+  </data>
+  <data name="UploadFinishedWithFail" xml:space="preserve">
+    <value>上传过程因失败而结束。失败的文件总数：{0}</value>
+  </data>
+  <data name="ArchiveFolderNotFound" xml:space="preserve">
+    <value>在 {0} 中找不到存档文件夹</value>
+  </data>
+  <data name="CreatedBatchFor" xml:space="preserve">
+    <value>已为 {0} 创建批次</value>
+  </data>
+  <data name="ReadyToUpload" xml:space="preserve">
+    <value>准备上传：{0}</value>
+  </data>
+  <data name="StartingUploadOf" xml:space="preserve">
+    <value>开始上传{0}</value>
+  </data>
+  <data name="UploadSuccessfulFor" xml:space="preserve">
+    <value>成功上传 {0}</value>
+  </data>
+  <data name="CLI_ErrorFor" xml:space="preserve">
+    <value>文件的 CLI 上传错误：{0}。退出代码：{1}。错误：{2}</value>
+  </data>
+  <data name="FailedToExecuteCLI" xml:space="preserve">
+    <value>无法为 {0} 执行 CLI。错误：{1}</value>
   </data>
 </root>

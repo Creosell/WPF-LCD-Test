@@ -19,7 +19,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public void Setup()
         {
             _mockMessageBox = new Mock<IMessageBox>();
-            _dialogService = new DialogService(_mockMessageBox.Object); // Передаем мок через конструктор
+            _dialogService = new DialogService(_mockMessageBox.Object);
         }
 
         [Test]
