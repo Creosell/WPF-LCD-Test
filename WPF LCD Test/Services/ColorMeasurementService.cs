@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
 using WPF_LCD_Test.Wrappers;

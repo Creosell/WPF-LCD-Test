@@ -501,4 +501,31 @@
   <data name="FailedToExecuteCLI" xml:space="preserve">
     <value>Failed to execute CLI for</value>
   </data>
+  <data name="StartingReportGeneration" xml:space="preserve">
+    <value>Starting report generation...</value>
+  </data>
+  <data name="ReportGeneratedSuccessfully" xml:space="preserve">
+    <value>Report generated successfully</value>
+  </data>
+  <data name="NoDataFoundForReportGenerator" xml:space="preserve">
+    <value>No data found for report generation</value>
+  </data>
+  <data name="InvalidReportConfiguration" xml:space="preserve">
+    <value>Invalid report configuration</value>
+  </data>
+  <data name="ReportGenerationFailed" xml:space="preserve">
+    <value>Report generation failed</value>
+  </data>
+  <data name="ErrorInBackgroundTask" xml:space="preserve">
+    <value>Error in background task</value>
+  </data>
+  <data name="CantStartUpload" xml:space="preserve">
+    <value>Cannot start upload: Device name is unknown</value>
+  </data>
+  <data name="StartingReportUploading" xml:space="preserve">
+    <value>Starting reports upload...</value>
+  </data>
+  <data name="UploadFailed" xml:space="preserve">
+    <value>Upload process failed</value>
+  </data>
 </root>

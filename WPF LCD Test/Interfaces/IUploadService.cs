@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace WPF_LCD_Test.Interfaces
+﻿namespace WPF_LCD_Test.Interfaces
 {
     public interface IUploadService
     {

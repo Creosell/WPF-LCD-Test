@@ -44,7 +44,7 @@ namespace WPF_LCD_Test.Services
                 StatusMessage?.Invoke(this, $"{ErrUnexpected}:  null!");
                 return $"!{key}!";
             }
-            
+
             string result = ResourceManager.GetString(key, _applicationCulture);
             if (result == null)
             {

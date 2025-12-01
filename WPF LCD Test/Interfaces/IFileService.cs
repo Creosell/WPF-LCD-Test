@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using WPF_LCD_Test.Models;
+﻿using WPF_LCD_Test.Models;
 
 namespace WPF_LCD_Test.Interfaces
 {

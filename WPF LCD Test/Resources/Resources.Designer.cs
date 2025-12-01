@@ -187,6 +187,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot start upload: Device name is unknown.
+        /// </summary>
+        public static string CantStartUpload {
+            get {
+                return ResourceManager.GetString("CantStartUpload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 5. Center.
         /// </summary>
         public static string CenterPoint {
@@ -520,6 +529,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error in background task.
+        /// </summary>
+        public static string ErrorInBackgroundTask {
+            get {
+                return ResourceManager.GetString("ErrorInBackgroundTask", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error releasing connection.
         /// </summary>
         public static string ErrReleaseConnectionCA {
@@ -624,6 +642,15 @@ namespace WPF_LCD_Test.Resources {
         public static string IncorrectMeasTimeFormat {
             get {
                 return ResourceManager.GetString("IncorrectMeasTimeFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid report configuration.
+        /// </summary>
+        public static string InvalidReportConfiguration {
+            get {
+                return ResourceManager.GetString("InvalidReportConfiguration", resourceCulture);
             }
         }
         
@@ -790,6 +817,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No data found for report generation.
+        /// </summary>
+        public static string NoDataFoundForReportGenerator {
+            get {
+                return ResourceManager.GetString("NoDataFoundForReportGenerator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No reports found for upload..
         /// </summary>
         public static string NoReportsFoundForUpload {
@@ -840,6 +876,24 @@ namespace WPF_LCD_Test.Resources {
         public static string RedPoint {
             get {
                 return ResourceManager.GetString("RedPoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report generated successfully.
+        /// </summary>
+        public static string ReportGeneratedSuccessfully {
+            get {
+                return ResourceManager.GetString("ReportGeneratedSuccessfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Report generation failed.
+        /// </summary>
+        public static string ReportGenerationFailed {
+            get {
+                return ResourceManager.GetString("ReportGenerationFailed", resourceCulture);
             }
         }
         
@@ -1024,6 +1078,24 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Starting report generation....
+        /// </summary>
+        public static string StartingReportGeneration {
+            get {
+                return ResourceManager.GetString("StartingReportGeneration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting reports upload....
+        /// </summary>
+        public static string StartingReportUploading {
+            get {
+                return ResourceManager.GetString("StartingReportUploading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Starting upload of.
         /// </summary>
         public static string StartingUploadOf {
@@ -1092,6 +1164,15 @@ namespace WPF_LCD_Test.Resources {
         public static string UploadedSuccessfully {
             get {
                 return ResourceManager.GetString("UploadedSuccessfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upload process failed.
+        /// </summary>
+        public static string UploadFailed {
+            get {
+                return ResourceManager.GetString("UploadFailed", resourceCulture);
             }
         }
         

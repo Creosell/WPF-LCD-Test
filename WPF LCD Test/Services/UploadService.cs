@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
 using WPF_LCD_Test.Wrappers;
@@ -43,6 +40,7 @@ namespace WPF_LCD_Test.Services
         // --- UPDATED METHOD: Manages parallel upload and deletion ---
         public async Task<bool> UploadReportsAsync()
         {
+            CheckCurrentAppLanguage();
             var uploadItems = ScanLocalFolders();
 
             if (!uploadItems.Any())
@@ -144,6 +142,7 @@ namespace WPF_LCD_Test.Services
         // Collects all files (ZIP, HTML, PDF) related to a single timestamp/device into batches.
         private List<UploadReportItem> ScanLocalFolders()
         {
+            CheckCurrentAppLanguage();
             var baseDir = AppDomain.CurrentDomain.BaseDirectory;
             var archivePath = _path.Combine(baseDir, ArchiveFolderName);
             var resultsPath = _path.Combine(baseDir, ResultsFolderName);
@@ -239,13 +238,14 @@ namespace WPF_LCD_Test.Services
             {
                 StatusMessage?.Invoke(this, $"{ReadyToUpload} {reports.Count} {Batches}, {Containing} {reports.Sum(b => b.LocalFilesToUpload.Count)} {Files}.");
             }
-            
+
             return reports;
         }
 
         // --- НОВЫЙ МЕТОД: Создает и запускает Task для выгрузки одного файла ---
         private async Task<bool> ExecuteSingleFileUploadAsync(string localPathArg, string remoteDir)
         {
+            CheckCurrentAppLanguage();
             var fileName = _path.GetFileName(localPathArg);
 
             // Remote path is the directory + filename
@@ -294,7 +294,14 @@ namespace WPF_LCD_Test.Services
                 return false;
             }
         }
+        // Helper method to ensure the correct culture for resource strings on background threads.
+        private static void CheckCurrentAppLanguage()
+            {
+            var culture = LocalizationService.Instance.CurrentCulture;
 
+            Thread.CurrentThread.CurrentCulture = culture;
+            Thread.CurrentThread.CurrentUICulture = culture;
+            }
 
-    }
+        }
 }

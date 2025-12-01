@@ -355,7 +355,7 @@
                     Margin="5"
                     HorizontalAlignment="Left"
                     MaterialDesign:ButtonAssist.CornerRadius="15"
-                    Command="{Binding DataContext.LaunchExternalProgramCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    Command="{Binding DataContext.ReportGenerateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                     CommandParameter="ReportGenerator.exe"
                     Content="{DynamicResource ReportButton}" />
                 <Button

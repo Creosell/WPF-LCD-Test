@@ -1,8 +1,6 @@
 ﻿// In Services/MeasurementStatusService.cs
 
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using WPF_LCD_Test.Models;
 
 namespace WPF_LCD_Test.Services

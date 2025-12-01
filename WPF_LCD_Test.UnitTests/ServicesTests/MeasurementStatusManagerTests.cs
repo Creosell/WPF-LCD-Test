@@ -1,9 +1,7 @@
 ﻿// WPF_LCD_Test.UnitTests/ServicesTests/MeasurementStatusServiceTests.cs
 
-using System.Linq;
 using WPF_LCD_Test.Models;
 using WPF_LCD_Test.Services;
-using NUnit.Framework;
 
 namespace WPF_LCD_Test.UnitTests.ServicesTests
 {

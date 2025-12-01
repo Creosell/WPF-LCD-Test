@@ -7,10 +7,6 @@ using WPF_LCD_Test.Models;
 using WPF_LCD_Test.Services;
 using WPF_LCD_Test.ViewModels;
 using WPF_LCD_Test.Views;
-using System.ComponentModel;
-using System.Globalization;
-using System.Threading;
-using System.Linq;
 
 namespace WPF_LCD_Test
 {

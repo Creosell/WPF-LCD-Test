@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace WPF_LCD_Test.Models
+﻿namespace WPF_LCD_Test.Models
 {
     // Model representing a single logical upload batch destined for a unique remote folder.
     public class UploadReportItem

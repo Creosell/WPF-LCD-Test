@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using WPF_LCD_Test.Converters;
 using static WPF_LCD_Test.Resources.Resources;
 

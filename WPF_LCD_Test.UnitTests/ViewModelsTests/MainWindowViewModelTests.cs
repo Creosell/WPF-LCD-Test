@@ -13,7 +13,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         private Mock<IDialogService> _mockDialogService;
         private Mock<ILocalizationService> _mockLocalizationService;
         private Mock<ISettingsService> _mockSettingsService;
-        private Mock<IDispatcher> _mockDispatcher; // Если используется в вашем коде
+        private Mock<IDispatcher> _mockDispatcher;
+        private Mock<IUploadService> _mockUploadService;
 
         private MainWindowViewModel _viewModel;
 
@@ -27,6 +28,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             _mockLocalizationService = new Mock<ILocalizationService>();
             _mockSettingsService = new Mock<ISettingsService>();
             _mockDispatcher = new Mock<IDispatcher>();
+            _mockUploadService = new Mock<IUploadService>();
 
             // Инициализация ViewModel с моками
             _viewModel = new MainWindowViewModel(
@@ -35,7 +37,9 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                 _mockDialogService.Object,
                 _mockLocalizationService.Object,
                 _mockSettingsService.Object,
+                _mockUploadService.Object,
                 _mockDispatcher.Object
+
             );
         }
 
@@ -67,6 +71,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                 _mockDialogService.Object,
                 _mockLocalizationService.Object,
                 _mockSettingsService.Object,
+                _mockUploadService.Object,
                 _mockDispatcher.Object
             ), "Should throw for colorMeasurementService");
 
@@ -76,6 +81,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                 _mockDialogService.Object,
                 _mockLocalizationService.Object,
                 _mockSettingsService.Object,
+                _mockUploadService.Object,
                 _mockDispatcher.Object
             ), "Should throw for fileService");
 
@@ -85,6 +91,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                 null,
                 _mockLocalizationService.Object,
                 _mockSettingsService.Object,
+                _mockUploadService.Object,
                 _mockDispatcher.Object
             ), "Should throw for dialogService");
 
@@ -94,6 +101,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                 _mockDialogService.Object,
                 null,
                 _mockSettingsService.Object,
+                _mockUploadService.Object,
                 _mockDispatcher.Object
             ), "Should throw for localizationService");
 
@@ -103,8 +111,19 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                 _mockDialogService.Object,
                 _mockLocalizationService.Object,
                 null,
+                _mockUploadService.Object,
                 _mockDispatcher.Object
             ), "Should throw for settingsService");
+
+            Assert.Throws<ArgumentNullException>(() => new MainWindowViewModel(
+    _mockColorMeasurementService.Object,
+    _mockFileService.Object,
+    _mockDialogService.Object,
+    _mockLocalizationService.Object,
+    _mockSettingsService.Object,
+    null,
+                    _mockDispatcher.Object
+), "Should throw for uploadService");
 
             Assert.Throws<ArgumentNullException>(() => new MainWindowViewModel(
                 _mockColorMeasurementService.Object,
@@ -112,6 +131,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                 _mockDialogService.Object,
                 _mockLocalizationService.Object,
                 _mockSettingsService.Object,
+                                _mockUploadService.Object,
                 null
             ), "Should throw for dispatcher");
         }

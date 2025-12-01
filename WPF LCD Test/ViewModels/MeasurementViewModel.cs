@@ -1,11 +1,9 @@
 ﻿using MvvmHelpers;
-using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using WPF_LCD_Test.Commands;
 using WPF_LCD_Test.Interfaces;
@@ -35,6 +33,8 @@ namespace WPF_LCD_Test.ViewModels
         public bool _isDeviceConnecting;
         public bool _isDeviceCalibrating;
         private bool _isTvCheckboxChecked;
+        private bool _isReportGenerating;
+        private bool _isUploadingReports;
         public event EventHandler RequestClearInputFocus;
         private const string SerialNumberPattern = "^[a-zA-Z0-9]*$";
         private string _logText = string.Empty;
@@ -119,6 +119,30 @@ namespace WPF_LCD_Test.ViewModels
             }
         }
 
+        public bool IsReportGenerating
+        {
+            get => _isReportGenerating;
+            set
+            {
+                if (SetProperty(ref _isReportGenerating, value))
+                {
+                    UpdateCommandsCanExecute();
+                }
+            }
+        }
+
+        public bool IsUploadingReports
+        {
+            get => _isUploadingReports;
+            set
+            {
+                if (SetProperty(ref _isUploadingReports, value))
+                {
+                    UpdateCommandsCanExecute();
+                }
+            }
+        }
+
         public int MeasurementTime
         {
             get => _measurementTime;
@@ -184,7 +208,7 @@ namespace WPF_LCD_Test.ViewModels
         public ICommand ApplySerialNumberCommand { get; }
         public ICommand ApplyMeasurementTimeCommand { get; }
         public ICommand NewDeviceUnderTestCommand { get; }
-        public ICommand LaunchExternalProgramCommand { get; }
+        public ICommand ReportGenerateCommand { get; }
         public ICommand UploadReportsCommand { get; }
 
         public MeasurementViewModel(
@@ -208,11 +232,11 @@ namespace WPF_LCD_Test.ViewModels
             ClearLogCommand = new RelayCommand(ExecuteClearLog);
             SwitchLanguageCommand = new RelayCommand(ExecuteSwitchLanguage, CanExecuteSwitchLanguage);
             NewDeviceUnderTestCommand = new RelayCommand(ExecuteNewDeviceUnderTest, CanExecuteNewDeviceUnderTest);
-            LaunchExternalProgramCommand = new RelayCommand(ExecuteLaunchExternalProgramCommand);
+            ReportGenerateCommand = new RelayCommand(ExecuteReportGenerateCommand, CanExecuteReportGenerateCommand);
             MeasureCommand = new RelayCommand(ExecuteMeasureAsync, CanExecuteMeasure);
             ApplySerialNumberCommand = new RelayCommand(ExecuteApplySerialNumber, CanExecuteApplySerialNumber);
             ApplyMeasurementTimeCommand = new RelayCommand(ExecuteApplyMeasurementTime, CanExecuteApplyMeasurementTime);
-            UploadReportsCommand = new RelayCommand(ExecuteUploadReportsAsync);
+            UploadReportsCommand = new RelayCommand(ExecuteUploadReportsAsync, CanExecuteUploadReportsAsync);
 
             _colorMeasurementService.StatusMessage += ColorMeasurementService_StatusMessage;
             _fileService.StatusMessage += FileService_StatusMessage;
@@ -666,7 +690,7 @@ namespace WPF_LCD_Test.ViewModels
 
         public void ExecuteClearLog() => LogText = string.Empty;
 
-        private void ExecuteLaunchExternalProgramCommand(object parameter)
+        private void ExecuteReportGenerateCommand(object parameter)
         {
             try
             {
@@ -679,7 +703,8 @@ namespace WPF_LCD_Test.ViewModels
                     return;
                 }
 
-                AddLogMessage("Starting report generation...");
+                AddLogMessage($"{StartingReportGeneration}");
+                IsReportGenerating = true; // Блокируем кнопку
 
                 var process = new Process
                 {
@@ -696,7 +721,6 @@ namespace WPF_LCD_Test.ViewModels
 
                 var errorOutput = new System.Text.StringBuilder();
 
-                // Capture stderr to show details only if something goes wrong
                 process.ErrorDataReceived += (s, e) =>
                 {
                     if (!string.IsNullOrEmpty(e.Data)) errorOutput.AppendLine(e.Data);
@@ -704,71 +728,89 @@ namespace WPF_LCD_Test.ViewModels
 
                 process.Start();
 
-                // Drain streams to prevent deadlocks
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
 
-                // Wait for exit asynchronously
                 Task.Run(() =>
                 {
-                    process.WaitForExit();
-                    var exitCode = (ReportExitCode)process.ExitCode;
-                    process.Dispose();
-
-                    string message;
-                    bool isError = false;
-
-                    switch (exitCode)
+                    try
                     {
-                        case ReportExitCode.Success:
-                            message = "Report generated successfully.";
-                            break;
-                        case ReportExitCode.NoDataFound:
-                            message = "Warning: No data found for report generation.";
-                            isError = true;
-                            break;
-                        case ReportExitCode.ConfigError:
-                            message = "Error: Invalid report configuration.";
-                            isError = true;
-                            break;
-                        case ReportExitCode.GeneralError:
-                        default:
-                            message = $"Report generation failed (Code: {(int)exitCode}).";
-                            isError = true;
-                            break;
-                    }
+                        process.WaitForExit();
+                        var exitCode = (ReportExitCode)process.ExitCode;
+                        process.Dispose();
 
-                    AddLogMessage($"{message}");
+                        string message;
+                        bool isError = false;
+
+                        switch (exitCode)
+                        {
+                            case ReportExitCode.Success:
+                                message = $"{ReportGeneratedSuccessfully}";
+                                break;
+                            case ReportExitCode.NoDataFound:
+                                message = $"{Warning}: {NoDataFoundForReportGenerator}";
+                                isError = true;
+                                break;
+                            case ReportExitCode.ConfigError:
+                                message = $"{Err}: {InvalidReportConfiguration}";
+                                isError = true;
+                                break;
+                            case ReportExitCode.GeneralError:
+                            default:
+                                message = $"{ReportGenerationFailed} ({Code}: {(int)exitCode}).";
+                                isError = true;
+                                break;
+                        }
+
+                        AddLogMessage($"{message}");
+                    }
+                    catch (Exception ex)
+                    {
+                        AddLogMessage($"{ErrorInBackgroundTask}: {ex.Message}");
+                    }
+                    finally
+                    {
+                        ExecuteThreadInUI(() => IsReportGenerating = false);
+                    }
                 });
             }
             catch (Exception ex)
             {
                 AddLogMessage($"{RunExternalAppUnexpectedErr}: {ex.Message}");
+                IsReportGenerating = false;
             }
         }
 
         private async Task ExecuteUploadReportsAsync(object parameter)
         {
-
             // 1. Get currentDeviceName
             string currentDeviceName = _choosedDeviceConfiguration;
 
             if (string.IsNullOrEmpty(currentDeviceName))
             {
-                _dialogService.ShowMessage($"Cannot start upload: Device name is unknown.", "Error");
+                _dialogService.ShowMessage($"{CantStartUpload}", $"{Err}");
                 return;
             }
 
             // 2. Call upload service
-            AddLogMessage($"Starting reports upload...");
+            AddLogMessage($"{StartingReportUploading}");
+            IsUploadingReports = true;
 
-            // UploadService returns true/false and sends detailed status via event
-            bool success = await _uploadService.UploadReportsAsync();
-
-            if (!success)
+            try
             {
-                AddLogMessage($"Upload process failed. Check log for details.");
+                // UploadService returns true/false and sends detailed status via event
+                bool success = await _uploadService.UploadReportsAsync();
+
+                if (!success)
+                {
+                    AddLogMessage($"{UploadFailed}");
+                }
             }
+            finally
+            {
+                IsUploadingReports = false;
+            }
+
         }
 
         private bool CanExecuteConnect() => !IsDeviceConnected && !_isDeviceCalibrating && !_isDeviceConnecting;
@@ -781,6 +823,8 @@ namespace WPF_LCD_Test.ViewModels
         private bool CanExecuteMeasure(object parameter) => IsDeviceConnected && !_isDeviceCalibrating && !_isDeviceConnecting && IsDeviceCalibrated && !string.IsNullOrWhiteSpace(SerialNumber) && MeasurementTime > 0;
         private bool CanExecuteApplySerialNumber(object parameter) => !string.IsNullOrWhiteSpace(parameter as string);
         private bool CanExecuteApplyMeasurementTime(object parameter) => MeasurementTime > 0;
+        private bool CanExecuteReportGenerateCommand(object parameter) => !IsReportGenerating;
+        private bool CanExecuteUploadReportsAsync(object parameter) => !IsUploadingReports;
 
         public void AddLogMessage(string message)
         {
@@ -805,6 +849,8 @@ namespace WPF_LCD_Test.ViewModels
             ((RelayCommand)ApplySerialNumberCommand)?.RaiseCanExecuteChanged();
             ((RelayCommand)ApplyMeasurementTimeCommand)?.RaiseCanExecuteChanged();
             ((RelayCommand)NewDeviceUnderTestCommand)?.RaiseCanExecuteChanged();
+            ((RelayCommand)ReportGenerateCommand)?.RaiseCanExecuteChanged();
+            ((RelayCommand)UploadReportsCommand)?.RaiseCanExecuteChanged();
         }
 
         private void UpdateMeasurementStatus(string location, bool? isPassed, string measuredValuesString)

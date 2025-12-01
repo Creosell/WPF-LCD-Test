@@ -502,4 +502,79 @@
   <data name="FailedToExecuteCLI" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
+  <data name="NoReportsFoundForUpload" xml:space="preserve">
+    <value>未找到可供上传的报告。</value>
+  </data>
+  <data name="WarningFailedToCleanup" xml:space="preserve">
+    <value>警告：清理失败</value>
+  </data>
+  <data name="StartingParallelUploadOf" xml:space="preserve">
+    <value>开始并行上传</value>
+  </data>
+  <data name="UploadedSuccessfully" xml:space="preserve">
+    <value>上传成功。上传的文件总数</value>
+  </data>
+  <data name="CopyOfUploadedArchivesInFolder" xml:space="preserve">
+    <value>文件夹中上传的报告档案的副本</value>
+  </data>
+  <data name="UploadFinishedWithFail" xml:space="preserve">
+    <value>上传过程因失败而结束。失败的文件总数</value>
+  </data>
+  <data name="ArchiveFolderNotFound" xml:space="preserve">
+    <value>找不到存档文件夹</value>
+  </data>
+  <data name="CreatedBatchFor" xml:space="preserve">
+    <value>已创建批次</value>
+  </data>
+  <data name="ReadyToUpload" xml:space="preserve">
+    <value>准备上传</value>
+  </data>
+  <data name="Batches" xml:space="preserve">
+    <value>批次</value>
+  </data>
+  <data name="Containing" xml:space="preserve">
+    <value>含有</value>
+  </data>
+  <data name="StartingUploadOf" xml:space="preserve">
+    <value>开始上传</value>
+  </data>
+  <data name="UploadSuccessfulFor" xml:space="preserve">
+    <value>上传成功</value>
+  </data>
+  <data name="CLI_ErrorFor" xml:space="preserve">
+    <value>CLI 错误为</value>
+  </data>
+  <data name="Code" xml:space="preserve">
+    <value>代码</value>
+  </data>
+  <data name="FailedToExecuteCLI" xml:space="preserve">
+    <value>无法执行 CLI</value>
+  </data>
+  <data name="StartingReportGeneration" xml:space="preserve">
+    <value>开始生成报告...</value>
+  </data>
+  <data name="ReportGeneratedSuccessfully" xml:space="preserve">
+    <value>报告生成成功</value>
+  </data>
+  <data name="NoDataFoundForReportGenerator" xml:space="preserve">
+    <value>未找到用于生成报告的数据</value>
+  </data>
+  <data name="InvalidReportConfiguration" xml:space="preserve">
+    <value>报告配置无效</value>
+  </data>
+  <data name="ReportGenerationFailed" xml:space="preserve">
+    <value>报告生成失败</value>
+  </data>
+  <data name="ErrorInBackgroundTask" xml:space="preserve">
+    <value>后台任务出错</value>
+  </data>
+  <data name="CantStartUpload" xml:space="preserve">
+    <value>无法开始上传：设备名称未知</value>
+  </data>
+  <data name="StartingReportUploading" xml:space="preserve">
+    <value>开始上传报告...</value>
+  </data>
+  <data name="UploadFailed" xml:space="preserve">
+    <value>上传过程失败</value>
+  </data>
 </root>

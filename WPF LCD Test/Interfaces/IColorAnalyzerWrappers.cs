@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace WPF_LCD_Test.Interfaces
+﻿namespace WPF_LCD_Test.Interfaces
 {
     public interface IColorAnalyzer200 : IDisposable
     {

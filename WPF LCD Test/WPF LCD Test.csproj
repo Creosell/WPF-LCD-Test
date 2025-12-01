@@ -83,13 +83,4 @@
     <Folder Include="data\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Upload_scripts\create_manifest.py">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Upload_scripts\upload.py">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>

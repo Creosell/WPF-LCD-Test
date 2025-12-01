@@ -18,7 +18,9 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         private Mock<IDialogService> _mockDialogService;
         private Mock<ILocalizationService> _mockLocalizationService;
         private Mock<IDispatcher> _mockDispatcher;
+        private Mock<IUploadService> _mockUploadService;
         private MeasurementViewModel _viewModel;
+
 
         [SetUp]
         public void Setup()
@@ -28,6 +30,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             _mockDialogService = new Mock<IDialogService>();
             _mockLocalizationService = new Mock<ILocalizationService>();
             _mockDispatcher = new Mock<IDispatcher>();
+            _mockUploadService = new Mock<IUploadService>();
 
             // --- КЛЮЧЕВОЕ ИЗМЕНЕНИЕ ЗДЕСЬ: Добавляем IDisposable к мокам СРАЗУ ПОСЛЕ ИХ СОЗДАНИЯ ---
             // Делаем это, если интерфейсы IColorMeasurementService, IFileService, IDialogService
@@ -56,7 +59,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                 _mockFileService.Object,
                 _mockDialogService.Object,
                 _mockLocalizationService.Object,
-                _mockDispatcher.Object
+                _mockDispatcher.Object,
+                _mockUploadService.Object
             );
 
             // Настройка LocalizationService:
@@ -125,7 +129,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                 _mockFileService.Object,
                 _mockDialogService.Object,
                 _mockLocalizationService.Object,
-                _mockDispatcher.Object
+                _mockDispatcher.Object,
+                _mockUploadService.Object
             );
         }
 
@@ -869,80 +874,70 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             Assert.That(_viewModel.IsSerialNumberConfirmed, Is.False); // SN не подтвержден
         }
 
-        // --- Тесты для LaunchExternalProgramCommand ---
         [Test]
-        public void LaunchExternalProgramCommand_Execute_LaunchesProgram()
-        {
+        public void ReportGenerateCommand_ExecutableNotFound_LogsErrorAndDoesNotStartGeneration()
+            {
             // Arrange
-            string programPath = "notepad.exe";
-            // Теперь мокируем новый метод RunExternalProgram в IFileService
-            _mockFileService.Setup(f => f.RunExternalProgram(It.IsAny<string>())).Returns(true);
+            // Убедимся, что IsReportGenerating изначально false
+            _viewModel.IsReportGenerating = false;
+
+            // Очищаем лог перед тестом, чтобы проверить новое сообщение
+            _viewModel.LogText = string.Empty;
+
+            // Формируем ожидаемый путь, который ищет ViewModel
+            var appDir = AppDomain.CurrentDomain.BaseDirectory;
+            var expectedExePath = Path.Combine(appDir, "ReportGenerator.exe");
+
+            // Убедимся, что файла действительно нет (чтобы тест был честным)
+            if (File.Exists(expectedExePath))
+                {
+                File.Delete(expectedExePath);
+                }
 
             // Act
-            _viewModel.LaunchExternalProgramCommand.Execute(programPath);
+            // Вызываем команду, которая внутри дергает ExecuteReportGenerateCommand
+            if (_viewModel.ReportGenerateCommand.CanExecute(null))
+                {
+                _viewModel.ReportGenerateCommand.Execute(null);
+                }
 
             // Assert
-            // Теперь проверяем, что ViewModel вызвал RunExternalProgram у IFileService
-            _mockFileService.Verify(f => f.RunExternalProgram(It.Is<string>(p => p.Contains(programPath))), Times.Once);
-            // Проверяем, что в логе было сообщение об успехе, если ViewModel его добавляет
-            // Assert.That(_viewModel.LogText.Contains($"Launched program: {programPath}"), Is.True);
-        }
+            // 1. Проверяем, что флаг генерации не "залип" в true (так как файл не найден, он должен сразу выйти)
+            Assert.That(_viewModel.IsReportGenerating, Is.False, "IsReportGenerating should be false if executable is missing.");
+
+            // 2. Проверяем, что в лог записалась ошибка
+            // Мы ищем в тексте лога имя файла или часть сообщения об ошибке
+            Assert.That(_viewModel.LogText, Does.Contain("ReportGenerator.exe"), "Log should contain the missing executable name.");
+
+            // Опционально: если вы хотите проверить точный текст ошибки из ресурсов
+            // Assert.That(_viewModel.LogText, Does.Contain(RunExternalAppNotFoundErr)); 
+            }
 
         [Test]
-        public void LaunchExternalProgramCommand_Execute_HandlesProgramNotFound()
-        {
+        public void ReportGenerateCommand_IsActive_WhenNotGenerating()
+            {
             // Arrange
-            // Передаем только имя программы, как теперь ожидает ViewModel
-            string programName = "nonexistent.exe";
-
-            // Мокируем, что RunExternalProgram будет вызван с этим именем и вернет false.
-            // Теперь Moq будет ожидать именно "nonexistent.exe", а не полный путь.
-            _mockFileService.Setup(f => f.RunExternalProgram(programName)).Returns(false);
+            _viewModel.IsReportGenerating = false;
 
             // Act
-            // Передаем название программы
-            _viewModel.LaunchExternalProgramCommand.Execute(programName);
+            var canExecute = _viewModel.ReportGenerateCommand.CanExecute(null);
 
             // Assert
-            // Проверяем, что ViewModel вызвал RunExternalProgram у IFileService с ПРАВИЛЬНЫМ НАЗВАНИЕМ ПРОГРАММЫ.
-            _mockFileService.Verify(f => f.RunExternalProgram(programName), Times.Once);
-
-            // Проверяем, что DialogService показал сообщение об ошибке.
-            // Используем мок ILocalizationService для получения ожидаемых строк.
-            // (Как мы выяснили ранее, если ресурсы возвращают локализованные строки, то Verify должен ожидать их).
-            _mockDialogService.Verify(d => d.ShowMessage(
-                It.Is<string>(msg => msg == _mockLocalizationService.Object.GetString(RunExternalAppNotFoundErr)),
-                It.Is<string>(title => title == _mockLocalizationService.Object.GetString(Err))
-            ), Times.Once);
-
-            // Проверяем, что в лог было добавлено сообщение об ошибке.
-            // Если вы добавили имя программы в лог, то ожидаем его здесь:
-            Assert.That(_viewModel.LogText.Contains($"{_mockLocalizationService.Object.GetString(RunExternalAppNotFoundErr)}: {programName}"), Is.True);
-            // Если просто сообщение об ошибке без имени программы:
-            // Assert.That(_viewModel.LogText.Contains(_mockLocalizationService.Object.GetString(RunExternalAppNotFoundErr)), Is.True);
-        }
+            Assert.That(canExecute, Is.True);
+            }
 
         [Test]
-        public void LaunchExternalProgramCommand_Execute_HandlesUnexpectedError()
-        {
+        public void ReportGenerateCommand_IsInactive_WhenGenerating()
+            {
             // Arrange
-            string programPath = "some_program.exe";
-            string errorMessage = "Access denied.";
-            // Мокируем, что RunExternalProgram выбросит исключение или вернет false
-            _mockFileService.Setup(f => f.RunExternalProgram(It.IsAny<string>())).Throws(new Exception(errorMessage));
+            _viewModel.IsReportGenerating = true;
 
             // Act
-            _viewModel.LaunchExternalProgramCommand.Execute(programPath);
+            var canExecute = _viewModel.ReportGenerateCommand.CanExecute(null);
 
             // Assert
-            _mockFileService.Verify(f => f.RunExternalProgram(It.Is<string>(p => p.Contains(programPath))), Times.Once);
-            _mockDialogService.Verify(d => d.ShowMessage(
-                It.Is<string>(msg => msg.Contains(RunExternalAppUnexpectedErr) && msg.Contains(errorMessage)),
-                It.Is<string>(title => title == Err)
-            ), Times.Once);
-            Assert.That(_viewModel.LogText.Contains(RunExternalAppUnexpectedErr), Is.True);
-            Assert.That(_viewModel.LogText.Contains(errorMessage), Is.True);
-        }
+            Assert.That(canExecute, Is.False);
+            }
 
         // --- Тесты для Dispose ---
         [Test]
