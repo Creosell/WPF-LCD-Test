@@ -19,7 +19,7 @@ namespace WPF_LCD_Test.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -201,6 +201,15 @@ namespace WPF_LCD_Test.Resources {
         public static string CenterPoint {
             get {
                 return ResourceManager.GetString("CenterPoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The device channel has been successfully changed to {0}.
+        /// </summary>
+        public static string ChannelChanged {
+            get {
+                return ResourceManager.GetString("ChannelChanged", resourceCulture);
             }
         }
         
@@ -471,6 +480,15 @@ namespace WPF_LCD_Test.Resources {
         public static string ErrAtCalibration {
             get {
                 return ResourceManager.GetString("ErrAtCalibration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error while changing CA channel: {0}.
+        /// </summary>
+        public static string ErrAtChangeChannel {
+            get {
+                return ResourceManager.GetString("ErrAtChangeChannel", resourceCulture);
             }
         }
         

@@ -531,4 +531,10 @@
   <data name="ErrWithArg" xml:space="preserve">
     <value>Error: {0}</value>
   </data>
+  <data name="ChannelChanged" xml:space="preserve">
+    <value>The device channel has been successfully changed to {0}</value>
+  </data>
+  <data name="ErrAtChangeChannel" xml:space="preserve">
+    <value>Error while changing CA channel: {0}</value>
+  </data>
 </root>

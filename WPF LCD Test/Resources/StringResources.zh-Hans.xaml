@@ -96,8 +96,8 @@
     </system:String>
 
     <!--  SettingsView keys  -->
-    <system:String x:Key="DevicePortLabel">
-        设备端口：
+    <system:String x:Key="ColorAnalyzerChannel">
+        色彩分析仪通道
     </system:String>
     <system:String x:Key="AutoConnectLabel">
         自动连接：

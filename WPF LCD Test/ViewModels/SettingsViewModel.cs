@@ -5,6 +5,8 @@ using System.Windows.Input;
 using WPF_LCD_Test.Commands;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
+using WPF_LCD_Test.Services;
+using static WPF_LCD_Test.Resources.Resources;
 
 namespace WPF_LCD_Test.ViewModels
 {
@@ -13,12 +15,17 @@ namespace WPF_LCD_Test.ViewModels
     {
         private readonly ISettingsService _settingsService;
         private readonly ILocalizationService _localizationService;
-        private string _devicePort;
-        public string DevicePort
+        private readonly IColorMeasurementService _colorMeasurementService;
+        private readonly IDialogService _dialogService;
+        private string _colorAnalyzerChannel;
+        private const int MinChannel = 0;
+        private const int MaxChannel = 99;
+
+        public string ColorAnalyzerChannel
         {
-            get => _devicePort;
-            set => SetProperty(ref _devicePort, value);
-        }
+            get => _colorAnalyzerChannel;
+            set => SetProperty(ref _colorAnalyzerChannel, value);
+            }
         private bool _autoConnectEnabled;
         public bool AutoConnectEnabled
         {
@@ -72,10 +79,12 @@ namespace WPF_LCD_Test.ViewModels
         public ICommand CancelSettingsCommand { get; }
 
         // Конструктор: инициализация сервисов, команд, языков и загрузка настроек
-        public SettingsViewModel(ISettingsService settingsService, ILocalizationService localizationService) : base()
+        public SettingsViewModel(ISettingsService settingsService, IDialogService dialogService, IColorMeasurementService colorMeasurementService, ILocalizationService localizationService) : base()
         {
             _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+            _colorMeasurementService = colorMeasurementService ?? throw new ArgumentNullException(nameof(colorMeasurementService));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+            _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             PopulateAvailableLanguages();
             SaveSettingsCommand = new RelayCommand(ExecuteSaveSettings, CanExecuteSaveSettings);
             CancelSettingsCommand = new RelayCommand(ExecuteCancelSettings, CanExecuteCancelSettings);
@@ -112,7 +121,7 @@ namespace WPF_LCD_Test.ViewModels
                         SelectedLanguage = AvailableLanguages.First();
                     }
                 }
-                DevicePort = currentSettings.DevicePort;
+                ColorAnalyzerChannel = currentSettings.ColorAnalyzerChannel;
                 AutoConnectEnabled = currentSettings.AutoConnectEnabled;
             }
             catch (Exception ex)
@@ -137,10 +146,13 @@ namespace WPF_LCD_Test.ViewModels
         // Выполняет сохранение текущих настроек
         private void ExecuteSaveSettings(object parameter)
         {
+
+            ExecuteChangeChannel(ColorAnalyzerChannel);
+
             AppSettings settingsToSave = new()
             {
                 LanguageCultureCode = LanguageCultureCode,
-                DevicePort = DevicePort,
+                ColorAnalyzerChannel = ColorAnalyzerChannel,
                 AutoConnectEnabled = AutoConnectEnabled
             };
             SaveSettings(settingsToSave);
@@ -156,6 +168,33 @@ namespace WPF_LCD_Test.ViewModels
             SaveSettings(settingsToSave);
         }
 
+        private int GetChannel(string channel)
+            {
+            if (!int.TryParse(channel, out int result) || result < MinChannel || result > MaxChannel)
+                {
+                _dialogService.ShowMessage(
+                    !int.TryParse(channel, out _)
+                        ? "Invalid channel format"
+                        : $"Available channels: {MinChannel}-{MaxChannel}",
+                    Err);
+
+                return int.TryParse(_settingsService.LoadSettings().ColorAnalyzerChannel, out int fallback)
+                    ? fallback
+                    : MinChannel;
+                }
+
+            return result;
+            }
+
+        private void ExecuteChangeChannel(string channel)
+            {
+
+            int channelInt = GetChannel(channel);
+
+            ColorAnalyzerChannel = channelInt.ToString();
+
+            _colorMeasurementService.CurrentChannel = channelInt;
+            }
         private bool CanExecuteSaveSettings(object parameter) => true;
         private void ExecuteCancelSettings(object parameter) => LoadSettings();
         private bool CanExecuteCancelSettings(object parameter) => true;

@@ -10,6 +10,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
     {
         private Mock<ISettingsService> _mockSettingsService;
         private Mock<ILocalizationService> _mockLocalizationService;
+        private Mock<IColorMeasurementService> _mockColorMeasurementService;
+        private Mock<IDialogService> _mockDialogService;
         private SettingsViewModel _viewModel;
 
         [SetUp]
@@ -17,14 +19,18 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         {
             _mockSettingsService = new Mock<ISettingsService>();
             _mockLocalizationService = new Mock<ILocalizationService>();
+            _mockColorMeasurementService = new Mock<IColorMeasurementService>();
+            _mockDialogService = new Mock<IDialogService>();
             _mockSettingsService.Setup(s => s.LoadSettings()).Returns(new AppSettings
             {
                 LanguageCultureCode = "",
-                DevicePort = "COM1",
+                ColorAnalyzerChannel = "1",
                 AutoConnectEnabled = true
             });
             _viewModel = new SettingsViewModel(
                 _mockSettingsService.Object,
+                _mockDialogService.Object,
+                _mockColorMeasurementService.Object,
                 _mockLocalizationService.Object
             );
         }
@@ -46,21 +52,43 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         {
             var ex1 = Assert.Throws<ArgumentNullException>(() => new SettingsViewModel(
                 null,
+                _mockDialogService.Object,
+                _mockColorMeasurementService.Object,
                 _mockLocalizationService.Object
             ));
             Assert.That(ex1.ParamName, Is.EqualTo("settingsService"));
+            
             var ex2 = Assert.Throws<ArgumentNullException>(() => new SettingsViewModel(
                 _mockSettingsService.Object,
+                null,
+                _mockColorMeasurementService.Object,
+                _mockLocalizationService.Object
+            ));
+            Assert.That(ex2.ParamName, Is.EqualTo("dialogService"));
+
+            var ex3 = Assert.Throws<ArgumentNullException>(() => new SettingsViewModel(
+                _mockSettingsService.Object,
+                _mockDialogService.Object,
+                null,
+                _mockLocalizationService.Object
+            ));
+            Assert.That(ex3.ParamName, Is.EqualTo("colorMeasurementService"));
+
+            var ex4 = Assert.Throws<ArgumentNullException>(() => new SettingsViewModel(
+                _mockSettingsService.Object,
+                _mockDialogService.Object,
+                _mockColorMeasurementService.Object,
                 null
             ));
-            Assert.That(ex2.ParamName, Is.EqualTo("localizationService"));
-        }
+            Assert.That(ex4.ParamName, Is.EqualTo("localizationService"));
+
+            }
 
         [Test]
         public void Ctor_LoadsSettingsOnInitialization()
         {
             _mockSettingsService.Verify(s => s.LoadSettings(), Times.Once());
-            Assert.That(_viewModel.DevicePort, Is.EqualTo("COM1"));
+            Assert.That(_viewModel.ColorAnalyzerChannel, Is.EqualTo("1"));
             Assert.That(_viewModel.AutoConnectEnabled, Is.True);
             Assert.That(_viewModel.LanguageCultureCode, Is.EqualTo(""));
             Assert.That(_viewModel.SelectedLanguage?.CultureCode, Is.EqualTo(""));
@@ -126,13 +154,13 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         [Test]
         public void SaveSettingsCommand_Execute_SavesCurrentSettings()
         {
-            _viewModel.DevicePort = "COM3";
+            _viewModel.ColorAnalyzerChannel = "3";
             _viewModel.AutoConnectEnabled = false;
             var newLang = new SettingsViewModel.LanguageOption { DisplayName = "Chinese", CultureCode = "zh-Hans" };
             _viewModel.SelectedLanguage = newLang;
             _viewModel.SaveSettingsCommand.Execute(null);
             _mockSettingsService.Verify(s => s.SaveSettings(It.Is<AppSettings>(
-                settings => settings.DevicePort == "COM3" &&
+                settings => settings.ColorAnalyzerChannel == "3" &&
                             settings.AutoConnectEnabled == false &&
                             settings.LanguageCultureCode == "zh-Hans"
             )), Times.Once());
@@ -155,18 +183,18 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         [Test]
         public void CancelSettingsCommand_Execute_ReloadsSettings()
         {
-            _viewModel.DevicePort = "COM_CHANGED";
+            _viewModel.ColorAnalyzerChannel = "COM_CHANGED";
             _viewModel.AutoConnectEnabled = false;
             _viewModel.SelectedLanguage = new SettingsViewModel.LanguageOption { DisplayName = "Chinese", CultureCode = "zh-Hans" };
             _mockSettingsService.Setup(s => s.LoadSettings()).Returns(new AppSettings
             {
                 LanguageCultureCode = "",
-                DevicePort = "COM1",
+                ColorAnalyzerChannel = "1",
                 AutoConnectEnabled = true
             });
             _viewModel.CancelSettingsCommand.Execute(null);
             _mockSettingsService.Verify(s => s.LoadSettings(), Times.Exactly(2));
-            Assert.That(_viewModel.DevicePort, Is.EqualTo("COM1"));
+            Assert.That(_viewModel.ColorAnalyzerChannel, Is.EqualTo("1"));
             Assert.That(_viewModel.AutoConnectEnabled, Is.True);
             Assert.That(_viewModel.LanguageCultureCode, Is.EqualTo(""));
             Assert.That(_viewModel.SelectedLanguage?.CultureCode, Is.EqualTo(""));

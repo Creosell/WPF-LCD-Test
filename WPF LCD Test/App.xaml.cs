@@ -35,6 +35,15 @@ namespace WPF_LCD_Test
             // Устанавливаем язык по умолчанию (это вызовет SetLanguage в сервисе,
             localizationService.SetLanguage(appSettings.LanguageCultureCode);
 
+            try
+                {
+                colorMeasurementService.CurrentChannel = int.Parse(appSettings.ColorAnalyzerChannel);
+                }
+            catch
+            {
+                colorMeasurementService.CurrentChannel = 0; // Значение по умолчанию
+                }
+
             // 2. Создаем экземпляр ГЛАВНОГО ViewModel приложения (оболочки)
             MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(
                 colorMeasurementService,

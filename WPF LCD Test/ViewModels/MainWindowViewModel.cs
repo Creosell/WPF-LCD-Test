@@ -84,7 +84,7 @@ namespace WPF_LCD_Test.ViewModels
                     targetViewModel = _measurementViewModel;
                     break;
                 case "Settings":
-                    _settingsViewModel ??= new SettingsViewModel(_settingService, _localizationService);
+                    _settingsViewModel ??= new SettingsViewModel(_settingService, _dialogService, _colorMeasurementService, _localizationService);
                     targetViewModel = _settingsViewModel;
                     break;
                 default:

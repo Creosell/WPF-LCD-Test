@@ -531,4 +531,10 @@
   <data name="FailedToExecuteCLI" xml:space="preserve">
     <value>无法为 {0} 执行 CLI。错误：{1}</value>
   </data>
+  <data name="ChannelChanged" xml:space="preserve">
+    <value>设备通道已成功更改为 {0}</value>
+  </data>
+  <data name="ErrAtChangeChannel" xml:space="preserve">
+    <value>更改CA通道时出错：{0}</value>
+  </data>
 </root>

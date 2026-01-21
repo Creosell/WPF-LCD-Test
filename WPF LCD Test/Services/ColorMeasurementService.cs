@@ -1,4 +1,12 @@
-﻿using System.Runtime.InteropServices;
+﻿using MvvmHelpers;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
+using System.Windows.Input;
+using System.Runtime.InteropServices;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
 using WPF_LCD_Test.Wrappers;
@@ -11,8 +19,10 @@ namespace WPF_LCD_Test.Services
     {
         private IColorAnalyzer200? _objCa200;
         private IColorAnalyzer? _objCa = null; // Analyzer object (e.g., SingleCa property from CA-200).
+        private IColorAnalyzerMemory? _objMemory = null; // Memory object (e.g., Memory property from CA-200).
         private bool _isDeviceConnected = false;
         private bool _isDeviceCalibrated = false;
+        private int _channel = 0;
 
         // Color analyzer constants (Remote modes)
         private const int RemoteModeOFF = 0;
@@ -53,6 +63,15 @@ namespace WPF_LCD_Test.Services
         public bool IsDeviceConnected => _isDeviceConnected;
         public bool IsDeviceCalibrated => _isDeviceCalibrated;
 
+        public int CurrentChannel
+            {
+            get => _channel;
+            set
+                {
+                ChangeChannel(value);
+                }
+            }
+
         public ColorMeasurementService()
         {
         }
@@ -83,6 +102,7 @@ namespace WPF_LCD_Test.Services
 
                         _objCa200.AutoConnect();
                         _objCa = _objCa200.SingleCa;
+                        _objMemory = _objCa.Memory;
 
                         _isDeviceConnected = true;
                         ConnectionStatusChanged?.Invoke(this, _isDeviceConnected);
@@ -112,22 +132,29 @@ namespace WPF_LCD_Test.Services
         public async Task<bool> CalibrateZeroAsync()
         {
             var success = false;
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
                 CheckCurrentAppLanguage();
                 try
                 {
                     StatusMessage?.Invoke(this, CalibratingZeroCA);
-                    if (_objCa200 != null)
+                    if (_objCa != null)
                     {
-                        _objCa200.SingleCa.CalZero();
+                        _objCa.CalZero();
 
                         // Configure the device settings after calibration.
-                        _objCa200.SingleCa.SyncMode = UniverslaSyncMode;
-                        _objCa200.SingleCa.AveragingMode = AutoMeasuringMode;
-                        _objCa200.SingleCa.SetAnalogRange(Convert.ToSingle(DefaultDisplayRange), Convert.ToSingle(DefaultDisplayRange));
-                        _objCa200.SingleCa.DisplayMode = LvxyDisplayMode;
-                    }
+                        _objCa.SyncMode = UniverslaSyncMode;
+                        _objCa.AveragingMode = AutoMeasuringMode;
+                        _objCa.SetAnalogRange(Convert.ToSingle(DefaultDisplayRange), Convert.ToSingle(DefaultDisplayRange));
+                        _objCa.DisplayMode = LvxyDisplayMode;
+
+                        if (_objMemory != null)
+                            {
+                            _objMemory.ChannelNO = CurrentChannel;
+                            }
+                        }
+
+                    
                     _isDeviceCalibrated = true;
                     CalibrationStatusChanged?.Invoke(this, _isDeviceCalibrated);
                     StatusMessage?.Invoke(this, ZeroCalibratedCA);
@@ -148,6 +175,33 @@ namespace WPF_LCD_Test.Services
             });
             return success;
         }
+
+        private void ChangeChannel(int channel)
+            {
+            CheckCurrentAppLanguage();
+            try
+                {
+                if (!_isDeviceConnected)
+                    {
+                    _channel = channel;
+                    return;
+                    }
+                if (_objMemory != null)
+                    {
+                    _objMemory.ChannelNO = channel;
+                    }
+                StatusMessage?.Invoke(this, string.Format(ChannelChanged, channel));
+                }
+            catch (COMException ex)
+                {
+                StatusMessage?.Invoke(this, string.Format(ErrAtChangeChannel, ex.Message));
+                }
+            catch (Exception ex)
+                {
+                StatusMessage?.Invoke(this, string.Format(ErrAtChangeChannel, ex.Message));
+                }
+            }
+
 
         // Asynchronously performs a series of measurements and calculates the average.
         public async Task<Measurement> MeasureAsync(int measurementTime)
