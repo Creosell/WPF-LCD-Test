@@ -1,12 +1,4 @@
-﻿using MvvmHelpers;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
-using System.Windows.Input;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
 using WPF_LCD_Test.Wrappers;
@@ -23,6 +15,7 @@ namespace WPF_LCD_Test.Services
         private bool _isDeviceConnected = false;
         private bool _isDeviceCalibrated = false;
         private int _channel = 0;
+        private string _probeSN = "Unknown";
 
         // Color analyzer constants (Remote modes)
         private const int RemoteModeOFF = 0;
@@ -62,6 +55,18 @@ namespace WPF_LCD_Test.Services
         // Use expression body for simple properties.
         public bool IsDeviceConnected => _isDeviceConnected;
         public bool IsDeviceCalibrated => _isDeviceCalibrated;
+
+        public string ProbeSN
+            {
+            get
+                {
+                if (_objCa != null)
+                    {
+                    _probeSN = _objCa.SingleProbe.SerialNO;
+                    }
+                return _probeSN;
+                }
+            }
 
         public int CurrentChannel
             {
@@ -107,7 +112,7 @@ namespace WPF_LCD_Test.Services
                         _isDeviceConnected = true;
                         ConnectionStatusChanged?.Invoke(this, _isDeviceConnected);
                         StatusMessage?.Invoke(this, ConnectedCA);
-                    }
+                        }
                 }
                 catch (COMException ex)
                 {

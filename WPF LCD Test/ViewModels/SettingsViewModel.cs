@@ -24,7 +24,13 @@ namespace WPF_LCD_Test.ViewModels
         public string ColorAnalyzerChannel
         {
             get => _colorAnalyzerChannel;
-            set => SetProperty(ref _colorAnalyzerChannel, value);
+            set 
+                {
+                if (value.Length<3)
+                    {
+                    SetProperty(ref _colorAnalyzerChannel, value);
+                    }
+                } 
             }
         private bool _autoConnectEnabled;
         public bool AutoConnectEnabled
@@ -95,8 +101,8 @@ namespace WPF_LCD_Test.ViewModels
         // Заполняет коллекцию доступных языков
         private void PopulateAvailableLanguages()
         {
-            AvailableLanguages.Add(new() { DisplayName = Resources.Resources.English, CultureCode = "" });
-            AvailableLanguages.Add(new() { DisplayName = Resources.Resources.Chinese, CultureCode = "zh-Hans" });
+            AvailableLanguages.Add(new() { DisplayName = English, CultureCode = "" });
+            AvailableLanguages.Add(new() { DisplayName = Chinese, CultureCode = "zh-Hans" });
         }
 
         // Обновляет отображаемые названия языков при смене языка

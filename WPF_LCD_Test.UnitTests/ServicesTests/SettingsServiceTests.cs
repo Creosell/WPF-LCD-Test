@@ -101,8 +101,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
 
             Assert.That(savedSettings, Is.Not.Null);
             Assert.That(savedSettings.LanguageCultureCode, Is.EqualTo(""), "LanguageCultureCode по умолчанию должен быть 'en'.");
-            Assert.That(savedSettings.ColorAnalyzerChannel, Is.EqualTo("COM1"), "DevicePort по умолчанию должен быть 'COM1'.");
-            // !!! ВАЖНОЕ ИЗМЕНЕНИЕ ЗДЕСЬ !!!
+            Assert.That(savedSettings.ColorAnalyzerChannel, Is.EqualTo("0"), "ColorAnalyzerChannel по умолчанию должен быть '0'.");
             Assert.That(savedSettings.AutoConnectEnabled, Is.EqualTo(true), "AutoConnectEnabled по умолчанию должен быть 'true' согласно обновленной модели.");
         }
 
@@ -134,7 +133,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public void LoadSettings_FileExists_InvalidJson_ReturnsDefaultSettings()
         {
             // Arrange
-            string invalidJson = "{ \"languageCultureCode\": \"es\", \"devicePort\": \"COMX\", \"autoConnectEnabled\": "; // Некорректный JSON (обрезан)
+            string invalidJson = "{ \"languageCultureCode\": \"es\", \"colorAnalyzerChannel\": \"4\", \"autoConnectEnabled\": "; // Некорректный JSON (обрезан)
             File.WriteAllText(_testTempFilePath, invalidJson);
 
             // Act
@@ -144,7 +143,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             Assert.That(loadedSettings, Is.Not.Null, "Загруженные настройки не должны быть null.");
             // Проверяем, что вернулись значения по умолчанию из-за ошибки JSON
             Assert.That(loadedSettings.LanguageCultureCode, Is.EqualTo(""), "LanguageCultureCode должен быть 'en' из-за ошибки JSON.");
-            Assert.That(loadedSettings.ColorAnalyzerChannel, Is.EqualTo("COM1"), "DevicePort должен быть 'COM1' из-за ошибки JSON.");
+            Assert.That(loadedSettings.ColorAnalyzerChannel, Is.EqualTo("0"), "ColorAnalyzerChannel должен быть '0' из-за ошибки JSON.");
             Assert.That(loadedSettings.AutoConnectEnabled, Is.EqualTo(true), "AutoConnectEnabled должен быть 'true' из-за ошибки JSON.");
         }
 

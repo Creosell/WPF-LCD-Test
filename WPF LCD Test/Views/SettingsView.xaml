@@ -44,10 +44,12 @@
                     x:Name="ColorAnalyzerChannelTextBox"
                     MinWidth="30"
                     Margin="5"
-                    HorizontalAlignment="Center"
                     VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
                     Foreground="White"
-                    Text="{Binding ColorAnalyzerChannel, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    Text="{Binding ColorAnalyzerChannel, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    TextAlignment="Center" />
             </StackPanel>
 
             <StackPanel

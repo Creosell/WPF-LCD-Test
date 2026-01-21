@@ -10,6 +10,10 @@
     {
         IColorAnalyzerProbe SingleProbe { get; }
         IColorAnalyzerMemory Memory { get; }
+
+        int Number { get; }
+        string ID { get; }
+        string PortID { get; }
         void CalZero();
         int SyncMode { get; set; }
         int AveragingMode { get; set; }
@@ -24,6 +28,7 @@
         double sy { get; }
         double Lv { get; }
         double T { get; }
+        string SerialNO { get; }
     }
 
     public interface IColorAnalyzerMemory

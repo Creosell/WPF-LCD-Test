@@ -40,6 +40,7 @@ namespace WPF_LCD_Test.ViewModels
         private const string SerialNumberPattern = "^[a-zA-Z0-9]*$";
         private string _logText = string.Empty;
         private readonly LogHandler _logHandler;
+        private const string QA_PROBE_SN = "08954195";
 
         private enum ReportExitCode
             {
@@ -347,6 +348,10 @@ namespace WPF_LCD_Test.ViewModels
                         {
                         ExecuteDisconnect();
                         _dialogService.ShowMessage($"{ErrAtCalibration}", $"{Err}");
+                        }
+                    if (_colorMeasurementService.ProbeSN.Equals(QA_PROBE_SN) && _colorMeasurementService.CurrentChannel != 1)
+                        {
+                        _dialogService.ShowMessage("Detected QA CA-310. Make sure you are using CH01 for measurement", Warning);
                         }
                     }
                 }

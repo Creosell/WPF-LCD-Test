@@ -82,6 +82,15 @@ namespace WPF_LCD_Test.Wrappers
                 return _probeInstance.T;
             }
         }
+
+        public string SerialNO
+            {
+            get
+                {
+                if (_probeInstance == null) throw new ObjectDisposedException(nameof(ColorAnalyzerProbeWrapper));
+                return _probeInstance.SerialNO;
+                }
+            }
     }
 
     /// <summary>
@@ -95,12 +104,50 @@ namespace WPF_LCD_Test.Wrappers
     {
         private Ca? _caInstance; // Реальный COM-объект CA200SRVRLib.Ca
         private ColorAnalyzerProbeWrapper? _singleProbeWrapper; // Обёртка для IColorAnalyzerProbe
-        private ColorAnalyzerMemoryWrapper? _memoryWrapper; // Обёртка для IColorAnalyzerMemory
+        private ColorAnalyzerMemoryWrapper? _memoryWrapper; // Обёртка для IColorAnalyzerMemory 
 
         public ColorAnalyzerWrapper(Ca caInstance)
         {
             _caInstance = caInstance ?? throw new ArgumentNullException(nameof(caInstance));
-        }
+            }
+
+
+        public string ID
+            {
+            get
+                {
+                if (_caInstance == null)
+                    {
+                    throw new ObjectDisposedException(nameof(ColorAnalyzerWrapper), "Cannot access ID on an uninitialized object.");
+                    }
+                return _caInstance.ID;
+                }
+            }
+
+        public string PortID
+            {
+            get
+                {
+                if (_caInstance == null)
+                    {
+                    throw new ObjectDisposedException(nameof(ColorAnalyzerWrapper), "Cannot access PortID on an uninitialized object.");
+                    }
+                return _caInstance.PortID;
+                }
+            }
+
+
+        public int Number
+            {
+            get
+                {
+                if (_caInstance == null)
+                    {
+                    throw new ObjectDisposedException(nameof(ColorAnalyzerWrapper), "Cannot access Number on an uninitialized object.");
+                    }
+                return _caInstance.Number;
+                }
+            }
 
         // Реализация свойств из IColorAnalyzer
         public IColorAnalyzerProbe SingleProbe
@@ -128,6 +175,8 @@ namespace WPF_LCD_Test.Wrappers
                 return _memoryWrapper;
             }
         }
+
+
 
         public void CalZero()
         {

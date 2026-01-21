@@ -7,6 +7,7 @@ namespace WPF_LCD_Test.Interfaces
         bool IsDeviceConnected { get; }
         bool IsDeviceCalibrated { get; }
         int CurrentChannel { get; set; }
+        string ProbeSN { get; }
         Task<bool> ConnectAsync();
         void Disconnect();
         Task<bool> CalibrateZeroAsync();

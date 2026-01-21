@@ -19,7 +19,7 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
 
             // Assert (Проверка)
             Assert.That(settings.LanguageCultureCode, Is.EqualTo(""), "Default LanguageCultureCode should be 'en'.");
-            Assert.That(settings.ColorAnalyzerChannel, Is.EqualTo("COM1"), "Default DevicePort should be 'COM1'.");
+            Assert.That(settings.ColorAnalyzerChannel, Is.EqualTo("0"), "Default ColorAnalyzerChannel should be '0'.");
             Assert.IsTrue(settings.AutoConnectEnabled, "Default AutoConnectEnabled should be true.");
         }
 
@@ -29,7 +29,7 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
             // Arrange
             var settings = new AppSettings();
             string expectedLanguage = "zh-Hans";
-            string expectedPort = "COM3";
+            string expectedPort = "3";
             bool expectedAutoConnect = false;
 
             // Act
@@ -39,7 +39,7 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
 
             // Assert
             Assert.That(settings.LanguageCultureCode, Is.EqualTo(expectedLanguage), "LanguageCultureCode should match the set value.");
-            Assert.That(settings.ColorAnalyzerChannel, Is.EqualTo(expectedPort), "DevicePort should match the set value.");
+            Assert.That(settings.ColorAnalyzerChannel, Is.EqualTo(expectedPort), "ColorAnalyzerChannel should match the set value.");
             Assert.That(settings.AutoConnectEnabled, Is.EqualTo(expectedAutoConnect), "AutoConnectEnabled should match the set value.");
         }
 
@@ -50,14 +50,14 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
             var settings = new AppSettings
             {
                 LanguageCultureCode = "zh-Hans",
-                ColorAnalyzerChannel = "USB0",
+                ColorAnalyzerChannel = "0",
                 AutoConnectEnabled = false
             };
 
             // Act
             string jsonString = JsonSerializer.Serialize(settings);
             // Ожидаем JSON, который соответствует атрибутам JsonPropertyName
-            string expectedJson = "{\"languageCultureCode\":\"zh-Hans\",\"devicePort\":\"USB0\",\"autoConnectEnabled\":false}";
+            string expectedJson = "{\"languageCultureCode\":\"zh-Hans\",\"colorAnalyzerChannel\":\"0\",\"autoConnectEnabled\":false}";
 
             // Assert
             // Сравниваем JSON, игнорируя возможные различия в форматировании (пробелы, переносы строк)
@@ -69,7 +69,7 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
 
             Assert.IsNotNull(deserializedSettings, "Deserialized settings should not be null.");
             Assert.That(deserializedSettings.LanguageCultureCode, Is.EqualTo(settings.LanguageCultureCode), "Deserialized LanguageCultureCode should match original.");
-            Assert.That(deserializedSettings.ColorAnalyzerChannel, Is.EqualTo(settings.ColorAnalyzerChannel), "Deserialized DevicePort should match original.");
+            Assert.That(deserializedSettings.ColorAnalyzerChannel, Is.EqualTo(settings.ColorAnalyzerChannel), "Deserialized ColorAnalyzerChannel should match original.");
             Assert.That(deserializedSettings.AutoConnectEnabled, Is.EqualTo(settings.AutoConnectEnabled), "Deserialized AutoConnectEnabled should match original.");
         }
 
@@ -87,7 +87,7 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
             Assert.IsNotNull(deserializedSettings, "Deserialized settings should not be null.");
             // Проверяем, что свойства, отсутствующие в JSON, приняли значения по умолчанию
             Assert.That(deserializedSettings.LanguageCultureCode, Is.EqualTo(""), "Missing LanguageCultureCode should default to 'en'.");
-            Assert.That(deserializedSettings.ColorAnalyzerChannel, Is.EqualTo("COM1"), "Missing DevicePort should default to 'COM1'.");
+            Assert.That(deserializedSettings.ColorAnalyzerChannel, Is.EqualTo("0"), "Missing ColorAnalyzerChannel should default to '0'.");
             Assert.IsTrue(deserializedSettings.AutoConnectEnabled, "Missing AutoConnectEnabled should default to true.");
         }
     }
