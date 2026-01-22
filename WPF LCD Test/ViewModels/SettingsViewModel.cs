@@ -22,7 +22,7 @@ namespace WPF_LCD_Test.ViewModels
 
         public string ColorAnalyzerChannel
             {
-            get => _colorMeasurementService.CurrentChannel.ToString();
+            get => _colorAnalyzerChannel;
             set
                 {
                 if (value.Length<3)

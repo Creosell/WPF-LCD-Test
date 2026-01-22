@@ -8,22 +8,22 @@ using WPF_LCD_Test.Services;
 // В более сложном сценарии вы бы могли использовать фреймворк для мокирования статических методов
 // или переделать LocalizationService для инъекции зависимостей.
 internal class MockLocalizationService
-{
+    {
     // Используем внутренний статический класс, чтобы избежать конфликтов имен
     // и чтобы он был доступен только в сборке тестов.
     private MockLocalizationService()
-    { } // Приватный конструктор для синглтона
+        { } // Приватный конструктор для синглтона
 
     public static MockLocalizationService Instance { get; } = new MockLocalizationService();
     public CultureInfo CurrentCulture { get; set; } = CultureInfo.InvariantCulture;
-}
+    }
 
 namespace WPF_LCD_Test.Tests
-{
+    {
     // [TestFixture] указывает NUnit, что этот класс содержит тесты
     [TestFixture]
     public class ColorMeasurementServiceTests : IDisposable
-    {
+        {
         private Mock<IColorAnalyzer200> _mockCa200;
         private Mock<IColorAnalyzer> _mockCa;
         private Mock<IColorAnalyzerProbe> _mockProbe;
@@ -33,7 +33,7 @@ namespace WPF_LCD_Test.Tests
         // [SetUp] метод выполняется перед каждым тестом
         [SetUp]
         public void Setup()
-        {
+            {
             // Инициализация моков
             _mockProbe = new Mock<IColorAnalyzerProbe>();
             _mockMemory = new Mock<IColorAnalyzerMemory>();
@@ -50,13 +50,13 @@ namespace WPF_LCD_Test.Tests
 
             // Настройка LocalizationService для тестов, чтобы он не мешал
             MockLocalizationService.Instance.CurrentCulture = CultureInfo.InvariantCulture;
-        }
+            }
 
         // --- Тесты для ConnectAsync ---
 
         [Test] // [Test] вместо [Fact]
         public async Task ConnectAsync_ShouldConnectSuccessfullyAndRaiseEvents()
-        {
+            {
             // Arrange
             bool connectionStatusChangedCalled = false;
             string? statusMessage = null;
@@ -78,11 +78,11 @@ namespace WPF_LCD_Test.Tests
             _mockCa200.Verify(m => m.AutoConnect(), Times.Once);
             // Убеждаемся, что SingleCa был запрошен
             _mockCa200.Verify(m => m.SingleCa, Times.Once);
-        }
+            }
 
         [Test]
         public async Task ConnectAsync_ShouldHandleCOMExceptionAndSetDisconnected()
-        {
+            {
             // Arrange
             _mockCa200
                 .Setup(m => m.AutoConnect())
@@ -103,11 +103,11 @@ namespace WPF_LCD_Test.Tests
             Assert.IsFalse(connectionStatusChangedCalled); // Событие должно быть вызвано со значением false
             StringAssert.Contains(Resources.Resources.ConnectionError, statusMessage); // NUnit: StringAssert.Contains
             StringAssert.Contains("Test COM Error", statusMessage); // NUnit: StringAssert.Contains
-        }
+            }
 
         [Test]
         public async Task ConnectAsync_ShouldNotConnectIfAlreadyConnected()
-        {
+            {
             // Arrange
             // Имитируем уже подключенное состояние
             _mockCa200.Setup(m => m.AutoConnect()).Verifiable(); // Настройка мока для первого вызова
@@ -121,13 +121,13 @@ namespace WPF_LCD_Test.Tests
             Assert.IsTrue(result); // Метод все еще должен вернуть true, так как он уже подключен
             Assert.IsTrue(_service.IsDeviceConnected); // Состояние должно остаться подключенным
             _mockCa200.Verify(m => m.AutoConnect(), Times.Never); // AutoConnect не должен быть вызван повторно
-        }
+            }
 
         // --- Тесты для CalibrateZeroAsync ---
 
         [Test]
         public async Task CalibrateZeroAsync_ShouldCalibrateSuccessfullyAndRaiseEvents()
-        {
+            {
             // Arrange
             // Убедимся, что устройство подключено, иначе CalibrateZeroAsync может не работать
             _mockCa200.Setup(m => m.AutoConnect()).Verifiable();
@@ -154,11 +154,11 @@ namespace WPF_LCD_Test.Tests
             _mockCa.VerifySet(m => m.AveragingMode = It.IsAny<int>(), Times.Once);
             _mockCa.Verify(m => m.SetAnalogRange(It.IsAny<float>(), It.IsAny<float>()), Times.Once);
             _mockCa.VerifySet(m => m.DisplayMode = It.IsAny<int>(), Times.Once);
-        }
+            }
 
         [Test]
         public async Task CalibrateZeroAsync_ShouldHandleCOMExceptionAndSetUncalibrated()
-        {
+            {
             // Arrange
             _mockCa200.Setup(m => m.AutoConnect()).Verifiable();
             await _service.ConnectAsync(); // Подключаемся
@@ -183,13 +183,13 @@ namespace WPF_LCD_Test.Tests
             Assert.IsFalse(calibrationStatusChangedCalled); // Событие должно быть вызвано со значением false
             StringAssert.Contains(Resources.Resources.CheckConnectionCA, statusMessage);
             StringAssert.Contains("Calibration COM Error", statusMessage);
-        }
+            }
 
         // --- Тесты для MeasureAsync ---
 
         [Test]
         public async Task MeasureAsync_ShouldReturnInvalidIfDeviceNotConnected()
-        {
+            {
             // Arrange
             // Убеждаемся, что устройство не подключено (по умолчанию оно не подключено)
             string? statusMessage = null;
@@ -202,11 +202,11 @@ namespace WPF_LCD_Test.Tests
             Assert.IsFalse(measurement.IsValid);
             StringAssert.Contains(Resources.Resources.MeasureWihoutConnectionError, statusMessage);
             _mockCa.Verify(m => m.Measure(), Times.Never); // Метод измерения не должен быть вызван
-        }
+            }
 
         [Test]
         public async Task MeasureAsync_ShouldReturnInvalidIfDeviceNotCalibrated()
-        {
+            {
             // Arrange
             _mockCa200.Setup(m => m.AutoConnect()).Verifiable();
             await _service.ConnectAsync(); // Подключаемся
@@ -221,11 +221,11 @@ namespace WPF_LCD_Test.Tests
             Assert.IsFalse(measurement.IsValid);
             StringAssert.Contains(Resources.Resources.MakeZeroCalibration, statusMessage);
             _mockCa.Verify(m => m.Measure(), Times.Never); // Метод измерения не должен быть вызван
-        }
+            }
 
         [Test]
         public async Task MeasureAsync_ShouldHandleCOMExceptionDuringIteration()
-        {
+            {
             // Arrange
             _mockCa200.Setup(m => m.AutoConnect()).Verifiable();
             await _service.ConnectAsync();
@@ -269,13 +269,13 @@ namespace WPF_LCD_Test.Tests
             // Если ожидается, что среднее будет только из успешных измерений,
             // тогда потребуется модификация ColorMeasurementService.MeasureAsync.
             // Для данного теста, мы проверяем, что сервис не падает и логирует ошибку.
-        }
+            }
 
         // --- Тесты для Disconnect / Dispose ---
 
         [Test]
         public void Disconnect_ShouldSetDisconnectedAndRaiseEvents()
-        {
+            {
             // Arrange
             _mockCa200.Setup(m => m.AutoConnect()).Verifiable();
             _service.ConnectAsync().Wait(); // Подключаемся
@@ -291,7 +291,7 @@ namespace WPF_LCD_Test.Tests
             _service.StatusMessage += (sender, msg) => statusMessage = msg;
 
             // Act
-            ((IColorMeasurementService)_service).Disconnect(); // Вызываем через интерфейс
+            ( (IColorMeasurementService)_service ).Disconnect(); // Вызываем через интерфейс
 
             // Assert
             Assert.IsFalse(_service.IsDeviceConnected);
@@ -301,11 +301,11 @@ namespace WPF_LCD_Test.Tests
             StringAssert.Contains(Resources.Resources.DisconnectedCA, statusMessage);
 
             _mockCa200.Verify(m => m.Dispose(), Times.Once); // Проверяем, что Dispose обертки был вызван
-        }
+            }
 
         [Test]
         public void Dispose_ShouldReleaseResourcesAndSetFlags()
-        {
+            {
             // Arrange
             _mockCa200.Setup(m => m.AutoConnect()).Verifiable();
             _service.ConnectAsync().Wait(); // Подключаемся
@@ -331,35 +331,61 @@ namespace WPF_LCD_Test.Tests
             StringAssert.Contains(Resources.Resources.DisconnectedCA, statusMessage);
 
             _mockCa200.Verify(m => m.Dispose(), Times.Once); // Проверяем, что Dispose обертки был вызван
-        }
+            }
+
+        [Test]
+        public void CurrentChannel_Set_RaisesCurrentChannelChangedEvent()
+            {
+            var service = new ColorMeasurementService();
+            int raisedChannel = -1;
+
+            service.CurrentChannelChanged += (sender, channel) => raisedChannel = channel;
+            service.CurrentChannel = 10;
+
+            Assert.That(raisedChannel, Is.EqualTo(10));
+            Assert.That(service.CurrentChannel, Is.EqualTo(10));
+            }
+
+        [Test]
+        public void CurrentChannel_SetInvalidValue_DoesNotRaiseEvent()
+            {
+            var service = new ColorMeasurementService();
+            bool eventRaised = false;
+
+            service.CurrentChannelChanged += (sender, channel) => eventRaised = true;
+            service.CurrentChannel = 150;
+
+            Assert.That(eventRaised, Is.False);
+            Assert.That(service.CurrentChannel, Is.EqualTo(0));
+            }
 
         public void Dispose()
-        {
+            {
             Dispose(true);
             GC.SuppressFinalize(this);
-        }
+            }
 
         protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
             {
-                if (_service != null)
+            if (disposing)
                 {
+                if (_service != null)
+                    {
                     _service.Dispose(true);
                     _service = null;
+                    }
                 }
             }
-        }
 
         [TearDown]
         public void TearDown()
-        {
+            {
             // Dispose the _service instance to release resources
             if (_service != null)
-            {
+                {
                 _service.Dispose(true);
                 _service = null; // Set to null to avoid reusing a disposed instance
+                }
             }
         }
     }
-}

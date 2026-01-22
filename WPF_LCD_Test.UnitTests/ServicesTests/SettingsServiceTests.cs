@@ -140,5 +140,6 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             var loadedSettings = _settingsService.LoadSettings();
             Assert.That(loadedSettings.ColorAnalyzerChannel, Is.EqualTo("5"));
             }
+
         }
     }

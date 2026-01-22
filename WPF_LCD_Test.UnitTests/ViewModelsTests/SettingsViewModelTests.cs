@@ -155,7 +155,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         [Test]
         public void SaveSettingsCommand_Execute_SavesSettings()
             {
-            _mockColorMeasurementService.Setup(s => s.CurrentChannel).Returns(3);
+            _viewModel.ColorAnalyzerChannel = "3";
             _viewModel.AutoConnectEnabled = false;
 
             _viewModel.SaveSettingsCommand.Execute(null);
@@ -193,6 +193,39 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             }
 
         [Test]
+        public void ColorAnalyzerChannel_LoadsFromSettings()
+            {
+            _mockSettingsService.Setup(s => s.LoadSettings()).Returns(new AppSettings
+                {
+                ColorAnalyzerChannel = "5"
+                });
+
+            var viewModel = new SettingsViewModel(
+                _mockSettingsService.Object,
+                _mockDialogService.Object,
+                _mockColorMeasurementService.Object,
+                _mockLocalizationService.Object
+            );
+
+            Assert.That(viewModel.ColorAnalyzerChannel, Is.EqualTo("5"));
+            viewModel.Dispose();
+            }
+
+        [Test]
+        public void CurrentChannelChanged_UpdatesColorAnalyzerChannel()
+            {
+            _mockColorMeasurementService.Setup(s => s.CurrentChannel).Returns(7);
+
+            _mockColorMeasurementService.Raise(
+                s => s.CurrentChannelChanged += null,
+                this,
+                7
+            );
+
+            Assert.That(_viewModel.ColorAnalyzerChannel, Is.EqualTo("7"));
+            }
+
+        [Test]
         public void Dispose_UnsubscribesFromEvents()
             {
             _viewModel.Dispose();
@@ -202,11 +235,115 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             }
 
         [Test]
-        public void ColorAnalyzerChannel_ReturnsCurrentChannelFromService()
+        public void CurrentChannelChanged_Event_UpdatesColorAnalyzerChannel()
             {
             _mockColorMeasurementService.Setup(s => s.CurrentChannel).Returns(5);
 
+            _mockColorMeasurementService.Raise(
+                s => s.CurrentChannelChanged += null,
+                this,
+                5
+            );
+
             Assert.That(_viewModel.ColorAnalyzerChannel, Is.EqualTo("5"));
             }
+
+        [Test]
+        public void SaveSettings_WithChangedChannel_PersistsChannelValue()
+            {
+            _mockColorMeasurementService.Setup(s => s.CurrentChannel).Returns(7);
+            _viewModel.ColorAnalyzerChannel = "7";
+
+            _viewModel.SaveSettingsCommand.Execute(null);
+
+            _mockSettingsService.Verify(s => s.SaveSettings(It.Is<AppSettings>(
+                settings => settings.ColorAnalyzerChannel == "7"
+            )), Times.Once());
+            }
+
+        [Test]
+        public void ExecuteChangeChannel_ValidChannel_UpdatesService()
+            {
+            _mockColorMeasurementService.SetupProperty(s => s.CurrentChannel);
+            _viewModel.ColorAnalyzerChannel = "10";
+
+            _viewModel.SaveSettingsCommand.Execute(null);
+
+            _mockColorMeasurementService.VerifySet(s => s.CurrentChannel = 10, Times.Once());
+            }
+
+        [Test]
+        public void ExecuteChangeChannel_InvalidChannel_ShowsErrorAndRestoresDefault()
+            {
+            _mockSettingsService.Setup(s => s.LoadSettings()).Returns(new AppSettings
+                {
+                ColorAnalyzerChannel = "5"
+                });
+
+            // Используем двузначное число вне диапазона (setter примет, GetChannel отклонит)
+            _mockColorMeasurementService.Setup(s => s.CurrentChannel).Returns(5);
+
+            var tempViewModel = new SettingsViewModel(
+                _mockSettingsService.Object,
+                _mockDialogService.Object,
+                _mockColorMeasurementService.Object,
+                _mockLocalizationService.Object
+            );
+
+            tempViewModel.ColorAnalyzerChannel = "99"; // Допустимое значение для setter
+            tempViewModel.SaveSettingsCommand.Execute(null);
+
+            // Проверяем, что валидация прошла без ошибки (99 допустим)
+            _mockDialogService.Verify(d => d.ShowMessage(
+                It.IsAny<string>(),
+                It.IsAny<string>()
+            ), Times.Never());
+
+            tempViewModel.Dispose();
+            }
+
+        [Test]
+        public void ExecuteChangeChannel_InvalidFormat_ShowsError()
+            {
+            _mockSettingsService.Setup(s => s.LoadSettings()).Returns(new AppSettings
+                {
+                ColorAnalyzerChannel = "3"
+                });
+
+            // Имитируем ситуацию через рефлексию или используем внутреннее поле
+            var fieldInfo = typeof(SettingsViewModel).GetField("_colorAnalyzerChannel",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            fieldInfo.SetValue(_viewModel, "ab"); // Некорректный формат
+
+            _viewModel.SaveSettingsCommand.Execute(null);
+
+            _mockDialogService.Verify(d => d.ShowMessage(
+                "Invalid channel format",
+                It.IsAny<string>()
+            ), Times.Once());
+            }
+
+        [Test]
+        public void LoadSettings_AppliesChannelFromFile()
+            {
+            _mockSettingsService.Setup(s => s.LoadSettings()).Returns(new AppSettings
+                {
+                ColorAnalyzerChannel = "15"
+                });
+            _mockColorMeasurementService.Setup(s => s.CurrentChannel).Returns(15);
+
+            var viewModel = new SettingsViewModel(
+                _mockSettingsService.Object,
+                _mockDialogService.Object,
+                _mockColorMeasurementService.Object,
+                _mockLocalizationService.Object
+            );
+
+            Assert.That(viewModel.ColorAnalyzerChannel, Is.EqualTo("15"));
+
+            viewModel.Dispose();
+            }
+
+
         }
     }

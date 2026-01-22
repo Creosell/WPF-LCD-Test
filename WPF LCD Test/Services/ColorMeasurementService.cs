@@ -204,6 +204,7 @@ namespace WPF_LCD_Test.Services
                 return;
 
             _channel = channel;
+            CurrentChannelChanged?.Invoke(this, _channel);
 
 
             if (!_isDeviceConnected || _objMemory == null)
