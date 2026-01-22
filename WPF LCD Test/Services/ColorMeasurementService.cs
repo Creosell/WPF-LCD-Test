@@ -6,68 +6,80 @@ using static WPF_LCD_Test.Resources.Resources;
 
 namespace WPF_LCD_Test.Services
     {
-    // Service class for handling all communications and measurements with the Color Analyzer device.
+    /// <summary>
+    /// Service for handling communications and measurements with Color Analyzer device (CA-200/CA-310).
+    /// </summary>
     public class ColorMeasurementService : IDisposable, IColorMeasurementService
         {
         private IColorAnalyzer200? _objCa200;
-        private IColorAnalyzer? _objCa = null; // Analyzer object (e.g., SingleCa property from CA-200).
-        private IColorAnalyzerMemory? _objMemory = null; // Memory object (e.g., Memory property from CA-200).
+        private IColorAnalyzer? _objCa = null;
+        private IColorAnalyzerMemory? _objMemory = null;
         private bool _isDeviceConnected = false;
         private bool _isDeviceCalibrated = false;
         private int _channel = 0;
         private string _probeSN = "Unknown";
+
         private const int MinChannel = 0;
         private const int MaxChannel = 99;
-
-        // Color analyzer constants (Remote modes)
         private const int RemoteModeOFF = 0;
-
         private const int RemoteModeON = 1;
         private const int RemoteModeLOCKED = 2;
-
-        // Sync modes
-        private const int NtscSync = 0; // NTSC sync.
-
-        private const int PalSync = 1; // PAL sync.
-        private const int ExtSync = 2; // EXT sync.
-        private const int UniverslaSyncMode = 3; // UNIV sync.
-
-        // Measuring rate modes
-        private const int SlowMeasuringMode = 0; // Slow
-
-        private const int FastMeasuringMode = 1; // Fast
-        private const int AutoMeasuringMode = 2; // Auto
-
-        // Analog display range constant.
+        private const int NtscSync = 0;
+        private const int PalSync = 1;
+        private const int ExtSync = 2;
+        private const int UniverslaSyncMode = 3;
+        private const int SlowMeasuringMode = 0;
+        private const int FastMeasuringMode = 1;
+        private const int AutoMeasuringMode = 2;
         private const double DefaultDisplayRange = 2.5;
+        private const int LvxyDisplayMode = 0;
+        private const int TdudvDisplayMode = 1;
+        private const int NoDisplayMode = 2;
+        private const int GDisplayMode = 3;
+        private const int RDisplayMode = 4;
+        private const int uvDisplayMode = 5;
+        private const int FmaDisplayMode = 6;
+        private const int XYZDisplayMode = 7;
+        private const int JeitaDisplayMode = 8;
 
-        // Display and measurement modes
-        private const int LvxyDisplayMode = 0; // Mode for measuring x, y, Lv
-
-        private const int TdudvDisplayMode = 1; // Tdudv
-        private const int NoDisplayMode = 2; // Analyzer mode (no display)
-        private const int GDisplayMode = 3; // Analyzer mode (G standard)
-        private const int RDisplayMode = 4; // Analyzer mode (R standard)
-        private const int uvDisplayMode = 5; // u'v'
-        private const int FmaDisplayMode = 6; // FMA flicker - Contrast flicker method
-        private const int XYZDisplayMode = 7; // XYZ
-        private const int JeitaDisplayMode = 8; // JEITA flicker*2 - JEITA flicker method
-
+        /// <summary>
+        /// Occurs when device connection status changes.
+        /// </summary>
         public event EventHandler<bool>? ConnectionStatusChanged;
 
+        /// <summary>
+        /// Occurs when device calibration status changes.
+        /// </summary>
         public event EventHandler<bool>? CalibrationStatusChanged;
 
+        /// <summary>
+        /// Occurs when status message needs to be reported.
+        /// </summary>
         public event EventHandler<string>? StatusMessage;
 
+        /// <summary>
+        /// Occurs when measurement progress updates.
+        /// </summary>
         public event EventHandler<double>? MeasurementProgress;
 
+        /// <summary>
+        /// Occurs when current channel changes.
+        /// </summary>
         public event EventHandler<int>? CurrentChannelChanged;
 
-        // Use expression body for simple properties.
+        /// <summary>
+        /// Gets whether device is currently connected.
+        /// </summary>
         public bool IsDeviceConnected => _isDeviceConnected;
 
+        /// <summary>
+        /// Gets whether device is calibrated.
+        /// </summary>
         public bool IsDeviceCalibrated => _isDeviceCalibrated;
 
+        /// <summary>
+        /// Gets the probe serial number.
+        /// </summary>
         public string ProbeSN
             {
             get
@@ -80,28 +92,39 @@ namespace WPF_LCD_Test.Services
                 }
             }
 
+        /// <summary>
+        /// Gets or sets the current measurement channel (0-99).
+        /// </summary>
         public int CurrentChannel
             {
             get => _channel;
             set { ChangeChannel(value); }
             }
 
+        /// <summary>
+        /// Initializes a new instance of ColorMeasurementService.
+        /// </summary>
         public ColorMeasurementService()
-            { }
+            {
+            }
 
-        // Constructor for injecting a mock/wrapper dependency.
+        /// <summary>
+        /// Initializes a new instance of ColorMeasurementService with dependency injection.
+        /// </summary>
+        /// <param name="ca200Wrapper">Color analyzer wrapper for testing.</param>
         public ColorMeasurementService(IColorAnalyzer200 ca200Wrapper)
             {
             _objCa200 = ca200Wrapper ?? throw new ArgumentNullException(nameof(ca200Wrapper));
             }
 
-        // Asynchronously attempts to connect to the color analyzer device.
+        /// <summary>
+        /// Asynchronously attempts to connect to color analyzer device.
+        /// </summary>
+        /// <returns>True if connection succeeded, false otherwise.</returns>
         public async Task<bool> ConnectAsync()
             {
             await Task.Run(() =>
             {
-                CheckCurrentAppLanguage();
-
                 if (_objCa200 == null)
                     {
                     _objCa200 = new ColorAnalyzer200Wrapper();
@@ -138,16 +161,20 @@ namespace WPF_LCD_Test.Services
             return _isDeviceConnected;
             }
 
-        // Calls the internal Dispose method for disconnection (expression-bodied member).
+        /// <summary>
+        /// Disconnects from device by disposing resources.
+        /// </summary>
         private void Disconnect() => Dispose(true);
 
-        // Asynchronously performs a zero calibration of the device.
+        /// <summary>
+        /// Asynchronously performs zero calibration and configures device settings.
+        /// </summary>
+        /// <returns>True if calibration succeeded, false otherwise.</returns>
         public async Task<bool> CalibrateZeroAsync()
             {
             var success = false;
-            await Task.Run(async () =>
+            await Task.Run(() =>
             {
-                CheckCurrentAppLanguage();
                 try
                     {
                     StatusMessage?.Invoke(this, CalibratingZeroCA);
@@ -155,7 +182,6 @@ namespace WPF_LCD_Test.Services
                         {
                         _objCa.CalZero();
 
-                        // Configure the device settings after calibration.
                         _objCa.SyncMode = UniverslaSyncMode;
                         _objCa.AveragingMode = AutoMeasuringMode;
                         _objCa.SetAnalogRange(
@@ -192,20 +218,17 @@ namespace WPF_LCD_Test.Services
             }
 
         /// <summary>
-        /// Updates the current channel and synchronizes with the connected device memory if available.
+        /// Updates current channel and synchronizes with connected device memory if available.
         /// Channel value is stored regardless of device connection state.
         /// </summary>
-        /// <param name="channel">The target channel identifier to set.</param>
+        /// <param name="channel">Target channel identifier to set (0-99).</param>
         private void ChangeChannel(int channel)
             {
-            CheckCurrentAppLanguage();
-
             if (!IsValidChannel(channel))
                 return;
 
             _channel = channel;
             CurrentChannelChanged?.Invoke(this, _channel);
-
 
             if (!_isDeviceConnected || _objMemory == null)
                 return;
@@ -221,15 +244,23 @@ namespace WPF_LCD_Test.Services
                 }
             }
 
+        /// <summary>
+        /// Validates if channel number is within acceptable range.
+        /// </summary>
+        /// <param name="channel">Channel number to validate.</param>
+        /// <returns>True if channel is valid, false otherwise.</returns>
         private bool IsValidChannel(int channel) => channel >= MinChannel && channel <= MaxChannel;
 
-        // Asynchronously performs a series of measurements and calculates the average.
+        /// <summary>
+        /// Asynchronously performs series of measurements and calculates average values.
+        /// </summary>
+        /// <param name="measurementTime">Number of measurements to perform.</param>
+        /// <returns>Measurement object containing averaged results.</returns>
         public async Task<Measurement> MeasureAsync(int measurementTime)
             {
             var result = new Measurement();
             await Task.Run(async () =>
             {
-                CheckCurrentAppLanguage();
                 try
                     {
                     if (!_isDeviceConnected)
@@ -247,7 +278,6 @@ namespace WPF_LCD_Test.Services
 
                     StatusMessage?.Invoke(this, Measuring);
 
-                    // Initialize arrays to store measurement results.
                     var xValues = new double[measurementTime];
                     var yValues = new double[measurementTime];
                     var LvValues = new double[measurementTime];
@@ -260,43 +290,31 @@ namespace WPF_LCD_Test.Services
                             if (_objCa200 != null)
                                 {
                                 _objCa200.SingleCa.Measure();
-                                var probe = _objCa200.SingleCa.SingleProbe; // Cache probe for conciseness.
+                                var probe = _objCa200.SingleCa.SingleProbe;
                                 xValues[i] = probe.sx;
                                 yValues[i] = probe.sy;
                                 LvValues[i] = probe.Lv;
                                 TValues[i] = probe.T;
                                 }
-                            // Report progress based on completion percentage.
-                            MeasurementProgress?.Invoke(
-                                this,
-                                (double)( i + 1 ) / measurementTime * 100
-                            );
+                            MeasurementProgress?.Invoke(this, (double)( i + 1 ) / measurementTime * 100);
                             }
                         catch (COMException measureEx)
                             {
-                            StatusMessage?.Invoke(
-                                this,
-                                $"{ErrorAtMeasuringIteration}{i}: {measureEx.Message}"
-                            );
-                            continue; // Continue to the next iteration on failure.
+                            StatusMessage?.Invoke(this, $"{ErrorAtMeasuringIteration}{i}: {measureEx.Message}");
+                            continue;
                             }
                         catch (Exception measureEx)
                             {
-                            StatusMessage?.Invoke(
-                                this,
-                                $"{ErrorAtMeasuringIteration}{i}: {measureEx.Message}"
-                            );
+                            StatusMessage?.Invoke(this, $"{ErrorAtMeasuringIteration}{i}: {measureEx.Message}");
                             continue;
                             }
 
-                        // Delay between measurements.
                         if (i < measurementTime - 1)
                             {
                             await Task.Delay(1000);
                             }
                         }
 
-                    // Calculate the average of all valid measurements.
                     result.x = xValues.Average();
                     result.y = yValues.Average();
                     result.Lv = LvValues.Average();
@@ -313,14 +331,19 @@ namespace WPF_LCD_Test.Services
             return result;
             }
 
-        // IDisposable implementation (explicit interface member).
+        /// <summary>
+        /// Releases all resources used by ColorMeasurementService.
+        /// </summary>
         void IDisposable.Dispose()
             {
             Dispose(true);
             GC.SuppressFinalize(this);
             }
 
-        // The core method for resource cleanup.
+        /// <summary>
+        /// Releases unmanaged and managed resources.
+        /// </summary>
+        /// <param name="disposing">True to release both managed and unmanaged resources.</param>
         public virtual void Dispose(bool disposing)
             {
             if (disposing)
@@ -333,7 +356,6 @@ namespace WPF_LCD_Test.Services
                     _objCa200 = null;
                     }
 
-                // Update connection and calibration status after disposal.
                 _isDeviceConnected = false;
                 ConnectionStatusChanged?.Invoke(this, _isDeviceConnected);
                 _isDeviceCalibrated = false;
@@ -342,19 +364,14 @@ namespace WPF_LCD_Test.Services
                 }
             }
 
-        // Finalizer calls Dispose(false) if Dispose(true) was not called.
+        /// <summary>
+        /// Finalizer for ColorMeasurementService.
+        /// </summary>
         ~ColorMeasurementService() => Dispose(false);
 
-        // IColorMeasurementService Disconnect implementation uses the private method (expression-bodied member).
+        /// <summary>
+        /// Disconnects from color analyzer device.
+        /// </summary>
         void IColorMeasurementService.Disconnect() => Disconnect();
-
-        // Helper method to ensure the correct culture for resource strings on background threads.
-        private static void CheckCurrentAppLanguage()
-            {
-            var culture = LocalizationService.Instance.CurrentCulture;
-
-            Thread.CurrentThread.CurrentCulture = culture;
-            Thread.CurrentThread.CurrentUICulture = culture;
-            }
         }
     }

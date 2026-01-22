@@ -243,7 +243,6 @@ namespace WPF_LCD_Test.ViewModels
             ReportGenerateCommand = new RelayCommand(ExecuteReportGenerateCommand, CanExecuteReportGenerateCommand);
             MeasureCommand = new RelayCommand(ExecuteMeasureAsync, CanExecuteMeasure);
             ApplySerialNumberCommand = new RelayCommand(ExecuteApplySerialNumber, CanExecuteApplySerialNumber);
-            //ApplyMeasurementTimeCommand = new RelayCommand(ExecuteApplyMeasurementTime, CanExecuteApplyMeasurementTime);
             UploadReportsCommand = new RelayCommand(ExecuteUploadReportsAsync, CanExecuteUploadReportsAsync);
 
             _colorMeasurementService.StatusMessage += ColorMeasurementService_StatusMessage;
@@ -337,7 +336,6 @@ namespace WPF_LCD_Test.ViewModels
 
         private async Task ExecuteZeroCalibrationAsync(object parameter)
             {
-            CheckCurrentAppLanguage();
             if (!CanExecuteZeroCalibration(parameter))
                 return;
 
@@ -378,7 +376,6 @@ namespace WPF_LCD_Test.ViewModels
 
         private async Task<bool> ExecuteSaveResultsAsync(object parameter)
             {
-            CheckCurrentAppLanguage();
             if (!CanExecuteSaveResults(parameter))
                 return false;
 
@@ -415,7 +412,6 @@ namespace WPF_LCD_Test.ViewModels
 
         private void ExecuteClearFields(object parameter)
             {
-            CheckCurrentAppLanguage();
             if (!CanExecuteClearFields(parameter))
                 return;
 
@@ -446,20 +442,12 @@ namespace WPF_LCD_Test.ViewModels
                 try
                     {
                     _localizationService.SetLanguage(languageCode);
-                    CheckCurrentAppLanguage();
                     }
                 catch (Exception ex)
                     {
                     _dialogService.ShowMessage($"{ErrMsgLangSwitchFailed}: {ex.Message}", $"{Err}");
                     }
                 }
-            }
-
-        private static void CheckCurrentAppLanguage()
-            {
-            var culture = LocalizationService.Instance.CurrentCulture;
-            Thread.CurrentThread.CurrentCulture = culture;
-            Thread.CurrentThread.CurrentUICulture = culture;
             }
 
         private async Task ExecuteMeasureAsync(object parameter)
@@ -469,7 +457,6 @@ namespace WPF_LCD_Test.ViewModels
 
             bool isMeasurementSuccess = false;
             string messageWithMeasuredValues = $"{NoData}";
-            CheckCurrentAppLanguage();
             UpdateMeasurementStatus(measurementLocation, null, $"{Measuring}");
 
             void ApplyMeasurementResult(Measurement measurement)
@@ -627,7 +614,6 @@ namespace WPF_LCD_Test.ViewModels
 
         public void ExecuteApplySerialNumber(object parameter)
             {
-            CheckCurrentAppLanguage();
             if (!CanExecuteApplySerialNumber(parameter) || parameter is not string enteredSerialNumber)
                 return;
 
@@ -669,33 +655,6 @@ namespace WPF_LCD_Test.ViewModels
             UpdateMeasurementButtonsState();
             UpdateCommandsCanExecute();
             }
-
-        //private void ExecuteApplyMeasurementTime(object parameter)
-        //    {
-        //    CheckCurrentAppLanguage();
-        //    if (parameter is not string enteredMeasurementTime || string.IsNullOrWhiteSpace(enteredMeasurementTime))
-        //        {
-        //        _dialogService.ShowMessage($"{IncorrectMeasTimeFormat}", $"{Err}");
-        //        return;
-        //        }
-
-        //    try
-        //        {
-        //        int measurementTime = int.Parse(enteredMeasurementTime);
-        //        if (measurementTime <= 0)
-        //            _dialogService.ShowMessage($"{IncorrectMeasTimeFormat}", $"{Err}");
-        //        else
-        //            {
-        //            MeasurementTime = measurementTime;
-        //            AddLogMessage($"{CurrentMeasurementTime}: {MeasurementTime} {Seconds}");
-        //            RequestClearInputFocus?.Invoke(this, EventArgs.Empty);
-        //            }
-        //        }
-        //    catch
-        //        {
-        //        _dialogService.ShowMessage($"{IncorrectMeasTimeFormat}", $"{Err}");
-        //        }
-        //    }
 
         private async Task ExecuteNewDeviceUnderTest(object parameter)
             {

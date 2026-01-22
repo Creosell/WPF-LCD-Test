@@ -1,28 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using WPF_LCD_Test.Interfaces;
-using WPF_LCD_Test.Models; // Подключаем LogHandler
+using WPF_LCD_Test.Models;
 using WPF_LCD_Test.Wrappers;
-// Статический импорт для доступа к ключам ресурсов
 using static WPF_LCD_Test.Resources.Resources;
 
 namespace WPF_LCD_Test.Services
     {
+    /// <summary>
+    /// Service for uploading test reports to remote storage using Nextcloud CLI.
+    /// </summary>
     public partial class UploadService : IUploadService
         {
         private readonly IDirectory _directory;
         private readonly IPath _path;
-
-        // Нам не нужно хранить ILocalizationService отдельно, он уйдет внутрь LogHandler
         private readonly LogHandler _logHandler;
 
-        // Configuration
         private const string UploadCliName = "Nextcloud_CLI.exe";
         private const string ArchiveFolderName = "report_archive";
         private const string ResultsFolderName = "results";
@@ -32,6 +27,12 @@ namespace WPF_LCD_Test.Services
 
         public event EventHandler<string>? StatusMessage;
 
+        /// <summary>
+        /// Initializes a new instance of UploadService with dependency injection.
+        /// </summary>
+        /// <param name="directory">Directory wrapper for file system operations.</param>
+        /// <param name="path">Path wrapper for path operations.</param>
+        /// <param name="localizationService">Service for localized messages.</param>
         public UploadService(IDirectory directory, IPath path, ILocalizationService localizationService)
             {
             _directory = directory;
@@ -39,30 +40,32 @@ namespace WPF_LCD_Test.Services
 
             if (localizationService == null) throw new ArgumentNullException(nameof(localizationService));
 
-            // Инициализируем LogHandler.
-            // Вместо записи в лог UI, он будет вызывать наше событие StatusMessage.
             _logHandler = new LogHandler(localizationService, (message) =>
             {
                 StatusMessage?.Invoke(this, message);
             });
             }
 
+        /// <summary>
+        /// Initializes a new instance of UploadService with default dependencies.
+        /// </summary>
         public UploadService() : this(new DirectoryWrapper(), new PathWrapper(), LocalizationService.Instance) { }
 
-        // ---------------------------------------------------------------------
-        // HELPER: Wrapper for LogHandler
-        // ---------------------------------------------------------------------
-
-        // Этот метод просто пробрасывает вызов в LogHandler, сохраняя CallerArgumentExpression
+        /// <summary>
+        /// Reports status message through LogHandler with optional formatting arguments.
+        /// </summary>
+        /// <param name="messageOrKey">Resource key or message text.</param>
+        /// <param name="args">Optional formatting arguments.</param>
+        /// <param name="resourceName">Automatically captured resource name.</param>
         private void ReportStatus(string messageOrKey, object[]? args = null, [CallerArgumentExpression("messageOrKey")] string? resourceName = null)
             {
             _logHandler.Log(messageOrKey, args, resourceName);
             }
 
-        // ---------------------------------------------------------------------
-        // BUSINESS LOGIC (Осталась без изменений, но использует ReportStatus)
-        // ---------------------------------------------------------------------
-
+        /// <summary>
+        /// Scans local folders, uploads all pending reports to remote storage, and moves uploaded files to archive.
+        /// </summary>
+        /// <returns>True if all uploads succeeded, false if any failed.</returns>
         public async Task<bool> UploadReportsAsync()
             {
             var uploadItems = ScanLocalFolders();
@@ -148,6 +151,10 @@ namespace WPF_LCD_Test.Services
             return allSucceeded;
             }
 
+        /// <summary>
+        /// Scans archive and results folders for pending uploads, groups files by report identifier.
+        /// </summary>
+        /// <returns>List of upload items with local files and remote directory paths.</returns>
         private List<UploadReportItem> ScanLocalFolders()
             {
             var baseDir = AppDomain.CurrentDomain.BaseDirectory;
@@ -224,6 +231,12 @@ namespace WPF_LCD_Test.Services
             return reports;
             }
 
+        /// <summary>
+        /// Executes single file upload using Nextcloud CLI.
+        /// </summary>
+        /// <param name="localPathArg">Local file path to upload.</param>
+        /// <param name="remoteDir">Remote directory path.</param>
+        /// <returns>True if upload succeeded, false otherwise.</returns>
         private async Task<bool> ExecuteSingleFileUploadAsync(string localPathArg, string remoteDir)
             {
             var fileName = _path.GetFileName(localPathArg);
