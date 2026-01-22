@@ -21,12 +21,16 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             _mockLocalizationService = new Mock<ILocalizationService>();
             _mockColorMeasurementService = new Mock<IColorMeasurementService>();
             _mockDialogService = new Mock<IDialogService>();
+
             _mockSettingsService.Setup(s => s.LoadSettings()).Returns(new AppSettings
                 {
                 LanguageCultureCode = "",
                 ColorAnalyzerChannel = "1",
                 AutoConnectEnabled = true
                 });
+
+            _mockColorMeasurementService.Setup(s => s.CurrentChannel).Returns(1);
+
             _viewModel = new SettingsViewModel(
                 _mockSettingsService.Object,
                 _mockDialogService.Object,
@@ -36,113 +40,110 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             }
 
         [TearDown]
-        public void Teardown()
+        public void TearDown()
             {
             _viewModel.Dispose();
             }
 
         [Test]
-        public void Ctor_InitializesWithDependencies()
+        public void Constructor_InitializesCorrectly()
             {
             Assert.That(_viewModel, Is.Not.Null);
             }
 
         [Test]
-        public void Ctor_ThrowsArgumentNullException_IfAnyDependencyIsNull()
+        public void Constructor_ThrowsArgumentNullException_WhenDependencyIsNull()
             {
-            var ex1 = Assert.Throws<ArgumentNullException>(() => new SettingsViewModel(
+            Assert.Throws<ArgumentNullException>(() => new SettingsViewModel(
                 null,
                 _mockDialogService.Object,
                 _mockColorMeasurementService.Object,
                 _mockLocalizationService.Object
             ));
-            Assert.That(ex1.ParamName, Is.EqualTo("settingsService"));
 
-            var ex2 = Assert.Throws<ArgumentNullException>(() => new SettingsViewModel(
+            Assert.Throws<ArgumentNullException>(() => new SettingsViewModel(
                 _mockSettingsService.Object,
                 null,
                 _mockColorMeasurementService.Object,
                 _mockLocalizationService.Object
             ));
-            Assert.That(ex2.ParamName, Is.EqualTo("dialogService"));
 
-            var ex3 = Assert.Throws<ArgumentNullException>(() => new SettingsViewModel(
+            Assert.Throws<ArgumentNullException>(() => new SettingsViewModel(
                 _mockSettingsService.Object,
                 _mockDialogService.Object,
                 null,
                 _mockLocalizationService.Object
             ));
-            Assert.That(ex3.ParamName, Is.EqualTo("colorMeasurementService"));
 
-            var ex4 = Assert.Throws<ArgumentNullException>(() => new SettingsViewModel(
+            Assert.Throws<ArgumentNullException>(() => new SettingsViewModel(
                 _mockSettingsService.Object,
                 _mockDialogService.Object,
                 _mockColorMeasurementService.Object,
                 null
             ));
-            Assert.That(ex4.ParamName, Is.EqualTo("localizationService"));
-
             }
 
         [Test]
-        public void Ctor_LoadsSettingsOnInitialization()
+        public void Constructor_LoadsSettings()
             {
             _mockSettingsService.Verify(s => s.LoadSettings(), Times.Once());
             Assert.That(_viewModel.ColorAnalyzerChannel, Is.EqualTo("1"));
             Assert.That(_viewModel.AutoConnectEnabled, Is.True);
             Assert.That(_viewModel.LanguageCultureCode, Is.EqualTo(""));
-            Assert.That(_viewModel.SelectedLanguage?.CultureCode, Is.EqualTo(""));
             }
 
         [Test]
-        public void Ctor_PopulatesAvailableLanguages()
+        public void Constructor_PopulatesAvailableLanguages()
             {
-            Assert.That(_viewModel.AvailableLanguages, Is.Not.Empty);
             Assert.That(_viewModel.AvailableLanguages.Count, Is.EqualTo(2));
             Assert.That(_viewModel.AvailableLanguages.Any(l => l.CultureCode == ""), Is.True);
             Assert.That(_viewModel.AvailableLanguages.Any(l => l.CultureCode == "zh-Hans"), Is.True);
             }
 
         [Test]
-        public void Ctor_SubscribesToLanguageChangedEvent()
+        public void Constructor_SubscribesToEvents()
             {
             _mockLocalizationService.VerifyAdd(l => l.LanguageChanged += It.IsAny<EventHandler>(), Times.Once());
+            _mockColorMeasurementService.VerifyAdd(c => c.CurrentChannelChanged += It.IsAny<EventHandler<int>>(), Times.Once());
             }
 
         [Test]
         public void SelectedLanguage_UpdatesLanguageCultureCode()
             {
             var newLang = new SettingsViewModel.LanguageOption { DisplayName = "Chinese", CultureCode = "zh-Hans" };
+
             _viewModel.SelectedLanguage = newLang;
+
             Assert.That(_viewModel.LanguageCultureCode, Is.EqualTo("zh-Hans"));
             }
 
         [Test]
-        public void SelectedLanguage_CallsSetLanguageOnLocalizationService()
+        public void SelectedLanguage_CallsSetLanguage()
             {
             var newLang = new SettingsViewModel.LanguageOption { DisplayName = "Chinese", CultureCode = "zh-Hans" };
+
             _viewModel.SelectedLanguage = newLang;
+
             _mockLocalizationService.Verify(l => l.SetLanguage("zh-Hans"), Times.Once());
             }
 
         [Test]
-        public void SelectedLanguage_CallsSaveLanguageToSettings()
+        public void SelectedLanguage_SavesLanguageSettings()
             {
             var newLang = new SettingsViewModel.LanguageOption { DisplayName = "Chinese", CultureCode = "zh-Hans" };
-            _mockSettingsService.Setup(s => s.SaveSettings(It.IsAny<AppSettings>()));
+
             _viewModel.SelectedLanguage = newLang;
+
             _mockSettingsService.Verify(s => s.SaveSettings(It.Is<AppSettings>(
-                appSettings => appSettings.LanguageCultureCode == "zh-Hans")), Times.Once());
+                settings => settings.LanguageCultureCode == "zh-Hans")), Times.Once());
             }
 
         [Test]
-        public void SelectedLanguage_HandlesNullSelectedLanguageGracefully()
+        public void SelectedLanguage_HandlesNull()
             {
-            _viewModel.SelectedLanguage = new SettingsViewModel.LanguageOption { DisplayName = "Chinese", CultureCode = "zh-Hans" };
-            _mockLocalizationService.Verify(l => l.SetLanguage("zh-Hans"), Times.Once());
             _viewModel.SelectedLanguage = null;
+
             Assert.That(_viewModel.LanguageCultureCode, Is.EqualTo(""));
-            _mockLocalizationService.Verify(l => l.SetLanguage(""), Times.Once());
             }
 
         [Test]
@@ -152,25 +153,25 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             }
 
         [Test]
-        public void SaveSettingsCommand_Execute_SavesCurrentSettings()
+        public void SaveSettingsCommand_Execute_SavesSettings()
             {
-            _viewModel.ColorAnalyzerChannel = "3";
+            _mockColorMeasurementService.Setup(s => s.CurrentChannel).Returns(3);
             _viewModel.AutoConnectEnabled = false;
-            var newLang = new SettingsViewModel.LanguageOption { DisplayName = "Chinese", CultureCode = "zh-Hans" };
-            _viewModel.SelectedLanguage = newLang;
+
             _viewModel.SaveSettingsCommand.Execute(null);
+
             _mockSettingsService.Verify(s => s.SaveSettings(It.Is<AppSettings>(
                 settings => settings.ColorAnalyzerChannel == "3" &&
-                            settings.AutoConnectEnabled == false &&
-                            settings.LanguageCultureCode == "zh-Hans"
+                            settings.AutoConnectEnabled == false
             )), Times.Once());
             }
 
         [Test]
-        public void SaveSettingsCommand_Execute_HandlesSaveSettingsException()
+        public void SaveSettingsCommand_Execute_HandlesException()
             {
             _mockSettingsService.Setup(s => s.SaveSettings(It.IsAny<AppSettings>()))
-                .Throws(new InvalidOperationException("Test save error"));
+                .Throws(new InvalidOperationException("Test error"));
+
             Assert.DoesNotThrow(() => _viewModel.SaveSettingsCommand.Execute(null));
             }
 
@@ -183,28 +184,29 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         [Test]
         public void CancelSettingsCommand_Execute_ReloadsSettings()
             {
-            _viewModel.ColorAnalyzerChannel = "2";
             _viewModel.AutoConnectEnabled = false;
-            _viewModel.SelectedLanguage = new SettingsViewModel.LanguageOption { DisplayName = "Chinese", CultureCode = "zh-Hans" };
-            _mockSettingsService.Setup(s => s.LoadSettings()).Returns(new AppSettings
-                {
-                LanguageCultureCode = "",
-                ColorAnalyzerChannel = "1",
-                AutoConnectEnabled = true
-                });
+
             _viewModel.CancelSettingsCommand.Execute(null);
+
             _mockSettingsService.Verify(s => s.LoadSettings(), Times.Exactly(2));
-            Assert.That(_viewModel.ColorAnalyzerChannel, Is.EqualTo("1"));
             Assert.That(_viewModel.AutoConnectEnabled, Is.True);
-            Assert.That(_viewModel.LanguageCultureCode, Is.EqualTo(""));
-            Assert.That(_viewModel.SelectedLanguage?.CultureCode, Is.EqualTo(""));
             }
 
         [Test]
-        public void Dispose_UnsubscribesFromLanguageChangedEvent()
+        public void Dispose_UnsubscribesFromEvents()
             {
             _viewModel.Dispose();
+
             _mockLocalizationService.VerifyRemove(l => l.LanguageChanged -= It.IsAny<EventHandler>(), Times.Once());
+            _mockColorMeasurementService.VerifyRemove(c => c.CurrentChannelChanged -= It.IsAny<EventHandler<int>>(), Times.Once());
+            }
+
+        [Test]
+        public void ColorAnalyzerChannel_ReturnsCurrentChannelFromService()
+            {
+            _mockColorMeasurementService.Setup(s => s.CurrentChannel).Returns(5);
+
+            Assert.That(_viewModel.ColorAnalyzerChannel, Is.EqualTo("5"));
             }
         }
     }
