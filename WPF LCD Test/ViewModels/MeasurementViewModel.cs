@@ -22,6 +22,7 @@ namespace WPF_LCD_Test.ViewModels
         private readonly ILocalizationService _localizationService;
         private readonly IDispatcher _dispatcher;
         private readonly IUploadService _uploadService;
+        private readonly ISettingsService _settingsService;
         public DeviceUnderTest? _currentDevice;
         private string _serialNumber = "";
         private bool _isSerialNumberConfirmed;
@@ -41,6 +42,7 @@ namespace WPF_LCD_Test.ViewModels
         private string _logText = string.Empty;
         private readonly LogHandler _logHandler;
         private const string QA_PROBE_SN = "08954195";
+        private const int QA_PROBE_CHANNEL = 1;
 
         private enum ReportExitCode
             {
@@ -220,12 +222,14 @@ namespace WPF_LCD_Test.ViewModels
             IDialogService dialogService,
             ILocalizationService localizationService,
             IDispatcher dispatcher,
-            IUploadService uploadService)
+            IUploadService uploadService,
+            ISettingsService settingsService)
             {
             _colorMeasurementService = colorMeasurementService ?? throw new ArgumentNullException(nameof(colorMeasurementService));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+            _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
             _uploadService = uploadService ?? throw new ArgumentNullException(nameof(uploadService));
             _logHandler = new LogHandler(_localizationService, AddLogMessage);
@@ -252,6 +256,7 @@ namespace WPF_LCD_Test.ViewModels
             InitializeDeviceConfigurations();
             UpdateCommandsCanExecute();
             UpdateMeasurementButtonsState();
+            _settingsService=settingsService;
             }
 
 
@@ -288,7 +293,7 @@ namespace WPF_LCD_Test.ViewModels
             if (allStatusPoints == null || !allStatusPoints.Any())
                 return false;
 
-            return allStatusPoints.All(status => status.Location == MeasurementLocation.WhiteColor.ToString() && !_currentDevice.IsTV ||
+            return allStatusPoints.All(status => ( status.Location == MeasurementLocation.WhiteColor.ToString() && !_currentDevice.IsTV ) ||
                 _currentDevice.Measurements.Any(measurement => measurement.Location == status.Location));
             }
 
@@ -349,9 +354,10 @@ namespace WPF_LCD_Test.ViewModels
                         ExecuteDisconnect();
                         _dialogService.ShowMessage($"{ErrAtCalibration}", $"{Err}");
                         }
-                    if (_colorMeasurementService.ProbeSN.Equals(QA_PROBE_SN) && _colorMeasurementService.CurrentChannel != 1)
+                    if (_colorMeasurementService.ProbeSN.Equals(QA_PROBE_SN) && _colorMeasurementService.CurrentChannel != QA_PROBE_CHANNEL)
                         {
-                        _dialogService.ShowMessage("Detected QA CA-310. Make sure you are using CH01 for measurement", Warning);
+                        _settingsService.UpdateChannel(_colorMeasurementService.CurrentChannel = QA_PROBE_CHANNEL);
+                        _dialogService.ShowMessage("Detected QA CA-310. Changed channel to CH01", Warning);
                         }
                     }
                 }
@@ -367,6 +373,8 @@ namespace WPF_LCD_Test.ViewModels
             UpdateCommandsCanExecute();
             UpdateMeasurementButtonsState();
             }
+
+
 
         private async Task<bool> ExecuteSaveResultsAsync(object parameter)
             {
@@ -486,7 +494,7 @@ namespace WPF_LCD_Test.ViewModels
                         }
 
                     _currentDevice = new DeviceUnderTest(SerialNumber);
-                    Log(TestStartInfo,[_currentDevice.SerialNumber]);
+                    Log(TestStartInfo, [_currentDevice.SerialNumber]);
                     ResetMeasurementStatuses();
                     UpdateMeasurementStatus(measurementLocation, null, $"{Measuring}");
                     }
@@ -774,7 +782,7 @@ namespace WPF_LCD_Test.ViewModels
                         }
                     catch (Exception ex)
                         {
-                        Log(ErrorInBackgroundTask,[ex.Message]);
+                        Log(ErrorInBackgroundTask, [ex.Message]);
                         }
                     finally
                         {

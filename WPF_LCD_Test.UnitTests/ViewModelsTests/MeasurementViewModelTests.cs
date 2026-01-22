@@ -1,8 +1,4 @@
 ﻿using Moq;
-using NUnit.Framework;
-using System;
-using System.IO;
-using System.Globalization;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
 using WPF_LCD_Test.Services; // Доступ к MeasurementStatusService
@@ -22,6 +18,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         private Mock<ILocalizationService> _mockLocalizationService;
         private Mock<IDispatcher> _mockDispatcher;
         private Mock<IUploadService> _mockUploadService;
+        private Mock<ISettingsService> _mockSettingsService;
         private MeasurementViewModel _viewModel;
 
         [SetUp]
@@ -33,6 +30,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             _mockLocalizationService = new Mock<ILocalizationService>();
             _mockDispatcher = new Mock<IDispatcher>();
             _mockUploadService = new Mock<IUploadService>();
+            _mockSettingsService = new Mock<ISettingsService>();
 
             // --- ИСПРАВЛЕННАЯ НАСТРОЙКА МОКА ---
 
@@ -54,7 +52,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                 _mockDialogService.Object,
                 _mockLocalizationService.Object,
                 _mockDispatcher.Object,
-                _mockUploadService.Object
+                _mockUploadService.Object,
+                _mockSettingsService.Object
             );
             }
 

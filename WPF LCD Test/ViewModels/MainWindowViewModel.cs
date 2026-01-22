@@ -79,7 +79,8 @@ namespace WPF_LCD_Test.ViewModels
                         _dialogService,
                         _localizationService,
                         _dispatcher,
-                        _uploadService
+                        _uploadService,
+                        _settingService
                     );
                     targetViewModel = _measurementViewModel;
                     break;
@@ -94,7 +95,8 @@ namespace WPF_LCD_Test.ViewModels
                         _dialogService,
                         _localizationService,
                         _dispatcher,
-                        _uploadService
+                        _uploadService,
+                        _settingService
                     );
                     targetViewModel = _measurementViewModel;
                     break;

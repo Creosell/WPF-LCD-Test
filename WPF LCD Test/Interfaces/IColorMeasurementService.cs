@@ -16,5 +16,6 @@ namespace WPF_LCD_Test.Interfaces
         event EventHandler<bool> CalibrationStatusChanged;
         event EventHandler<string> StatusMessage;
         event EventHandler<double> MeasurementProgress;
+        event EventHandler<int> CurrentChannelChanged;
     }
 }
