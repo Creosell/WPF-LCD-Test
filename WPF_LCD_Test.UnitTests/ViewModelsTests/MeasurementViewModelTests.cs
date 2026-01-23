@@ -7,7 +7,7 @@ using WPF_LCD_Test.ViewModels;
 // Для доступа к ключам ресурсов (RunExternalAppNotFoundErr и др.)
 using static WPF_LCD_Test.Resources.Resources;
 
-namespace WPF_LCD_Test.UnitTests.ViewModels
+namespace WPF_LCD_Test.UnitTests.ViewModelsTests
     {
     [TestFixture]
     public class MeasurementViewModelTests
@@ -70,7 +70,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             {
             // Arrange
             _viewModel.ExecuteApplySerialNumber("Sn123");
-            Assert.That(_viewModel._currentDevice, Is.Not.Null);
+            Assert.That(_viewModel.CurrentDevice, Is.Not.Null);
 
             // ИСПРАВЛЕНИЕ: Берем список точек из Singleton сервиса, так как во ViewModel нет публичного свойства
             var allStatuses = MeasurementStatusService.Instance.AllMeasurementButtonStatuses;
@@ -78,7 +78,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             foreach (var status in allStatuses)
                 {
                 // Добавляем измерение для каждой требуемой точки
-                _viewModel._currentDevice.AddMeasurement(new Measurement { Location = status.Location, IsValid = true });
+                _viewModel.CurrentDevice.AddMeasurement(new Measurement { Location = status.Location, IsValid = true });
                 }
 
             // Act
@@ -93,10 +93,10 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             {
             // Arrange
             _viewModel.ExecuteApplySerialNumber("SnPartial");
-            Assert.That(_viewModel._currentDevice, Is.Not.Null);
+            Assert.That(_viewModel.CurrentDevice, Is.Not.Null);
 
             // Добавляем только одно измерение
-            _viewModel._currentDevice.AddMeasurement(new Measurement { Location = "TopLeft", IsValid = true });
+            _viewModel.CurrentDevice.AddMeasurement(new Measurement { Location = "TopLeft", IsValid = true });
 
             // Act
             bool result = _viewModel.AreAllStatusesRepresentedInMeasurements();
@@ -108,7 +108,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         [Test]
         public void AreAllStatusesRepresentedInMeasurements_ReturnsFalse_WhenNoDevice()
             {
-            _viewModel._currentDevice = null;
+            _viewModel.CurrentDevice = null;
             bool result = _viewModel.AreAllStatusesRepresentedInMeasurements();
             Assert.That(result, Is.False);
             }
@@ -117,8 +117,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         public void AreAllStatusesRepresentedInMeasurements_ReturnsFalse_WhenDeviceHasNoMeasurements()
             {
             _viewModel.ExecuteApplySerialNumber("SnEmpty");
-            Assert.That(_viewModel._currentDevice, Is.Not.Null);
-            Assert.That(_viewModel._currentDevice.Measurements, Is.Empty);
+            Assert.That(_viewModel.CurrentDevice, Is.Not.Null);
+            Assert.That(_viewModel.CurrentDevice.Measurements, Is.Empty);
 
             bool result = _viewModel.AreAllStatusesRepresentedInMeasurements();
             Assert.That(result, Is.False);
@@ -149,12 +149,15 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                 _viewModel.ReportGenerateCommand.Execute(null);
                 }
 
-            // Assert
-            Assert.That(_viewModel.IsReportGenerating, Is.False, "Flag should correspond to finished/failed state");
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(_viewModel.IsReportGenerating, Is.False, "Flag should correspond to finished/failed state");
 
-            // Проверяем, что в лог попал ключ ошибки (RunExternalAppNotFoundErr)
-            // Текст лога берется из свойства LogText
-            Assert.That(_viewModel.LogText, Does.Contain(nameof(RunExternalAppNotFoundErr)));
+                // Проверяем, что в лог попал ключ ошибки (RunExternalAppNotFoundErr)
+                // Текст лога берется из свойства LogText
+                Assert.That(_viewModel.LogText, Does.Contain(nameof(RunExternalAppNotFoundErr)));
+            });
             Assert.That(_viewModel.LogText, Does.Contain(expectedExePath));
             }
 

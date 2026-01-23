@@ -46,7 +46,7 @@ namespace WPF_LCD_Test.Models
                 throw new ArgumentException($"{SnCantBeEmpty}", nameof(serialNumber));
             SerialNumber = serialNumber;
             MeasurementDateTime = DateTime.Now;
-            Measurements = new List<Measurement>();
+            Measurements = [];
             }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace WPF_LCD_Test.Models
         /// <returns>Formatted device information string.</returns>
         public override string ToString()
             {
-            var measurementsStr = Measurements?.Any() == true
+            var measurementsStr = ( Measurements.Count>0 ) == true
                 ? string.Join("; ", Measurements.Select(m => m.ToString()))
                 : "None";
             return $"Device SN: {SerialNumber}, Config: {DeviceConfiguration}, IsTV: {IsTV}, Measured at: {MeasurementDateTime}, Measurements: [{measurementsStr}]";
