@@ -79,8 +79,4 @@
 	</EmbeddedResource>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="data\" />
-  </ItemGroup>
-
 </Project>

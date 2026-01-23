@@ -1,15 +1,19 @@
 ﻿namespace WPF_LCD_Test.Interfaces
-{
-    public interface IUploadService
     {
-        // Event for sending status messages back to the ViewModel/Log
+    /// <summary>
+    /// Service interface for uploading test reports to remote storage.
+    /// </summary>
+    public interface IUploadService
+        {
+        /// <summary>
+        /// Occurs when status message needs to be reported during upload process.
+        /// </summary>
         event EventHandler<string> StatusMessage;
 
         /// <summary>
-        /// Scans local folders, creates UploadReportItem objects, and initiates the upload process.
+        /// Scans local folders, creates upload batches, and uploads reports to remote storage.
         /// </summary>
-        /// <param name="currentDeviceName">The name of the device being tested.</param>
-        /// <returns>True if the entire process completed without critical errors.</returns>
+        /// <returns>True if all uploads completed successfully, false if any upload failed.</returns>
         Task<bool> UploadReportsAsync();
+        }
     }
-}
