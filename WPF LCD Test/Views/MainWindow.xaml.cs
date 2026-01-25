@@ -4,61 +4,77 @@ using System.Windows.Input;
 namespace WPF_LCD_Test.Views
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Main application window with custom title bar controls.
     /// </summary>
     public partial class MainWindow : Window
     {
+        /// <summary>
+        /// Initializes a new instance of MainWindow.
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Handles minimize button click to minimize the window.
+        /// </summary>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Mouse button event arguments.</param>
         private void MinimizeImage_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            this.WindowState = WindowState.Minimized; // Сворачиваем окно
+            this.WindowState = WindowState.Minimized;
         }
 
+        /// <summary>
+        /// Handles maximize/restore button click to toggle window state between maximized and normal.
+        /// </summary>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Mouse button event arguments.</param>
         private void MaximizeRestoreImage_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            // Логика для переключения между Maximize и Normal
             if (this.WindowState == WindowState.Normal)
             {
-                this.WindowState = WindowState.Maximized; // Развернуть окно
+                this.WindowState = WindowState.Maximized;
             }
             else
             {
-                this.WindowState = WindowState.Normal; // Восстановить нормальный размер
+                this.WindowState = WindowState.Normal;
             }
-            // При желании, здесь нужно обновить иконку кнопки
         }
 
+        /// <summary>
+        /// Handles close button click to close the window.
+        /// </summary>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Mouse button event arguments.</param>
         private void CloseImage_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            this.Close(); // Закрываем окно
+            this.Close();
         }
 
+        /// <summary>
+        /// Handles title bar mouse down events for window dragging and double-click maximize/restore.
+        /// </summary>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Mouse button event arguments.</param>
         private void Grid_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             {
-                // Проверяем, была ли нажата левая кнопка мыши
                 if (e.LeftButton == MouseButtonState.Pressed)
                 {
-                    // Вызываем метод DragMove для начала перетаскивания окна
-                    // Обернем в try-catch, т.к. он может выбросить исключение,
-                    // если кнопка мыши отпущена слишком быстро.
                     try
                     {
                         this.DragMove();
                     }
                     catch (InvalidOperationException)
                     {
-                        // Игнорируем исключение, если DragMove не может быть вызван
+                        // Ignore exception if DragMove cannot be called
                     }
                 }
-                // Опционально: Обработка двойного клика для развертывания/восстановления
                 if (e.ClickCount == 2)
                 {
-                    MaximizeRestoreImage_PreviewMouseLeftButtonDown(sender, e); // Вызываем логику кнопки развернуть/восстановить
+                    MaximizeRestoreImage_PreviewMouseLeftButtonDown(sender, e);
                 }
             }
         }

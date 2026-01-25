@@ -1,17 +1,15 @@
-﻿// В папке ViewModels
-// Файл MainWindowViewModel.cs
-
-using MvvmHelpers;
+﻿using MvvmHelpers;
 using System.Windows.Input;
 using WPF_LCD_Test.Commands;
 using WPF_LCD_Test.Interfaces;
 
 namespace WPF_LCD_Test.ViewModels
 {
-    // ViewModel для главного окна приложения, управляет навигацией между страницами
+    /// <summary>
+    /// ViewModel for the main application window, manages navigation between pages.
+    /// </summary>
     public class MainWindowViewModel : BaseViewModel, IDisposable
     {
-        // Сервисы для передачи в ViewModel страниц
         private readonly IColorMeasurementService _colorMeasurementService;
         private readonly IFileService _fileService;
         private readonly IDialogService _dialogService;
@@ -24,23 +22,39 @@ namespace WPF_LCD_Test.ViewModels
         private MeasurementViewModel? _measurementViewModel;
         private SettingsViewModel? _settingsViewModel;
 
-        // Текущий идентификатор страницы
+        /// <summary>
+        /// Gets the current page identifier.
+        /// </summary>
         public string CurrentPageIdentifier
         {
             get => _currentPageIdentifier;
             private set => SetProperty(ref _currentPageIdentifier, value);
         }
 
-        // Текущий ViewModel страницы
+        /// <summary>
+        /// Gets or sets the current page ViewModel.
+        /// </summary>
         public BaseViewModel CurrentPageViewModel
         {
             get => _currentPageViewModel;
             set => SetProperty(ref _currentPageViewModel, value);
         }
 
+        /// <summary>
+        /// Gets the command for navigating between pages.
+        /// </summary>
         public ICommand NavigateCommand { get; }
 
-        // Конструктор: инициализация сервисов, команд и стартовой страницы
+        /// <summary>
+        /// Initializes a new instance of MainWindowViewModel with required services.
+        /// </summary>
+        /// <param name="colorMeasurementService">Service for color measurement operations.</param>
+        /// <param name="fileService">Service for file operations.</param>
+        /// <param name="dialogService">Service for dialog operations.</param>
+        /// <param name="localizationService">Service for localization.</param>
+        /// <param name="settingsService">Service for application settings.</param>
+        /// <param name="uploadService">Service for upload operations.</param>
+        /// <param name="dispatcher">Dispatcher for thread marshalling.</param>
         public MainWindowViewModel(
             IColorMeasurementService colorMeasurementService,
             IFileService fileService,
@@ -61,10 +75,17 @@ namespace WPF_LCD_Test.ViewModels
             ExecuteNavigate("Measurement");
         }
 
-        // Проверяет возможность навигации
+        /// <summary>
+        /// Determines whether navigation can be executed.
+        /// </summary>
+        /// <param name="parameter">Navigation parameter.</param>
+        /// <returns>True if navigation is allowed.</returns>
         private bool CanExecuteNavigate(object parameter) => true;
 
-        // Выполняет навигацию между страницами
+        /// <summary>
+        /// Executes navigation to the specified page.
+        /// </summary>
+        /// <param name="parameter">Page name as string ("Measurement" or "Settings").</param>
         private void ExecuteNavigate(object parameter)
         {
             string? pageName = parameter as string;
@@ -107,7 +128,9 @@ namespace WPF_LCD_Test.ViewModels
             }
         }
 
-        // Освобождает ресурсы текущей страницы
+        /// <summary>
+        /// Releases resources used by the current page ViewModel.
+        /// </summary>
         public void Dispose()
         {
             (CurrentPageViewModel as IDisposable)?.Dispose();
