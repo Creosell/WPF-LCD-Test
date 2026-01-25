@@ -92,5 +92,22 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             status.MeasuredValuesString = expectedValues;
             Assert.AreEqual(expectedValues, status.MeasuredValuesString);
         }
+
+        [Test]
+        public void Singleton_ConcurrentAccess_ReturnsSameInstance()
+        {
+            // Arrange
+            var instances = new System.Collections.Concurrent.ConcurrentBag<MeasurementStatusService>();
+            var tasks = Enumerable.Range(0, 100).Select(_ => Task.Run(() =>
+            {
+                instances.Add(MeasurementStatusService.Instance);
+            }));
+
+            // Act
+            Task.WaitAll(tasks.ToArray());
+
+            // Assert
+            Assert.That(instances.Distinct().Count(), Is.EqualTo(1), "All threads should receive the same singleton instance");
+        }
     }
 }

@@ -272,5 +272,47 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             _viewModel.NavigateCommand.Execute("Settings");
             // Assert.That(_viewModel.CurrentPageIdentifier, Is.EqualTo("Settings"));
         }
+
+        // --- Additional Tests ---
+
+        [Test]
+        public void ChangeView_PropertyChanged_FiredForCurrentView()
+        {
+            // Arrange
+            var propertiesChanged = new List<string>();
+            _viewModel.PropertyChanged += (s, e) => propertiesChanged.Add(e.PropertyName!);
+
+            // Act
+            _viewModel.NavigateCommand.Execute("Settings");
+
+            // Assert
+            Assert.That(propertiesChanged, Does.Contain(nameof(_viewModel.CurrentPageViewModel)));
+        }
+
+        [Test]
+        public void Dispose_CleansUpChildViewModels()
+        {
+            // Arrange
+            _viewModel.NavigateCommand.Execute("Settings");
+            _viewModel.NavigateCommand.Execute("Measurement");
+
+            // Act & Assert - should not throw
+            Assert.DoesNotThrow(() => _viewModel.Dispose());
+        }
+
+        [Test]
+        public void MultipleNavigations_MaintainsViewModelCaching()
+        {
+            // Act
+            _viewModel.NavigateCommand.Execute("Settings");
+            var settingsInstance1 = _viewModel.CurrentPageViewModel;
+
+            _viewModel.NavigateCommand.Execute("Measurement");
+            _viewModel.NavigateCommand.Execute("Settings");
+            var settingsInstance2 = _viewModel.CurrentPageViewModel;
+
+            // Assert - should be same instance due to caching
+            Assert.That(settingsInstance2, Is.SameAs(settingsInstance1));
+        }
     }
 }

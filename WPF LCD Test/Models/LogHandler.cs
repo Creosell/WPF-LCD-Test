@@ -49,7 +49,15 @@ namespace WPF_LCD_Test.Models
                 }
             catch (Exception ex)
                 {
-                _logAction($"[Log Error] {messageOrKey} | {ex.Message}");
+                try
+                    {
+                    _logAction($"[Log Error] {messageOrKey} | {ex.Message}");
+                    }
+                catch
+                    {
+                    // Suppress exceptions in error logging to prevent infinite loops
+                    System.Diagnostics.Debug.WriteLine($"[Log Error] Failed to log error: {ex.Message}");
+                    }
                 }
             }
 

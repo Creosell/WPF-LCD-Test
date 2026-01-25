@@ -125,5 +125,22 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             Assert.That(result, Is.EqualTo($"!{nonExistentKey}!"));
             Assert.That(_capturedStatusMessage, Is.Not.Null.And.Contains("LocalisationService Warning"));
             }
+
+        [Test]
+        public void Singleton_ConcurrentAccess_ReturnsSameInstance()
+            {
+            // Arrange
+            var instances = new System.Collections.Concurrent.ConcurrentBag<ILocalizationService>();
+            var tasks = Enumerable.Range(0, 100).Select(_ => Task.Run(() =>
+            {
+                instances.Add(LocalizationService.Instance);
+            }));
+
+            // Act
+            Task.WaitAll(tasks.ToArray());
+
+            // Assert
+            Assert.That(instances.Distinct().Count(), Is.EqualTo(1), "All threads should receive the same singleton instance");
+            }
         }
     }

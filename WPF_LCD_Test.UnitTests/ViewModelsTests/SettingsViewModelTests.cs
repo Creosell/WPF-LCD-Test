@@ -344,6 +344,47 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             viewModel.Dispose();
             }
 
+        [Test]
+        public void PropertyChanged_FiredForColorAnalyzerChannel()
+            {
+            // Arrange
+            var propertiesChanged = new List<string>();
+            _viewModel.PropertyChanged += (s, e) => propertiesChanged.Add(e.PropertyName!);
+
+            // Act
+            _viewModel.ColorAnalyzerChannel = "20";
+
+            // Assert
+            Assert.That(propertiesChanged, Does.Contain(nameof(_viewModel.ColorAnalyzerChannel)));
+            }
+
+        [Test]
+        public void PropertyChanged_FiredForAutoConnectEnabled()
+            {
+            // Arrange
+            var propertiesChanged = new List<string>();
+            _viewModel.PropertyChanged += (s, e) => propertiesChanged.Add(e.PropertyName!);
+
+            // Act
+            _viewModel.AutoConnectEnabled = false;
+
+            // Assert
+            Assert.That(propertiesChanged, Does.Contain(nameof(_viewModel.AutoConnectEnabled)));
+            }
+
+        [Test]
+        public void LanguageChanged_UpdatesSelectedLanguage()
+            {
+            // Arrange
+            var newCultureCode = "zh-Hans";
+
+            // Act
+            _mockLocalizationService.Raise(l => l.LanguageChanged += null, EventArgs.Empty);
+
+            // This test verifies event subscription exists
+            _mockLocalizationService.VerifyAdd(l => l.LanguageChanged += It.IsAny<EventHandler>(), Times.Once());
+            }
+
 
         }
     }

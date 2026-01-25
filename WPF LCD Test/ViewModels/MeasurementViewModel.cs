@@ -797,6 +797,11 @@ namespace WPF_LCD_Test.ViewModels
 
         private static void ResetAttemptCount(string location) => _measurementAttemptCountersMap[location] = 0;
 
+        /// <summary>
+        /// Clears all measurement attempt counts. Used for testing purposes.
+        /// </summary>
+        public void ClearAllAttemptCounts() => _measurementAttemptCountersMap.Clear();
+
         private void Log(string messageOrKey, object[]? args = null, [CallerArgumentExpression(nameof(messageOrKey))] string? resourceName = null) =>
             _logHandler.Log(messageOrKey, args, resourceName);
 

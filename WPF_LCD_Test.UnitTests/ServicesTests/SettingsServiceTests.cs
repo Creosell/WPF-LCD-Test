@@ -141,5 +141,22 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             Assert.That(loadedSettings.ColorAnalyzerChannel, Is.EqualTo("5"));
             }
 
+        [Test]
+        public void Singleton_ConcurrentAccess_ReturnsSameInstance()
+            {
+            // Arrange
+            var instances = new System.Collections.Concurrent.ConcurrentBag<SettingsService>();
+            var tasks = Enumerable.Range(0, 100).Select(_ => Task.Run(() =>
+            {
+                instances.Add(SettingsService.Instance);
+            }));
+
+            // Act
+            Task.WaitAll(tasks.ToArray());
+
+            // Assert
+            Assert.That(instances.Distinct().Count(), Is.EqualTo(1), "All threads should receive the same singleton instance");
+            }
+
         }
     }
