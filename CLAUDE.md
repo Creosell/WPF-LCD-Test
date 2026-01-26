@@ -53,9 +53,13 @@ dotnet test --filter "FullyQualifiedName~TestClassName.TestMethodName"
 
 **Testability:** All system dependencies (file system, COM device, MessageBox, WPF Dispatcher) are wrapped in interfaces and injected, allowing comprehensive mocking with Moq.
 
+**Dependency Injection:** Manual DI in `App.xaml.cs` - services instantiated at startup and injected into MainWindowViewModel constructor. Singletons (SettingsService, LocalizationService) accessed via `.Instance` property.
+
+**Commands:** ViewModels use `RelayCommand` (in `Commands/`) for ICommand implementation binding to UI actions.
+
 ## Configuration
 
-Device test specifications are YAML files in `WPF LCD Test/config/device_configs/` defining min/max/typical values for brightness, contrast, color gamut, RGB primaries, and white point.
+Device test specifications are YAML files in `WPF LCD Test/config/device_configs/` defining min/max/typical values for brightness, contrast, color gamut (RGB/NTSC area), RGB primaries (x/y coordinates), white point, and color temperature. Each config specifies acceptable ranges under `main_tests`.
 
 ## Localization
 

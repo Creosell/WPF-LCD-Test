@@ -1,41 +1,41 @@
 # WPF LCD Test
 
-Десктопное приложение для тестирования цветовых характеристик LCD-дисплеев с использованием колориметров Konica Minolta CA-200/CA-310.
+Desktop application for testing color characteristics of LCD displays using Konica Minolta CA-200/CA-310 colorimeters.
 
-## Технологии
+## Technologies
 
 - .NET 8.0
 - WPF (Windows Presentation Foundation)
 - Material Design Themes
-- MVVM архитектура
+- MVVM architecture
 
-## Возможности
+## Features
 
-- Подключение и калибровка колориметра Konica Minolta
-- Измерение цветовых координат (x, y), яркости и цветовой температуры
-- Поддержка нескольких каналов измерения (0-99)
-- Загрузка конфигураций устройств из YAML-файлов
-- Экспорт результатов измерений
-- Параллельная загрузка отчётов на сервер
-- Локализация (English, 中文)
+- Konica Minolta colorimeter connection and calibration
+- Color coordinate measurement (x, y), brightness, and color temperature
+- Multi-channel measurement support (0-99)
+- Device configuration loading from YAML files
+- Measurement results export
+- Parallel report upload to server
+- Localization (English, 中文)
 
-## Сборка и запуск
+## Build and Run
 
-Требуется Visual Studio 2022+ с установленным .NET 8.0 SDK.
+Requires Visual Studio 2022+ with .NET 8.0 SDK installed.
 
 ```bash
 msbuild "WPF LCD Test.sln" /p:Configuration=Release
 ```
 
-## Тестирование
+## Testing
 
 ```bash
 dotnet test "WPF_LCD_Test.UnitTests\WPF_LCD_Test.UnitTests.csproj"
 ```
 
-## Что планируется добавить
+## Planned Features
 
-- Счётчик для DUT (Device Under Test)
-- Страница для работы с результатами в папке
-- Разделение параметра location на MeasurementPoint с двумя параметрами: Position и Color
-- Перенос времени измерения в настройки
+- Counter for DUT (Device Under Test)
+- Page for working with results in folder
+- Split location parameter into MeasurementPoint with two parameters: Position and Color
+- Move measurement time to settings
