@@ -55,6 +55,10 @@ dotnet test --filter "FullyQualifiedName~TestClassName.TestMethodName"
 
 **Dependency Injection:** Uses Microsoft.Extensions.DependencyInjection container configured in `App.xaml.cs`. Services registered in `ConfigureServices()` method with appropriate lifetimes (Singleton/Transient). ViewModels resolve dependencies through IServiceProvider.
 
+**Path Management:** Centralized through IPathProvider service (PathProvider implementation). Provides BaseDirectory, ConfigDirectory, and DataDirectory paths. Eliminates hardcoded AppDomain.CurrentDomain.BaseDirectory throughout codebase.
+
+**Constants:** Application-wide constants defined in AppConstants class. ColorAnalyzer.MinChannel/MaxChannel used across ColorMeasurementService and SettingsViewModel for validation.
+
 **Commands:** ViewModels use `RelayCommand` (in `Commands/`) for ICommand implementation binding to UI actions.
 
 ## Configuration

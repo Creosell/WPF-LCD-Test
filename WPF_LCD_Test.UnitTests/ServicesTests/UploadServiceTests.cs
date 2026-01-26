@@ -11,6 +11,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
     public class UploadServiceTests
     {
         private MockFileSystem _mockFileSystem;
+        private Mock<IPathProvider> _mockPathProvider;
         private Mock<ILocalizationService> _mockLocalizationService;
         private UploadService _uploadService;
         private string _testBaseDirectory;
@@ -20,6 +21,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public void Setup()
         {
             _mockFileSystem = new MockFileSystem();
+            _mockPathProvider = new Mock<IPathProvider>();
             _mockLocalizationService = new Mock<ILocalizationService>();
             _statusMessages = new List<string>();
 
@@ -48,8 +50,9 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
                 });
 
             _testBaseDirectory = "C:\\TestApp\\";
+            _mockPathProvider.Setup(p => p.BaseDirectory).Returns(_testBaseDirectory);
 
-            _uploadService = new UploadService(_mockFileSystem, _mockLocalizationService.Object);
+            _uploadService = new UploadService(_mockFileSystem, _mockPathProvider.Object, _mockLocalizationService.Object);
             _uploadService.StatusMessage += (sender, message) => _statusMessages.Add(message);
         }
 
@@ -59,7 +62,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public void Constructor_WithDependencies_InitializesCorrectly()
         {
             // Act
-            var service = new UploadService(_mockFileSystem, _mockLocalizationService.Object);
+            var service = new UploadService(_mockFileSystem, _mockPathProvider.Object, _mockLocalizationService.Object);
 
             // Assert
             Assert.That(service, Is.Not.Null);
@@ -81,7 +84,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             // which requires proper application context
             Assert.DoesNotThrow(() =>
             {
-                var service = new UploadService(_mockFileSystem, _mockLocalizationService.Object);
+                var service = new UploadService(_mockFileSystem, _mockPathProvider.Object, _mockLocalizationService.Object);
                 Assert.That(service, Is.Not.Null);
             });
         }

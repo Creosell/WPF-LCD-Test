@@ -25,6 +25,7 @@ namespace WPF_LCD_Test.ViewModels
         private readonly IDispatcher _dispatcher;
         private readonly IUploadService _uploadService;
         private readonly ISettingsService _settingsService;
+        private readonly IPathProvider _pathProvider;
         private readonly LogHandler _logHandler;
 
         private DeviceUnderTest? _currentDevice;
@@ -42,7 +43,6 @@ namespace WPF_LCD_Test.ViewModels
         private bool _isUploadingReports;
         private string _logText = string.Empty;
 
-        private readonly string CONFIGS_DIR = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config", "device_configs");
         private const string SERIAL_NUMBER_PATTERN = "^[a-zA-Z0-9]*$";
         private const string QA_PROBE_SN = "08954195";
         private const int QA_PROBE_CHANNEL = 1;
@@ -227,7 +227,8 @@ namespace WPF_LCD_Test.ViewModels
             ILocalizationService localizationService,
             IDispatcher dispatcher,
             IUploadService uploadService,
-            ISettingsService settingsService)
+            ISettingsService settingsService,
+            IPathProvider pathProvider)
             {
             _colorMeasurementService = colorMeasurementService ?? throw new ArgumentNullException(nameof(colorMeasurementService));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
@@ -236,6 +237,7 @@ namespace WPF_LCD_Test.ViewModels
             _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
             _uploadService = uploadService ?? throw new ArgumentNullException(nameof(uploadService));
+            _pathProvider = pathProvider ?? throw new ArgumentNullException(nameof(pathProvider));
             _logHandler = new LogHandler(_localizationService, AddLogMessage);
 
             ZeroCalibrationCommand = new RelayCommand(ExecuteZeroCalibrationAsync, CanExecuteZeroCalibration);
@@ -271,10 +273,10 @@ namespace WPF_LCD_Test.ViewModels
             {
             try
                 {
-                if (!Directory.Exists(CONFIGS_DIR))
-                    Directory.CreateDirectory(CONFIGS_DIR);
+                if (!Directory.Exists(_pathProvider.ConfigDirectory))
+                    Directory.CreateDirectory(_pathProvider.ConfigDirectory);
 
-                var configFiles = Directory.GetFiles(CONFIGS_DIR, "*.yaml");
+                var configFiles = Directory.GetFiles(_pathProvider.ConfigDirectory, "*.yaml");
                 DeviceConfigurations.Clear();
 
                 foreach (var file in configFiles)
@@ -283,7 +285,7 @@ namespace WPF_LCD_Test.ViewModels
                 if (DeviceConfigurations.Any())
                     SelectedDeviceConfiguration = DeviceConfigurations.First();
                 else
-                    Log(ConfigDirNotFound, [CONFIGS_DIR]);
+                    Log(ConfigDirNotFound, [_pathProvider.ConfigDirectory]);
                 }
             catch (Exception ex)
                 {

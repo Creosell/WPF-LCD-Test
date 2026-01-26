@@ -15,6 +15,7 @@ namespace WPF_LCD_Test.Services
     public partial class UploadService : IUploadService
         {
         private readonly IFileSystem _fileSystem;
+        private readonly IPathProvider _pathProvider;
         private readonly LogHandler _logHandler;
 
         private const string UploadCliName = "Nextcloud_CLI.exe";
@@ -30,10 +31,12 @@ namespace WPF_LCD_Test.Services
         /// Initializes a new instance of UploadService with dependency injection.
         /// </summary>
         /// <param name="fileSystem">File system abstraction for file operations.</param>
+        /// <param name="pathProvider">Path provider for application directories.</param>
         /// <param name="localizationService">Service for localized messages.</param>
-        public UploadService(IFileSystem fileSystem, ILocalizationService localizationService)
+        public UploadService(IFileSystem fileSystem, IPathProvider pathProvider, ILocalizationService localizationService)
             {
             _fileSystem = fileSystem;
+            _pathProvider = pathProvider;
 
             if (localizationService == null) throw new ArgumentNullException(nameof(localizationService));
 
@@ -46,7 +49,7 @@ namespace WPF_LCD_Test.Services
         /// <summary>
         /// Initializes a new instance of UploadService with default dependencies.
         /// </summary>
-        public UploadService() : this(new FileSystem(), LocalizationService.Instance) { }
+        public UploadService() : this(new FileSystem(), new PathProvider(), LocalizationService.Instance) { }
 
         /// <summary>
         /// Reports status message through LogHandler with optional formatting arguments.
@@ -73,7 +76,7 @@ namespace WPF_LCD_Test.Services
                 return true;
                 }
 
-            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var baseDir = _pathProvider.BaseDirectory;
             var uploadedReportsDir = Path.Combine(baseDir, UploadedReportsFolderName);
 
             if (!Directory.Exists(uploadedReportsDir))
@@ -154,7 +157,7 @@ namespace WPF_LCD_Test.Services
         /// <returns>List of upload items with local files and remote directory paths.</returns>
         private List<UploadReportItem> ScanLocalFolders()
             {
-            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var baseDir = _pathProvider.BaseDirectory;
             var archivePath = _fileSystem.Path.Combine(baseDir, ArchiveFolderName);
             var resultsPath = _fileSystem.Path.Combine(baseDir, ResultsFolderName);
 

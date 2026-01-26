@@ -17,8 +17,6 @@ namespace WPF_LCD_Test.ViewModels
         private readonly IColorMeasurementService _colorMeasurementService;
         private readonly IDialogService _dialogService;
         private string _colorAnalyzerChannel;
-        private const int MinChannel = 0;
-        private const int MaxChannel = 99;
 
         public string ColorAnalyzerChannel
             {
@@ -181,17 +179,17 @@ namespace WPF_LCD_Test.ViewModels
 
         private int GetChannel(string channel)
             {
-            if (!int.TryParse(channel, out int result) || result < MinChannel || result > MaxChannel)
+            if (!int.TryParse(channel, out int result) || result < AppConstants.ColorAnalyzer.MinChannel || result > AppConstants.ColorAnalyzer.MaxChannel)
                 {
                 _dialogService.ShowMessage(
                     !int.TryParse(channel, out _)
                         ? "Invalid channel format"
-                        : $"Available channels: {MinChannel}-{MaxChannel}",
+                        : $"Available channels: {AppConstants.ColorAnalyzer.MinChannel}-{AppConstants.ColorAnalyzer.MaxChannel}",
                     Err);
 
                 return int.TryParse(_settingsService.LoadSettings().ColorAnalyzerChannel, out int fallback)
                     ? fallback
-                    : MinChannel;
+                    : AppConstants.ColorAnalyzer.MinChannel;
                 }
 
             return result;

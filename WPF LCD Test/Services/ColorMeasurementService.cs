@@ -19,8 +19,6 @@ namespace WPF_LCD_Test.Services
         private int _channel = 0;
         private string _probeSN = "Unknown";
 
-        private const int MinChannel = 0;
-        private const int MaxChannel = 99;
         private const int RemoteModeOFF = 0;
         private const int RemoteModeON = 1;
         private const int RemoteModeLOCKED = 2;
@@ -249,7 +247,7 @@ namespace WPF_LCD_Test.Services
         /// </summary>
         /// <param name="channel">Channel number to validate.</param>
         /// <returns>True if channel is valid, false otherwise.</returns>
-        private bool IsValidChannel(int channel) => channel >= MinChannel && channel <= MaxChannel;
+        private bool IsValidChannel(int channel) => channel >= AppConstants.ColorAnalyzer.MinChannel && channel <= AppConstants.ColorAnalyzer.MaxChannel;
 
         /// <summary>
         /// Asynchronously performs series of measurements and calculates average values.

@@ -25,6 +25,7 @@ namespace WPF_LCD_Test
             // Infrastructure services
             services.AddSingleton<IFileSystem, FileSystem>();
             services.AddSingleton<IDispatcher, WpfDispatcher>();
+            services.AddSingleton<IPathProvider>(new PathProvider());
 
             // Singleton services
             services.AddSingleton<ISettingsService>(SettingsService.Instance);
@@ -32,14 +33,9 @@ namespace WPF_LCD_Test
 
             // Application services
             services.AddSingleton<IColorMeasurementService, ColorMeasurementService>();
-            services.AddSingleton<IFileService>(sp => new FileService(
-                sp.GetRequiredService<IFileSystem>(),
-                AppDomain.CurrentDomain.BaseDirectory,
-                sp.GetRequiredService<ILocalizationService>()));
+            services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<IDialogService, DialogService>();
-            services.AddSingleton<IUploadService>(sp => new UploadService(
-                sp.GetRequiredService<IFileSystem>(),
-                sp.GetRequiredService<ILocalizationService>()));
+            services.AddSingleton<IUploadService, UploadService>();
 
             // ViewModels
             services.AddTransient<MainWindowViewModel>();

@@ -39,6 +39,13 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             services.AddSingleton(_mockSettingsService.Object);
             services.AddSingleton(_mockDispatcher.Object);
             services.AddSingleton(_mockUploadService.Object);
+
+            var mockPathProvider = new Mock<IPathProvider>();
+            mockPathProvider.Setup(p => p.BaseDirectory).Returns("C:\\TestApp\\");
+            mockPathProvider.Setup(p => p.ConfigDirectory).Returns("C:\\TestApp\\config\\device_configs");
+            mockPathProvider.Setup(p => p.DataDirectory).Returns("C:\\TestApp\\data");
+            services.AddSingleton(mockPathProvider.Object);
+
             services.AddTransient<MeasurementViewModel>();
             services.AddTransient<SettingsViewModel>();
 

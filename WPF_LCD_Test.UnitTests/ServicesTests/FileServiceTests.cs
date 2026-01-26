@@ -16,6 +16,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
     public class FileServiceTests
     {
         private MockFileSystem _mockFileSystem;
+        private Mock<IPathProvider> _mockPathProvider;
         private FileService _fileService;
         private string _testBasePath;
         private Mock<ILocalizationService> _mockLocalizationService;
@@ -24,11 +25,14 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public void Setup()
         {
             _mockFileSystem = new MockFileSystem();
+            _mockPathProvider = new Mock<IPathProvider>();
             _mockLocalizationService = new Mock<ILocalizationService>();
 
             _mockLocalizationService.SetupGet(ls => ls.CurrentCulture).Returns(CultureInfo.InvariantCulture);
 
             _testBasePath = "C:\\TestApp\\";
+            _mockPathProvider.Setup(p => p.BaseDirectory).Returns(_testBasePath);
+            _mockPathProvider.Setup(p => p.DataDirectory).Returns(System.IO.Path.Combine(_testBasePath, "data"));
         }
 
         // Тест для конструктора / InitializeWorkingFolders
@@ -39,7 +43,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             string expectedBaseFolderPath = System.IO.Path.Combine(_testBasePath, "data");
 
             // Act
-            _fileService = new FileService(_mockFileSystem, _testBasePath, _mockLocalizationService.Object);
+            _fileService = new FileService(_mockFileSystem, _mockPathProvider.Object, _mockLocalizationService.Object);
 
             // Assert
             Assert.That(_mockFileSystem.Directory.Exists(expectedBaseFolderPath), Is.True);
@@ -54,7 +58,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             _mockFileSystem.Directory.CreateDirectory(expectedBaseFolderPath);
 
             // Act
-            _fileService = new FileService(_mockFileSystem, _testBasePath, _mockLocalizationService.Object);
+            _fileService = new FileService(_mockFileSystem, _mockPathProvider.Object, _mockLocalizationService.Object);
 
             // Assert
             Assert.That(_mockFileSystem.Directory.Exists(expectedBaseFolderPath), Is.True);
@@ -86,7 +90,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public async Task SaveDeviceDataToJsonAsync_ReturnsFalseAndSendsMessage_WhenDeviceIsNull()
         {
             // Arrange
-            _fileService = new FileService(_mockFileSystem, _testBasePath, _mockLocalizationService.Object);
+            _fileService = new FileService(_mockFileSystem, _mockPathProvider.Object, _mockLocalizationService.Object);
             string statusMessage = null;
             bool? saveCompletedStatus = null;
 
@@ -106,7 +110,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public async Task SaveDeviceDataToJsonAsync_ReturnsTrueAndSavesFile_WhenDeviceIsValid()
         {
             // Arrange
-            _fileService = new FileService(_mockFileSystem, _testBasePath, _mockLocalizationService.Object);
+            _fileService = new FileService(_mockFileSystem, _mockPathProvider.Object, _mockLocalizationService.Object);
             var device = new DeviceUnderTest("SN123");
             string expectedFilePath = System.IO.Path.Combine(_testBasePath, "data", "SN123.json");
 
@@ -164,7 +168,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public async Task SaveMeasurementToCsvAsync_ReturnsFalseAndSendsMessage_WhenSerialNumberIsEmpty()
         {
             // Arrange
-            _fileService = new FileService(_mockFileSystem, _testBasePath, _mockLocalizationService.Object);
+            _fileService = new FileService(_mockFileSystem, _mockPathProvider.Object, _mockLocalizationService.Object);
             string statusMessage = null;
             _fileService.StatusMessage += (sender, msg) => statusMessage = msg;
 
@@ -180,7 +184,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public async Task SaveMeasurementToCsvAsync_ReturnsFalseAndSendsMessage_WhenCsvStringIsEmpty()
         {
             // Arrange
-            _fileService = new FileService(_mockFileSystem, _testBasePath, _mockLocalizationService.Object);
+            _fileService = new FileService(_mockFileSystem, _mockPathProvider.Object, _mockLocalizationService.Object);
             string statusMessage = null;
             _fileService.StatusMessage += (sender, msg) => statusMessage = msg;
 
@@ -196,7 +200,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public async Task SaveMeasurementToCsvAsync_ReturnsFalseAndSendsMessage_WhenLocationNameIsEmpty()
         {
             // Arrange
-            _fileService = new FileService(_mockFileSystem, _testBasePath, _mockLocalizationService.Object);
+            _fileService = new FileService(_mockFileSystem, _mockPathProvider.Object, _mockLocalizationService.Object);
             string statusMessage = null;
             _fileService.StatusMessage += (sender, msg) => statusMessage = msg;
 
@@ -212,7 +216,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public async Task SaveMeasurementToCsvAsync_CreatesDirectoryAndSavesFile_WhenDataIsValidAndFolderNotExist()
         {
             // Arrange
-            _fileService = new FileService(_mockFileSystem, _testBasePath, _mockLocalizationService.Object);
+            _fileService = new FileService(_mockFileSystem, _mockPathProvider.Object, _mockLocalizationService.Object);
             string serialNumber = "SN789";
             string measurementLocation = "Point1";
             string csvContent = "header\n1,2,3";
@@ -244,7 +248,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             string expectedFilePath = System.IO.Path.Combine(expectedFolderPath, $"{measurementLocation}.csv");
 
             _mockFileSystem.Directory.CreateDirectory(expectedFolderPath);
-            _fileService = new FileService(_mockFileSystem, _testBasePath, _mockLocalizationService.Object);
+            _fileService = new FileService(_mockFileSystem, _mockPathProvider.Object, _mockLocalizationService.Object);
 
             string statusMessage = null;
             _fileService.StatusMessage += (sender, msg) => statusMessage = msg;
@@ -269,7 +273,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
 
             // MockFileSystem doesn't easily simulate IO exceptions
             // This test validates basic error handling structure
-            _fileService = new FileService(_mockFileSystem, _testBasePath, _mockLocalizationService.Object);
+            _fileService = new FileService(_mockFileSystem, _mockPathProvider.Object, _mockLocalizationService.Object);
 
             string statusMessage = null;
             _fileService.StatusMessage += (sender, msg) => statusMessage = msg;

@@ -13,11 +13,10 @@ namespace WPF_LCD_Test.Services
     /// </summary>
     public class FileService : IFileService
         {
-        private readonly string _workFolerName = "data";
-        private string _applicationBasePath;
         private string _baseFolderPath;
 
         private readonly IFileSystem _fileSystem;
+        private readonly IPathProvider _pathProvider;
         private readonly ILocalizationService _localizationService;
 
         private static readonly JsonSerializerOptions _saveSerializerOptions = new()
@@ -33,7 +32,7 @@ namespace WPF_LCD_Test.Services
         /// <summary>
         /// Gets the working folder name.
         /// </summary>
-        public string WorkFolderName => _workFolerName;
+        public string WorkFolderName => "data";
 
         /// <summary>
         /// Occurs when status message needs to be reported.
@@ -48,7 +47,7 @@ namespace WPF_LCD_Test.Services
         /// <summary>
         /// Initializes a new instance of FileService with default dependencies.
         /// </summary>
-        public FileService() : this(new FileSystem(), AppDomain.CurrentDomain.BaseDirectory, LocalizationService.Instance)
+        public FileService() : this(new FileSystem(), new PathProvider(), LocalizationService.Instance)
             {
             }
 
@@ -56,11 +55,11 @@ namespace WPF_LCD_Test.Services
         /// Initializes a new instance of FileService with dependency injection.
         /// </summary>
         /// <param name="fileSystem">File system abstraction for file operations.</param>
-        /// <param name="applicationBasePath">Base path for application data.</param>
+        /// <param name="pathProvider">Path provider for application directories.</param>
         /// <param name="localizationService">Service for localized messages.</param>
-        public FileService(IFileSystem fileSystem, string applicationBasePath, ILocalizationService localizationService)
+        public FileService(IFileSystem fileSystem, IPathProvider pathProvider, ILocalizationService localizationService)
             {
-            (_fileSystem, _applicationBasePath, _localizationService) = (fileSystem, applicationBasePath, localizationService);
+            (_fileSystem, _pathProvider, _localizationService) = (fileSystem, pathProvider, localizationService);
             InitializeWorkingFolders();
             }
 
@@ -71,7 +70,7 @@ namespace WPF_LCD_Test.Services
             {
             try
                 {
-                _baseFolderPath = _fileSystem.Path.Combine(_applicationBasePath, _workFolerName);
+                _baseFolderPath = _pathProvider.DataDirectory;
 
                 if (!_fileSystem.Directory.Exists(_baseFolderPath))
                     {
