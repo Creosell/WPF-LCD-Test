@@ -1,5 +1,6 @@
 ﻿using Moq;
-using MvvmHelpers; // Для BaseViewModel
+using MvvmHelpers;
+using Microsoft.Extensions.DependencyInjection;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.ViewModels;
 
@@ -16,12 +17,12 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         private Mock<IDispatcher> _mockDispatcher;
         private Mock<IUploadService> _mockUploadService;
 
+        private IServiceProvider _serviceProvider;
         private MainWindowViewModel _viewModel;
 
         [SetUp]
         public void Setup()
         {
-            // Инициализация моков для каждого теста
             _mockColorMeasurementService = new Mock<IColorMeasurementService>();
             _mockFileService = new Mock<IFileService>();
             _mockDialogService = new Mock<IDialogService>();
@@ -30,17 +31,19 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             _mockDispatcher = new Mock<IDispatcher>();
             _mockUploadService = new Mock<IUploadService>();
 
-            // Инициализация ViewModel с моками
-            _viewModel = new MainWindowViewModel(
-                _mockColorMeasurementService.Object,
-                _mockFileService.Object,
-                _mockDialogService.Object,
-                _mockLocalizationService.Object,
-                _mockSettingsService.Object,
-                _mockUploadService.Object,
-                _mockDispatcher.Object
+            var services = new ServiceCollection();
+            services.AddSingleton(_mockColorMeasurementService.Object);
+            services.AddSingleton(_mockFileService.Object);
+            services.AddSingleton(_mockDialogService.Object);
+            services.AddSingleton(_mockLocalizationService.Object);
+            services.AddSingleton(_mockSettingsService.Object);
+            services.AddSingleton(_mockDispatcher.Object);
+            services.AddSingleton(_mockUploadService.Object);
+            services.AddTransient<MeasurementViewModel>();
+            services.AddTransient<SettingsViewModel>();
 
-            );
+            _serviceProvider = services.BuildServiceProvider();
+            _viewModel = new MainWindowViewModel(_serviceProvider);
         }
 
         [TearDown]
@@ -60,80 +63,9 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         }
 
         [Test]
-        [TestCase("")]
-        public void Ctor_ThrowsArgumentNullException_IfAnyDependencyIsNull(string paramName)
+        public void Ctor_ThrowsArgumentNullException_IfServiceProviderIsNull()
         {
-            // Этот тест сложнее, так как нужно динамически передавать null
-            // Создадим тестовые сценарии для каждого параметра.
-            Assert.Throws<ArgumentNullException>(() => new MainWindowViewModel(
-                null,
-                _mockFileService.Object,
-                _mockDialogService.Object,
-                _mockLocalizationService.Object,
-                _mockSettingsService.Object,
-                _mockUploadService.Object,
-                _mockDispatcher.Object
-            ), "Should throw for colorMeasurementService");
-
-            Assert.Throws<ArgumentNullException>(() => new MainWindowViewModel(
-                _mockColorMeasurementService.Object,
-                null,
-                _mockDialogService.Object,
-                _mockLocalizationService.Object,
-                _mockSettingsService.Object,
-                _mockUploadService.Object,
-                _mockDispatcher.Object
-            ), "Should throw for fileService");
-
-            Assert.Throws<ArgumentNullException>(() => new MainWindowViewModel(
-                _mockColorMeasurementService.Object,
-                _mockFileService.Object,
-                null,
-                _mockLocalizationService.Object,
-                _mockSettingsService.Object,
-                _mockUploadService.Object,
-                _mockDispatcher.Object
-            ), "Should throw for dialogService");
-
-            Assert.Throws<ArgumentNullException>(() => new MainWindowViewModel(
-                _mockColorMeasurementService.Object,
-                _mockFileService.Object,
-                _mockDialogService.Object,
-                null,
-                _mockSettingsService.Object,
-                _mockUploadService.Object,
-                _mockDispatcher.Object
-            ), "Should throw for localizationService");
-
-            Assert.Throws<ArgumentNullException>(() => new MainWindowViewModel(
-                _mockColorMeasurementService.Object,
-                _mockFileService.Object,
-                _mockDialogService.Object,
-                _mockLocalizationService.Object,
-                null,
-                _mockUploadService.Object,
-                _mockDispatcher.Object
-            ), "Should throw for settingsService");
-
-            Assert.Throws<ArgumentNullException>(() => new MainWindowViewModel(
-    _mockColorMeasurementService.Object,
-    _mockFileService.Object,
-    _mockDialogService.Object,
-    _mockLocalizationService.Object,
-    _mockSettingsService.Object,
-    null,
-                    _mockDispatcher.Object
-), "Should throw for uploadService");
-
-            Assert.Throws<ArgumentNullException>(() => new MainWindowViewModel(
-                _mockColorMeasurementService.Object,
-                _mockFileService.Object,
-                _mockDialogService.Object,
-                _mockLocalizationService.Object,
-                _mockSettingsService.Object,
-                                _mockUploadService.Object,
-                null
-            ), "Should throw for dispatcher");
+            Assert.Throws<ArgumentNullException>(() => new MainWindowViewModel(null));
         }
 
         // --- Тесты навигации ---

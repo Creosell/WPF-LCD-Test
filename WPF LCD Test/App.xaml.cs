@@ -1,22 +1,53 @@
 ﻿using System.Diagnostics;
+using System.IO.Abstractions;
 using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
 using WPF_LCD_Test.Services;
 using WPF_LCD_Test.ViewModels;
 using WPF_LCD_Test.Views;
+using WPF_LCD_Test.Wrappers;
 
 namespace WPF_LCD_Test
     {
     public partial class App : Application
         {
-        private IColorMeasurementService colorMeasurementService = new ColorMeasurementService();
-        private IFileService fileService = new FileService();
-        private IDialogService dialogService = new DialogService();
-        private ISettingsService settingsService = SettingsService.Instance;
-        private ILocalizationService localizationService = LocalizationService.Instance;
-        private IDispatcher dispatcher = new WpfDispatcher();
-        private IUploadService uploadService = new UploadService();
+        private IServiceProvider _serviceProvider;
+
+        /// <summary>
+        /// Configures dependency injection container with all application services.
+        /// </summary>
+        private void ConfigureServices()
+            {
+            var services = new ServiceCollection();
+
+            // Infrastructure services
+            services.AddSingleton<IFileSystem, FileSystem>();
+            services.AddSingleton<IDispatcher, WpfDispatcher>();
+
+            // Singleton services
+            services.AddSingleton<ISettingsService>(SettingsService.Instance);
+            services.AddSingleton<ILocalizationService>(LocalizationService.Instance);
+
+            // Application services
+            services.AddSingleton<IColorMeasurementService, ColorMeasurementService>();
+            services.AddSingleton<IFileService>(sp => new FileService(
+                sp.GetRequiredService<IFileSystem>(),
+                AppDomain.CurrentDomain.BaseDirectory,
+                sp.GetRequiredService<ILocalizationService>()));
+            services.AddSingleton<IDialogService, DialogService>();
+            services.AddSingleton<IUploadService>(sp => new UploadService(
+                sp.GetRequiredService<IFileSystem>(),
+                sp.GetRequiredService<ILocalizationService>()));
+
+            // ViewModels
+            services.AddTransient<MainWindowViewModel>();
+            services.AddTransient<MeasurementViewModel>();
+            services.AddTransient<SettingsViewModel>();
+
+            _serviceProvider = services.BuildServiceProvider();
+            }
 
         /// <summary>
         /// Initializes application services, loads settings, configures localization, and displays main window.
@@ -25,6 +56,12 @@ namespace WPF_LCD_Test
         /// <param name="e">Startup event arguments.</param>
         private void Application_Startup(object sender, StartupEventArgs e)
             {
+            ConfigureServices();
+
+            var settingsService = _serviceProvider.GetRequiredService<ISettingsService>();
+            var localizationService = _serviceProvider.GetRequiredService<ILocalizationService>();
+            var colorMeasurementService = _serviceProvider.GetRequiredService<IColorMeasurementService>();
+
             AppSettings appSettings = settingsService.LoadSettings();
 
             localizationService.LanguageChanged += LocalizationService_LanguageChanged;
@@ -35,15 +72,7 @@ namespace WPF_LCD_Test
                 colorMeasurementService.CurrentChannel = channel;
                 }
 
-            MainWindowViewModel mainWindowViewModel = new(
-                colorMeasurementService,
-                fileService,
-                dialogService,
-                localizationService,
-                settingsService,
-                uploadService,
-                dispatcher
-            );
+            var mainWindowViewModel = _serviceProvider.GetRequiredService<MainWindowViewModel>();
 
             MainWindow mainWindow = new()
                 {
@@ -99,10 +128,10 @@ namespace WPF_LCD_Test
         /// <param name="e">Exit event arguments.</param>
         protected override void OnExit(ExitEventArgs e)
             {
-            ( colorMeasurementService as IDisposable )?.Dispose();
-            ( fileService as IDisposable )?.Dispose();
-            ( dialogService as IDisposable )?.Dispose();
-            ( localizationService as IDisposable )?.Dispose();
+            if (_serviceProvider is IDisposable disposable)
+                {
+                disposable.Dispose();
+                }
             base.OnExit(e);
             }
         }

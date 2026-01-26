@@ -53,7 +53,7 @@ dotnet test --filter "FullyQualifiedName~TestClassName.TestMethodName"
 
 **Testability:** All system dependencies (file system, COM device, MessageBox, WPF Dispatcher) are wrapped in interfaces and injected, allowing comprehensive mocking with Moq. File system operations use System.IO.Abstractions (IFileSystem) with MockFileSystem for testing.
 
-**Dependency Injection:** Manual DI in `App.xaml.cs` - services instantiated at startup and injected into MainWindowViewModel constructor. Singletons (SettingsService, LocalizationService) accessed via `.Instance` property.
+**Dependency Injection:** Uses Microsoft.Extensions.DependencyInjection container configured in `App.xaml.cs`. Services registered in `ConfigureServices()` method with appropriate lifetimes (Singleton/Transient). ViewModels resolve dependencies through IServiceProvider.
 
 **Commands:** ViewModels use `RelayCommand` (in `Commands/`) for ICommand implementation binding to UI actions.
 

@@ -1,5 +1,6 @@
 ﻿using MvvmHelpers;
 using System.Windows.Input;
+using Microsoft.Extensions.DependencyInjection;
 using WPF_LCD_Test.Commands;
 using WPF_LCD_Test.Interfaces;
 
@@ -10,13 +11,7 @@ namespace WPF_LCD_Test.ViewModels
     /// </summary>
     public class MainWindowViewModel : BaseViewModel, IDisposable
     {
-        private readonly IColorMeasurementService _colorMeasurementService;
-        private readonly IFileService _fileService;
-        private readonly IDialogService _dialogService;
-        private readonly ILocalizationService _localizationService;
-        private readonly ISettingsService _settingService;
-        private readonly IDispatcher _dispatcher;
-        private readonly IUploadService _uploadService;
+        private readonly IServiceProvider _serviceProvider;
         private BaseViewModel _currentPageViewModel;
         private string _currentPageIdentifier;
         private MeasurementViewModel? _measurementViewModel;
@@ -46,31 +41,12 @@ namespace WPF_LCD_Test.ViewModels
         public ICommand NavigateCommand { get; }
 
         /// <summary>
-        /// Initializes a new instance of MainWindowViewModel with required services.
+        /// Initializes a new instance of MainWindowViewModel with service provider.
         /// </summary>
-        /// <param name="colorMeasurementService">Service for color measurement operations.</param>
-        /// <param name="fileService">Service for file operations.</param>
-        /// <param name="dialogService">Service for dialog operations.</param>
-        /// <param name="localizationService">Service for localization.</param>
-        /// <param name="settingsService">Service for application settings.</param>
-        /// <param name="uploadService">Service for upload operations.</param>
-        /// <param name="dispatcher">Dispatcher for thread marshalling.</param>
-        public MainWindowViewModel(
-            IColorMeasurementService colorMeasurementService,
-            IFileService fileService,
-            IDialogService dialogService,
-            ILocalizationService localizationService,
-            ISettingsService settingsService,
-            IUploadService uploadService,
-            IDispatcher dispatcher) : base()
+        /// <param name="serviceProvider">Service provider for dependency resolution.</param>
+        public MainWindowViewModel(IServiceProvider serviceProvider) : base()
         {
-            _colorMeasurementService = colorMeasurementService ?? throw new ArgumentNullException(nameof(colorMeasurementService));
-            _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
-            _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
-            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
-            _settingService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
-            _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
-            _uploadService = uploadService ?? throw new ArgumentNullException(nameof(uploadService));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             NavigateCommand = new RelayCommand(ExecuteNavigate, CanExecuteNavigate);
             ExecuteNavigate("Measurement");
         }
@@ -94,37 +70,22 @@ namespace WPF_LCD_Test.ViewModels
             switch (pageName)
             {
                 case "Measurement":
-                    _measurementViewModel ??= new MeasurementViewModel(
-                        _colorMeasurementService,
-                        _fileService,
-                        _dialogService,
-                        _localizationService,
-                        _dispatcher,
-                        _uploadService,
-                        _settingService
-                    );
+                    _measurementViewModel ??= _serviceProvider.GetRequiredService<MeasurementViewModel>();
                     targetViewModel = _measurementViewModel;
                     break;
                 case "Settings":
-                    _settingsViewModel ??= new SettingsViewModel(_settingService, _dialogService, _colorMeasurementService, _localizationService);
+                    _settingsViewModel ??= _serviceProvider.GetRequiredService<SettingsViewModel>();
                     targetViewModel = _settingsViewModel;
                     break;
                 default:
-                    _measurementViewModel ??= new MeasurementViewModel(
-                        _colorMeasurementService,
-                        _fileService,
-                        _dialogService,
-                        _localizationService,
-                        _dispatcher,
-                        _uploadService,
-                        _settingService
-                    );
+                    _measurementViewModel ??= _serviceProvider.GetRequiredService<MeasurementViewModel>();
                     targetViewModel = _measurementViewModel;
                     break;
             }
             if (targetViewModel != null && targetViewModel != _currentPageViewModel)
             {
                 CurrentPageViewModel = targetViewModel;
+                CurrentPageIdentifier = pageName;
             }
         }
 
