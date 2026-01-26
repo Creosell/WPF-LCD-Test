@@ -51,7 +51,7 @@ dotnet test --filter "FullyQualifiedName~TestClassName.TestMethodName"
 | IUploadService | Report upload with parallel support |
 | IDialogService | File dialogs, message boxes |
 
-**Testability:** All system dependencies (file system, COM device, MessageBox, WPF Dispatcher) are wrapped in interfaces and injected, allowing comprehensive mocking with Moq.
+**Testability:** All system dependencies (file system, COM device, MessageBox, WPF Dispatcher) are wrapped in interfaces and injected, allowing comprehensive mocking with Moq. File system operations use System.IO.Abstractions (IFileSystem) with MockFileSystem for testing.
 
 **Dependency Injection:** Manual DI in `App.xaml.cs` - services instantiated at startup and injected into MainWindowViewModel constructor. Singletons (SettingsService, LocalizationService) accessed via `.Instance` property.
 

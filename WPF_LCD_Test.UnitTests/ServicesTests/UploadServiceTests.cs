@@ -1,5 +1,6 @@
 using Moq;
 using System.Globalization;
+using System.IO.Abstractions.TestingHelpers;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Services;
 using static WPF_LCD_Test.Resources.Resources;
@@ -9,8 +10,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
     [TestFixture]
     public class UploadServiceTests
     {
-        private Mock<IDirectory> _mockDirectory;
-        private Mock<IPath> _mockPath;
+        private MockFileSystem _mockFileSystem;
         private Mock<ILocalizationService> _mockLocalizationService;
         private UploadService _uploadService;
         private string _testBaseDirectory;
@@ -19,8 +19,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         [SetUp]
         public void Setup()
         {
-            _mockDirectory = new Mock<IDirectory>();
-            _mockPath = new Mock<IPath>();
+            _mockFileSystem = new MockFileSystem();
             _mockLocalizationService = new Mock<ILocalizationService>();
             _statusMessages = new List<string>();
 
@@ -48,15 +47,9 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
                     };
                 });
 
-            // Setup path combining - Combine takes params string[] as a single parameter
-            _mockPath.Setup(p => p.Combine(It.IsAny<string[]>()))
-                .Returns((string[] paths) => System.IO.Path.Combine(paths));
-            _mockPath.Setup(p => p.GetFileName(It.IsAny<string>()))
-                .Returns((string path) => System.IO.Path.GetFileName(path));
-
             _testBaseDirectory = "C:\\TestApp\\";
 
-            _uploadService = new UploadService(_mockDirectory.Object, _mockPath.Object, _mockLocalizationService.Object);
+            _uploadService = new UploadService(_mockFileSystem, _mockLocalizationService.Object);
             _uploadService.StatusMessage += (sender, message) => _statusMessages.Add(message);
         }
 
@@ -66,7 +59,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public void Constructor_WithDependencies_InitializesCorrectly()
         {
             // Act
-            var service = new UploadService(_mockDirectory.Object, _mockPath.Object, _mockLocalizationService.Object);
+            var service = new UploadService(_mockFileSystem, _mockLocalizationService.Object);
 
             // Assert
             Assert.That(service, Is.Not.Null);
@@ -77,7 +70,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         {
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() =>
-                new UploadService(_mockDirectory.Object, _mockPath.Object, null!));
+                new UploadService(_mockFileSystem, null!));
         }
 
         [Test]
@@ -88,7 +81,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             // which requires proper application context
             Assert.DoesNotThrow(() =>
             {
-                var service = new UploadService(_mockDirectory.Object, _mockPath.Object, _mockLocalizationService.Object);
+                var service = new UploadService(_mockFileSystem, _mockLocalizationService.Object);
                 Assert.That(service, Is.Not.Null);
             });
         }

@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.IO.Abstractions;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
-using WPF_LCD_Test.Wrappers;
 using static WPF_LCD_Test.Resources.Resources;
 
 namespace WPF_LCD_Test.Services
@@ -14,8 +14,7 @@ namespace WPF_LCD_Test.Services
     /// </summary>
     public partial class UploadService : IUploadService
         {
-        private readonly IDirectory _directory;
-        private readonly IPath _path;
+        private readonly IFileSystem _fileSystem;
         private readonly LogHandler _logHandler;
 
         private const string UploadCliName = "Nextcloud_CLI.exe";
@@ -30,13 +29,11 @@ namespace WPF_LCD_Test.Services
         /// <summary>
         /// Initializes a new instance of UploadService with dependency injection.
         /// </summary>
-        /// <param name="directory">Directory wrapper for file system operations.</param>
-        /// <param name="path">Path wrapper for path operations.</param>
+        /// <param name="fileSystem">File system abstraction for file operations.</param>
         /// <param name="localizationService">Service for localized messages.</param>
-        public UploadService(IDirectory directory, IPath path, ILocalizationService localizationService)
+        public UploadService(IFileSystem fileSystem, ILocalizationService localizationService)
             {
-            _directory = directory;
-            _path = path;
+            _fileSystem = fileSystem;
 
             if (localizationService == null) throw new ArgumentNullException(nameof(localizationService));
 
@@ -49,7 +46,7 @@ namespace WPF_LCD_Test.Services
         /// <summary>
         /// Initializes a new instance of UploadService with default dependencies.
         /// </summary>
-        public UploadService() : this(new DirectoryWrapper(), new PathWrapper(), LocalizationService.Instance) { }
+        public UploadService() : this(new FileSystem(), LocalizationService.Instance) { }
 
         /// <summary>
         /// Reports status message through LogHandler with optional formatting arguments.
@@ -158,24 +155,24 @@ namespace WPF_LCD_Test.Services
         private List<UploadReportItem> ScanLocalFolders()
             {
             var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            var archivePath = _path.Combine(baseDir, ArchiveFolderName);
-            var resultsPath = _path.Combine(baseDir, ResultsFolderName);
+            var archivePath = _fileSystem.Path.Combine(baseDir, ArchiveFolderName);
+            var resultsPath = _fileSystem.Path.Combine(baseDir, ResultsFolderName);
 
             var reports = new List<UploadReportItem>();
             var regex = new Regex(FilenameRegexPattern, RegexOptions.IgnoreCase);
             var uploadBatches = new Dictionary<string, UploadReportItem>();
 
-            if (!_directory.Exists(archivePath))
+            if (!_fileSystem.Directory.Exists(archivePath))
                 {
                 ReportStatus(ArchiveFolderNotFound, [archivePath]);
                 return reports;
                 }
 
-            var zipFiles = _directory.EnumerateFiles(archivePath, "*.zip", SearchOption.TopDirectoryOnly);
+            var zipFiles = _fileSystem.Directory.EnumerateFiles(archivePath, "*.zip", SearchOption.TopDirectoryOnly);
 
             foreach (var zipFilePath in zipFiles)
                 {
-                var zipFileName = _path.GetFileName(zipFilePath);
+                var zipFileName = _fileSystem.Path.GetFileName(zipFilePath);
                 var match = regex.Match(zipFileName);
 
                 if (match.Success)
@@ -209,12 +206,12 @@ namespace WPF_LCD_Test.Services
                     }
                 }
 
-            if (_directory.Exists(resultsPath))
+            if (_fileSystem.Directory.Exists(resultsPath))
                 {
                 var baseFileNames = uploadBatches.Keys;
                 foreach (var baseName in baseFileNames)
                     {
-                    var resultFiles = _directory.EnumerateFiles(resultsPath, $"{baseName}.*", SearchOption.TopDirectoryOnly).ToList();
+                    var resultFiles = _fileSystem.Directory.EnumerateFiles(resultsPath, $"{baseName}.*", SearchOption.TopDirectoryOnly).ToList();
                     if (uploadBatches.TryGetValue(baseName, out var item))
                         {
                         item.LocalFilesToUpload.AddRange(resultFiles);
@@ -239,7 +236,7 @@ namespace WPF_LCD_Test.Services
         /// <returns>True if upload succeeded, false otherwise.</returns>
         private async Task<bool> ExecuteSingleFileUploadAsync(string localPathArg, string remoteDir)
             {
-            var fileName = _path.GetFileName(localPathArg);
+            var fileName = _fileSystem.Path.GetFileName(localPathArg);
             var remoteFullPath = remoteDir + fileName;
             var cleanRemoteFullPath = remoteFullPath.Replace('\\', '/');
             var arguments = $"upload -l \"{localPathArg}\" -r \"{cleanRemoteFullPath}\" -f";

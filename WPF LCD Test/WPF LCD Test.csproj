@@ -46,6 +46,7 @@
   <ItemGroup>
 	<PackageReference Include="MaterialDesignThemes" Version="5.2.2-ci976" />
 	<PackageReference Include="Refractored.MvvmHelpers" Version="1.6.2" />
+	<PackageReference Include="System.IO.Abstractions" Version="22.1.0" />
   </ItemGroup>
 
   <ItemGroup>

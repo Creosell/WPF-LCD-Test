@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.IO.Abstractions;
 using System.Text.Json;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
-using WPF_LCD_Test.Wrappers;
 using static WPF_LCD_Test.Resources.Resources;
 
 namespace WPF_LCD_Test.Services
@@ -17,9 +17,7 @@ namespace WPF_LCD_Test.Services
         private string _applicationBasePath;
         private string _baseFolderPath;
 
-        private readonly IDirectory _directory;
-        private readonly IFile _file;
-        private readonly IPath _path;
+        private readonly IFileSystem _fileSystem;
         private readonly ILocalizationService _localizationService;
 
         private static readonly JsonSerializerOptions _saveSerializerOptions = new()
@@ -50,21 +48,19 @@ namespace WPF_LCD_Test.Services
         /// <summary>
         /// Initializes a new instance of FileService with default dependencies.
         /// </summary>
-        public FileService() : this(new DirectoryWrapper(), new FileWrapper(), new PathWrapper(), AppDomain.CurrentDomain.BaseDirectory, LocalizationService.Instance)
+        public FileService() : this(new FileSystem(), AppDomain.CurrentDomain.BaseDirectory, LocalizationService.Instance)
             {
             }
 
         /// <summary>
         /// Initializes a new instance of FileService with dependency injection.
         /// </summary>
-        /// <param name="directory">Directory wrapper for directory operations.</param>
-        /// <param name="file">File wrapper for file operations.</param>
-        /// <param name="path">Path wrapper for path operations.</param>
+        /// <param name="fileSystem">File system abstraction for file operations.</param>
         /// <param name="applicationBasePath">Base path for application data.</param>
         /// <param name="localizationService">Service for localized messages.</param>
-        public FileService(IDirectory directory, IFile file, IPath path, string applicationBasePath, ILocalizationService localizationService)
+        public FileService(IFileSystem fileSystem, string applicationBasePath, ILocalizationService localizationService)
             {
-            (_directory, _file, _path, _applicationBasePath, _localizationService) = (directory, file, path, applicationBasePath, localizationService);
+            (_fileSystem, _applicationBasePath, _localizationService) = (fileSystem, applicationBasePath, localizationService);
             InitializeWorkingFolders();
             }
 
@@ -75,11 +71,11 @@ namespace WPF_LCD_Test.Services
             {
             try
                 {
-                _baseFolderPath = _path.Combine(_applicationBasePath, _workFolerName);
+                _baseFolderPath = _fileSystem.Path.Combine(_applicationBasePath, _workFolerName);
 
-                if (!_directory.Exists(_baseFolderPath))
+                if (!_fileSystem.Directory.Exists(_baseFolderPath))
                     {
-                    _directory.CreateDirectory(_baseFolderPath);
+                    _fileSystem.Directory.CreateDirectory(_baseFolderPath);
                     StatusMessage?.Invoke(this, $"{WorkFolderCreated}: {_baseFolderPath}");
                     }
                 }
@@ -106,11 +102,11 @@ namespace WPF_LCD_Test.Services
             try
                 {
                 string fileName = $"{device.SerialNumber}.json";
-                string filePath = _path.Combine(BaseFolderPath, fileName);
+                string filePath = _fileSystem.Path.Combine(BaseFolderPath, fileName);
 
                 string jsonString = JsonSerializer.Serialize(device, _saveSerializerOptions);
 
-                await _file.WriteAllTextAsync(filePath, jsonString);
+                await _fileSystem.File.WriteAllTextAsync(filePath, jsonString);
 
                 StatusMessage?.Invoke(this, $"{ResultsForSN} {device.SerialNumber} {SavedToJSON}: {filePath}");
                 SaveOperationCompleted?.Invoke(this, true);
@@ -151,18 +147,18 @@ namespace WPF_LCD_Test.Services
 
             try
                 {
-                string serialNumberFolderPath = _path.Combine(BaseFolderPath, serialNumber);
+                string serialNumberFolderPath = _fileSystem.Path.Combine(BaseFolderPath, serialNumber);
 
-                if (!_directory.Exists(serialNumberFolderPath))
+                if (!_fileSystem.Directory.Exists(serialNumberFolderPath))
                     {
-                    _directory.CreateDirectory(serialNumberFolderPath);
+                    _fileSystem.Directory.CreateDirectory(serialNumberFolderPath);
                     StatusMessage?.Invoke(this, $"{WorkFolderCreatedForSN}: {serialNumberFolderPath}");
                     }
 
                 string fileName = $"{measurementLocationName}.csv";
-                string filePath = _path.Combine(serialNumberFolderPath, fileName);
+                string filePath = _fileSystem.Path.Combine(serialNumberFolderPath, fileName);
 
-                await _file.WriteAllTextAsync(filePath, measurementCsvString);
+                await _fileSystem.File.WriteAllTextAsync(filePath, measurementCsvString);
                 return true;
                 }
             catch (Exception ex)
