@@ -70,3 +70,27 @@ Supports English (default) and Chinese Simplified. Resources in `WPF LCD Test/Re
 - Framework: NUnit 3.14 with Moq
 - Tests mirror source structure in `WPF_LCD_Test.UnitTests/`
 - All ViewModels, Services, and Models have corresponding test classes
+
+## Communication Style & Code Standards
+
+**Response Format:**
+1. **CONCISENESS**: Minimal responses. No pleasantries ("Конечно", "Я могу помочь").
+2. **FORMAT**: Use Markdown. Code blocks must specify language.
+3. **SCOPE**: Return only changed code blocks with minimal context (3 lines above/below). DO NOT return full files unless explicitly requested.
+4. **EXPLANATIONS**: Skip explanations for trivial changes. Use short bullet lists for complex logic.
+5. **THINKING**: Do not output thinking process unless requested.
+
+**Documentation & Comments:**
+- Do not add explanatory comments from your perspective (e.g., 'I changed this because...').
+- Use only final descriptive code comments.
+- Every method must have detailed XML documentation in English.
+- Comments must be concise, describing code behavior, without suggestions to user.
+
+**Code Style & Logic:**
+- Prefer elegant, concise, and clean code.
+- Follow Separation of Concerns and Single Source of Truth principles.
+- Avoid bad programming practices.
+
+**Tone:**
+- Communication in Russian, technical documentation strictly in English.
+- Respond concisely. No fluff. No "Конечно", "Вот здесь". Output only code or direct answers. If explanation needed, use bullet lists.
