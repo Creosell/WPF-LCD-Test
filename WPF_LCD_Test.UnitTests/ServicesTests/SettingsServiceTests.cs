@@ -9,19 +9,30 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         {
         private SettingsService _settingsService;
         private string _testFilePath;
+        private TestPathProvider _pathProvider;
 
         [SetUp]
         public void Setup()
             {
             _testFilePath = Path.Combine(Path.GetTempPath(), $"test_settings_{Guid.NewGuid()}.json");
+            _pathProvider = new TestPathProvider(Path.GetDirectoryName(_testFilePath));
 
-            _settingsService = SettingsService.Instance;
+            _settingsService = new SettingsService(_pathProvider);
             _settingsService.SetTestFilePath(_testFilePath);
 
             if (File.Exists(_testFilePath))
                 {
                 File.Delete(_testFilePath);
                 }
+            }
+
+        private class TestPathProvider : Interfaces.IPathProvider
+            {
+            private readonly string _baseDir;
+            public TestPathProvider(string baseDir) => _baseDir = baseDir;
+            public string BaseDirectory => _baseDir;
+            public string ConfigDirectory => Path.Combine(_baseDir, "config");
+            public string DataDirectory => Path.Combine(_baseDir, "data");
             }
 
         [TearDown]
@@ -33,15 +44,6 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
                 }
             }
 
-        [Test]
-        public void Instance_ReturnsSingletonInstance()
-            {
-            var instance1 = SettingsService.Instance;
-            var instance2 = SettingsService.Instance;
-
-            Assert.That(instance1, Is.SameAs(instance2));
-            Assert.That(instance1, Is.InstanceOf<SettingsService>());
-            }
 
         [Test]
         public void LoadSettings_FileDoesNotExist_CreatesDefaultSettingsFile()
@@ -141,22 +143,6 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             Assert.That(loadedSettings.ColorAnalyzerChannel, Is.EqualTo("5"));
             }
 
-        [Test]
-        public void Singleton_ConcurrentAccess_ReturnsSameInstance()
-            {
-            // Arrange
-            var instances = new System.Collections.Concurrent.ConcurrentBag<SettingsService>();
-            var tasks = Enumerable.Range(0, 100).Select(_ => Task.Run(() =>
-            {
-                instances.Add(SettingsService.Instance);
-            }));
-
-            // Act
-            Task.WaitAll(tasks.ToArray());
-
-            // Assert
-            Assert.That(instances.Distinct().Count(), Is.EqualTo(1), "All threads should receive the same singleton instance");
-            }
 
         }
     }

@@ -20,6 +20,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
         private Mock<IDispatcher> _mockDispatcher;
         private Mock<IUploadService> _mockUploadService;
         private Mock<ISettingsService> _mockSettingsService;
+        private Mock<IPathProvider> _mockPathProvider;
+        private Mock<IMeasurementStatusService> _mockMeasurementStatusService;
         private MeasurementViewModel _viewModel;
 
         [SetUp]
@@ -32,6 +34,21 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             _mockDispatcher = new Mock<IDispatcher>();
             _mockUploadService = new Mock<IUploadService>();
             _mockSettingsService = new Mock<ISettingsService>();
+            _mockPathProvider = new Mock<IPathProvider>();
+            _mockMeasurementStatusService = new Mock<IMeasurementStatusService>();
+
+            // Setup PathProvider
+            _mockPathProvider.Setup(p => p.BaseDirectory).Returns("C:\\TestApp");
+            _mockPathProvider.Setup(p => p.ConfigDirectory).Returns("C:\\TestApp\\config");
+            _mockPathProvider.Setup(p => p.DataDirectory).Returns("C:\\TestApp\\data");
+
+            // Setup MeasurementStatusService
+            var measurementStatuses = new System.Collections.ObjectModel.ObservableCollection<MeasurementStatus>();
+            foreach (var location in Enum.GetValues<MeasurementLocation>())
+                {
+                measurementStatuses.Add(new MeasurementStatus(location.ToString()));
+                }
+            _mockMeasurementStatusService.Setup(m => m.AllMeasurementButtonStatuses).Returns(measurementStatuses);
 
             // --- ИСПРАВЛЕННАЯ НАСТРОЙКА МОКА ---
 
@@ -54,7 +71,9 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
                 _mockLocalizationService.Object,
                 _mockDispatcher.Object,
                 _mockUploadService.Object,
-                _mockSettingsService.Object
+                _mockSettingsService.Object,
+                _mockPathProvider.Object,
+                _mockMeasurementStatusService.Object
             );
 
             // Сбрасываем статический счетчик попыток измерений между тестами
@@ -77,7 +96,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             Assert.That(_viewModel.CurrentDevice, Is.Not.Null);
 
             // ИСПРАВЛЕНИЕ: Берем список точек из Singleton сервиса, так как во ViewModel нет публичного свойства
-            var allStatuses = MeasurementStatusService.Instance.AllMeasurementButtonStatuses;
+            var allStatuses = _mockMeasurementStatusService.Object.AllMeasurementButtonStatuses;
 
             foreach (var status in allStatuses)
                 {
@@ -460,7 +479,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             {
             // Arrange
             _viewModel.ExecuteApplySerialNumber("SN12345");
-            var allStatuses = MeasurementStatusService.Instance.AllMeasurementButtonStatuses;
+            var allStatuses = _mockMeasurementStatusService.Object.AllMeasurementButtonStatuses;
             foreach (var status in allStatuses)
                 {
                 _viewModel.CurrentDevice!.AddMeasurement(new Measurement { Location = status.Location, IsValid = true, x = 0.3, y = 0.3, Lv = 100, T = 6500 });
@@ -482,7 +501,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             _viewModel.ExecuteApplySerialNumber("SN12345");
             _viewModel.SelectedDeviceConfiguration = "TestConfig";
             _viewModel.IsTvCheckboxChecked = true;
-            var allStatuses = MeasurementStatusService.Instance.AllMeasurementButtonStatuses;
+            var allStatuses = _mockMeasurementStatusService.Object.AllMeasurementButtonStatuses;
             foreach (var status in allStatuses)
                 {
                 _viewModel.CurrentDevice!.AddMeasurement(new Measurement { Location = status.Location, IsValid = true, x = 0.3, y = 0.3, Lv = 100, T = 6500 });

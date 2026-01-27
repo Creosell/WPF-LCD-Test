@@ -15,7 +15,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public void Setup()
             {
             _initialCulture = Thread.CurrentThread.CurrentUICulture;
-            _localizationService = LocalizationService.Instance;
+            _localizationService = new LocalizationService();
             _capturedStatusMessage = null;
             }
 
@@ -41,15 +41,6 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             _capturedStatusMessage = message;
             }
 
-        [Test]
-        public void Instance_ReturnsSingletonInstance()
-            {
-            var instance1 = LocalizationService.Instance;
-            var instance2 = LocalizationService.Instance;
-
-            Assert.That(instance1, Is.SameAs(instance2));
-            Assert.That(instance1, Is.InstanceOf<ILocalizationService>());
-            }
 
         [Test]
         public void SetLanguage_ChangesCurrentCulture()
@@ -126,21 +117,5 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             Assert.That(_capturedStatusMessage, Is.Not.Null.And.Contains("LocalisationService Warning"));
             }
 
-        [Test]
-        public void Singleton_ConcurrentAccess_ReturnsSameInstance()
-            {
-            // Arrange
-            var instances = new System.Collections.Concurrent.ConcurrentBag<ILocalizationService>();
-            var tasks = Enumerable.Range(0, 100).Select(_ => Task.Run(() =>
-            {
-                instances.Add(LocalizationService.Instance);
-            }));
-
-            // Act
-            Task.WaitAll(tasks.ToArray());
-
-            // Assert
-            Assert.That(instances.Distinct().Count(), Is.EqualTo(1), "All threads should receive the same singleton instance");
-            }
         }
     }

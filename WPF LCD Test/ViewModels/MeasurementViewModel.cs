@@ -9,7 +9,6 @@ using System.Windows.Input;
 using WPF_LCD_Test.Commands;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
-using WPF_LCD_Test.Services;
 using static WPF_LCD_Test.Resources.Resources;
 
 namespace WPF_LCD_Test.ViewModels
@@ -26,6 +25,7 @@ namespace WPF_LCD_Test.ViewModels
         private readonly IUploadService _uploadService;
         private readonly ISettingsService _settingsService;
         private readonly IPathProvider _pathProvider;
+        private readonly IMeasurementStatusService _measurementStatusService;
         private readonly LogHandler _logHandler;
 
         private DeviceUnderTest? _currentDevice;
@@ -188,6 +188,7 @@ namespace WPF_LCD_Test.ViewModels
         public string DeviceConnectionStatusText => _isDeviceConnected ? ConnectedCA : DisconnectedCA;
         public string DeviceCalibrationStatusText => _isDeviceCalibrated ? CalibratedCA : NotCalibratedCa;
         public ObservableCollection<string> DeviceConfigurations { get; } = [];
+        public IMeasurementStatusService MeasurementStatusService => _measurementStatusService;
 
         #endregion
 
@@ -220,6 +221,7 @@ namespace WPF_LCD_Test.ViewModels
         /// <param name="dispatcher">Dispatcher for UI thread marshaling.</param>
         /// <param name="uploadService">Service for uploading reports.</param>
         /// <param name="settingsService">Service for application settings.</param>
+        /// <param name="measurementStatusService">Service for managing measurement statuses.</param>
         public MeasurementViewModel(
             IColorMeasurementService colorMeasurementService,
             IFileService fileService,
@@ -228,7 +230,8 @@ namespace WPF_LCD_Test.ViewModels
             IDispatcher dispatcher,
             IUploadService uploadService,
             ISettingsService settingsService,
-            IPathProvider pathProvider)
+            IPathProvider pathProvider,
+            IMeasurementStatusService measurementStatusService)
             {
             _colorMeasurementService = colorMeasurementService ?? throw new ArgumentNullException(nameof(colorMeasurementService));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
@@ -238,6 +241,7 @@ namespace WPF_LCD_Test.ViewModels
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
             _uploadService = uploadService ?? throw new ArgumentNullException(nameof(uploadService));
             _pathProvider = pathProvider ?? throw new ArgumentNullException(nameof(pathProvider));
+            _measurementStatusService = measurementStatusService ?? throw new ArgumentNullException(nameof(measurementStatusService));
             _logHandler = new LogHandler(_localizationService, AddLogMessage);
 
             ZeroCalibrationCommand = new RelayCommand(ExecuteZeroCalibrationAsync, CanExecuteZeroCalibration);
@@ -302,7 +306,7 @@ namespace WPF_LCD_Test.ViewModels
             if (_currentDevice?.Measurements == null || _currentDevice.Measurements.Count == 0)
                 return false;
 
-            var allStatusPoints = MeasurementStatusService.Instance.AllMeasurementButtonStatuses;
+            var allStatusPoints = _measurementStatusService.AllMeasurementButtonStatuses;
             if (allStatusPoints == null || !allStatusPoints.Any())
                 return false;
 
@@ -834,7 +838,7 @@ namespace WPF_LCD_Test.ViewModels
 
         private void UpdateMeasurementStatus(string location, bool? isPassed, string measuredValuesString)
             {
-            var status = MeasurementStatusService.Instance.AllMeasurementButtonStatuses.FirstOrDefault(s => s.Location == location);
+            var status = _measurementStatusService.AllMeasurementButtonStatuses.FirstOrDefault(s => s.Location == location);
             if (status != null)
                 {
                 status.IsPassed = isPassed;
@@ -846,9 +850,9 @@ namespace WPF_LCD_Test.ViewModels
                 }
             }
 
-        private static void ResetMeasurementStatuses()
+        private void ResetMeasurementStatuses()
             {
-            foreach (var status in MeasurementStatusService.Instance.AllMeasurementButtonStatuses)
+            foreach (var status in _measurementStatusService.AllMeasurementButtonStatuses)
                 {
                 status.IsPassed = null;
                 status.MeasuredValuesString = "";
@@ -863,7 +867,7 @@ namespace WPF_LCD_Test.ViewModels
 
         // CanExecute predicates
         private bool CanExecuteConnect() => !IsDeviceConnected && !_isDeviceCalibrating && !_isDeviceConnecting;
-        private bool CanExecuteDisconnect() => !_isDeviceConnecting && !_isDeviceCalibrating;
+        private bool CanExecuteDisconnect() => true;
         private bool CanExecuteZeroCalibration(object parameter) => !_isDeviceConnecting && !_isDeviceCalibrating;
         private bool CanExecuteSaveResults(object parameter) => _currentDevice != null && !string.IsNullOrWhiteSpace(_currentDevice.SerialNumber) && _currentDevice.Measurements.Count > 0;
         private bool CanExecuteNewDeviceUnderTest(object parameter) => CanExecuteSaveResults(parameter);

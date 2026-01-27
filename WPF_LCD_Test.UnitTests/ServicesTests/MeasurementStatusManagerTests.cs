@@ -13,18 +13,9 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         [SetUp]
         public void Setup()
         {
-            _service = MeasurementStatusService.Instance;
+            _service = new MeasurementStatusService();
         }
 
-        [Test]
-        public void Instance_ReturnsSingletonInstance()
-        {
-            var instance1 = MeasurementStatusService.Instance;
-            var instance2 = MeasurementStatusService.Instance;
-
-            Assert.That(instance1, Is.SameAs(instance2));
-            Assert.That(instance1, Is.InstanceOf<MeasurementStatusService>());
-        }
 
         [Test]
         public void AllStatuses_AreInitialized_ForAllEnumValues()
@@ -93,21 +84,5 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             Assert.AreEqual(expectedValues, status.MeasuredValuesString);
         }
 
-        [Test]
-        public void Singleton_ConcurrentAccess_ReturnsSameInstance()
-        {
-            // Arrange
-            var instances = new System.Collections.Concurrent.ConcurrentBag<MeasurementStatusService>();
-            var tasks = Enumerable.Range(0, 100).Select(_ => Task.Run(() =>
-            {
-                instances.Add(MeasurementStatusService.Instance);
-            }));
-
-            // Act
-            Task.WaitAll(tasks.ToArray());
-
-            // Assert
-            Assert.That(instances.Distinct().Count(), Is.EqualTo(1), "All threads should receive the same singleton instance");
-        }
     }
 }

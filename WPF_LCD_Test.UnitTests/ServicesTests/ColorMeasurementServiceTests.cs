@@ -47,9 +47,6 @@ namespace WPF_LCD_Test.Tests
 
             // Создаем экземпляр сервиса, передавая ему МОК IColorAnalyzer200
             _service = new ColorMeasurementService(_mockCa200.Object);
-
-            // Настройка LocalizationService для тестов, чтобы он не мешал
-            MockLocalizationService.Instance.CurrentCulture = CultureInfo.InvariantCulture;
             }
 
         // --- Тесты для ConnectAsync ---

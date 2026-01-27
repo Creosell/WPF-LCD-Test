@@ -45,13 +45,6 @@ namespace WPF_LCD_Test.Services
         public event EventHandler<bool>? SaveOperationCompleted;
 
         /// <summary>
-        /// Initializes a new instance of FileService with default dependencies.
-        /// </summary>
-        public FileService() : this(new FileSystem(), new PathProvider(), LocalizationService.Instance)
-            {
-            }
-
-        /// <summary>
         /// Initializes a new instance of FileService with dependency injection.
         /// </summary>
         /// <param name="fileSystem">File system abstraction for file operations.</param>
@@ -59,7 +52,9 @@ namespace WPF_LCD_Test.Services
         /// <param name="localizationService">Service for localized messages.</param>
         public FileService(IFileSystem fileSystem, IPathProvider pathProvider, ILocalizationService localizationService)
             {
-            (_fileSystem, _pathProvider, _localizationService) = (fileSystem, pathProvider, localizationService);
+            _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+            _pathProvider = pathProvider ?? throw new ArgumentNullException(nameof(pathProvider));
+            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             InitializeWorkingFolders();
             }
 

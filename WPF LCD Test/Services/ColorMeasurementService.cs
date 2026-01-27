@@ -107,10 +107,10 @@ namespace WPF_LCD_Test.Services
             }
 
         /// <summary>
-        /// Initializes a new instance of ColorMeasurementService with dependency injection.
+        /// Initializes a new instance of ColorMeasurementService with dependency injection for testing.
         /// </summary>
         /// <param name="ca200Wrapper">Color analyzer wrapper for testing.</param>
-        public ColorMeasurementService(IColorAnalyzer200 ca200Wrapper)
+        internal ColorMeasurementService(IColorAnalyzer200 ca200Wrapper)
             {
             _objCa200 = ca200Wrapper ?? throw new ArgumentNullException(nameof(ca200Wrapper));
             }

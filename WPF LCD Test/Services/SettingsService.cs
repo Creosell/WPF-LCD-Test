@@ -7,15 +7,13 @@ using WPF_LCD_Test.Models;
 namespace WPF_LCD_Test.Services
     {
     /// <summary>
-    /// Service for loading and saving application settings to JSON file. Implemented as Singleton.
+    /// Service for loading and saving application settings to JSON file.
     /// </summary>
     public class SettingsService : ISettingsService
         {
+        private readonly IPathProvider _pathProvider;
         private string _currentSettingsFilePath;
         private const string _settingsFileName = "appsettings.json";
-
-        private static readonly Lazy<SettingsService> _lazyInstance = new(
-            () => new SettingsService(), LazyThreadSafetyMode.ExecutionAndPublication);
 
         private static readonly JsonSerializerOptions _loadJsonSerializerOptions = new()
             {
@@ -30,18 +28,18 @@ namespace WPF_LCD_Test.Services
             };
 
         /// <summary>
-        /// Gets the singleton instance of SettingsService.
-        /// </summary>
-        public static SettingsService Instance => _lazyInstance.Value;
-
-        /// <summary>
         /// Gets the current application settings.
         /// </summary>
         public AppSettings CurrentSettings => LoadSettings();
 
-        private SettingsService()
+        /// <summary>
+        /// Initializes a new instance of SettingsService.
+        /// </summary>
+        /// <param name="pathProvider">Path provider for resolving file paths.</param>
+        public SettingsService(IPathProvider pathProvider)
             {
-            _currentSettingsFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _settingsFileName);
+            _pathProvider = pathProvider;
+            _currentSettingsFilePath = Path.Combine(_pathProvider.BaseDirectory, _settingsFileName);
             LoadSettings();
             }
 

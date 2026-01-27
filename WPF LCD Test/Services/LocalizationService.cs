@@ -5,11 +5,10 @@ using static WPF_LCD_Test.Resources.Resources;
 namespace WPF_LCD_Test.Services
     {
     /// <summary>
-    /// Service for managing application localization and culture settings. Implemented as Singleton.
+    /// Service for managing application localization and culture settings.
     /// </summary>
     public class LocalizationService : ILocalizationService
         {
-        private static readonly Lazy<ILocalizationService> _lazyInstance = new(() => new LocalizationService());
         private CultureInfo _applicationCulture;
 
         /// <summary>
@@ -23,16 +22,14 @@ namespace WPF_LCD_Test.Services
         public event EventHandler LanguageChanged;
 
         /// <summary>
-        /// Gets the singleton instance of LocalizationService.
-        /// </summary>
-        public static ILocalizationService Instance => _lazyInstance.Value;
-
-        /// <summary>
         /// Gets the current application culture.
         /// </summary>
         public CultureInfo CurrentCulture => _applicationCulture;
 
-        private LocalizationService()
+        /// <summary>
+        /// Initializes a new instance of LocalizationService with default culture.
+        /// </summary>
+        public LocalizationService()
             {
             SetLanguage("");
             }

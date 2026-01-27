@@ -1,21 +1,14 @@
 ﻿using System.Collections.ObjectModel;
+using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
 
 namespace WPF_LCD_Test.Services
     {
     /// <summary>
-    /// Manages the collection of measurement point statuses for UI binding. Implemented as Singleton.
+    /// Manages the collection of measurement point statuses for UI binding.
     /// </summary>
-    public class MeasurementStatusService
+    public class MeasurementStatusService : IMeasurementStatusService
         {
-        private static readonly Lazy<MeasurementStatusService> _lazyInstance =
-            new(() => new MeasurementStatusService());
-
-        /// <summary>
-        /// Gets the singleton instance of MeasurementStatusService.
-        /// </summary>
-        public static MeasurementStatusService Instance => _lazyInstance.Value;
-
         /// <summary>
         /// Gets dictionary for quick access to measurement status by location.
         /// </summary>
@@ -26,7 +19,10 @@ namespace WPF_LCD_Test.Services
         /// </summary>
         public ObservableCollection<MeasurementStatus> AllMeasurementButtonStatuses { get; }
 
-        private MeasurementStatusService()
+        /// <summary>
+        /// Initializes a new instance of MeasurementStatusService.
+        /// </summary>
+        public MeasurementStatusService()
             {
             var statuses = Enum.GetValues<MeasurementLocation>()
                                .ToDictionary(

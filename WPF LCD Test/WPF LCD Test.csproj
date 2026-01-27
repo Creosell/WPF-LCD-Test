@@ -81,4 +81,8 @@
 	</EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+	<InternalsVisibleTo Include="WPF_LCD_Test.UnitTests" />
+  </ItemGroup>
+
 </Project>

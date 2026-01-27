@@ -35,8 +35,8 @@ namespace WPF_LCD_Test.Services
         /// <param name="localizationService">Service for localized messages.</param>
         public UploadService(IFileSystem fileSystem, IPathProvider pathProvider, ILocalizationService localizationService)
             {
-            _fileSystem = fileSystem;
-            _pathProvider = pathProvider;
+            _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+            _pathProvider = pathProvider ?? throw new ArgumentNullException(nameof(pathProvider));
 
             if (localizationService == null) throw new ArgumentNullException(nameof(localizationService));
 
@@ -45,11 +45,6 @@ namespace WPF_LCD_Test.Services
                 StatusMessage?.Invoke(this, message);
             });
             }
-
-        /// <summary>
-        /// Initializes a new instance of UploadService with default dependencies.
-        /// </summary>
-        public UploadService() : this(new FileSystem(), new PathProvider(), LocalizationService.Instance) { }
 
         /// <summary>
         /// Reports status message through LogHandler with optional formatting arguments.

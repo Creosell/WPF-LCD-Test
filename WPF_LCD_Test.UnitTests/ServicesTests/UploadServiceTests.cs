@@ -76,18 +76,6 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
                 new UploadService(_mockFileSystem, null!));
         }
 
-        [Test]
-        public void Constructor_ParameterlessConstructor_CreatesInstance()
-        {
-            // Act & Assert - should not throw
-            // Note: Parameterless constructor uses real LocalizationService.Instance,
-            // which requires proper application context
-            Assert.DoesNotThrow(() =>
-            {
-                var service = new UploadService(_mockFileSystem, _mockPathProvider.Object, _mockLocalizationService.Object);
-                Assert.That(service, Is.Not.Null);
-            });
-        }
 
         #endregion
 

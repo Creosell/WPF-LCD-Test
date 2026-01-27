@@ -27,9 +27,10 @@ namespace WPF_LCD_Test
             services.AddSingleton<IDispatcher, WpfDispatcher>();
             services.AddSingleton<IPathProvider>(new PathProvider());
 
-            // Singleton services
-            services.AddSingleton<ISettingsService>(SettingsService.Instance);
-            services.AddSingleton<ILocalizationService>(LocalizationService.Instance);
+            // Core services
+            services.AddSingleton<ISettingsService, SettingsService>();
+            services.AddSingleton<ILocalizationService, LocalizationService>();
+            services.AddSingleton<IMeasurementStatusService, MeasurementStatusService>();
 
             // Application services
             services.AddSingleton<IColorMeasurementService, ColorMeasurementService>();
@@ -87,7 +88,8 @@ namespace WPF_LCD_Test
         private void LocalizationService_LanguageChanged(object sender, EventArgs e)
             {
             const string defaultResourcePath = "/Resources/StringResources.xaml";
-            string cultureCode = LocalizationService.Instance.CurrentCulture.Name;
+            var localizationService = _serviceProvider.GetRequiredService<ILocalizationService>();
+            string cultureCode = localizationService.CurrentCulture.Name;
 
             string resourcePath = cultureCode switch
                 {
