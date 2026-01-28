@@ -346,7 +346,6 @@ namespace WPF_LCD_Test.Services
             {
             if (disposing)
                 {
-                StatusMessage?.Invoke(this, DisconnectingCA);
 
                 if (_objCa200 != null)
                     {

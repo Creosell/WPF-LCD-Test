@@ -9,7 +9,7 @@ namespace WPF_LCD_Test.Wrappers
     /// <summary>
     /// Обёртка для объекта CA200SRVRLib.Memory, реализующая IColorAnalyzerMemory.
     /// </summary>
-    public class ColorAnalyzerMemoryWrapper : IColorAnalyzerMemory
+    public class ColorAnalyzerMemoryWrapper : IColorAnalyzerMemory, IDisposable
     {
         private Memory? _memoryInstance; // Реальный COM-объект CA200SRVRLib.Memory
 
@@ -32,12 +32,31 @@ namespace WPF_LCD_Test.Wrappers
                 _memoryInstance.ChannelNO = value;
             }
         }
+
+        /// <summary>
+        /// Releases COM reference.
+        /// </summary>
+        public void Dispose()
+        {
+            if (_memoryInstance != null)
+            {
+                try
+                {
+                    if (Marshal.IsComObject(_memoryInstance))
+                    {
+                        Marshal.ReleaseComObject(_memoryInstance);
+                    }
+                }
+                catch { /* Ignore release errors */ }
+                _memoryInstance = null;
+            }
+        }
     }
 
     /// <summary>
     /// Обёртка для объекта CA200SRVRLib.Probe, реализующая IColorAnalyzerProbe.
     /// </summary>
-    public class ColorAnalyzerProbeWrapper : IColorAnalyzerProbe
+    public class ColorAnalyzerProbeWrapper : IColorAnalyzerProbe, IDisposable
     {
         private Probe? _probeInstance; // Реальный COM-объект CA200SRVRLib.Probe
 
@@ -91,6 +110,25 @@ namespace WPF_LCD_Test.Wrappers
                 return _probeInstance.SerialNO;
                 }
             }
+
+        /// <summary>
+        /// Releases COM reference.
+        /// </summary>
+        public void Dispose()
+        {
+            if (_probeInstance != null)
+            {
+                try
+                {
+                    if (Marshal.IsComObject(_probeInstance))
+                    {
+                        Marshal.ReleaseComObject(_probeInstance);
+                    }
+                }
+                catch { /* Ignore release errors */ }
+                _probeInstance = null;
+            }
+        }
     }
 
     /// <summary>
@@ -265,13 +303,48 @@ namespace WPF_LCD_Test.Wrappers
             _caInstance.Measure();
         }
 
-        // Вложенные обертки (Probe, Memory) не владеют своими COM-объектами напрямую,
-        // они получают их от _caInstance. Поэтому здесь достаточно обнулить ссылки.
+        /// <summary>
+        /// Releases all COM references held by this wrapper.
+        /// </summary>
         public void Dispose()
         {
-            _singleProbeWrapper = null;
-            _memoryWrapper = null;
-            _caInstance = null; // Обнуляем ссылку на внутренний COM-объект
+            // Dispose nested wrappers first
+            if (_singleProbeWrapper != null)
+            {
+                try
+                {
+                    _singleProbeWrapper.Dispose();
+                }
+                catch { /* Ignore disposal errors */ }
+                _singleProbeWrapper = null;
+            }
+
+            if (_memoryWrapper != null)
+            {
+                try
+                {
+                    _memoryWrapper.Dispose();
+                }
+                catch { /* Ignore disposal errors */ }
+                _memoryWrapper = null;
+            }
+
+            // Release COM object reference
+            if (_caInstance != null)
+            {
+                try
+                {
+                    if (Marshal.IsComObject(_caInstance))
+                    {
+                        Marshal.ReleaseComObject(_caInstance);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"ColorAnalyzerWrapper: Error releasing COM object: {ex.Message}");
+                }
+                _caInstance = null;
+            }
         }
     }
 
