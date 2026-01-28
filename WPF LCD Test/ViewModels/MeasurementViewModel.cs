@@ -320,19 +320,23 @@ namespace WPF_LCD_Test.ViewModels
         /// <summary>
         /// Attempts to establish a connection with the measurement device.
         /// </summary>
-        private async Task ExecuteConnectAsync()
+        /// <returns>True if connection was successful, false otherwise.</returns>
+        private async Task<bool> ExecuteConnectAsync()
             {
-            if (!CanExecuteConnect()) return;
+            if (!CanExecuteConnect()) return false;
 
             try
                 {
                 _isDeviceConnecting = true;
-                if (!await _colorMeasurementService.ConnectAsync())
+                bool connected = await _colorMeasurementService.ConnectAsync();
+                if (!connected)
                     ExecuteDisconnect(force: true);
+                return connected;
                 }
             catch
                 {
                 ExecuteDisconnect(force: true);
+                return false;
                 }
             finally
                 {
@@ -372,7 +376,7 @@ namespace WPF_LCD_Test.ViewModels
                 // Use return value directly to avoid race condition with event-based property updates
                 bool isConnected = _colorMeasurementService.IsDeviceConnected;
                 if (!isConnected)
-                    isConnected = await _colorMeasurementService.ConnectAsync();
+                    isConnected = await ExecuteConnectAsync();
 
                 if (isConnected)
                     {
@@ -381,6 +385,7 @@ namespace WPF_LCD_Test.ViewModels
                         {
                         ExecuteDisconnect(force: true);
                         _dialogService.ShowMessage($"{ErrAtCalibration}", $"{Err}");
+                        return;
                         }
                     // QA Probe specific logic
                     if (_colorMeasurementService.ProbeSN.Equals(QA_PROBE_SN) && _colorMeasurementService.CurrentChannel != QA_PROBE_CHANNEL)

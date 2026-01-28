@@ -309,7 +309,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             }
 
         [Test]
-        public async Task ExecuteConnectAsync_Failed_DoesNotCallDisconnect()
+        public async Task ExecuteConnectAsync_Failed_CallsDisconnectForCleanup()
             {
             // Arrange
             _mockColorMeasurementService.Setup(s => s.ConnectAsync()).ReturnsAsync(false);
@@ -317,13 +317,12 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             // Act
             await ((RelayCommand)_viewModel.ZeroCalibrationCommand).ExecuteAsync(null);
 
-            // Assert - ExecuteDisconnect is called but CanExecuteDisconnect returns false during connection attempt
-            // so Disconnect() is not actually invoked
-            _mockColorMeasurementService.Verify(s => s.Disconnect(), Times.Never);
+            // Assert - ExecuteDisconnect(force: true) is called to cleanup COM objects on failed connection
+            _mockColorMeasurementService.Verify(s => s.Disconnect(), Times.Once);
             }
 
         [Test]
-        public async Task ExecuteConnectAsync_Exception_DoesNotCallDisconnect()
+        public async Task ExecuteConnectAsync_Exception_CallsDisconnectForCleanup()
             {
             // Arrange
             _mockColorMeasurementService.Setup(s => s.ConnectAsync()).ThrowsAsync(new InvalidOperationException("Connection failed"));
@@ -331,9 +330,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             // Act
             await ((RelayCommand)_viewModel.ZeroCalibrationCommand).ExecuteAsync(null);
 
-            // Assert - ExecuteDisconnect is called but CanExecuteDisconnect returns false during connection attempt
-            // so Disconnect() is not actually invoked
-            _mockColorMeasurementService.Verify(s => s.Disconnect(), Times.Never);
+            // Assert - ExecuteDisconnect(force: true) is called to cleanup COM objects on connection exception
+            _mockColorMeasurementService.Verify(s => s.Disconnect(), Times.Once);
             }
 
         // --- Тесты для ExecuteZeroCalibrationAsync ---
