@@ -16,6 +16,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         private Mock<ISettingsService> _mockSettingsService;
         private Mock<IDispatcher> _mockDispatcher;
         private Mock<IUploadService> _mockUploadService;
+        private Mock<IMeasurementStatusService> _mockMeasurementStatusService;
 
 #pragma warning disable NUnit1032
         private IServiceProvider _serviceProvider;
@@ -32,6 +33,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             _mockSettingsService = new Mock<ISettingsService>();
             _mockDispatcher = new Mock<IDispatcher>();
             _mockUploadService = new Mock<IUploadService>();
+            _mockMeasurementStatusService = new Mock<IMeasurementStatusService>();
 
             var services = new ServiceCollection();
             services.AddSingleton(_mockColorMeasurementService.Object);
@@ -41,6 +43,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             services.AddSingleton(_mockSettingsService.Object);
             services.AddSingleton(_mockDispatcher.Object);
             services.AddSingleton(_mockUploadService.Object);
+            services.AddSingleton(_mockMeasurementStatusService.Object);
 
             var mockPathProvider = new Mock<IPathProvider>();
             mockPathProvider.Setup(p => p.BaseDirectory).Returns("C:\\TestApp\\");

@@ -362,7 +362,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
         public async Task ExecuteZeroCalibrationAsync_CalibrationFails_ShowsDialog()
             {
             // Arrange
-            _viewModel.IsDeviceConnected = true; // Assume already connected
+            _mockColorMeasurementService.SetupGet(s => s.IsDeviceConnected).Returns(true);
             _mockColorMeasurementService.Setup(s => s.CalibrateZeroAsync()).ReturnsAsync(false);
             _mockColorMeasurementService.SetupGet(s => s.ProbeSN).Returns("SomeProbe");
 
@@ -371,16 +371,15 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
 
             // Assert
             _mockDialogService.Verify(d => d.ShowMessage(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-            // ExecuteDisconnect is called but CanExecuteDisconnect returns false during calibration
-            // so Disconnect() is not actually invoked
-            _mockColorMeasurementService.Verify(s => s.Disconnect(), Times.Never);
+            // ExecuteDisconnect(force: true) is called to cleanup COM objects on calibration failure
+            _mockColorMeasurementService.Verify(s => s.Disconnect(), Times.Once);
             }
 
         [Test]
         public async Task ExecuteZeroCalibrationAsync_QAProbe_SwitchesChannel()
             {
             // Arrange
-            _viewModel.IsDeviceConnected = true; // Assume already connected
+            _mockColorMeasurementService.SetupGet(s => s.IsDeviceConnected).Returns(true);
             _mockColorMeasurementService.Setup(s => s.CalibrateZeroAsync()).ReturnsAsync(true);
             _mockColorMeasurementService.SetupGet(s => s.ProbeSN).Returns("08954195"); // QA Probe
             _mockColorMeasurementService.SetupGet(s => s.CurrentChannel).Returns(5);

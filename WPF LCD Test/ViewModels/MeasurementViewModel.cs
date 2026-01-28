@@ -326,11 +326,11 @@ namespace WPF_LCD_Test.ViewModels
                 {
                 _isDeviceConnecting = true;
                 if (!await _colorMeasurementService.ConnectAsync())
-                    ExecuteDisconnect();
+                    ExecuteDisconnect(force: true);
                 }
             catch
                 {
-                ExecuteDisconnect();
+                ExecuteDisconnect(force: true);
                 }
             finally
                 {
@@ -341,9 +341,10 @@ namespace WPF_LCD_Test.ViewModels
         /// <summary>
         /// Disconnects the measurement device and updates the UI state.
         /// </summary>
-        private void ExecuteDisconnect()
+        /// <param name="force">If true, bypasses state checks for error recovery scenarios.</param>
+        private void ExecuteDisconnect(bool force = false)
             {
-            if (!CanExecuteDisconnect()) return;
+            if (!force && !CanExecuteDisconnect()) return;
 
             try
                 {
@@ -376,7 +377,7 @@ namespace WPF_LCD_Test.ViewModels
                     _isDeviceCalibrating = true;
                     if (!await _colorMeasurementService.CalibrateZeroAsync())
                         {
-                        ExecuteDisconnect();
+                        ExecuteDisconnect(force: true);
                         _dialogService.ShowMessage($"{ErrAtCalibration}", $"{Err}");
                         }
                     // QA Probe specific logic
@@ -389,7 +390,9 @@ namespace WPF_LCD_Test.ViewModels
                 }
             catch
                 {
-                ExecuteDisconnect();
+                // Force disconnect on error to cleanup COM objects
+                if (_colorMeasurementService.IsDeviceConnected)
+                    ExecuteDisconnect(force: true);
                 _dialogService.ShowMessage($"{ErrAtCalibration}", $"{Err}");
                 }
             finally
@@ -869,7 +872,7 @@ namespace WPF_LCD_Test.ViewModels
 
         // CanExecute predicates
         private bool CanExecuteConnect() => !IsDeviceConnected && !_isDeviceCalibrating && !_isDeviceConnecting;
-        private bool CanExecuteDisconnect() => true;
+        private bool CanExecuteDisconnect() => !_isDeviceCalibrating && !_isDeviceConnecting;
         private bool CanExecuteZeroCalibration(object parameter) => !_isDeviceConnecting && !_isDeviceCalibrating;
         private bool CanExecuteSaveResults(object parameter) => _currentDevice != null && !string.IsNullOrWhiteSpace(_currentDevice.SerialNumber) && _currentDevice.Measurements.Count > 0;
         private bool CanExecuteNewDeviceUnderTest(object parameter) => CanExecuteSaveResults(parameter);
