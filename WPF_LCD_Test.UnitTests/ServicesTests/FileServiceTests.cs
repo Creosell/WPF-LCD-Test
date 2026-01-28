@@ -75,7 +75,10 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             string statusMessage = null;
 
             // Act
-            var fileService = new FileService(mockFileSystemWithError, _testBasePath, _mockLocalizationService.Object);
+            var mockPathProviderWithError = new Mock<IPathProvider>();
+            mockPathProviderWithError.Setup(p => p.BaseDirectory).Returns(_testBasePath);
+            mockPathProviderWithError.Setup(p => p.DataDirectory).Returns(System.IO.Path.Combine(_testBasePath, "data"));
+            var fileService = new FileService(mockFileSystemWithError, mockPathProviderWithError.Object, _mockLocalizationService.Object);
             fileService.StatusMessage += (sender, msg) => statusMessage = msg;
 
             // Try to trigger error by calling InitializeWorkingFolders again with read-only directory
@@ -148,7 +151,10 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             var dirInfo = readOnlyFileSystem.DirectoryInfo.New(basePath);
             dirInfo.Attributes = System.IO.FileAttributes.ReadOnly;
 
-            _fileService = new FileService(readOnlyFileSystem, _testBasePath, _mockLocalizationService.Object);
+            var mockPathProviderReadOnly = new Mock<IPathProvider>();
+            mockPathProviderReadOnly.Setup(p => p.BaseDirectory).Returns(_testBasePath);
+            mockPathProviderReadOnly.Setup(p => p.DataDirectory).Returns(basePath);
+            _fileService = new FileService(readOnlyFileSystem, mockPathProviderReadOnly.Object, _mockLocalizationService.Object);
 
             string statusMessage = null;
             bool? saveCompletedStatus = null;

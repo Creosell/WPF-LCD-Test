@@ -73,7 +73,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         {
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() =>
-                new UploadService(_mockFileSystem, null!));
+                new UploadService(_mockFileSystem, _mockPathProvider.Object, null!));
         }
 
 
@@ -85,8 +85,8 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public async Task UploadReportsAsync_NoArchiveFolder_ReturnsTrue()
         {
             // Arrange
-            var archivePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "report_archive");
-            _mockDirectory.Setup(d => d.Exists(archivePath)).Returns(false);
+            var archivePath = System.IO.Path.Combine(_testBaseDirectory, "report_archive");
+            // MockFileSystem already doesn't have this directory by default
 
             // Act
             var result = await _uploadService.UploadReportsAsync();
@@ -100,10 +100,8 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public async Task UploadReportsAsync_EmptyArchiveFolder_ReturnsTrue()
         {
             // Arrange
-            var archivePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "report_archive");
-            _mockDirectory.Setup(d => d.Exists(archivePath)).Returns(true);
-            _mockDirectory.Setup(d => d.EnumerateFiles(archivePath, "*.zip", SearchOption.TopDirectoryOnly))
-                .Returns(Enumerable.Empty<string>());
+            var archivePath = System.IO.Path.Combine(_testBaseDirectory, "report_archive");
+            _mockFileSystem.AddDirectory(archivePath); // Create empty directory
 
             // Act
             var result = await _uploadService.UploadReportsAsync();
@@ -117,15 +115,13 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public async Task ScanLocalFolders_ValidZipFile_CreatesCorrectBatch()
         {
             // Arrange
-            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var baseDir = _testBaseDirectory;
             var archivePath = System.IO.Path.Combine(baseDir, "report_archive");
             var zipFile = System.IO.Path.Combine(archivePath, "DeviceName_Config_20230115_1430.zip");
 
-            // Setup directory existence checks - archive exists, other directories don't
-            _mockDirectory.Setup(d => d.Exists(It.IsAny<string>()))
-                .Returns((string path) => path == archivePath);
-            _mockDirectory.Setup(d => d.EnumerateFiles(archivePath, "*.zip", SearchOption.TopDirectoryOnly))
-                .Returns(new[] { zipFile });
+            // Setup directory and files in MockFileSystem
+            _mockFileSystem.AddDirectory(archivePath);
+            _mockFileSystem.AddFile(zipFile, new MockFileData("test zip content"));
 
             // Act
             var result = await _uploadService.UploadReportsAsync();
@@ -139,13 +135,12 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public async Task ScanLocalFolders_InvalidFilename_SkipsFile()
         {
             // Arrange
-            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var baseDir = _testBaseDirectory;
             var archivePath = System.IO.Path.Combine(baseDir, "report_archive");
             var invalidZipFile = System.IO.Path.Combine(archivePath, "invalid_filename.zip");
 
-            _mockDirectory.Setup(d => d.Exists(archivePath)).Returns(true);
-            _mockDirectory.Setup(d => d.EnumerateFiles(archivePath, "*.zip", SearchOption.TopDirectoryOnly))
-                .Returns(new[] { invalidZipFile });
+            _mockFileSystem.AddDirectory(archivePath);
+            _mockFileSystem.AddFile(invalidZipFile, new MockFileData("test zip content"));
 
             // Act
             var result = await _uploadService.UploadReportsAsync();
@@ -159,19 +154,18 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public async Task ScanLocalFolders_WithResultsFiles_AddsToExistingBatch()
         {
             // Arrange
-            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var baseDir = _testBaseDirectory;
             var archivePath = System.IO.Path.Combine(baseDir, "report_archive");
             var resultsPath = System.IO.Path.Combine(baseDir, "results");
             var zipFile = System.IO.Path.Combine(archivePath, "Device_20230115_1430.zip");
             var resultFile1 = System.IO.Path.Combine(resultsPath, "Device_20230115_1430.html");
             var resultFile2 = System.IO.Path.Combine(resultsPath, "Device_20230115_1430.pdf");
 
-            _mockDirectory.Setup(d => d.Exists(archivePath)).Returns(true);
-            _mockDirectory.Setup(d => d.Exists(resultsPath)).Returns(true);
-            _mockDirectory.Setup(d => d.EnumerateFiles(archivePath, "*.zip", SearchOption.TopDirectoryOnly))
-                .Returns(new[] { zipFile });
-            _mockDirectory.Setup(d => d.EnumerateFiles(resultsPath, "Device_20230115_1430.*", SearchOption.TopDirectoryOnly))
-                .Returns(new[] { resultFile1, resultFile2 });
+            _mockFileSystem.AddDirectory(archivePath);
+            _mockFileSystem.AddDirectory(resultsPath);
+            _mockFileSystem.AddFile(zipFile, new MockFileData("test zip content"));
+            _mockFileSystem.AddFile(resultFile1, new MockFileData("test html content"));
+            _mockFileSystem.AddFile(resultFile2, new MockFileData("test pdf content"));
 
             // Act
             var result = await _uploadService.UploadReportsAsync();
@@ -185,15 +179,13 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public async Task ScanLocalFolders_ComplexDeviceName_ParsesCorrectly()
         {
             // Arrange
-            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var baseDir = _testBaseDirectory;
             var archivePath = System.IO.Path.Combine(baseDir, "report_archive");
             var zipFile = System.IO.Path.Combine(archivePath, "LG_50UQ6031_REV1_20230115_1430.zip");
 
-            // Setup directory existence checks - archive exists, other directories don't
-            _mockDirectory.Setup(d => d.Exists(It.IsAny<string>()))
-                .Returns((string path) => path == archivePath);
-            _mockDirectory.Setup(d => d.EnumerateFiles(archivePath, "*.zip", SearchOption.TopDirectoryOnly))
-                .Returns(new[] { zipFile });
+            // Setup directory and files in MockFileSystem
+            _mockFileSystem.AddDirectory(archivePath);
+            _mockFileSystem.AddFile(zipFile, new MockFileData("test zip content"));
 
             // Act
             var result = await _uploadService.UploadReportsAsync();
@@ -210,10 +202,8 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public async Task UploadReportsAsync_NoReports_ReturnsTrue()
         {
             // Arrange
-            var archivePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "report_archive");
-            _mockDirectory.Setup(d => d.Exists(archivePath)).Returns(true);
-            _mockDirectory.Setup(d => d.EnumerateFiles(archivePath, "*.zip", SearchOption.TopDirectoryOnly))
-                .Returns(Enumerable.Empty<string>());
+            var archivePath = System.IO.Path.Combine(_testBaseDirectory, "report_archive");
+            _mockFileSystem.AddDirectory(archivePath); // Empty directory
 
             // Act
             var result = await _uploadService.UploadReportsAsync();
@@ -232,16 +222,14 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             // This test is limited to verifying the folder creation logic.
 
             // Arrange
-            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var baseDir = _testBaseDirectory;
             var archivePath = System.IO.Path.Combine(baseDir, "report_archive");
             var uploadedReportsDir = System.IO.Path.Combine(baseDir, "uploaded_reports");
             var zipFile = System.IO.Path.Combine(archivePath, "Device_20230115_1430.zip");
 
-            // Setup directory existence checks - archive exists, other directories don't
-            _mockDirectory.Setup(d => d.Exists(It.IsAny<string>()))
-                .Returns((string path) => path == archivePath);
-            _mockDirectory.Setup(d => d.EnumerateFiles(archivePath, "*.zip", SearchOption.TopDirectoryOnly))
-                .Returns(new[] { zipFile });
+            // Setup directory and files in MockFileSystem
+            _mockFileSystem.AddDirectory(archivePath);
+            _mockFileSystem.AddFile(zipFile, new MockFileData("test zip content"));
 
             // Act
             var result = await _uploadService.UploadReportsAsync();
@@ -288,8 +276,8 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public async Task UploadReportsAsync_RaisesStatusEvents_DuringOperation()
         {
             // Arrange
-            var archivePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "report_archive");
-            _mockDirectory.Setup(d => d.Exists(archivePath)).Returns(false);
+            var archivePath = System.IO.Path.Combine(_testBaseDirectory, "report_archive");
+            // Directory doesn't exist in MockFileSystem by default
 
             // Clear any setup messages
             _statusMessages.Clear();
@@ -305,10 +293,8 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public async Task UploadReportsAsync_NoReports_RaisesNoReportsMessage()
         {
             // Arrange
-            var archivePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "report_archive");
-            _mockDirectory.Setup(d => d.Exists(archivePath)).Returns(true);
-            _mockDirectory.Setup(d => d.EnumerateFiles(archivePath, "*.zip", SearchOption.TopDirectoryOnly))
-                .Returns(Enumerable.Empty<string>());
+            var archivePath = System.IO.Path.Combine(_testBaseDirectory, "report_archive");
+            _mockFileSystem.AddDirectory(archivePath); // Empty directory
 
             _statusMessages.Clear();
 
@@ -327,13 +313,12 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public async Task ScanLocalFolders_FilenameWithoutTimestamp_SkipsFile()
         {
             // Arrange
-            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var baseDir = _testBaseDirectory;
             var archivePath = System.IO.Path.Combine(baseDir, "report_archive");
             var invalidFile = System.IO.Path.Combine(archivePath, "DeviceName.zip"); // Missing timestamp
 
-            _mockDirectory.Setup(d => d.Exists(archivePath)).Returns(true);
-            _mockDirectory.Setup(d => d.EnumerateFiles(archivePath, "*.zip", SearchOption.TopDirectoryOnly))
-                .Returns(new[] { invalidFile });
+            _mockFileSystem.AddDirectory(archivePath);
+            _mockFileSystem.AddFile(invalidFile, new MockFileData("test zip content"));
 
             // Act
             var result = await _uploadService.UploadReportsAsync();
@@ -347,13 +332,12 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public async Task ScanLocalFolders_FilenameWithInvalidDateFormat_SkipsFile()
         {
             // Arrange
-            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var baseDir = _testBaseDirectory;
             var archivePath = System.IO.Path.Combine(baseDir, "report_archive");
             var invalidFile = System.IO.Path.Combine(archivePath, "Device_2023-01-15.zip"); // Wrong date format
 
-            _mockDirectory.Setup(d => d.Exists(archivePath)).Returns(true);
-            _mockDirectory.Setup(d => d.EnumerateFiles(archivePath, "*.zip", SearchOption.TopDirectoryOnly))
-                .Returns(new[] { invalidFile });
+            _mockFileSystem.AddDirectory(archivePath);
+            _mockFileSystem.AddFile(invalidFile, new MockFileData("test zip content"));
 
             // Act
             var result = await _uploadService.UploadReportsAsync();
@@ -367,15 +351,13 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public async Task ScanLocalFolders_FilenameWithMultipleUnderscores_ParsesCorrectly()
         {
             // Arrange
-            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var baseDir = _testBaseDirectory;
             var archivePath = System.IO.Path.Combine(baseDir, "report_archive");
             var zipFile = System.IO.Path.Combine(archivePath, "Device_With_Multiple_Underscores_20230115_1430.zip");
 
-            // Setup directory existence checks - archive exists, other directories don't
-            _mockDirectory.Setup(d => d.Exists(It.IsAny<string>()))
-                .Returns((string path) => path == archivePath);
-            _mockDirectory.Setup(d => d.EnumerateFiles(archivePath, "*.zip", SearchOption.TopDirectoryOnly))
-                .Returns(new[] { zipFile });
+            // Setup directory and files in MockFileSystem
+            _mockFileSystem.AddDirectory(archivePath);
+            _mockFileSystem.AddFile(zipFile, new MockFileData("test zip content"));
 
             // Act
             var result = await _uploadService.UploadReportsAsync();
@@ -392,15 +374,13 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public async Task ScanLocalFolders_ConstructsCorrectRemotePath_DeviceWithConfig()
         {
             // Arrange
-            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var baseDir = _testBaseDirectory;
             var archivePath = System.IO.Path.Combine(baseDir, "report_archive");
             var zipFile = System.IO.Path.Combine(archivePath, "LG50UQ_REV1_20230115_1430.zip");
 
-            // Setup directory existence checks - archive exists, other directories don't
-            _mockDirectory.Setup(d => d.Exists(It.IsAny<string>()))
-                .Returns((string path) => path == archivePath);
-            _mockDirectory.Setup(d => d.EnumerateFiles(archivePath, "*.zip", SearchOption.TopDirectoryOnly))
-                .Returns(new[] { zipFile });
+            // Setup directory and files in MockFileSystem
+            _mockFileSystem.AddDirectory(archivePath);
+            _mockFileSystem.AddFile(zipFile, new MockFileData("test zip content"));
 
             // Act
             await _uploadService.UploadReportsAsync();
@@ -414,15 +394,13 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         public async Task ScanLocalFolders_ConstructsCorrectRemotePath_DeviceWithoutConfig()
         {
             // Arrange
-            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var baseDir = _testBaseDirectory;
             var archivePath = System.IO.Path.Combine(baseDir, "report_archive");
             var zipFile = System.IO.Path.Combine(archivePath, "SimpleDevice_20230115_1430.zip");
 
-            // Setup directory existence checks - archive exists, other directories don't
-            _mockDirectory.Setup(d => d.Exists(It.IsAny<string>()))
-                .Returns((string path) => path == archivePath);
-            _mockDirectory.Setup(d => d.EnumerateFiles(archivePath, "*.zip", SearchOption.TopDirectoryOnly))
-                .Returns(new[] { zipFile });
+            // Setup directory and files in MockFileSystem
+            _mockFileSystem.AddDirectory(archivePath);
+            _mockFileSystem.AddFile(zipFile, new MockFileData("test zip content"));
 
             // Act
             await _uploadService.UploadReportsAsync();

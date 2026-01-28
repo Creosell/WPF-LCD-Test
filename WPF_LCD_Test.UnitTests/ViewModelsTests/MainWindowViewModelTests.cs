@@ -17,7 +17,9 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         private Mock<IDispatcher> _mockDispatcher;
         private Mock<IUploadService> _mockUploadService;
 
+#pragma warning disable NUnit1032
         private IServiceProvider _serviceProvider;
+#pragma warning restore NUnit1032
         private MainWindowViewModel _viewModel;
 
         [SetUp]
