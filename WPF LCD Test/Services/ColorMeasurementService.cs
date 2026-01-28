@@ -257,7 +257,7 @@ namespace WPF_LCD_Test.Services
         public async Task<Measurement> MeasureAsync(int measurementTime)
             {
             var result = new Measurement();
-            await Task.Run(async () =>
+            await Task.Run(() =>
             {
                 try
                     {
@@ -309,7 +309,7 @@ namespace WPF_LCD_Test.Services
 
                         if (i < measurementTime - 1)
                             {
-                            await Task.Delay(1000);
+                            Thread.Sleep(1000);
                             }
                         }
 

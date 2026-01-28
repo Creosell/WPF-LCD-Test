@@ -1,4 +1,5 @@
 ﻿using MvvmHelpers;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -42,6 +43,7 @@ namespace WPF_LCD_Test.ViewModels
         private bool _isReportGenerating;
         private bool _isUploadingReports;
         private string _logText = string.Empty;
+        private int _logLineCount = 0;
 
         private const string SERIAL_NUMBER_PATTERN = "^[a-zA-Z0-9]*$";
         private const string QA_PROBE_SN = "08954195";
@@ -57,7 +59,7 @@ namespace WPF_LCD_Test.ViewModels
             { MeasurementLocation.WhiteColor.ToString(), (0.3127, 0.3290) }
         };
 
-        private static readonly Dictionary<string, int> _measurementAttemptCountersMap = [];
+        private static readonly ConcurrentDictionary<string, int> _measurementAttemptCountersMap = new();
 
         public event EventHandler RequestClearInputFocus;
 
@@ -259,7 +261,7 @@ namespace WPF_LCD_Test.ViewModels
             _fileService.StatusMessage += FileService_StatusMessage;
             _colorMeasurementService.ConnectionStatusChanged += ColorMeasurementService_ConnectionStatusChanged;
             _colorMeasurementService.CalibrationStatusChanged += ColorMeasurementService_CalibrationStatusChanged;
-            _uploadService.StatusMessage += (sender, message) => Log(message);
+            _uploadService.StatusMessage += UploadService_StatusMessage;
 
             Log(WelcomeMessage);
             InitializeDeviceConfigurations();
@@ -583,7 +585,11 @@ namespace WPF_LCD_Test.ViewModels
         /// <summary>
         /// Clears the log text.
         /// </summary>
-        public void ExecuteClearLog() => LogText = string.Empty;
+        public void ExecuteClearLog()
+            {
+            LogText = string.Empty;
+            _logLineCount = 0;
+            }
 
         /// <summary>
         /// Executes the external report generator application.
@@ -604,30 +610,28 @@ namespace WPF_LCD_Test.ViewModels
                 Log(StartingReportGeneration);
                 IsReportGenerating = true;
 
-                var process = new Process
-                    {
-                    StartInfo = new ProcessStartInfo
-                        {
-                        FileName = exePath,
-                        WorkingDirectory = appDir,
-                        UseShellExecute = false,
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        CreateNoWindow = true
-                        }
-                    };
-
-                process.Start();
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
-
                 Task.Run(() =>
                 {
+                    using var process = new Process
+                        {
+                        StartInfo = new ProcessStartInfo
+                            {
+                            FileName = exePath,
+                            WorkingDirectory = appDir,
+                            UseShellExecute = false,
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            CreateNoWindow = true
+                            }
+                        };
+
                     try
                         {
+                        process.Start();
+                        process.BeginOutputReadLine();
+                        process.BeginErrorReadLine();
                         process.WaitForExit();
                         var exitCode = (ReportExitCode)process.ExitCode;
-                        process.Dispose();
                         HandleReportGenerationResult(exitCode);
                         }
                     catch (Exception ex)
@@ -818,10 +822,27 @@ namespace WPF_LCD_Test.ViewModels
 
         private void AddLogMessage(string message) => AppendToLog(message);
 
+        /// <summary>
+        /// Appends a message to the log with automatic cleanup of old entries.
+        /// Limits log to last 500 lines to prevent memory issues.
+        /// </summary>
         private void AppendToLog(string message)
             {
-            if (!string.IsNullOrEmpty(message))
-                LogText += $"{DateTime.Now:HH:mm:ss} {message}{Environment.NewLine}";
+            if (string.IsNullOrEmpty(message)) return;
+
+            const int maxLines = 500;
+            _logLineCount++;
+
+            // If we exceed the limit, trim old lines
+            if (_logLineCount > maxLines)
+                {
+                var lines = LogText.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+                var linesToKeep = lines.Skip(lines.Length - maxLines + 1);
+                LogText = string.Join(Environment.NewLine, linesToKeep) + Environment.NewLine;
+                _logLineCount = maxLines;
+                }
+
+            LogText += $"{DateTime.Now:HH:mm:ss} {message}{Environment.NewLine}";
             }
 
         private void UpdateUIState()
@@ -897,9 +918,7 @@ namespace WPF_LCD_Test.ViewModels
             _fileService.StatusMessage -= FileService_StatusMessage;
             _colorMeasurementService.ConnectionStatusChanged -= ColorMeasurementService_ConnectionStatusChanged;
             _colorMeasurementService.CalibrationStatusChanged -= ColorMeasurementService_CalibrationStatusChanged;
-
-            if (_uploadService != null)
-                _uploadService.StatusMessage -= (sender, message) => AddLogMessage(message);
+            _uploadService.StatusMessage -= UploadService_StatusMessage;
 
             ( _colorMeasurementService as IDisposable )?.Dispose();
             ( _fileService as IDisposable )?.Dispose();
@@ -926,6 +945,9 @@ namespace WPF_LCD_Test.ViewModels
             ExecuteThreadInUI(() => AddLogMessage(message));
 
         private void FileService_StatusMessage(object? sender, string message) =>
+            ExecuteThreadInUI(() => AddLogMessage(message));
+
+        private void UploadService_StatusMessage(object? sender, string message) =>
             ExecuteThreadInUI(() => AddLogMessage(message));
 
         private void ColorMeasurementService_CalibrationStatusChanged(object? sender, bool isCalibrated) =>

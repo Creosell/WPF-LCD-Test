@@ -90,11 +90,13 @@ namespace WPF_LCD_Test.ViewModels
         }
 
         /// <summary>
-        /// Releases resources used by the current page ViewModel.
+        /// Releases resources used by all ViewModels.
         /// </summary>
         public void Dispose()
         {
-            (CurrentPageViewModel as IDisposable)?.Dispose();
+            // Dispose both ViewModels if they were created
+            (_measurementViewModel as IDisposable)?.Dispose();
+            (_settingsViewModel as IDisposable)?.Dispose();
             GC.SuppressFinalize(this);
         }
     }

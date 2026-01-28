@@ -1,6 +1,7 @@
 ﻿// В папке Wrappers
 // Файл ColorAnalyzerWrapper.cs
 using CA200SRVRLib; // Прямая ссылка на COM-библиотеку
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using WPF_LCD_Test.Interfaces; // Наши объединенные интерфейсы
 
@@ -47,7 +48,10 @@ namespace WPF_LCD_Test.Wrappers
                         Marshal.ReleaseComObject(_memoryInstance);
                     }
                 }
-                catch { /* Ignore release errors */ }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Failed to release ColorAnalyzerMemory COM object: {ex.Message}");
+                }
                 _memoryInstance = null;
             }
         }
@@ -125,7 +129,10 @@ namespace WPF_LCD_Test.Wrappers
                         Marshal.ReleaseComObject(_probeInstance);
                     }
                 }
-                catch { /* Ignore release errors */ }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Failed to release ColorAnalyzerProbe COM object: {ex.Message}");
+                }
                 _probeInstance = null;
             }
         }
@@ -315,7 +322,10 @@ namespace WPF_LCD_Test.Wrappers
                 {
                     _singleProbeWrapper.Dispose();
                 }
-                catch { /* Ignore disposal errors */ }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Failed to dispose SingleProbe wrapper: {ex.Message}");
+                }
                 _singleProbeWrapper = null;
             }
 
@@ -325,7 +335,10 @@ namespace WPF_LCD_Test.Wrappers
                 {
                     _memoryWrapper.Dispose();
                 }
-                catch { /* Ignore disposal errors */ }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Failed to dispose Memory wrapper: {ex.Message}");
+                }
                 _memoryWrapper = null;
             }
 
