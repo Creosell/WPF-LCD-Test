@@ -356,6 +356,151 @@ namespace WPF_LCD_Test.Tests
             Assert.That(service.CurrentChannel, Is.EqualTo(0));
             }
 
+        // --- Tests for COM Object Lifecycle ---
+
+        [Test]
+        public void Disconnect_ShouldCleanupAllReferencesAndRaiseEvents()
+            {
+            // Arrange
+            _mockCa200.Setup(m => m.AutoConnect()).Verifiable();
+            _service.ConnectAsync().Wait();
+
+            bool connectionStatusChanged = true; // Should become false after disconnect
+            bool calibrationStatusChanged = true; // Should become false after disconnect
+
+            _service.ConnectionStatusChanged += (sender, connected) => connectionStatusChanged = connected;
+            _service.CalibrationStatusChanged += (sender, calibrated) => calibrationStatusChanged = calibrated;
+
+            // Act
+            ((IColorMeasurementService)_service).Disconnect();
+
+            // Assert
+            Assert.IsFalse(_service.IsDeviceConnected);
+            Assert.IsFalse(_service.IsDeviceCalibrated);
+            Assert.IsFalse(connectionStatusChanged);
+            Assert.IsFalse(calibrationStatusChanged);
+            _mockCa200.Verify(m => m.Dispose(), Times.Once);
+            }
+
+        [Test]
+        public async Task ConnectAsync_AfterDisconnect_ShouldReconnectSuccessfully()
+            {
+            // Arrange - First connection
+            _mockCa200.Setup(m => m.AutoConnect()).Verifiable();
+            var firstResult = await _service.ConnectAsync();
+            Assert.IsTrue(firstResult);
+            Assert.IsTrue(_service.IsDeviceConnected);
+
+            // Act - Disconnect
+            ((IColorMeasurementService)_service).Disconnect();
+            Assert.IsFalse(_service.IsDeviceConnected);
+
+            // Prepare for reconnection - need fresh mock since old one is disposed
+            _mockCa200 = new Mock<IColorAnalyzer200>();
+            _mockCa = new Mock<IColorAnalyzer>();
+            _mockProbe = new Mock<IColorAnalyzerProbe>();
+            _mockMemory = new Mock<IColorAnalyzerMemory>();
+
+            _mockCa200.Setup(m => m.SingleCa).Returns(_mockCa.Object);
+            _mockCa.Setup(m => m.SingleProbe).Returns(_mockProbe.Object);
+            _mockCa.Setup(m => m.Memory).Returns(_mockMemory.Object);
+            _mockCa200.Setup(m => m.AutoConnect()).Verifiable();
+
+            _service = new ColorMeasurementService(_mockCa200.Object);
+
+            // Act - Reconnect
+            var secondResult = await _service.ConnectAsync();
+
+            // Assert - Should connect successfully again
+            Assert.IsTrue(secondResult);
+            Assert.IsTrue(_service.IsDeviceConnected);
+            _mockCa200.Verify(m => m.AutoConnect(), Times.Once);
+            }
+
+        [Test]
+        public async Task ConnectAsync_AfterCOMException_ShouldCleanupAndAllowReconnect()
+            {
+            // Arrange - First connection attempt fails
+            _mockCa200
+                .Setup(m => m.AutoConnect())
+                .Throws(new COMException("Connection failed", -2147024891));
+
+            // Act - First attempt
+            var firstResult = await _service.ConnectAsync();
+
+            // Assert - Connection failed
+            Assert.IsFalse(firstResult);
+            Assert.IsFalse(_service.IsDeviceConnected);
+
+            // Arrange - Prepare for successful reconnection
+            _mockCa200 = new Mock<IColorAnalyzer200>();
+            _mockCa = new Mock<IColorAnalyzer>();
+            _mockProbe = new Mock<IColorAnalyzerProbe>();
+            _mockMemory = new Mock<IColorAnalyzerMemory>();
+
+            _mockCa200.Setup(m => m.SingleCa).Returns(_mockCa.Object);
+            _mockCa.Setup(m => m.SingleProbe).Returns(_mockProbe.Object);
+            _mockCa.Setup(m => m.Memory).Returns(_mockMemory.Object);
+            _mockCa200.Setup(m => m.AutoConnect()).Verifiable();
+
+            _service = new ColorMeasurementService(_mockCa200.Object);
+
+            // Act - Second attempt should succeed
+            var secondResult = await _service.ConnectAsync();
+
+            // Assert - Should connect successfully
+            Assert.IsTrue(secondResult);
+            Assert.IsTrue(_service.IsDeviceConnected);
+            }
+
+        [Test]
+        public async Task ConnectAsync_WithExistingConnection_ShouldNotCreateNewWrapper()
+            {
+            // Arrange
+            _mockCa200.Setup(m => m.AutoConnect()).Verifiable();
+
+            // Act - First connection
+            await _service.ConnectAsync();
+            var firstCallCount = _mockCa200.Invocations.Count;
+
+            // Act - Second connection attempt while already connected
+            await _service.ConnectAsync();
+            var secondCallCount = _mockCa200.Invocations.Count;
+
+            // Assert - AutoConnect should only be called once
+            Assert.AreEqual(firstCallCount, secondCallCount);
+            _mockCa200.Verify(m => m.AutoConnect(), Times.Once);
+            Assert.IsTrue(_service.IsDeviceConnected);
+            }
+
+        [Test]
+        public void Dispose_ShouldCleanupAllReferencesAndSetStatesToFalse()
+            {
+            // Arrange
+            _mockCa200.Setup(m => m.AutoConnect()).Verifiable();
+            _service.ConnectAsync().Wait();
+            _service.CalibrateZeroAsync().Wait();
+
+            Assert.IsTrue(_service.IsDeviceConnected);
+            Assert.IsTrue(_service.IsDeviceCalibrated);
+
+            bool connectionStatusChanged = true;
+            bool calibrationStatusChanged = true;
+
+            _service.ConnectionStatusChanged += (sender, connected) => connectionStatusChanged = connected;
+            _service.CalibrationStatusChanged += (sender, calibrated) => calibrationStatusChanged = calibrated;
+
+            // Act
+            _service.Dispose(true);
+
+            // Assert
+            Assert.IsFalse(_service.IsDeviceConnected);
+            Assert.IsFalse(_service.IsDeviceCalibrated);
+            Assert.IsFalse(connectionStatusChanged);
+            Assert.IsFalse(calibrationStatusChanged);
+            _mockCa200.Verify(m => m.Dispose(), Times.Once);
+            }
+
         public void Dispose()
             {
             Dispose(true);

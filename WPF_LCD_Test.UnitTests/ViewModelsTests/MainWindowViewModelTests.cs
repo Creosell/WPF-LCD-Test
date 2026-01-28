@@ -57,6 +57,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         public void Teardown()
         {
             _viewModel.Dispose(); // Вызываем Dispose для очистки
+            (_serviceProvider as IDisposable)?.Dispose();
         }
 
         // --- Тесты конструктора ---
