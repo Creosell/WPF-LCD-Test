@@ -366,10 +366,12 @@ namespace WPF_LCD_Test.ViewModels
 
             try
                 {
-                if (!IsDeviceConnected)
-                    await ExecuteConnectAsync();
+                // Use return value directly to avoid race condition with event-based property updates
+                bool isConnected = _colorMeasurementService.IsDeviceConnected;
+                if (!isConnected)
+                    isConnected = await _colorMeasurementService.ConnectAsync();
 
-                if (IsDeviceConnected)
+                if (isConnected)
                     {
                     _isDeviceCalibrating = true;
                     if (!await _colorMeasurementService.CalibrateZeroAsync())
