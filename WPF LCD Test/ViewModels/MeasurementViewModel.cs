@@ -49,7 +49,7 @@ namespace WPF_LCD_Test.ViewModels
         private const string QA_PROBE_SN = "08954195";
         private const int QA_PROBE_CHANNEL = 1;
         private const int MAX_MEASUREMENT_ATTEMPTS_BEFORE_CONFIRM = 1;
-        private const double COLOR_COORDINATES_TOLERANCE = 0.1;
+        private const double COLOR_COORDINATES_TOLERANCE = 0.15;
 
         private static readonly Dictionary<string, (double x, double y)> primariesNTSC = new()
         {
