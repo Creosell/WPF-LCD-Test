@@ -29,7 +29,7 @@ dotnet test --filter "FullyQualifiedName~TestClassName.TestMethodName"
 
 **Pattern:** MVVM (Model-View-ViewModel)
 
-**Entry Point:** `App.xaml.cs` initializes services and creates MainWindowViewModel with manual dependency injection.
+**Entry Point:** `App.xaml.cs` configures `Microsoft.Extensions.DependencyInjection` container and resolves `MainWindowViewModel` as the application root.
 
 **Key Layers:**
 
@@ -47,17 +47,19 @@ dotnet test --filter "FullyQualifiedName~TestClassName.TestMethodName"
 | IColorMeasurementService | COM interop with color analyzer device |
 | ISettingsService | App configuration (singleton) |
 | ILocalizationService | Runtime language switching (singleton) |
-| IFileService | File I/O abstraction |
-| IUploadService | Report upload with parallel support |
+| IFileService | File I/O abstraction, JSON/CSV export |
+| IUploadService | Parallel report upload to Nextcloud |
 | IDialogService | File dialogs, message boxes |
+| IMeasurementStatusService | Measurement state tracking |
+| IPathProvider | Centralized path resolution (BaseDirectory, ConfigDirectory, DataDirectory) |
 
-**Testability:** All system dependencies (file system, COM device, MessageBox, WPF Dispatcher) are wrapped in interfaces and injected, allowing comprehensive mocking with Moq. File system operations use System.IO.Abstractions (IFileSystem) with MockFileSystem for testing.
+**Testability:** All system dependencies (file system, COM device, MessageBox, WPF Dispatcher) are wrapped in interfaces injected via DI. File system uses `System.IO.Abstractions` (`IFileSystem` / `MockFileSystem`). COM device wrapped in `ColorAnalyzerMemoryWrapper` / `ColorAnalyzerProbeWrapper` with proper `Marshal.ReleaseComObject` cleanup.
 
-**Dependency Injection:** Uses Microsoft.Extensions.DependencyInjection container configured in `App.xaml.cs`. Services registered in `ConfigureServices()` method with appropriate lifetimes (Singleton/Transient). ViewModels resolve dependencies through IServiceProvider. All services use constructor injection - no static singleton instances.
+**Dependency Injection:** `Microsoft.Extensions.DependencyInjection` container configured in `App.xaml.cs` → `ConfigureServices()`. Singletons: settings, localization, path provider, measurement status. Transients: ViewModels. All services use constructor injection — no static singletons.
 
-**Path Management:** Centralized through IPathProvider service (PathProvider implementation). Provides BaseDirectory, ConfigDirectory, and DataDirectory paths. Eliminates hardcoded AppDomain.CurrentDomain.BaseDirectory throughout codebase.
+**Path Management:** `IPathProvider` / `PathProvider` — single source of truth for `BaseDirectory`, `ConfigDirectory`, `DataDirectory`. No hardcoded `AppDomain.CurrentDomain.BaseDirectory`.
 
-**Constants:** Application-wide constants defined in AppConstants class. ColorAnalyzer.MinChannel/MaxChannel used across ColorMeasurementService and SettingsViewModel for validation.
+**Constants:** `AppConstants` class. `ColorAnalyzer.MinChannel` = 0, `MaxChannel` = 99. `MeasurementViewModel.COLOR_COORDINATES_TOLERANCE` = 0.15, `QA_PROBE_SN` = "08954195".
 
 **Commands:** ViewModels use `RelayCommand` (in `Commands/`) for ICommand implementation binding to UI actions.
 
@@ -65,15 +67,20 @@ dotnet test --filter "FullyQualifiedName~TestClassName.TestMethodName"
 
 Device test specifications are YAML files in `WPF LCD Test/config/device_configs/` defining min/max/typical values for brightness, contrast, color gamut (RGB/NTSC area), RGB primaries (x/y coordinates), white point, and color temperature. Each config specifies acceptable ranges under `main_tests`.
 
+## Version
+
+Current version: **1.2.3** (set in `WPF LCD Test\WPF LCD Test.csproj` — `AssemblyVersion` / `FileVersion`). See [CHANGELOG.md](CHANGELOG.md) for history.
+
 ## Localization
 
 Supports English (default) and Chinese Simplified. Resources in `WPF LCD Test/Resources/StringResources.xaml` and `StringResources.zh-Hans.xaml`. Language can be switched at runtime.
 
 ## Testing
 
-- Framework: NUnit 3.14 with Moq
+- Framework: NUnit 3.14 with Moq 4.20, `System.IO.Abstractions.TestingHelpers` for file system mocking
 - Tests mirror source structure in `WPF_LCD_Test.UnitTests/`
-- All ViewModels, Services, and Models have corresponding test classes
+- Coverage: ViewModels, all Services (including COM lifecycle), Models, Converters, Commands
+- Do **not** use `dotnet build` to build before running tests — use MSBuild due to COM interop
 
 ## Communication Style & Code Standards
 

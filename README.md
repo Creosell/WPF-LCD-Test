@@ -16,6 +16,7 @@ Desktop application for automated testing of LCD display color characteristics u
 - [Testing](#testing)
 - [Localization](#localization)
 - [Roadmap](#roadmap)
+- [Changelog](#changelog)
 - [License](#license)
 
 ## Features
@@ -180,10 +181,8 @@ main_tests:
 Settings are stored in `%AppData%\WPF_LCD_Test\settings.json`:
 
 - **ColorAnalyzerChannel**: Measurement channel (0-99)
-- **LanguageCultureCode**: UI language ("en" or "zh-Hans")
-- **LastDeviceConfigPath**: Path to last used device configuration
-- **UploadServerUrl**: Server endpoint for report uploads
-- **MeasurementTimeout**: Timeout for measurements in seconds
+- **LanguageCultureCode**: UI language ("" for default / "zh-Hans" for Chinese Simplified)
+- **AutoConnectEnabled**: Automatically connect to device on startup
 
 ### Device Configurations
 
@@ -224,18 +223,21 @@ Place YAML device configuration files in `config/device_configs/`. Each configur
 - **ColorMeasurementService**: COM interop with Konica Minolta device
 - **SettingsService**: Application configuration management (singleton)
 - **LocalizationService**: Runtime language switching (singleton)
-- **FileService**: File I/O operations
-- **UploadService**: Parallel report upload to server
+- **FileService**: File I/O, JSON serialization, CSV export
+- **UploadService**: Parallel report upload to Nextcloud server
 - **DialogService**: File dialogs and message boxes
+- **MeasurementStatusService**: Tracks measurement status and state
+- **PathProvider**: Centralized path management (`BaseDirectory`, `ConfigDirectory`, `DataDirectory`)
 
 #### Wrappers
 Abstractions over system dependencies for testability:
-- **ICA200Wrapper**: COM device interface wrapper
-- **IFileSystemWrapper**: File system operations
-- **IDispatcher**: WPF Dispatcher wrapper for UI thread access
+- **ColorAnalyzerWrappers**: COM device wrappers (`ColorAnalyzerMemoryWrapper`, `ColorAnalyzerProbeWrapper`) with proper `Marshal.ReleaseComObject` disposal
+- **IFileSystem** (System.IO.Abstractions): File system abstraction with `MockFileSystem` support in tests
+- **WpfDispatcher**: `IDispatcher` implementation wrapping WPF `Dispatcher` for UI thread access
+- **MessageBoxWrapper**: `IMessageBox` abstraction over `System.Windows.MessageBox`
 
 #### Dependency Injection
-Manual DI in `App.xaml.cs` - all services are instantiated at startup and injected into MainWindowViewModel. Services are interface-based for unit testing with Moq.
+`Microsoft.Extensions.DependencyInjection` container configured in `App.xaml.cs`. Services registered with appropriate lifetimes (Singleton/Transient) and resolved via `IServiceProvider`. All services use constructor injection — no static singletons.
 
 ## Development
 
@@ -330,13 +332,15 @@ Change language at runtime in Settings. Localization resources are in:
 
 ### Planned Features
 
-- **DUT Counter**: Serial number tracking for Device Under Test
-- **Results Management**: Dedicated page for browsing historical results
-- **Enhanced Data Model**: Split location parameter into MeasurementPoint with Position and Color properties
-- **Configurable Timing**: Move measurement timing to user-configurable settings
-- **Export Formats**: Additional export formats (CSV, PDF reports)
+- **Results Management**: Dedicated page for browsing historical measurement results
+- **Enhanced Data Model**: Split location parameter into `MeasurementPoint` with Position and Color properties
+- **PDF Reports**: PDF export in addition to existing JSON/CSV formats
 - **Batch Testing**: Automated multi-point measurement sequences
 - **Statistical Analysis**: Trend analysis and statistical reporting
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 
 ## License
 
