@@ -8,8 +8,8 @@
 	<ImplicitUsings>enable</ImplicitUsings>
 	<UseWPF>true</UseWPF>
 	  <ApplicationIcon>Images\AppIcon.ico</ApplicationIcon>
-	  <AssemblyVersion>1.2.3</AssemblyVersion>
-	  <FileVersion>1.2.3</FileVersion>
+	  <AssemblyVersion>1.2.4</AssemblyVersion>
+	  <FileVersion>1.2.4</FileVersion>
   
   </PropertyGroup>
 
@@ -84,7 +84,7 @@
   </ItemGroup>
 
   <ItemGroup>
-	<InternalsVisibleTo Include="WPF_LCD_Test.UnitTests" />
+	<InternalsVisibleTo Include="Screen Checker.UnitTests" />
   </ItemGroup>
 
 </Project>

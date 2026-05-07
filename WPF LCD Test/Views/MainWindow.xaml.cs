@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Reflection;
+using System.Windows;
 using System.Windows.Input;
 
 namespace WPF_LCD_Test.Views
@@ -14,6 +15,8 @@ namespace WPF_LCD_Test.Views
         public MainWindow()
         {
             InitializeComponent();
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            Title = $"Screen Checker {version?.Major}.{version?.Minor}.{version?.Build}";
         }
 
         /// <summary>

@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.4] - 2026-05-07
+
+### Changed
+- Application renamed from **WPF LCD Test** to **Screen Checker**
+- Window title now displays version number dynamically (e.g. `Screen Checker 1.2.4`)
+- Added release tooling: `tools/release/release_manager.py` for packaging and uploading builds to Nextcloud
+- Updated README: project renamed, corrected build/test commands, added Releasing section
+
+---
+
 ## [1.2.3] - 2026-02-03
 
 ### Changed

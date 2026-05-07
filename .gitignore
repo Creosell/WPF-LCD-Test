@@ -362,3 +362,10 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /.claude
+
+# Release tools
+!tools/release/
+!tools/release/**
+tools/release/.env
+tools/release/release.log
+release_artifacts/

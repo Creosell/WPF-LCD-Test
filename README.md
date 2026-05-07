@@ -1,4 +1,4 @@
-# WPF LCD Test
+# Screen Checker
 
 Desktop application for automated testing of LCD display color characteristics using Konica Minolta CA-200/CA-310 colorimeters. The application provides comprehensive measurement capabilities for brightness, contrast, color gamut, RGB primaries, and white point coordinates with automatic validation against device specifications.
 
@@ -15,6 +15,7 @@ Desktop application for automated testing of LCD display color characteristics u
 - [Development](#development)
 - [Testing](#testing)
 - [Localization](#localization)
+- [Releasing](#releasing)
 - [Roadmap](#roadmap)
 - [Changelog](#changelog)
 - [License](#license)
@@ -73,7 +74,7 @@ Desktop application for automated testing of LCD display color characteristics u
 1. Download the latest release from the releases page
 2. Extract the archive to your desired location
 3. Ensure Konica Minolta CA-SDK2 is installed
-4. Run `WPF LCD Test.exe`
+4. Run `Screen Checker.exe`
 
 ### For Developers
 
@@ -91,7 +92,7 @@ dotnet --version
 
 3. Restore dependencies:
 ```bash
-dotnet restore "WPF LCD Test.sln"
+dotnet restore "Screen Checker.sln"
 ```
 
 ## Building the Project
@@ -102,17 +103,17 @@ The project uses COM interop for the Konica Minolta colorimeter, which requires 
 
 **Debug Build:**
 ```bash
-msbuild "WPF LCD Test.sln" /p:Configuration=Debug
+msbuild "Screen Checker.sln" /p:Configuration=Debug
 ```
 
 **Release Build:**
 ```bash
-msbuild "WPF LCD Test.sln" /p:Configuration=Release
+msbuild "Screen Checker.sln" /p:Configuration=Release
 ```
 
 ### Using Visual Studio
 
-1. Open `WPF LCD Test.sln`
+1. Open `Screen Checker.sln`
 2. Select Debug or Release configuration
 3. Build → Build Solution (Ctrl+Shift+B)
 
@@ -129,7 +130,7 @@ Executable and dependencies will be located in:
 ### From Build Output
 ```bash
 cd "WPF LCD Test\bin\Debug\net8.0-windows"
-.\WPF LCD Test.exe
+.\"Screen Checker.exe"
 ```
 
 ### From Visual Studio
@@ -281,20 +282,22 @@ WPF_LCD_Test.UnitTests/
 
 ### Running All Tests
 
+Build the solution first (MSBuild required due to COM interop), then:
+
 ```bash
-dotnet test "WPF_LCD_Test.UnitTests\WPF_LCD_Test.UnitTests.csproj"
+dotnet test "WPF_LCD_Test.UnitTests\Screen Checker.UnitTests.csproj" --no-build
 ```
 
 ### Running Specific Test Class
 
 ```bash
-dotnet test --filter "FullyQualifiedName~MeasurementViewModelTests"
+dotnet test --filter "FullyQualifiedName~MeasurementViewModelTests" --no-build
 ```
 
 ### Running Single Test Method
 
 ```bash
-dotnet test --filter "FullyQualifiedName~MeasurementViewModelTests.TestMethodName"
+dotnet test --filter "FullyQualifiedName~MeasurementViewModelTests.TestMethodName" --no-build
 ```
 
 ### Test Coverage
@@ -327,6 +330,48 @@ Change language at runtime in Settings. Localization resources are in:
 3. Translate all string values
 4. Update `LocalizationService.cs` to include new culture
 5. Add culture option to Settings UI
+
+## Releasing
+
+The release script is located at `tools/release/release_manager.py`. It packages the published build and uploads it to Nextcloud. Requires [uv](https://docs.astral.sh/uv/) — all Python dependencies are installed automatically on first run.
+
+### 1. Configure credentials
+
+Copy `.env.example` to `.env` in the same directory and fill in your Nextcloud credentials:
+
+```
+tools/release/.env.example  →  tools/release/.env
+```
+
+### 2. Publish the application
+
+In Visual Studio: right-click the **Screen Checker** project → **Publish** → use the **Folder** profile with output path set to `Release\` in the repo root.
+
+Or via MSBuild:
+
+```bash
+msbuild "Screen Checker.sln" /p:Configuration=Release /p:PublishDir=Release\ /t:Publish
+```
+
+### 3. Run the release manager
+
+From the repo root:
+
+```bash
+uv run .\tools\release\release_manager.py --upload zip .\Release screen_checker 1.2.3
+```
+
+Replace `1.2.3` with the actual version being released (must match `AssemblyVersion` in `Screen Checker.csproj`).
+
+| Argument | Description |
+|----------|-------------|
+| `zip` | Package mode — produces a single zip archive |
+| `.\Release` | Path to the published build folder |
+| `screen_checker` | Product identifier on Nextcloud |
+| `1.2.3` | Version string |
+| `--upload` | Skip the confirmation prompt and upload immediately |
+
+The script creates a `release_artifacts/` folder locally (gitignored) with the zip and manifest, then uploads both to Nextcloud under `SCT/Updater/versions/screen_checker/1.2.3/`.
 
 ## Roadmap
 

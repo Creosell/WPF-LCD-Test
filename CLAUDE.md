@@ -69,7 +69,7 @@ Device test specifications are YAML files in `WPF LCD Test/config/device_configs
 
 ## Version
 
-Current version: **1.2.3** (set in `WPF LCD Test\WPF LCD Test.csproj` — `AssemblyVersion` / `FileVersion`). See [CHANGELOG.md](CHANGELOG.md) for history.
+Current version: **1.2.4** (set in `WPF LCD Test\Screen Checker.csproj` — `AssemblyVersion` / `FileVersion`). See [CHANGELOG.md](CHANGELOG.md) for history.
 
 ## Localization
 

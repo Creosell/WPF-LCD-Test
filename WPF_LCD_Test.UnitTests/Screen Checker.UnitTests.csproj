@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WPF LCD Test\WPF LCD Test.csproj" />
+    <ProjectReference Include="..\WPF LCD Test\Screen Checker.csproj" />
   </ItemGroup>
 
 

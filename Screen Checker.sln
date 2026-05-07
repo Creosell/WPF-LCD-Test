@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.13.35931.197
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11527.330 d18.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF LCD Test", "WPF LCD Test\WPF LCD Test.csproj", "{2D380470-85BF-7B8D-C499-16522543CD79}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Screen Checker", "WPF LCD Test\Screen Checker.csproj", "{2D380470-85BF-7B8D-C499-16522543CD79}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF_LCD_Test.UnitTests", "WPF_LCD_Test.UnitTests\WPF_LCD_Test.UnitTests.csproj", "{162A4888-B5C8-8A4E-6542-0C41B5906B84}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Screen Checker.UnitTests", "WPF_LCD_Test.UnitTests\Screen Checker.UnitTests.csproj", "{162A4888-B5C8-8A4E-6542-0C41B5906B84}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

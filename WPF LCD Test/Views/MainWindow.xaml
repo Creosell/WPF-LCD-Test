@@ -8,7 +8,7 @@
     xmlns:resources="clr-namespace:WPF_LCD_Test.Resources"
     xmlns:view="clr-namespace:WPF_LCD_Test.Views"
     xmlns:viewmodel="clr-namespace:WPF_LCD_Test.ViewModels"
-    Title="LCD Test Tool"
+    Title="Screen Checker"
     Width="1000"
     Height="600"
     MinWidth="1100"
