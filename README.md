@@ -337,11 +337,7 @@ The release script is located at `tools/release/release_manager.py`. It packages
 
 ### 1. Configure credentials
 
-Copy `.env.example` to `.env` in the same directory and fill in your Nextcloud credentials:
-
-```
-tools/release/.env.example  →  tools/release/.env
-```
+Create `tools/release/.env` based on `tools/release/.env.example` and fill in your Nextcloud credentials.
 
 ### 2. Publish the application
 
