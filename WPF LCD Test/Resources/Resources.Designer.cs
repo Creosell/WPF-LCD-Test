@@ -241,6 +241,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Choose configuration.
+        /// </summary>
+        public static string ChooseConfiguration {
+            get {
+                return ResourceManager.GetString("ChooseConfiguration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Are you sure you want to clear all fields?.
         /// </summary>
         public static string CleanFieldWarning {

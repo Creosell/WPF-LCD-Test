@@ -235,7 +235,18 @@
                                 <TextBlock
                                     MinWidth="160"
                                     VerticalAlignment="Center"
-                                    Text="{Binding SelectedDeviceConfigurationDisplayName}" />
+                                    Text="{Binding SelectedDeviceConfigurationDisplayName}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding HasSelectedDeviceConfiguration}" Value="False">
+                                                    <Setter Property="Opacity" Value="0.6" />
+                                                    <Setter Property="FontStyle" Value="Italic" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                                 <MaterialDesign:PackIcon
                                     Margin="4,0,0,0"
                                     VerticalAlignment="Center"

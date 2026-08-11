@@ -98,6 +98,7 @@ namespace WPF_LCD_Test.ViewModels
                 if (SetProperty(ref _selectedDeviceConfiguration, value))
                     {
                     OnPropertyChanged(nameof(SelectedDeviceConfigurationDisplayName));
+                    OnPropertyChanged(nameof(HasSelectedDeviceConfiguration));
                     UpdateSelectedConfigNodeHighlight();
                     }
                 }
@@ -105,10 +106,16 @@ namespace WPF_LCD_Test.ViewModels
 
         /// <summary>
         /// Gets the file name (without folder path) of the currently selected device configuration,
-        /// shown on the closed cascading configuration menu button.
+        /// shown on the closed cascading configuration menu button, or a placeholder when none is selected.
         /// </summary>
         public string SelectedDeviceConfigurationDisplayName =>
-            string.IsNullOrEmpty(_selectedDeviceConfiguration) ? string.Empty : Path.GetFileName(_selectedDeviceConfiguration);
+            string.IsNullOrEmpty(_selectedDeviceConfiguration) ? ChooseConfiguration : Path.GetFileName(_selectedDeviceConfiguration);
+
+        /// <summary>
+        /// Gets whether a device configuration is currently selected, used to dim the
+        /// configuration button text while it shows the "choose configuration" placeholder.
+        /// </summary>
+        public bool HasSelectedDeviceConfiguration => !string.IsNullOrEmpty(_selectedDeviceConfiguration);
 
         public string SerialNumber
             {
@@ -308,10 +315,7 @@ namespace WPF_LCD_Test.ViewModels
                 foreach (var node in BuildDeviceConfigurationTree(_pathProvider.ConfigDirectory))
                     DeviceConfigurationTree.Add(node);
 
-                var firstConfiguration = FindFirstConfiguration(DeviceConfigurationTree);
-                if (firstConfiguration != null)
-                    SelectedDeviceConfiguration = firstConfiguration;
-                else
+                if (FindFirstConfiguration(DeviceConfigurationTree) == null)
                     Log(ConfigDirNotFound, [_pathProvider.ConfigDirectory]);
                 }
             catch (Exception ex)
