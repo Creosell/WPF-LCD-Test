@@ -36,7 +36,10 @@
             checked), the header text, and a submenu arrow (only when the item has children).
         -->
         <ControlTemplate x:Key="DeviceConfigMenuItemTemplate" TargetType="MenuItem">
-            <Border x:Name="Bg" Background="Transparent" Padding="10,6">
+            <Border
+                x:Name="Bg"
+                Padding="10,6"
+                Background="Transparent">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -99,7 +102,7 @@
             precedence over any implicit (unkeyed) TargetType="MenuItem" style for generated containers.
             This style must therefore be applied explicitly via ItemContainerStyle, and re-applies itself
             to its own ItemContainerStyle so it keeps propagating into nested folder submenus.
-
+            
             Selection itself stays on Command/CommandParameter (bound to the ViewModel's
             SelectDeviceConfigurationCommand), keeping the MVVM action in the ViewModel. The Click
             EventSetter is only a bridge invoking that already-bound Command: containers generated
@@ -137,7 +140,10 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Underline" BorderBrush="Black" BorderThickness="0,0,0,1">
+                        <Border
+                            x:Name="Underline"
+                            BorderBrush="Black"
+                            BorderThickness="0,0,0,1">
                             <ContentPresenter Margin="0,0,0,4" />
                         </Border>
                         <ControlTemplate.Triggers>
@@ -242,6 +248,7 @@
                                                 <DataTrigger Binding="{Binding HasSelectedDeviceConfiguration}" Value="False">
                                                     <Setter Property="Opacity" Value="0.6" />
                                                     <Setter Property="FontStyle" Value="Italic" />
+                                                    <Setter Property="FontSize" Value="13" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>

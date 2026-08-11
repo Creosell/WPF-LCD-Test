@@ -241,7 +241,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Choose configuration.
+        ///   Looks up a localized string similar to Choose configuration….
         /// </summary>
         public static string ChooseConfiguration {
             get {

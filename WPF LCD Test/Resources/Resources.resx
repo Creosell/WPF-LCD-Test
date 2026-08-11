@@ -415,7 +415,7 @@
     <value>Configurations directory not found: {0}</value>
   </data>
   <data name="ChooseConfiguration" xml:space="preserve">
-    <value>Choose configuration</value>
+    <value>Choose configuration…</value>
   </data>
   <data name="ErrMeasurementValidation" xml:space="preserve">
     <value>Unknown error in measurement validation</value>
