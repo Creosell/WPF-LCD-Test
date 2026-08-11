@@ -1041,5 +1041,224 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             Assert.That(_viewModel.CurrentDevice, Is.Not.Null);
             Assert.That(_viewModel.CurrentDevice.SerialNumber, Is.EqualTo("SN12345"));
             }
+
+        // --- Тесты для иерархического дерева конфигураций и каскадного меню ---
+
+        private string _configTestDirectory;
+
+        [TearDown]
+        public void TearDownConfigTestDirectory()
+            {
+            if (_configTestDirectory != null && Directory.Exists(_configTestDirectory))
+                Directory.Delete(_configTestDirectory, recursive: true);
+            _configTestDirectory = null;
+            }
+
+        /// <summary>
+        /// Creates a fresh temp config directory and a MeasurementViewModel wired to it, so
+        /// InitializeDeviceConfigurations (called from the constructor) scans real files/folders.
+        /// </summary>
+        private MeasurementViewModel CreateViewModelWithConfigDirectory(Action<string> populateDirectory)
+            {
+            _configTestDirectory = Path.Combine(Path.GetTempPath(), "WpfLcdTestConfigs_" + Guid.NewGuid());
+            Directory.CreateDirectory(_configTestDirectory);
+            populateDirectory(_configTestDirectory);
+
+            _mockPathProvider.Setup(p => p.ConfigDirectory).Returns(_configTestDirectory);
+
+            var viewModel = new MeasurementViewModel(
+                _mockColorMeasurementService.Object,
+                _mockFileService.Object,
+                _mockDialogService.Object,
+                _mockLocalizationService.Object,
+                _mockDispatcher.Object,
+                _mockUploadService.Object,
+                _mockSettingsService.Object,
+                _mockPathProvider.Object,
+                _mockMeasurementStatusService.Object);
+            viewModel.ClearAllAttemptCounts();
+            return viewModel;
+            }
+
+        [Test]
+        public void InitializeDeviceConfigurations_NoConfigSelected_ByDefault()
+            {
+            // Arrange & Act
+            using var viewModel = CreateViewModelWithConfigDirectory(dir =>
+                File.WriteAllText(Path.Combine(dir, "Config1.yaml"), string.Empty));
+
+            // Assert - the operator must explicitly pick a configuration, nothing is auto-selected
+            Assert.That(viewModel.SelectedDeviceConfiguration, Is.Null.Or.Empty);
+            Assert.That(viewModel.HasSelectedDeviceConfiguration, Is.False);
+            Assert.That(viewModel.SelectedDeviceConfigurationDisplayName, Is.EqualTo(ChooseConfiguration));
+            }
+
+        [Test]
+        public void InitializeDeviceConfigurations_EmptyDirectory_LogsConfigDirNotFound()
+            {
+            // Arrange & Act
+            using var viewModel = CreateViewModelWithConfigDirectory(dir => { });
+
+            // Assert
+            Assert.That(viewModel.LogText, Does.Contain(nameof(ConfigDirNotFound)));
+            }
+
+        [Test]
+        public void InitializeDeviceConfigurations_DirectoryHasConfigs_DoesNotLogConfigDirNotFound()
+            {
+            // Arrange & Act
+            using var viewModel = CreateViewModelWithConfigDirectory(dir =>
+                File.WriteAllText(Path.Combine(dir, "Config1.yaml"), string.Empty));
+
+            // Assert
+            Assert.That(viewModel.LogText, Does.Not.Contain(nameof(ConfigDirNotFound)));
+            }
+
+        [Test]
+        public void InitializeDeviceConfigurations_BuildsFlatFileList_OrderedAlphabetically()
+            {
+            // Arrange & Act
+            using var viewModel = CreateViewModelWithConfigDirectory(dir =>
+                {
+                File.WriteAllText(Path.Combine(dir, "Zebra.yaml"), string.Empty);
+                File.WriteAllText(Path.Combine(dir, "Alpha.yaml"), string.Empty);
+                });
+
+            // Assert
+            Assert.That(viewModel.DeviceConfigurationTree, Has.Count.EqualTo(2));
+            Assert.That(viewModel.DeviceConfigurationTree[0].DisplayName, Is.EqualTo("Alpha"));
+            Assert.That(viewModel.DeviceConfigurationTree[1].DisplayName, Is.EqualTo("Zebra"));
+            Assert.That(viewModel.DeviceConfigurationTree[0].IsFolder, Is.False);
+            }
+
+        [Test]
+        public void InitializeDeviceConfigurations_NestedFolders_SubfoldersOrderedBeforeFiles()
+            {
+            // Arrange & Act
+            using var viewModel = CreateViewModelWithConfigDirectory(dir =>
+                {
+                File.WriteAllText(Path.Combine(dir, "RootConfig.yaml"), string.Empty);
+                var orderFolder = Directory.CreateDirectory(Path.Combine(dir, "OrderA")).FullName;
+                File.WriteAllText(Path.Combine(orderFolder, "Nested.yaml"), string.Empty);
+                });
+
+            // Assert - folder node comes first, then the root-level file
+            Assert.That(viewModel.DeviceConfigurationTree, Has.Count.EqualTo(2));
+            Assert.That(viewModel.DeviceConfigurationTree[0].IsFolder, Is.True);
+            Assert.That(viewModel.DeviceConfigurationTree[0].DisplayName, Is.EqualTo("OrderA"));
+            Assert.That(viewModel.DeviceConfigurationTree[1].DisplayName, Is.EqualTo("RootConfig"));
+
+            var nestedNode = viewModel.DeviceConfigurationTree[0].Children.Single();
+            Assert.That(nestedNode.DisplayName, Is.EqualTo("Nested"));
+            Assert.That(nestedNode.RelativePath, Is.EqualTo(Path.Combine("OrderA", "Nested")));
+            }
+
+        [Test]
+        public void InitializeDeviceConfigurations_EmptySubfolder_IsExcludedFromTree()
+            {
+            // Arrange & Act
+            using var viewModel = CreateViewModelWithConfigDirectory(dir =>
+                Directory.CreateDirectory(Path.Combine(dir, "EmptyOrder")));
+
+            // Assert - a folder with no configuration files (direct or nested) is not shown
+            Assert.That(viewModel.DeviceConfigurationTree, Is.Empty);
+            }
+
+        [Test]
+        public void SelectDeviceConfigurationCommand_CanExecute_TrueForNonEmptyRelativePath()
+            {
+            using var viewModel = CreateViewModelWithConfigDirectory(dir =>
+                File.WriteAllText(Path.Combine(dir, "Config1.yaml"), string.Empty));
+
+            Assert.That(viewModel.SelectDeviceConfigurationCommand.CanExecute("Config1"), Is.True);
+            }
+
+        [Test]
+        public void SelectDeviceConfigurationCommand_CanExecute_FalseForNullOrEmptyParameter()
+            {
+            using var viewModel = CreateViewModelWithConfigDirectory(dir =>
+                File.WriteAllText(Path.Combine(dir, "Config1.yaml"), string.Empty));
+
+            Assert.That(viewModel.SelectDeviceConfigurationCommand.CanExecute(null), Is.False);
+            Assert.That(viewModel.SelectDeviceConfigurationCommand.CanExecute(string.Empty), Is.False);
+            }
+
+        [Test]
+        public void SelectDeviceConfigurationCommand_Execute_SetsSelectedDeviceConfiguration()
+            {
+            // Arrange
+            using var viewModel = CreateViewModelWithConfigDirectory(dir =>
+                File.WriteAllText(Path.Combine(dir, "Config1.yaml"), string.Empty));
+
+            // Act
+            viewModel.SelectDeviceConfigurationCommand.Execute("Config1");
+
+            // Assert
+            Assert.That(viewModel.SelectedDeviceConfiguration, Is.EqualTo("Config1"));
+            Assert.That(viewModel.HasSelectedDeviceConfiguration, Is.True);
+            Assert.That(viewModel.SelectedDeviceConfigurationDisplayName, Is.EqualTo("Config1"));
+            }
+
+        [Test]
+        public void SelectDeviceConfigurationCommand_Execute_NestedConfig_DisplayNameShowsFileNameOnly()
+            {
+            // Arrange
+            using var viewModel = CreateViewModelWithConfigDirectory(dir =>
+                {
+                var orderFolder = Directory.CreateDirectory(Path.Combine(dir, "OrderA")).FullName;
+                File.WriteAllText(Path.Combine(orderFolder, "Nested.yaml"), string.Empty);
+                });
+            var relativePath = Path.Combine("OrderA", "Nested");
+
+            // Act
+            viewModel.SelectDeviceConfigurationCommand.Execute(relativePath);
+
+            // Assert - button shows only the file name, not the folder path
+            Assert.That(viewModel.SelectedDeviceConfigurationDisplayName, Is.EqualTo("Nested"));
+            }
+
+        [Test]
+        public void SelectDeviceConfigurationCommand_Execute_UpdatesCheckmarkHighlight_AndMovesItOnReselection()
+            {
+            // Arrange
+            using var viewModel = CreateViewModelWithConfigDirectory(dir =>
+                {
+                File.WriteAllText(Path.Combine(dir, "Config1.yaml"), string.Empty);
+                File.WriteAllText(Path.Combine(dir, "Config2.yaml"), string.Empty);
+                });
+            var config1Node = viewModel.DeviceConfigurationTree.Single(n => n.DisplayName == "Config1");
+            var config2Node = viewModel.DeviceConfigurationTree.Single(n => n.DisplayName == "Config2");
+
+            // Act - select the first configuration
+            viewModel.SelectDeviceConfigurationCommand.Execute("Config1");
+
+            // Assert
+            Assert.That(config1Node.IsSelected, Is.True);
+            Assert.That(config2Node.IsSelected, Is.False);
+
+            // Act - switch to the second configuration
+            viewModel.SelectDeviceConfigurationCommand.Execute("Config2");
+
+            // Assert - checkmark moves, previous selection is cleared
+            Assert.That(config1Node.IsSelected, Is.False);
+            Assert.That(config2Node.IsSelected, Is.True);
+            }
+
+        [Test]
+        public void SelectDeviceConfigurationCommand_Execute_PropertyChanged_ForDisplayNameAndHasSelected()
+            {
+            // Arrange
+            using var viewModel = CreateViewModelWithConfigDirectory(dir =>
+                File.WriteAllText(Path.Combine(dir, "Config1.yaml"), string.Empty));
+            var propertiesChanged = new List<string>();
+            viewModel.PropertyChanged += (s, e) => propertiesChanged.Add(e.PropertyName!);
+
+            // Act
+            viewModel.SelectDeviceConfigurationCommand.Execute("Config1");
+
+            // Assert
+            Assert.That(propertiesChanged, Does.Contain(nameof(viewModel.SelectedDeviceConfigurationDisplayName)));
+            Assert.That(propertiesChanged, Does.Contain(nameof(viewModel.HasSelectedDeviceConfiguration)));
+            }
         }
     }
