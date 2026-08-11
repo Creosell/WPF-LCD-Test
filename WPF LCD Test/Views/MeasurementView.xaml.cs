@@ -27,6 +27,26 @@ namespace WPF_LCD_Test.Views
             this.Unloaded += MeasurementView_Unloaded;
         }
 
+        private void DeviceConfigurationButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.ContextMenu != null)
+            {
+                button.ContextMenu.PlacementTarget = button;
+                button.ContextMenu.IsOpen = true;
+            }
+        }
+
+        // Containers generated inside a ContextMenu's nested Popups do not reliably invoke their
+        // bound Command on click in this MaterialDesign setup, so this bridge forces the already-bound
+        // Command/CommandParameter to execute; the selection logic itself stays in the ViewModel.
+        private void DeviceConfigMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem { Command: ICommand command } menuItem && command.CanExecute(menuItem.CommandParameter))
+            {
+                command.Execute(menuItem.CommandParameter);
+            }
+        }
+
         private void SerialNumberTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             TextBox serialNumberTextBox = sender as TextBox;

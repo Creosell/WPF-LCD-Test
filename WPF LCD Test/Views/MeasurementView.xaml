@@ -23,6 +23,133 @@
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+        <!--  HierarchicalDataTemplate driving the cascading device configuration menu; propagates recursively to nested folder submenus.  -->
+        <HierarchicalDataTemplate DataType="{x:Type models:DeviceConfigTreeNode}" ItemsSource="{Binding Children}">
+            <TextBlock Text="{Binding DisplayName}" />
+        </HierarchicalDataTemplate>
+
+        <!--
+            Compact MenuItem template: MaterialDesign's default MenuItem chrome reserves a wide fixed-width
+            icon gutter on the left even when no Icon is set, which reads as an oversized indent for a plain
+            text list. This template renders only a checkmark column (collapsed to zero width unless
+            checked), the header text, and a submenu arrow (only when the item has children).
+        -->
+        <ControlTemplate x:Key="DeviceConfigMenuItemTemplate" TargetType="MenuItem">
+            <Border x:Name="Bg" Background="Transparent" Padding="10,6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        x:Name="CheckGlyph"
+                        Grid.Column="0"
+                        Margin="0,0,6,0"
+                        VerticalAlignment="Center"
+                        FontWeight="Bold"
+                        Text="✓"
+                        Visibility="Collapsed" />
+                    <ContentPresenter
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        ContentSource="Header" />
+                    <Path
+                        x:Name="SubmenuArrow"
+                        Grid.Column="2"
+                        Margin="10,0,0,0"
+                        VerticalAlignment="Center"
+                        Data="M0,0 L4,4 L0,8"
+                        Fill="{TemplateBinding Foreground}"
+                        Visibility="Collapsed" />
+                    <Popup
+                        x:Name="PART_Popup"
+                        AllowsTransparency="False"
+                        Focusable="False"
+                        HorizontalOffset="10"
+                        IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                        Placement="Right"
+                        PopupAnimation="None"
+                        VerticalOffset="-6">
+                        <Border
+                            Background="{DynamicResource MaterialDesignPaper}"
+                            BorderBrush="#FFAAAAAA"
+                            BorderThickness="1">
+                            <ItemsPresenter />
+                        </Border>
+                    </Popup>
+                </Grid>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsHighlighted" Value="True">
+                    <Setter TargetName="Bg" Property="Background" Value="#22000000" />
+                </Trigger>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter TargetName="CheckGlyph" Property="Visibility" Value="Visible" />
+                </Trigger>
+                <Trigger Property="HasItems" Value="True">
+                    <Setter TargetName="SubmenuArrow" Property="Visibility" Value="Visible" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <!--
+            MaterialDesign assigns ContextMenu/MenuItem its own default ItemContainerStyle, which takes
+            precedence over any implicit (unkeyed) TargetType="MenuItem" style for generated containers.
+            This style must therefore be applied explicitly via ItemContainerStyle, and re-applies itself
+            to its own ItemContainerStyle so it keeps propagating into nested folder submenus.
+
+            Selection itself stays on Command/CommandParameter (bound to the ViewModel's
+            SelectDeviceConfigurationCommand), keeping the MVVM action in the ViewModel. The Click
+            EventSetter is only a bridge invoking that already-bound Command: containers generated
+            inside a ContextMenu's nested Popups do not reliably raise ICommandSource execution on
+            their own in this MaterialDesign setup, so the bridge forces it explicitly.
+        -->
+        <Style x:Key="DeviceConfigMenuItemStyle" TargetType="MenuItem">
+            <Setter Property="Template" Value="{StaticResource DeviceConfigMenuItemTemplate}" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Normal" />
+            <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+            <Setter Property="TextOptions.TextRenderingMode" Value="Grayscale" />
+            <Setter Property="ItemContainerStyle" Value="{DynamicResource DeviceConfigMenuItemStyle}" />
+            <Setter Property="Command" Value="{Binding SelectCommand}" />
+            <Setter Property="CommandParameter" Value="{Binding RelativePath}" />
+            <EventSetter Event="Click" Handler="DeviceConfigMenuItem_Click" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsFolder}" Value="False">
+                    <Setter Property="IsCheckable" Value="True" />
+                    <Setter Property="IsChecked" Value="{Binding IsSelected}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!--
+            MaterialDesignFlatButton fills the entire button area on hover (a ripple-style highlight),
+            which reads as inconsistent next to the plain underline hover of the SN TextBox. This template
+            keeps only a bottom underline that brightens on hover, matching the TextBox's affordance.
+        -->
+        <Style x:Key="DeviceConfigDropdownButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Underline" BorderBrush="Black" BorderThickness="0,0,0,1">
+                            <ContentPresenter Margin="0,0,0,4" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Underline" Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style
             x:Key="MeasurementButtonsStyle"
             BasedOn="{StaticResource MaterialDesignFlatDarkBgButton}"
@@ -86,15 +213,35 @@
                             VerticalAlignment="Center"
                             Content="{DynamicResource DeviceConfiguration}"
                             Foreground="White" />
-                        <ComboBox
-                            x:Name="DeviceConfigurationComboBox"
+                        <Button
+                            x:Name="DeviceConfigurationButton"
                             MinWidth="200"
                             MinHeight="20"
                             Margin="5"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            ItemsSource="{Binding DeviceConfigurations}"
-                            SelectedItem="{Binding SelectedDeviceConfiguration, Mode=TwoWay}" />
+                            Click="DeviceConfigurationButton_Click"
+                            Foreground="White"
+                            Style="{StaticResource DeviceConfigDropdownButtonStyle}"
+                            Tag="{Binding}">
+                            <Button.ContextMenu>
+                                <ContextMenu
+                                    DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}"
+                                    ItemContainerStyle="{StaticResource DeviceConfigMenuItemStyle}"
+                                    ItemsSource="{Binding DeviceConfigurationTree}"
+                                    Placement="Bottom" />
+                            </Button.ContextMenu>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock
+                                    MinWidth="160"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding SelectedDeviceConfigurationDisplayName}" />
+                                <MaterialDesign:PackIcon
+                                    Margin="4,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Kind="ChevronDown" />
+                            </StackPanel>
+                        </Button>
 
 
 

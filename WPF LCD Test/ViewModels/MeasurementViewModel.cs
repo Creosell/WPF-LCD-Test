@@ -45,6 +45,9 @@ namespace WPF_LCD_Test.ViewModels
         private string _logText = string.Empty;
         private int _logLineCount = 0;
 
+        private readonly Dictionary<string, DeviceConfigTreeNode> _configNodesByPath = [];
+        private DeviceConfigTreeNode? _selectedConfigNode;
+
         private const string SERIAL_NUMBER_PATTERN = "^[a-zA-Z0-9]*$";
         private const string QA_PROBE_SN = "08954195";
         private const int QA_PROBE_CHANNEL = 1;
@@ -90,8 +93,22 @@ namespace WPF_LCD_Test.ViewModels
         public string SelectedDeviceConfiguration
             {
             get => _selectedDeviceConfiguration;
-            set => SetProperty(ref _selectedDeviceConfiguration, value);
+            set
+                {
+                if (SetProperty(ref _selectedDeviceConfiguration, value))
+                    {
+                    OnPropertyChanged(nameof(SelectedDeviceConfigurationDisplayName));
+                    UpdateSelectedConfigNodeHighlight();
+                    }
+                }
             }
+
+        /// <summary>
+        /// Gets the file name (without folder path) of the currently selected device configuration,
+        /// shown on the closed cascading configuration menu button.
+        /// </summary>
+        public string SelectedDeviceConfigurationDisplayName =>
+            string.IsNullOrEmpty(_selectedDeviceConfiguration) ? string.Empty : Path.GetFileName(_selectedDeviceConfiguration);
 
         public string SerialNumber
             {
@@ -189,7 +206,7 @@ namespace WPF_LCD_Test.ViewModels
 
         public string DeviceConnectionStatusText => _isDeviceConnected ? ConnectedCA : DisconnectedCA;
         public string DeviceCalibrationStatusText => _isDeviceCalibrated ? CalibratedCA : NotCalibratedCa;
-        public ObservableCollection<string> DeviceConfigurations { get; } = [];
+        public ObservableCollection<DeviceConfigTreeNode> DeviceConfigurationTree { get; } = [];
         public IMeasurementStatusService MeasurementStatusService => _measurementStatusService;
 
         #endregion
@@ -207,6 +224,7 @@ namespace WPF_LCD_Test.ViewModels
         public ICommand NewDeviceUnderTestCommand { get; }
         public ICommand ReportGenerateCommand { get; }
         public ICommand UploadReportsCommand { get; }
+        public ICommand SelectDeviceConfigurationCommand { get; }
 
         #endregion
 
@@ -256,6 +274,7 @@ namespace WPF_LCD_Test.ViewModels
             MeasureCommand = new RelayCommand(ExecuteMeasureAsync, CanExecuteMeasure);
             ApplySerialNumberCommand = new RelayCommand(ExecuteApplySerialNumber, CanExecuteApplySerialNumber);
             UploadReportsCommand = new RelayCommand(ExecuteUploadReportsAsync, CanExecuteUploadReportsAsync);
+            SelectDeviceConfigurationCommand = new RelayCommand(ExecuteSelectDeviceConfiguration, CanExecuteSelectDeviceConfiguration);
 
             _colorMeasurementService.StatusMessage += ColorMeasurementService_StatusMessage;
             _fileService.StatusMessage += FileService_StatusMessage;
@@ -273,7 +292,8 @@ namespace WPF_LCD_Test.ViewModels
         #region Methods
 
         /// <summary>
-        /// Loads device configuration files from the disk and populates the selection list.
+        /// Loads device configuration files from the disk, including any nested subfolders,
+        /// and populates the hierarchical selection tree for cascading menu display.
         /// </summary>
         private void InitializeDeviceConfigurations()
             {
@@ -282,14 +302,15 @@ namespace WPF_LCD_Test.ViewModels
                 if (!Directory.Exists(_pathProvider.ConfigDirectory))
                     Directory.CreateDirectory(_pathProvider.ConfigDirectory);
 
-                var configFiles = Directory.GetFiles(_pathProvider.ConfigDirectory, "*.yaml");
-                DeviceConfigurations.Clear();
+                DeviceConfigurationTree.Clear();
+                _configNodesByPath.Clear();
+                _selectedConfigNode = null;
+                foreach (var node in BuildDeviceConfigurationTree(_pathProvider.ConfigDirectory))
+                    DeviceConfigurationTree.Add(node);
 
-                foreach (var file in configFiles)
-                    DeviceConfigurations.Add(Path.GetFileNameWithoutExtension(file));
-
-                if (DeviceConfigurations.Any())
-                    SelectedDeviceConfiguration = DeviceConfigurations.First();
+                var firstConfiguration = FindFirstConfiguration(DeviceConfigurationTree);
+                if (firstConfiguration != null)
+                    SelectedDeviceConfiguration = firstConfiguration;
                 else
                     Log(ConfigDirNotFound, [_pathProvider.ConfigDirectory]);
                 }
@@ -297,6 +318,102 @@ namespace WPF_LCD_Test.ViewModels
                 {
                 Log(ErrUnexpected, [ex.Message]);
                 }
+            }
+
+        /// <summary>
+        /// Recursively builds device configuration tree nodes for a directory: subfolders
+        /// (containing at least one configuration file, direct or nested) ordered alphabetically
+        /// first, followed by the directory's own configuration files ordered alphabetically.
+        /// </summary>
+        /// <param name="directoryPath">Directory to scan.</param>
+        /// <returns>Sequence of child nodes for the directory.</returns>
+        private IEnumerable<DeviceConfigTreeNode> BuildDeviceConfigurationTree(string directoryPath)
+            {
+            foreach (var subDirectory in Directory.GetDirectories(directoryPath).OrderBy(d => d, StringComparer.OrdinalIgnoreCase))
+                {
+                var folderNode = new DeviceConfigTreeNode { DisplayName = Path.GetFileName(subDirectory), IsFolder = true };
+                foreach (var childNode in BuildDeviceConfigurationTree(subDirectory))
+                    folderNode.Children.Add(childNode);
+
+                if (folderNode.Children.Any())
+                    yield return folderNode;
+                }
+
+            foreach (var file in Directory.GetFiles(directoryPath, "*.yaml").OrderBy(f => f, StringComparer.OrdinalIgnoreCase))
+                {
+                var relativePath = Path.GetRelativePath(_pathProvider.ConfigDirectory, file);
+                var relativePathWithoutExtension = Path.Combine(
+                    Path.GetDirectoryName(relativePath) ?? string.Empty,
+                    Path.GetFileNameWithoutExtension(relativePath));
+
+                var fileNode = new DeviceConfigTreeNode
+                    {
+                    DisplayName = Path.GetFileNameWithoutExtension(file),
+                    RelativePath = relativePathWithoutExtension,
+                    IsFolder = false,
+                    SelectCommand = SelectDeviceConfigurationCommand
+                    };
+                _configNodesByPath[relativePathWithoutExtension] = fileNode;
+                yield return fileNode;
+                }
+            }
+
+        /// <summary>
+        /// Moves the checkmark shown in the cascading configuration menu to the node matching
+        /// the currently selected device configuration.
+        /// </summary>
+        private void UpdateSelectedConfigNodeHighlight()
+            {
+            if (_selectedConfigNode != null)
+                _selectedConfigNode.IsSelected = false;
+
+            _selectedConfigNode = !string.IsNullOrEmpty(_selectedDeviceConfiguration) &&
+                _configNodesByPath.TryGetValue(_selectedDeviceConfiguration, out var node)
+                    ? node
+                    : null;
+
+            if (_selectedConfigNode != null)
+                _selectedConfigNode.IsSelected = true;
+            }
+
+        /// <summary>
+        /// Finds the identifier of the first configuration file in the tree, following display order
+        /// (subfolders before files at every level), for use as the default selection.
+        /// </summary>
+        /// <param name="nodes">Nodes to search, in display order.</param>
+        /// <returns>Relative path of the first configuration file found, or null if none exist.</returns>
+        private static string? FindFirstConfiguration(IEnumerable<DeviceConfigTreeNode> nodes)
+            {
+            foreach (var node in nodes)
+                {
+                if (!node.IsFolder)
+                    return node.RelativePath;
+
+                var foundInChildren = FindFirstConfiguration(node.Children);
+                if (foundInChildren != null)
+                    return foundInChildren;
+                }
+            return null;
+            }
+
+        /// <summary>
+        /// Applies the device configuration selected from the cascading configuration menu.
+        /// </summary>
+        /// <param name="parameter">Relative path identifier of the selected configuration file.</param>
+        private void ExecuteSelectDeviceConfiguration(object parameter)
+            {
+            SelectedDeviceConfiguration = (string)parameter;
+            }
+
+        /// <summary>
+        /// Determines whether a configuration menu entry represents a selectable configuration file
+        /// rather than a folder node.
+        /// </summary>
+        /// <param name="parameter">Relative path identifier, or null for folder nodes.</param>
+        /// <returns>True if the entry is a configuration file; otherwise, false.</returns>
+        private bool CanExecuteSelectDeviceConfiguration(object parameter)
+            {
+            return parameter is string relativePath && !string.IsNullOrEmpty(relativePath);
             }
 
         /// <summary>
