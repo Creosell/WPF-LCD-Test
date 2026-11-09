@@ -63,6 +63,17 @@ dotnet test --filter "FullyQualifiedName~TestClassName.TestMethodName"
 
 **Commands:** ViewModels use `RelayCommand` (in `Commands/`) for ICommand implementation binding to UI actions.
 
+## Project Map (graphify)
+
+Knowledge graph of the codebase is stored in `graphify-out/` (`graph.json`, `graph.html`, `GRAPH_REPORT.md`). Use it to navigate before broad grep searches.
+
+- Start with `graphify-out/GRAPH_REPORT.md` (community hubs, most connected nodes).
+- CLI: `C:\Users\Pavel\.claude\tools\graphify\venv\Scripts\graphify.exe` (not in PATH):
+  - `graphify explain "MeasurementViewModel"` — node and its neighbors
+  - `graphify path "A" "B"` — shortest path between two nodes
+  - `graphify update .` — rebuild the graph after code changes (AST only, no LLM)
+- Freshness: compare `Built from commit` in `GRAPH_REPORT.md` with `git rev-parse HEAD`; run `graphify update .` if stale.
+
 ## Configuration
 
 Device test specifications are YAML files in `WPF LCD Test/config/device_configs/` defining min/max/typical values for brightness, contrast, color gamut (RGB/NTSC area), RGB primaries (x/y coordinates), white point, and color temperature. Each config specifies acceptable ranges under `main_tests`.
