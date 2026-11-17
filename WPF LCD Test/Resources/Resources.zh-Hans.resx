@@ -570,4 +570,144 @@
   <data name="DeviceStateConnectedCalibrated" xml:space="preserve">
     <value>已连接（已校准）</value>
   </data>
+  <data name="SpecVerdictFormat" xml:space="preserve">
+    <value>规格: {0}</value>
+  </data>
+  <data name="SpecVerdictPass" xml:space="preserve">
+    <value>通过</value>
+  </data>
+  <data name="SpecVerdictWarn" xml:space="preserve">
+    <value>提示</value>
+  </data>
+  <data name="SpecVerdictFail" xml:space="preserve">
+    <value>不合格</value>
+  </data>
+  <data name="SpecNoIssuesYet" xml:space="preserve">
+    <value>暂无问题</value>
+  </data>
+  <data name="SpecPointsProgress" xml:space="preserve">
+    <value>{0}/{1} 点</value>
+  </data>
+  <data name="SpecWaitingFor" xml:space="preserve">
+    <value>等待: {0}</value>
+  </data>
+  <data name="SpecSelectConfig" xml:space="preserve">
+    <value>请选择设备配置，以按规格检查测量结果</value>
+  </data>
+  <data name="SpecUnavailable" xml:space="preserve">
+    <value>规格检查不可用: {0}</value>
+  </data>
+  <data name="SpecLogLine" xml:space="preserve">
+    <value>规格: {0}</value>
+  </data>
+  <data name="SpecBound_min" xml:space="preserve">
+    <value>最小</value>
+  </data>
+  <data name="SpecBound_typ" xml:space="preserve">
+    <value>典型</value>
+  </data>
+  <data name="SpecBound_max" xml:space="preserve">
+    <value>最大</value>
+  </data>
+  <data name="SaveWithSpecFailQuestion" xml:space="preserve">
+    <value>以下数值超出规格:
+{0}
+仍要保存结果吗？</value>
+  </data>
+  <data name="SpecGamutArea" xml:space="preserve">
+    <value>{0} 色域面积比, {1}</value>
+  </data>
+  <data name="SpecGamutCoverage" xml:space="preserve">
+    <value>{0} 色域覆盖率, {1}</value>
+  </data>
+  <data name="SpecMetric_Brightness" xml:space="preserve">
+    <value>亮度 (cd/m²)</value>
+  </data>
+  <data name="SpecMetric_Black_luminance" xml:space="preserve">
+    <value>黑场亮度 (cd/m²)</value>
+  </data>
+  <data name="SpecMetric_Brightness_uniformity" xml:space="preserve">
+    <value>亮度均匀性 (%)</value>
+  </data>
+  <data name="SpecMetric_Contrast" xml:space="preserve">
+    <value>对比度</value>
+  </data>
+  <data name="SpecMetric_Temperature" xml:space="preserve">
+    <value>色温 (K)</value>
+  </data>
+  <data name="SpecMetric_Delta_e" xml:space="preserve">
+    <value>ΔE</value>
+  </data>
+  <data name="SpecMetric_Red_x" xml:space="preserve">
+    <value>红 (x)</value>
+  </data>
+  <data name="SpecMetric_Red_y" xml:space="preserve">
+    <value>红 (y)</value>
+  </data>
+  <data name="SpecMetric_Green_x" xml:space="preserve">
+    <value>绿 (x)</value>
+  </data>
+  <data name="SpecMetric_Green_y" xml:space="preserve">
+    <value>绿 (y)</value>
+  </data>
+  <data name="SpecMetric_Blue_x" xml:space="preserve">
+    <value>蓝 (x)</value>
+  </data>
+  <data name="SpecMetric_Blue_y" xml:space="preserve">
+    <value>蓝 (y)</value>
+  </data>
+  <data name="SpecMetric_White_x" xml:space="preserve">
+    <value>白 (x)</value>
+  </data>
+  <data name="SpecMetric_White_y" xml:space="preserve">
+    <value>白 (y)</value>
+  </data>
+  <data name="SpecMetric_Center_x" xml:space="preserve">
+    <value>中心 (x)</value>
+  </data>
+  <data name="SpecMetric_Center_y" xml:space="preserve">
+    <value>中心 (y)</value>
+  </data>
+  <data name="SpecLocation_TopLeft" xml:space="preserve">
+    <value>左上</value>
+  </data>
+  <data name="SpecLocation_TopCenter" xml:space="preserve">
+    <value>上中</value>
+  </data>
+  <data name="SpecLocation_TopRight" xml:space="preserve">
+    <value>右上</value>
+  </data>
+  <data name="SpecLocation_MiddleLeft" xml:space="preserve">
+    <value>左中</value>
+  </data>
+  <data name="SpecLocation_Center" xml:space="preserve">
+    <value>中心</value>
+  </data>
+  <data name="SpecLocation_MiddleRight" xml:space="preserve">
+    <value>右中</value>
+  </data>
+  <data name="SpecLocation_BottomLeft" xml:space="preserve">
+    <value>左下</value>
+  </data>
+  <data name="SpecLocation_BottomCenter" xml:space="preserve">
+    <value>下中</value>
+  </data>
+  <data name="SpecLocation_BottomRight" xml:space="preserve">
+    <value>右下</value>
+  </data>
+  <data name="SpecLocation_RedColor" xml:space="preserve">
+    <value>红</value>
+  </data>
+  <data name="SpecLocation_GreenColor" xml:space="preserve">
+    <value>绿</value>
+  </data>
+  <data name="SpecLocation_BlueColor" xml:space="preserve">
+    <value>蓝</value>
+  </data>
+  <data name="SpecLocation_WhiteColor" xml:space="preserve">
+    <value>白</value>
+  </data>
+  <data name="SpecLocation_BlackColor" xml:space="preserve">
+    <value>黑</value>
+  </data>
 </root>

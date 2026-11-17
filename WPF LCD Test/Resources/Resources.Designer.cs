@@ -1114,6 +1114,17 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to These values are outside the specification:
+        ///{0}
+        ///Save the results anyway?.
+        /// </summary>
+        public static string SaveWithSpecFailQuestion {
+            get {
+                return ResourceManager.GetString("SaveWithSpecFailQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Saving....
         /// </summary>
         public static string Saving {
@@ -1164,6 +1175,411 @@ namespace WPF_LCD_Test.Resources {
         public static string SnCantBeEmpty {
             get {
                 return ResourceManager.GetString("SnCantBeEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to max.
+        /// </summary>
+        public static string SpecBound_max {
+            get {
+                return ResourceManager.GetString("SpecBound_max", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to min.
+        /// </summary>
+        public static string SpecBound_min {
+            get {
+                return ResourceManager.GetString("SpecBound_min", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to typ.
+        /// </summary>
+        public static string SpecBound_typ {
+            get {
+                return ResourceManager.GetString("SpecBound_typ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} gamut area, {1}.
+        /// </summary>
+        public static string SpecGamutArea {
+            get {
+                return ResourceManager.GetString("SpecGamutArea", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} gamut coverage, {1}.
+        /// </summary>
+        public static string SpecGamutCoverage {
+            get {
+                return ResourceManager.GetString("SpecGamutCoverage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Black.
+        /// </summary>
+        public static string SpecLocation_BlackColor {
+            get {
+                return ResourceManager.GetString("SpecLocation_BlackColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Blue.
+        /// </summary>
+        public static string SpecLocation_BlueColor {
+            get {
+                return ResourceManager.GetString("SpecLocation_BlueColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bottom center.
+        /// </summary>
+        public static string SpecLocation_BottomCenter {
+            get {
+                return ResourceManager.GetString("SpecLocation_BottomCenter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bottom left.
+        /// </summary>
+        public static string SpecLocation_BottomLeft {
+            get {
+                return ResourceManager.GetString("SpecLocation_BottomLeft", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bottom right.
+        /// </summary>
+        public static string SpecLocation_BottomRight {
+            get {
+                return ResourceManager.GetString("SpecLocation_BottomRight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Center.
+        /// </summary>
+        public static string SpecLocation_Center {
+            get {
+                return ResourceManager.GetString("SpecLocation_Center", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Green.
+        /// </summary>
+        public static string SpecLocation_GreenColor {
+            get {
+                return ResourceManager.GetString("SpecLocation_GreenColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Middle left.
+        /// </summary>
+        public static string SpecLocation_MiddleLeft {
+            get {
+                return ResourceManager.GetString("SpecLocation_MiddleLeft", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Middle right.
+        /// </summary>
+        public static string SpecLocation_MiddleRight {
+            get {
+                return ResourceManager.GetString("SpecLocation_MiddleRight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Red.
+        /// </summary>
+        public static string SpecLocation_RedColor {
+            get {
+                return ResourceManager.GetString("SpecLocation_RedColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Top center.
+        /// </summary>
+        public static string SpecLocation_TopCenter {
+            get {
+                return ResourceManager.GetString("SpecLocation_TopCenter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Top left.
+        /// </summary>
+        public static string SpecLocation_TopLeft {
+            get {
+                return ResourceManager.GetString("SpecLocation_TopLeft", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Top right.
+        /// </summary>
+        public static string SpecLocation_TopRight {
+            get {
+                return ResourceManager.GetString("SpecLocation_TopRight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to White.
+        /// </summary>
+        public static string SpecLocation_WhiteColor {
+            get {
+                return ResourceManager.GetString("SpecLocation_WhiteColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spec: {0}.
+        /// </summary>
+        public static string SpecLogLine {
+            get {
+                return ResourceManager.GetString("SpecLogLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Black luminance (cd/m²).
+        /// </summary>
+        public static string SpecMetric_Black_luminance {
+            get {
+                return ResourceManager.GetString("SpecMetric_Black_luminance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Blue (x).
+        /// </summary>
+        public static string SpecMetric_Blue_x {
+            get {
+                return ResourceManager.GetString("SpecMetric_Blue_x", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Blue (y).
+        /// </summary>
+        public static string SpecMetric_Blue_y {
+            get {
+                return ResourceManager.GetString("SpecMetric_Blue_y", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Brightness (cd/m²).
+        /// </summary>
+        public static string SpecMetric_Brightness {
+            get {
+                return ResourceManager.GetString("SpecMetric_Brightness", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Brightness uniformity (%).
+        /// </summary>
+        public static string SpecMetric_Brightness_uniformity {
+            get {
+                return ResourceManager.GetString("SpecMetric_Brightness_uniformity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Center (x).
+        /// </summary>
+        public static string SpecMetric_Center_x {
+            get {
+                return ResourceManager.GetString("SpecMetric_Center_x", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Center (y).
+        /// </summary>
+        public static string SpecMetric_Center_y {
+            get {
+                return ResourceManager.GetString("SpecMetric_Center_y", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Contrast ratio.
+        /// </summary>
+        public static string SpecMetric_Contrast {
+            get {
+                return ResourceManager.GetString("SpecMetric_Contrast", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ΔE.
+        /// </summary>
+        public static string SpecMetric_Delta_e {
+            get {
+                return ResourceManager.GetString("SpecMetric_Delta_e", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Green (x).
+        /// </summary>
+        public static string SpecMetric_Green_x {
+            get {
+                return ResourceManager.GetString("SpecMetric_Green_x", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Green (y).
+        /// </summary>
+        public static string SpecMetric_Green_y {
+            get {
+                return ResourceManager.GetString("SpecMetric_Green_y", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Red (x).
+        /// </summary>
+        public static string SpecMetric_Red_x {
+            get {
+                return ResourceManager.GetString("SpecMetric_Red_x", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Red (y).
+        /// </summary>
+        public static string SpecMetric_Red_y {
+            get {
+                return ResourceManager.GetString("SpecMetric_Red_y", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Color temperature (K).
+        /// </summary>
+        public static string SpecMetric_Temperature {
+            get {
+                return ResourceManager.GetString("SpecMetric_Temperature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to White (x).
+        /// </summary>
+        public static string SpecMetric_White_x {
+            get {
+                return ResourceManager.GetString("SpecMetric_White_x", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to White (y).
+        /// </summary>
+        public static string SpecMetric_White_y {
+            get {
+                return ResourceManager.GetString("SpecMetric_White_y", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to no issues yet.
+        /// </summary>
+        public static string SpecNoIssuesYet {
+            get {
+                return ResourceManager.GetString("SpecNoIssuesYet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} of {1} points.
+        /// </summary>
+        public static string SpecPointsProgress {
+            get {
+                return ResourceManager.GetString("SpecPointsProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select a device configuration to check the measurements against its specification.
+        /// </summary>
+        public static string SpecSelectConfig {
+            get {
+                return ResourceManager.GetString("SpecSelectConfig", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specification check is unavailable: {0}.
+        /// </summary>
+        public static string SpecUnavailable {
+            get {
+                return ResourceManager.GetString("SpecUnavailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FAIL.
+        /// </summary>
+        public static string SpecVerdictFail {
+            get {
+                return ResourceManager.GetString("SpecVerdictFail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spec: {0}.
+        /// </summary>
+        public static string SpecVerdictFormat {
+            get {
+                return ResourceManager.GetString("SpecVerdictFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PASS.
+        /// </summary>
+        public static string SpecVerdictPass {
+            get {
+                return ResourceManager.GetString("SpecVerdictPass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WARN.
+        /// </summary>
+        public static string SpecVerdictWarn {
+            get {
+                return ResourceManager.GetString("SpecVerdictWarn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Waiting for: {0}.
+        /// </summary>
+        public static string SpecWaitingFor {
+            get {
+                return ResourceManager.GetString("SpecWaitingFor", resourceCulture);
             }
         }
         

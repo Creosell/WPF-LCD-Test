@@ -45,6 +45,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             services.AddSingleton(_mockUploadService.Object);
             services.AddSingleton(_mockMeasurementStatusService.Object);
             services.AddSingleton(new Mock<IAnalyzerRegistryService>().Object);
+            services.AddSingleton(new Mock<ISpecEvaluationService>().Object);
 
             var mockPathProvider = new Mock<IPathProvider>();
             mockPathProvider.Setup(p => p.BaseDirectory).Returns("C:\\TestApp\\");

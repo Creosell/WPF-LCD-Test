@@ -570,4 +570,144 @@
   <data name="DeviceStateConnectedCalibrated" xml:space="preserve">
     <value>Connected (calibrated)</value>
   </data>
+  <data name="SpecVerdictFormat" xml:space="preserve">
+    <value>Spec: {0}</value>
+  </data>
+  <data name="SpecVerdictPass" xml:space="preserve">
+    <value>PASS</value>
+  </data>
+  <data name="SpecVerdictWarn" xml:space="preserve">
+    <value>WARN</value>
+  </data>
+  <data name="SpecVerdictFail" xml:space="preserve">
+    <value>FAIL</value>
+  </data>
+  <data name="SpecNoIssuesYet" xml:space="preserve">
+    <value>no issues yet</value>
+  </data>
+  <data name="SpecPointsProgress" xml:space="preserve">
+    <value>{0} of {1} points</value>
+  </data>
+  <data name="SpecWaitingFor" xml:space="preserve">
+    <value>Waiting for: {0}</value>
+  </data>
+  <data name="SpecSelectConfig" xml:space="preserve">
+    <value>Select a device configuration to check the measurements against its specification</value>
+  </data>
+  <data name="SpecUnavailable" xml:space="preserve">
+    <value>Specification check is unavailable: {0}</value>
+  </data>
+  <data name="SpecLogLine" xml:space="preserve">
+    <value>Spec: {0}</value>
+  </data>
+  <data name="SpecBound_min" xml:space="preserve">
+    <value>min</value>
+  </data>
+  <data name="SpecBound_typ" xml:space="preserve">
+    <value>typ</value>
+  </data>
+  <data name="SpecBound_max" xml:space="preserve">
+    <value>max</value>
+  </data>
+  <data name="SaveWithSpecFailQuestion" xml:space="preserve">
+    <value>These values are outside the specification:
+{0}
+Save the results anyway?</value>
+  </data>
+  <data name="SpecGamutArea" xml:space="preserve">
+    <value>{0} gamut area, {1}</value>
+  </data>
+  <data name="SpecGamutCoverage" xml:space="preserve">
+    <value>{0} gamut coverage, {1}</value>
+  </data>
+  <data name="SpecMetric_Brightness" xml:space="preserve">
+    <value>Brightness (cd/m²)</value>
+  </data>
+  <data name="SpecMetric_Black_luminance" xml:space="preserve">
+    <value>Black luminance (cd/m²)</value>
+  </data>
+  <data name="SpecMetric_Brightness_uniformity" xml:space="preserve">
+    <value>Brightness uniformity (%)</value>
+  </data>
+  <data name="SpecMetric_Contrast" xml:space="preserve">
+    <value>Contrast ratio</value>
+  </data>
+  <data name="SpecMetric_Temperature" xml:space="preserve">
+    <value>Color temperature (K)</value>
+  </data>
+  <data name="SpecMetric_Delta_e" xml:space="preserve">
+    <value>ΔE</value>
+  </data>
+  <data name="SpecMetric_Red_x" xml:space="preserve">
+    <value>Red (x)</value>
+  </data>
+  <data name="SpecMetric_Red_y" xml:space="preserve">
+    <value>Red (y)</value>
+  </data>
+  <data name="SpecMetric_Green_x" xml:space="preserve">
+    <value>Green (x)</value>
+  </data>
+  <data name="SpecMetric_Green_y" xml:space="preserve">
+    <value>Green (y)</value>
+  </data>
+  <data name="SpecMetric_Blue_x" xml:space="preserve">
+    <value>Blue (x)</value>
+  </data>
+  <data name="SpecMetric_Blue_y" xml:space="preserve">
+    <value>Blue (y)</value>
+  </data>
+  <data name="SpecMetric_White_x" xml:space="preserve">
+    <value>White (x)</value>
+  </data>
+  <data name="SpecMetric_White_y" xml:space="preserve">
+    <value>White (y)</value>
+  </data>
+  <data name="SpecMetric_Center_x" xml:space="preserve">
+    <value>Center (x)</value>
+  </data>
+  <data name="SpecMetric_Center_y" xml:space="preserve">
+    <value>Center (y)</value>
+  </data>
+  <data name="SpecLocation_TopLeft" xml:space="preserve">
+    <value>Top left</value>
+  </data>
+  <data name="SpecLocation_TopCenter" xml:space="preserve">
+    <value>Top center</value>
+  </data>
+  <data name="SpecLocation_TopRight" xml:space="preserve">
+    <value>Top right</value>
+  </data>
+  <data name="SpecLocation_MiddleLeft" xml:space="preserve">
+    <value>Middle left</value>
+  </data>
+  <data name="SpecLocation_Center" xml:space="preserve">
+    <value>Center</value>
+  </data>
+  <data name="SpecLocation_MiddleRight" xml:space="preserve">
+    <value>Middle right</value>
+  </data>
+  <data name="SpecLocation_BottomLeft" xml:space="preserve">
+    <value>Bottom left</value>
+  </data>
+  <data name="SpecLocation_BottomCenter" xml:space="preserve">
+    <value>Bottom center</value>
+  </data>
+  <data name="SpecLocation_BottomRight" xml:space="preserve">
+    <value>Bottom right</value>
+  </data>
+  <data name="SpecLocation_RedColor" xml:space="preserve">
+    <value>Red</value>
+  </data>
+  <data name="SpecLocation_GreenColor" xml:space="preserve">
+    <value>Green</value>
+  </data>
+  <data name="SpecLocation_BlueColor" xml:space="preserve">
+    <value>Blue</value>
+  </data>
+  <data name="SpecLocation_WhiteColor" xml:space="preserve">
+    <value>White</value>
+  </data>
+  <data name="SpecLocation_BlackColor" xml:space="preserve">
+    <value>Black</value>
+  </data>
 </root>

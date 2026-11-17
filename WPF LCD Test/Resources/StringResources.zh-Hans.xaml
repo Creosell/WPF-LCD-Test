@@ -98,6 +98,12 @@
         上传报告
     </system:String>
 
+    <!--  Device info panel  -->
+    <system:String x:Key="SpecPanelTitle">设备信息</system:String>
+    <system:String x:Key="SpecColumnParameter">参数</system:String>
+    <system:String x:Key="SpecColumnValue">值</system:String>
+    <system:String x:Key="SpecColumnSpec">规格</system:String>
+
     <!--  SettingsView keys  -->
     <system:String x:Key="ColorAnalyzerChannel">
         色彩分析仪通道

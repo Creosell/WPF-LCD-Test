@@ -26,6 +26,7 @@ namespace WPF_LCD_Test
             services.AddSingleton<IFileSystem, FileSystem>();
             services.AddSingleton<IDispatcher, WpfDispatcher>();
             services.AddSingleton<IPathProvider>(new PathProvider());
+            services.AddSingleton<IProcessRunner, ProcessRunner>();
 
             // Core services
             services.AddSingleton<ISettingsService, SettingsService>();
@@ -38,6 +39,7 @@ namespace WPF_LCD_Test
             services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<IDialogService, DialogService>();
             services.AddSingleton<IUploadService, UploadService>();
+            services.AddSingleton<ISpecEvaluationService, SpecEvaluationService>();
 
             // ViewModels
             services.AddTransient<MainWindowViewModel>();

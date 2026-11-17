@@ -22,6 +22,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
         private Mock<ISettingsService> _mockSettingsService;
         private Mock<IPathProvider> _mockPathProvider;
         private Mock<IMeasurementStatusService> _mockMeasurementStatusService;
+        private Mock<ISpecEvaluationService> _mockSpecEvaluationService;
         private Mock<IAnalyzerRegistryService> _mockAnalyzerRegistryService;
         private MeasurementViewModel _viewModel;
 
@@ -37,6 +38,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             _mockSettingsService = new Mock<ISettingsService>();
             _mockPathProvider = new Mock<IPathProvider>();
             _mockMeasurementStatusService = new Mock<IMeasurementStatusService>();
+            _mockSpecEvaluationService = new Mock<ISpecEvaluationService>();
             _mockAnalyzerRegistryService = new Mock<IAnalyzerRegistryService>();
 
             // Setup PathProvider
@@ -76,7 +78,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
                 _mockSettingsService.Object,
                 _mockPathProvider.Object,
                 _mockMeasurementStatusService.Object,
-                _mockAnalyzerRegistryService.Object
+                _mockAnalyzerRegistryService.Object,
+                _mockSpecEvaluationService.Object
             );
 
             // Сбрасываем статический счетчик попыток измерений между тестами
@@ -792,6 +795,47 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             }
 
         [Test]
+        public async Task ExecuteMeasureAsync_FailedRetry_DropsThePreviousMeasurementOfThePoint()
+            {
+            _viewModel.ExecuteApplySerialNumber("SN12345");
+            _viewModel.IsDeviceConnected = true;
+            _viewModel.IsDeviceCalibrated = true;
+            var location = MeasurementLocation.WhiteColor.ToString();
+            var good = new Measurement { Location = location, x = 0.3127, y = 0.3290, Lv = 100, T = 6500, IsValid = true };
+            var tooDark = new Measurement { Location = location, x = 0.3127, y = 0.3290, Lv = 1, T = 6500, IsValid = true };
+            _mockColorMeasurementService.SetupSequence(s => s.MeasureAsync(It.IsAny<int>())).ReturnsAsync(good).ReturnsAsync(tooDark);
+
+            await ((RelayCommand)_viewModel.MeasureCommand).ExecuteAsync(location);
+            await ((RelayCommand)_viewModel.MeasureCommand).ExecuteAsync(location);
+
+            Assert.That(_viewModel.CurrentDevice.Measurements, Is.Empty);
+            }
+
+        [Test]
+        public async Task ExecuteMeasureAsync_WithConfiguration_ChecksTheSpecificationAfterEveryAcceptedMeasurement()
+            {
+            _mockDispatcher.Setup(d => d.CheckAccess()).Returns(true);
+            _mockFileService.Setup(f => f.SerializeDevice(It.IsAny<DeviceUnderTest>())).Returns("{}");
+            var evaluation = new SpecEvaluation(SpecVerdict.Warn, false,
+                [new SpecCheck("Brightness", 90, 100, 120, null, SpecStatus.Warning, ["WhiteColor"], [])]);
+            _mockSpecEvaluationService.Setup(s => s.EvaluateAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new SpecEvaluationOutcome(evaluation, null));
+            _viewModel.SelectedDeviceConfiguration = "TestConfig";
+            _viewModel.ExecuteApplySerialNumber("SN12345");
+            _viewModel.IsDeviceConnected = true;
+            _viewModel.IsDeviceCalibrated = true;
+            var location = MeasurementLocation.WhiteColor.ToString();
+            _mockColorMeasurementService.Setup(s => s.MeasureAsync(It.IsAny<int>()))
+                .ReturnsAsync(new Measurement { Location = location, x = 0.3127, y = 0.3290, Lv = 90, T = 6500, IsValid = true });
+
+            await ((RelayCommand)_viewModel.MeasureCommand).ExecuteAsync(location);
+            await Task.Delay(50);
+
+            _mockSpecEvaluationService.Verify(s => s.EvaluateAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.AtLeast(2));
+            Assert.That(_viewModel.Spec.Evaluation, Is.SameAs(evaluation));
+            }
+
+        [Test]
         public async Task ExecuteMeasureAsync_MeasurementException_HandlesGracefully()
             {
             // Arrange
@@ -1224,7 +1268,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
                 _mockSettingsService.Object,
                 _mockPathProvider.Object,
                 _mockMeasurementStatusService.Object,
-                _mockAnalyzerRegistryService.Object);
+                _mockAnalyzerRegistryService.Object,
+                _mockSpecEvaluationService.Object);
             viewModel.ClearAllAttemptCounts();
             return viewModel;
             }

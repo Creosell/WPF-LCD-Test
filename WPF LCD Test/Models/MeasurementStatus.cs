@@ -10,6 +10,8 @@ namespace WPF_LCD_Test.Models
     public class MeasurementStatus : BaseViewModel
         {
         private bool? _isPassed;
+        private SpecStatus _specRemark;
+        private string _specTooltip = "";
         private string _measuredValuesString = "";
 
         /// <summary>
@@ -27,9 +29,44 @@ namespace WPF_LCD_Test.Models
             set
                 {
                 if (SetProperty(ref _isPassed, value))
+                    {
                     OnPropertyChanged(nameof(StatusColor));
+                    OnPropertyChanged(nameof(SpecBadge));
+                    }
                 }
             }
+
+        /// <summary>
+        /// Gets or sets the worst remark the specification check has about this point
+        /// (<see cref="SpecStatus.Pass"/> when there is none).
+        /// </summary>
+        [JsonIgnore]
+        public SpecStatus SpecRemark
+            {
+            get => _specRemark;
+            set
+                {
+                if (SetProperty(ref _specRemark, value))
+                    OnPropertyChanged(nameof(SpecBadge));
+                }
+            }
+
+        /// <summary>
+        /// Gets or sets the text of the remarks shown in the badge tooltip.
+        /// </summary>
+        [JsonIgnore]
+        public string SpecTooltip
+            {
+            get => _specTooltip;
+            set => SetProperty(ref _specTooltip, value);
+            }
+
+        /// <summary>
+        /// Gets the remark to show as a badge: only while the point holds an accepted measurement,
+        /// so a failed or running measurement does not keep the badge of the previous one.
+        /// </summary>
+        [JsonIgnore]
+        public SpecStatus SpecBadge => IsPassed == true ? SpecRemark : SpecStatus.Pass;
 
         /// <summary>
         /// Gets the status color brush based on measurement result.

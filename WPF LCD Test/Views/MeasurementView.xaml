@@ -202,6 +202,121 @@
             </Setter>
         </Style>
 
+        <!--
+            Badge on a measurement button: the specification check has a remark about the accepted measurement of
+            that point (amber exclamation mark - below typ, red cross - outside min/max). The DataContext is the
+            MeasurementStatus of the point; the badge is hidden while the point holds no accepted measurement.
+        -->
+        <Style x:Key="SpecBadgeStyle" TargetType="ContentControl">
+            <Setter Property="Width" Value="20" />
+            <Setter Property="Height" Value="20" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="Margin" Value="0,0,6,0" />
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Setter Property="ToolTip" Value="{Binding SpecTooltip}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContentControl">
+                        <Grid>
+                            <Ellipse
+                                x:Name="Dot"
+                                Fill="#FFC107"
+                                Stroke="#FF424242"
+                                StrokeThickness="2" />
+                            <TextBlock
+                                x:Name="Glyph"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontFamily="Segoe UI"
+                                FontSize="13"
+                                FontWeight="Bold"
+                                Foreground="#1E1E1E"
+                                Text="!" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <DataTrigger Binding="{Binding SpecBadge}" Value="Fail">
+                                <Setter TargetName="Dot" Property="Fill" Value="#FF5252" />
+                                <Setter TargetName="Glyph" Property="FontFamily" Value="Segoe UI Symbol" />
+                                <Setter TargetName="Glyph" Property="FontSize" Value="10" />
+                                <Setter TargetName="Glyph" Property="Text" Value="&#x2716;" />
+                            </DataTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding SpecBadge}" Value="Warning">
+                    <Setter Property="Visibility" Value="Visible" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding SpecBadge}" Value="Fail">
+                    <Setter Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!--  Row of the device info table: tinted by the check status  -->
+        <Style x:Key="SpecRowStyle" TargetType="Border">
+            <Setter Property="Margin" Value="4,1" />
+            <Setter Property="Padding" Value="6,5" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Background" Value="Transparent" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Status}" Value="Warning">
+                    <Setter Property="Background" Value="#33FFC107" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="Fail">
+                    <Setter Property="Background" Value="#33FF5252" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="Pending">
+                    <Setter Property="Opacity" Value="0.6" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="Unavailable">
+                    <Setter Property="Opacity" Value="0.6" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SpecDotStyle" TargetType="Ellipse">
+            <Setter Property="Width" Value="10" />
+            <Setter Property="Height" Value="10" />
+            <Setter Property="Margin" Value="0,0,10,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Fill" Value="#8A8A8A" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Status}" Value="Pass">
+                    <Setter Property="Fill" Value="#4CAF50" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="Warning">
+                    <Setter Property="Fill" Value="#FFC107" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="Fail">
+                    <Setter Property="Fill" Value="#FF5252" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SpecVerdictChipStyle" TargetType="Border">
+            <Setter Property="Padding" Value="10,2" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="#4CAF50" />
+            <Setter Property="Background" Value="#334CAF50" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Spec.Verdict}" Value="Warn">
+                    <Setter Property="BorderBrush" Value="#FFC107" />
+                    <Setter Property="Background" Value="#33FFC107" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Spec.Verdict}" Value="Fail">
+                    <Setter Property="BorderBrush" Value="#FF5252" />
+                    <Setter Property="Background" Value="#33FF5252" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Spec.VerdictText}" Value="">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <Style
             x:Key="MeasurementButtonsStyle"
             BasedOn="{StaticResource MaterialDesignFlatDarkBgButton}"
@@ -433,6 +548,11 @@
                             Content="{DynamicResource TopLeftPoint}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[TopLeft].MeasuredValuesString, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        <ContentControl
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            DataContext="{Binding DataContext.MeasurementStatusService.Statuses[TopLeft], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            Style="{StaticResource SpecBadgeStyle}" />
                         <Button
                             Grid.Row="0"
                             Grid.Column="1"
@@ -443,6 +563,11 @@
                             Content="{DynamicResource TopCenterPoint}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[TopCenter].MeasuredValuesString, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        <ContentControl
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            DataContext="{Binding DataContext.MeasurementStatusService.Statuses[TopCenter], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            Style="{StaticResource SpecBadgeStyle}" />
 
                         <Button
                             Grid.Row="0"
@@ -454,6 +579,11 @@
                             Content="{DynamicResource TopRightPoint}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[TopRight].MeasuredValuesString, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        <ContentControl
+                            Grid.Row="0"
+                            Grid.Column="2"
+                            DataContext="{Binding DataContext.MeasurementStatusService.Statuses[TopRight], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            Style="{StaticResource SpecBadgeStyle}" />
 
                         <Button
                             Grid.Row="1"
@@ -465,6 +595,11 @@
                             Content="{DynamicResource MiddleLeftPoint}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[MiddleLeft].MeasuredValuesString, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        <ContentControl
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            DataContext="{Binding DataContext.MeasurementStatusService.Statuses[MiddleLeft], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            Style="{StaticResource SpecBadgeStyle}" />
 
                         <Button
                             Grid.Row="1"
@@ -476,6 +611,11 @@
                             Content="{DynamicResource CenterPoint}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[Center].MeasuredValuesString, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        <ContentControl
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            DataContext="{Binding DataContext.MeasurementStatusService.Statuses[Center], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            Style="{StaticResource SpecBadgeStyle}" />
 
                         <Button
                             Grid.Row="1"
@@ -487,6 +627,11 @@
                             Content="{DynamicResource MiddleRightPoint}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[MiddleRight].MeasuredValuesString, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        <ContentControl
+                            Grid.Row="1"
+                            Grid.Column="2"
+                            DataContext="{Binding DataContext.MeasurementStatusService.Statuses[MiddleRight], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            Style="{StaticResource SpecBadgeStyle}" />
 
                         <Button
                             Grid.Row="2"
@@ -498,6 +643,11 @@
                             Content="{DynamicResource BottomLeftPoint}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[BottomLeft].MeasuredValuesString, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        <ContentControl
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            DataContext="{Binding DataContext.MeasurementStatusService.Statuses[BottomLeft], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            Style="{StaticResource SpecBadgeStyle}" />
 
                         <Button
                             Grid.Row="2"
@@ -509,6 +659,11 @@
                             Content="{DynamicResource BottomCenterPoint}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[BottomCenter].MeasuredValuesString, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        <ContentControl
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            DataContext="{Binding DataContext.MeasurementStatusService.Statuses[BottomCenter], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            Style="{StaticResource SpecBadgeStyle}" />
 
                         <Button
                             Grid.Row="2"
@@ -520,6 +675,11 @@
                             Content="{DynamicResource BottomRightPoint}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[BottomRight].MeasuredValuesString, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        <ContentControl
+                            Grid.Row="2"
+                            Grid.Column="2"
+                            DataContext="{Binding DataContext.MeasurementStatusService.Statuses[BottomRight], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            Style="{StaticResource SpecBadgeStyle}" />
                     </Grid>
                     <Grid
                         Grid.Row="1"
@@ -543,6 +703,10 @@
                             Content="{DynamicResource RedPoint}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[RedColor].MeasuredValuesString, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        <ContentControl
+                            Grid.Column="0"
+                            DataContext="{Binding DataContext.MeasurementStatusService.Statuses[RedColor], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            Style="{StaticResource SpecBadgeStyle}" />
                         <Button
                             Grid.Column="1"
                             Background="{Binding DataContext.MeasurementStatusService.Statuses[GreenColor].StatusColor, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
@@ -551,6 +715,10 @@
                             Content="{DynamicResource GreenPoint}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[GreenColor].MeasuredValuesString, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        <ContentControl
+                            Grid.Column="1"
+                            DataContext="{Binding DataContext.MeasurementStatusService.Statuses[GreenColor], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            Style="{StaticResource SpecBadgeStyle}" />
                         <Button
                             Grid.Column="2"
                             Background="{Binding DataContext.MeasurementStatusService.Statuses[BlueColor].StatusColor, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
@@ -559,6 +727,10 @@
                             Content="{DynamicResource BluePoint}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[BlueColor].MeasuredValuesString, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        <ContentControl
+                            Grid.Column="2"
+                            DataContext="{Binding DataContext.MeasurementStatusService.Statuses[BlueColor], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            Style="{StaticResource SpecBadgeStyle}" />
                         <Button
                             Grid.Column="3"
                             Background="{Binding DataContext.MeasurementStatusService.Statuses[WhiteColor].StatusColor, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
@@ -568,6 +740,10 @@
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[WhiteColor].MeasuredValuesString, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             Visibility="{Binding IsTvCheckboxChecked, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        <ContentControl
+                            Grid.Column="3"
+                            DataContext="{Binding DataContext.MeasurementStatusService.Statuses[WhiteColor], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            Style="{StaticResource SpecBadgeStyle}" />
                         <Button
                             Grid.Column="4"
                             Background="{Binding DataContext.MeasurementStatusService.Statuses[BlackColor].StatusColor, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
@@ -576,38 +752,145 @@
                             Content="{DynamicResource BlackPoint}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[BlackColor].MeasuredValuesString, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        <ContentControl
+                            Grid.Column="4"
+                            DataContext="{Binding DataContext.MeasurementStatusService.Statuses[BlackColor], RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                            Style="{StaticResource SpecBadgeStyle}" />
                     </Grid>
                 </Grid>
             </Grid>
         </Grid>
 
-        <TextBox
-            x:Name="LogTextBox"
-            Grid.Row="1"
-            MinHeight="200"
-            Margin="0,5,5,5"
-            AcceptsReturn="True"
-            Background="#FF2A2828"
-            BorderBrush="White"
-            BorderThickness="1"
-            Foreground="White"
-            HorizontalScrollBarVisibility="Disabled"
-            IsReadOnly="True"
-            Text="{Binding LogText, Mode=OneWay}"
-            TextWrapping="Wrap"
-            VerticalScrollBarVisibility="Auto">
-            <TextBox.ContextMenu>
-                <ContextMenu>
+        <Grid Grid.Row="1" MinHeight="200" Margin="0,5,5,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48*" />
+                <ColumnDefinition Width="52*" />
+            </Grid.ColumnDefinitions>
+            <TextBox
+                x:Name="LogTextBox"
+                Grid.Column="0"
+                MinHeight="200"
+                Margin="0,0,5,0"
+                AcceptsReturn="True"
+                Background="#FF2A2828"
+                BorderBrush="White"
+                BorderThickness="1"
+                Foreground="White"
+                HorizontalScrollBarVisibility="Disabled"
+                IsReadOnly="True"
+                Text="{Binding LogText, Mode=OneWay}"
+                TextWrapping="Wrap"
+                VerticalScrollBarVisibility="Auto">
+                <TextBox.ContextMenu>
+                    <ContextMenu>
 
-                    <MenuItem Command="ApplicationCommands.Cut" />
-                    <MenuItem Command="ApplicationCommands.Copy" />
-                    <MenuItem Command="ApplicationCommands.Paste" />
-                    <MenuItem Command="{Binding ClearLogCommand}" Header="{DynamicResource ClearLogWindow}" />
-                    <Separator />
-                    <MenuItem Command="ApplicationCommands.SelectAll" />
-                </ContextMenu>
-            </TextBox.ContextMenu>
-        </TextBox>
+                        <MenuItem Command="ApplicationCommands.Cut" />
+                        <MenuItem Command="ApplicationCommands.Copy" />
+                        <MenuItem Command="ApplicationCommands.Paste" />
+                        <MenuItem Command="{Binding ClearLogCommand}" Header="{DynamicResource ClearLogWindow}" />
+                        <Separator />
+                        <MenuItem Command="ApplicationCommands.SelectAll" />
+                    </ContextMenu>
+                </TextBox.ContextMenu>
+            </TextBox>
+            <Border
+                Grid.Column="1"
+                Margin="5,0,0,0"
+                Background="#FF2C2C2C"
+                BorderBrush="#FF5A5A5A"
+                BorderThickness="1"
+                CornerRadius="4">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="4,0,4,6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="15"
+                            FontWeight="SemiBold"
+                            Text="{DynamicResource SpecPanelTitle}" />
+                        <Border
+                            Grid.Column="1"
+                            Margin="14,0,0,0"
+                            Style="{StaticResource SpecVerdictChipStyle}">
+                            <TextBlock
+                                FontSize="13"
+                                Foreground="White"
+                                Text="{Binding Spec.VerdictText}" />
+                        </Border>
+                        <TextBlock
+                            Grid.Column="2"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            FontSize="13"
+                            Foreground="#B5FFFFFF"
+                            Text="{Binding Spec.ProgressText}" />
+                    </Grid>
+
+                    <ScrollViewer
+                        Grid.Row="1"
+                        Grid.IsSharedSizeScope="True"
+                        VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding Spec.Rows}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource SpecRowStyle}" ToolTip="{Binding ToolTip}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" SharedSizeGroup="SpecValue" />
+                                                <ColumnDefinition Width="Auto" SharedSizeGroup="SpecBounds" />
+                                            </Grid.ColumnDefinitions>
+                                            <Ellipse Style="{StaticResource SpecDotStyle}" />
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                MinWidth="120"
+                                                VerticalAlignment="Center"
+                                                FontSize="14"
+                                                Text="{Binding Name}"
+                                                TextWrapping="Wrap" />
+                                            <TextBlock
+                                                Grid.Column="2"
+                                                MinWidth="44"
+                                                Margin="8,0"
+                                                VerticalAlignment="Center"
+                                                FontSize="15"
+                                                FontWeight="Bold"
+                                                Text="{Binding ValueText}"
+                                                TextAlignment="Right" />
+                                            <TextBlock
+                                                Grid.Column="3"
+                                                VerticalAlignment="Center"
+                                                FontSize="12"
+                                                Foreground="#B5FFFFFF"
+                                                Text="{Binding SpecText}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <TextBlock
+                        Grid.Row="2"
+                        Margin="4,6,4,0"
+                        FontSize="13"
+                        Foreground="#B5FFFFFF"
+                        Text="{Binding Spec.HintText}"
+                        TextWrapping="Wrap" />
+                </Grid>
+            </Border>
+        </Grid>
 
         <Grid
             Grid.Row="2"

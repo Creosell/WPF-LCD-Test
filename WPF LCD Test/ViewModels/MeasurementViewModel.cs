@@ -27,7 +27,11 @@ namespace WPF_LCD_Test.ViewModels
         private readonly ISettingsService _settingsService;
         private readonly IPathProvider _pathProvider;
         private readonly IMeasurementStatusService _measurementStatusService;
+        private readonly ISpecEvaluationService _specEvaluationService;
         private readonly LogHandler _logHandler;
+        private CancellationTokenSource? _specCts;
+        private Task _specTask = Task.CompletedTask;
+        private string? _lastSpecError;
 
         private DeviceUnderTest? _currentDevice;
         private string _serialNumber = string.Empty;
@@ -54,6 +58,7 @@ namespace WPF_LCD_Test.ViewModels
         private const string SERIAL_NUMBER_PATTERN = "^[a-zA-Z0-9]*$";
         private const int MAX_MEASUREMENT_ATTEMPTS_BEFORE_CONFIRM = 1;
         private const double COLOR_COORDINATES_TOLERANCE = 0.15;
+        private const string PreviewSerialNumber = "preview";
 
         private static readonly Dictionary<string, (double x, double y)> primariesNTSC = new()
         {
@@ -85,10 +90,19 @@ namespace WPF_LCD_Test.ViewModels
             set => SetProperty(ref _currentDevice, value);
             }
 
+        /// <summary>
+        /// Gets the device info: the specification check of the measurements taken so far.
+        /// </summary>
+        public SpecSummaryViewModel Spec { get; }
+
         public bool IsTvCheckboxChecked
             {
             get => _isTvCheckboxChecked;
-            set => SetProperty(ref _isTvCheckboxChecked, value);
+            set
+                {
+                if (SetProperty(ref _isTvCheckboxChecked, value))
+                    RequestSpecCheck();
+                }
             }
 
         public string SelectedDeviceConfiguration
@@ -101,6 +115,7 @@ namespace WPF_LCD_Test.ViewModels
                     OnPropertyChanged(nameof(SelectedDeviceConfigurationDisplayName));
                     OnPropertyChanged(nameof(HasSelectedDeviceConfiguration));
                     UpdateSelectedConfigNodeHighlight();
+                    RequestSpecCheck();
                     }
                 }
             }
@@ -295,6 +310,8 @@ namespace WPF_LCD_Test.ViewModels
         /// <param name="uploadService">Service for uploading reports.</param>
         /// <param name="settingsService">Service for application settings.</param>
         /// <param name="measurementStatusService">Service for managing measurement statuses.</param>
+        /// <param name="analyzerRegistryService">Registry of the last confirmed channel per probe.</param>
+        /// <param name="specEvaluationService">Service checking the measurements against the device specification.</param>
         public MeasurementViewModel(
             IColorMeasurementService colorMeasurementService,
             IFileService fileService,
@@ -305,7 +322,8 @@ namespace WPF_LCD_Test.ViewModels
             ISettingsService settingsService,
             IPathProvider pathProvider,
             IMeasurementStatusService measurementStatusService,
-            IAnalyzerRegistryService analyzerRegistryService)
+            IAnalyzerRegistryService analyzerRegistryService,
+            ISpecEvaluationService specEvaluationService)
             {
             _colorMeasurementService = colorMeasurementService ?? throw new ArgumentNullException(nameof(colorMeasurementService));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
@@ -317,7 +335,9 @@ namespace WPF_LCD_Test.ViewModels
             _pathProvider = pathProvider ?? throw new ArgumentNullException(nameof(pathProvider));
             _measurementStatusService = measurementStatusService ?? throw new ArgumentNullException(nameof(measurementStatusService));
             _analyzerRegistryService = analyzerRegistryService ?? throw new ArgumentNullException(nameof(analyzerRegistryService));
+            _specEvaluationService = specEvaluationService ?? throw new ArgumentNullException(nameof(specEvaluationService));
             _logHandler = new LogHandler(_localizationService, AddLogMessage);
+            Spec = new SpecSummaryViewModel(_measurementStatusService, AddLogMessage);
 
             ZeroCalibrationCommand = new RelayCommand(ExecuteZeroCalibrationAsync, CanExecuteZeroCalibration);
             SaveResultsCommand = new RelayCommand(ExecuteSaveResultsAsync, CanExecuteSaveResults);
@@ -337,9 +357,11 @@ namespace WPF_LCD_Test.ViewModels
             _colorMeasurementService.CalibrationStatusChanged += ColorMeasurementService_CalibrationStatusChanged;
             _colorMeasurementService.CurrentChannelChanged += ColorMeasurementService_CurrentChannelChanged;
             _uploadService.StatusMessage += UploadService_StatusMessage;
+            _localizationService.LanguageChanged += LocalizationService_LanguageChanged;
 
             Log(WelcomeMessage);
             InitializeDeviceConfigurations();
+            RequestSpecCheck();
             UpdateUIState();
             }
 
@@ -634,6 +656,15 @@ namespace WPF_LCD_Test.ViewModels
                 _currentDevice.DeviceConfiguration = SelectedDeviceConfiguration;
                 _currentDevice.IsTV = IsTvCheckboxChecked;
 
+                await _specTask;
+                var specFailures = Spec.DescribeFailures();
+                if (specFailures.Count > 0 &&
+                    !_dialogService.ShowQuestion(string.Format(ResourceManager.GetString("SaveWithSpecFailQuestion")!, string.Join(Environment.NewLine, specFailures)), $"{Warning}"))
+                    {
+                    Log(SaveCanceled);
+                    return false;
+                    }
+
                 if (!AreAllStatusesRepresentedInMeasurements())
                     {
                     if (!_dialogService.ShowQuestion($"{SavingNotFullWarning}", $"{Warning}"))
@@ -671,6 +702,8 @@ namespace WPF_LCD_Test.ViewModels
                 IsSerialNumberConfirmed = false;
                 ResetMeasurementStatuses();
                 Log(ClearFieldsDone);
+                Spec.Reset();
+                RequestSpecCheck();
                 UpdateUIState();
                 }
             }
@@ -733,6 +766,8 @@ namespace WPF_LCD_Test.ViewModels
                 {
                 UpdateMeasurementStatus(measurementLocation, isMeasurementSuccess, messageWithMeasuredValues);
                 UpdateCommandsCanExecute();
+                if (!isMeasurementSuccess) _currentDevice?.RemoveMeasurement(measurementLocation);
+                RequestSpecCheck();
                 }
             }
 
@@ -764,6 +799,7 @@ namespace WPF_LCD_Test.ViewModels
                     {
                     _currentDevice = new DeviceUnderTest(SerialNumber) { Colorimeter = _colorimeter };
                     ResetMeasurementStatuses();
+                    RequestSpecCheck();
                     }
                 catch (ArgumentException ex)
                     {
@@ -1085,12 +1121,73 @@ namespace WPF_LCD_Test.ViewModels
                 }
             }
 
+        /// <summary>
+        /// Starts the specification check of the current measurements; the previous request is abandoned.
+        /// </summary>
+        private void RequestSpecCheck() => _specTask = CheckSpecAsync();
+
+        /// <summary>
+        /// Evaluates the measurements taken so far against the selected configuration and shows the result.
+        /// Without a device, an empty one is evaluated so the table lists the checked metrics as pending.
+        /// </summary>
+        private async Task CheckSpecAsync()
+            {
+            _specCts?.Cancel();
+            var cts = _specCts = new CancellationTokenSource();
+
+            if (string.IsNullOrEmpty(SelectedDeviceConfiguration))
+                {
+                ExecuteThreadInUI(() => Spec.ShowMessage(ResourceManager.GetString("SpecSelectConfig")!));
+                return;
+                }
+
+            var device = _currentDevice ?? new DeviceUnderTest(PreviewSerialNumber);
+            device.DeviceConfiguration = SelectedDeviceConfiguration;
+            device.IsTV = IsTvCheckboxChecked;
+            string deviceJson = _fileService.SerializeDevice(device);
+            int measuredPoints = device.Measurements.Count;
+            int totalPoints = _measurementStatusService.AllMeasurementButtonStatuses.Count - (device.IsTV ? 0 : 1);
+
+            SpecEvaluationOutcome outcome;
+            try
+                {
+                outcome = await _specEvaluationService.EvaluateAsync(deviceJson, cts.Token);
+                }
+            catch (OperationCanceledException)
+                {
+                return;
+                }
+            if (cts.IsCancellationRequested) return;
+
+            ExecuteThreadInUI(() =>
+            {
+                if (outcome.Evaluation != null)
+                    {
+                    _lastSpecError = null;
+                    Spec.Show(outcome.Evaluation, measuredPoints, totalPoints);
+                    return;
+                    }
+
+                string error = outcome.Error ?? "?";
+                Spec.ShowMessage(string.Format(ResourceManager.GetString("SpecUnavailable")!, error));
+                if (error != _lastSpecError)
+                    {
+                    _lastSpecError = error;
+                    AddLogMessage(string.Format(ResourceManager.GetString("SpecUnavailable")!, error));
+                    }
+            });
+            }
+
+        private void LocalizationService_LanguageChanged(object? sender, EventArgs e) => Spec.Refresh();
+
         private void ResetMeasurementStatuses()
             {
             foreach (var status in _measurementStatusService.AllMeasurementButtonStatuses)
                 {
                 status.IsPassed = null;
                 status.MeasuredValuesString = "";
+                status.SpecRemark = SpecStatus.Pass;
+                status.SpecTooltip = "";
                 }
             }
 
@@ -1129,6 +1226,8 @@ namespace WPF_LCD_Test.ViewModels
             _colorMeasurementService.CalibrationStatusChanged -= ColorMeasurementService_CalibrationStatusChanged;
             _colorMeasurementService.CurrentChannelChanged -= ColorMeasurementService_CurrentChannelChanged;
             _uploadService.StatusMessage -= UploadService_StatusMessage;
+            _localizationService.LanguageChanged -= LocalizationService_LanguageChanged;
+            _specCts?.Cancel();
 
             ( _colorMeasurementService as IDisposable )?.Dispose();
             ( _fileService as IDisposable )?.Dispose();
