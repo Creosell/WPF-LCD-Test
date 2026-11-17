@@ -26,7 +26,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                 {
                 LanguageCultureCode = "",
                 ColorAnalyzerChannel = "1",
-                AutoConnectEnabled = true
+                MeasurementSpeed = MeasurementSpeed.Slow
                 });
 
             _mockColorMeasurementService.Setup(s => s.CurrentChannel).Returns(1);
@@ -88,7 +88,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             {
             _mockSettingsService.Verify(s => s.LoadSettings(), Times.Once());
             Assert.That(_viewModel.ColorAnalyzerChannel, Is.EqualTo("1"));
-            Assert.That(_viewModel.AutoConnectEnabled, Is.True);
+            Assert.That(_viewModel.MeasurementSpeed, Is.EqualTo(MeasurementSpeed.Slow));
             Assert.That(_viewModel.LanguageCultureCode, Is.EqualTo(""));
             }
 
@@ -155,13 +155,13 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         public void SaveSettingsCommand_Execute_SavesSettings()
             {
             _viewModel.ColorAnalyzerChannel = "3";
-            _viewModel.AutoConnectEnabled = false;
+            _viewModel.MeasurementSpeed = MeasurementSpeed.Fast;
 
             _viewModel.SaveSettingsCommand.Execute(null);
 
             _mockSettingsService.Verify(s => s.SaveSettings(It.Is<AppSettings>(
                 settings => settings.ColorAnalyzerChannel == "3" &&
-                            settings.AutoConnectEnabled == false
+                            settings.MeasurementSpeed == MeasurementSpeed.Fast
             )), Times.Once());
             }
 
@@ -183,12 +183,12 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         [Test]
         public void CancelSettingsCommand_Execute_ReloadsSettings()
             {
-            _viewModel.AutoConnectEnabled = false;
+            _viewModel.MeasurementSpeed = MeasurementSpeed.Fast;
 
             _viewModel.CancelSettingsCommand.Execute(null);
 
             _mockSettingsService.Verify(s => s.LoadSettings(), Times.Exactly(2));
-            Assert.That(_viewModel.AutoConnectEnabled, Is.True);
+            Assert.That(_viewModel.MeasurementSpeed, Is.EqualTo(MeasurementSpeed.Slow));
             }
 
         [Test]
@@ -358,17 +358,17 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             }
 
         [Test]
-        public void PropertyChanged_FiredForAutoConnectEnabled()
+        public void PropertyChanged_FiredForMeasurementSpeed()
             {
             // Arrange
             var propertiesChanged = new List<string>();
             _viewModel.PropertyChanged += (s, e) => propertiesChanged.Add(e.PropertyName!);
 
             // Act
-            _viewModel.AutoConnectEnabled = false;
+            _viewModel.MeasurementSpeed = MeasurementSpeed.Fast;
 
             // Assert
-            Assert.That(propertiesChanged, Does.Contain(nameof(_viewModel.AutoConnectEnabled)));
+            Assert.That(propertiesChanged, Does.Contain(nameof(_viewModel.MeasurementSpeed)));
             }
 
         [Test]

@@ -110,9 +110,6 @@
     <system:String x:Key="SyncModeLabel">
         Sync mode
     </system:String>
-    <system:String x:Key="AutoConnectLabel">
-        Auto Connect:
-    </system:String>
     <system:String x:Key="SaveButton">
         Save
     </system:String>

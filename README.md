@@ -183,7 +183,8 @@ Settings are stored in `%AppData%\WPF_LCD_Test\settings.json`:
 
 - **ColorAnalyzerChannel**: Measurement channel (0-99)
 - **LanguageCultureCode**: UI language ("" for default / "zh-Hans" for Chinese Simplified)
-- **AutoConnectEnabled**: Automatically connect to device on startup
+- **MeasurementSpeed**: Analyzer measurement speed ("Slow" by default / "Fast" / "Auto")
+- **SyncFrequency**: Internal synchronization frequency in Hz (40-200); omitted for the universal synchronization
 
 ### Device Configurations
 

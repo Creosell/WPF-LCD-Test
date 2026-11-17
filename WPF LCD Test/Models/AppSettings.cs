@@ -21,12 +21,6 @@ namespace WPF_LCD_Test.Models
         public string ColorAnalyzerChannel { get; set; } = "0";
 
         /// <summary>
-        /// Gets or sets whether automatic connection to color analyzer is enabled on startup.
-        /// </summary>
-        [JsonPropertyName("autoConnectEnabled")]
-        public bool AutoConnectEnabled { get; set; } = true;
-
-        /// <summary>
         /// Gets or sets the measurement speed applied to the color analyzer during zero calibration.
         /// </summary>
         [JsonPropertyName("measurementSpeed")]

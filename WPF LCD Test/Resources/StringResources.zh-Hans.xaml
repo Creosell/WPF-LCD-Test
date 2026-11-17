@@ -108,9 +108,6 @@
     <system:String x:Key="SyncModeLabel">
         同步模式
     </system:String>
-    <system:String x:Key="AutoConnectLabel">
-        自动连接：
-    </system:String>
     <system:String x:Key="SaveButton">
         节省
     </system:String>

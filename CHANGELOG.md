@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - Hardcoded QA probe handling (serial number `08954195`, forced channel 1)
+- The unused `autoConnectEnabled` setting (nothing read it); old settings files that still contain it load fine
 
 ### Fixed
 - Changing the language reset the other settings (channel, auto connect) to their defaults; only the language is updated now

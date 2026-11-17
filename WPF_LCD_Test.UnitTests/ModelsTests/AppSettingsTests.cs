@@ -20,7 +20,8 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
             // Assert (Проверка)
             Assert.That(settings.LanguageCultureCode, Is.EqualTo(""), "Default LanguageCultureCode should be 'en'.");
             Assert.That(settings.ColorAnalyzerChannel, Is.EqualTo("0"), "Default ColorAnalyzerChannel should be '0'.");
-            Assert.IsTrue(settings.AutoConnectEnabled, "Default AutoConnectEnabled should be true.");
+            Assert.That(settings.MeasurementSpeed, Is.EqualTo(MeasurementSpeed.Slow), "Default MeasurementSpeed should be Slow.");
+            Assert.That(settings.SyncFrequency, Is.Null, "Default SyncFrequency should select the universal synchronization.");
         }
 
         [Test]
@@ -30,17 +31,17 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
             var settings = new AppSettings();
             string expectedLanguage = "zh-Hans";
             string expectedPort = "3";
-            bool expectedAutoConnect = false;
+            var expectedSpeed = MeasurementSpeed.Fast;
 
             // Act
             settings.LanguageCultureCode = expectedLanguage;
             settings.ColorAnalyzerChannel = expectedPort;
-            settings.AutoConnectEnabled = expectedAutoConnect;
+            settings.MeasurementSpeed = expectedSpeed;
 
             // Assert
             Assert.That(settings.LanguageCultureCode, Is.EqualTo(expectedLanguage), "LanguageCultureCode should match the set value.");
             Assert.That(settings.ColorAnalyzerChannel, Is.EqualTo(expectedPort), "ColorAnalyzerChannel should match the set value.");
-            Assert.That(settings.AutoConnectEnabled, Is.EqualTo(expectedAutoConnect), "AutoConnectEnabled should match the set value.");
+            Assert.That(settings.MeasurementSpeed, Is.EqualTo(expectedSpeed), "MeasurementSpeed should match the set value.");
         }
 
         [Test]
@@ -51,13 +52,13 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
             {
                 LanguageCultureCode = "zh-Hans",
                 ColorAnalyzerChannel = "0",
-                AutoConnectEnabled = false
+                MeasurementSpeed = MeasurementSpeed.Auto
             };
 
             // Act
             string jsonString = JsonSerializer.Serialize(settings);
             // Ожидаем JSON, который соответствует атрибутам JsonPropertyName
-            string expectedJson = "{\"languageCultureCode\":\"zh-Hans\",\"colorAnalyzerChannel\":\"0\",\"autoConnectEnabled\":false,\"measurementSpeed\":\"Slow\",\"syncFrequency\":null}";
+            string expectedJson = "{\"languageCultureCode\":\"zh-Hans\",\"colorAnalyzerChannel\":\"0\",\"measurementSpeed\":\"Auto\",\"syncFrequency\":null}";
 
             // Assert
             // Сравниваем JSON, игнорируя возможные различия в форматировании (пробелы, переносы строк)
@@ -70,7 +71,7 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
             Assert.IsNotNull(deserializedSettings, "Deserialized settings should not be null.");
             Assert.That(deserializedSettings.LanguageCultureCode, Is.EqualTo(settings.LanguageCultureCode), "Deserialized LanguageCultureCode should match original.");
             Assert.That(deserializedSettings.ColorAnalyzerChannel, Is.EqualTo(settings.ColorAnalyzerChannel), "Deserialized ColorAnalyzerChannel should match original.");
-            Assert.That(deserializedSettings.AutoConnectEnabled, Is.EqualTo(settings.AutoConnectEnabled), "Deserialized AutoConnectEnabled should match original.");
+            Assert.That(deserializedSettings.MeasurementSpeed, Is.EqualTo(settings.MeasurementSpeed), "Deserialized MeasurementSpeed should match original.");
         }
 
         [Test]
@@ -88,7 +89,7 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
             // Проверяем, что свойства, отсутствующие в JSON, приняли значения по умолчанию
             Assert.That(deserializedSettings.LanguageCultureCode, Is.EqualTo(""), "Missing LanguageCultureCode should default to 'en'.");
             Assert.That(deserializedSettings.ColorAnalyzerChannel, Is.EqualTo("0"), "Missing ColorAnalyzerChannel should default to '0'.");
-            Assert.IsTrue(deserializedSettings.AutoConnectEnabled, "Missing AutoConnectEnabled should default to true.");
+            Assert.That(deserializedSettings.MeasurementSpeed, Is.EqualTo(MeasurementSpeed.Slow), "Missing MeasurementSpeed should default to Slow.");
         }
     }
 }

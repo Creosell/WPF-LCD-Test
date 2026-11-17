@@ -65,12 +65,6 @@ namespace WPF_LCD_Test.ViewModels
                 }
             }
         private const int DefaultSyncFrequency = 60;
-        private bool _autoConnectEnabled;
-        public bool AutoConnectEnabled
-            {
-            get => _autoConnectEnabled;
-            set => SetProperty(ref _autoConnectEnabled, value);
-            }
         private string _languageCultureCode;
         public string LanguageCultureCode
             {
@@ -167,7 +161,6 @@ namespace WPF_LCD_Test.ViewModels
                         }
                     }
                 ColorAnalyzerChannel = currentSettings.ColorAnalyzerChannel;
-                AutoConnectEnabled = currentSettings.AutoConnectEnabled;
                 MeasurementSpeed = currentSettings.MeasurementSpeed;
                 SyncMode = currentSettings.SyncFrequency.HasValue ? SyncModeOption.Internal : SyncModeOption.Universal;
                 SyncFrequency = (currentSettings.SyncFrequency ?? DefaultSyncFrequency).ToString();
@@ -201,7 +194,6 @@ namespace WPF_LCD_Test.ViewModels
                 {
                 LanguageCultureCode = LanguageCultureCode,
                 ColorAnalyzerChannel = ColorAnalyzerChannel,
-                AutoConnectEnabled = AutoConnectEnabled,
                 MeasurementSpeed = MeasurementSpeed,
                 SyncFrequency = SyncMode == SyncModeOption.Internal ? GetSyncFrequency(SyncFrequency) : null
                 };

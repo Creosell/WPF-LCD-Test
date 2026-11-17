@@ -59,7 +59,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             Assert.That(savedSettings, Is.Not.Null);
             Assert.That(savedSettings.LanguageCultureCode, Is.EqualTo(""));
             Assert.That(savedSettings.ColorAnalyzerChannel, Is.EqualTo("0"));
-            Assert.That(savedSettings.AutoConnectEnabled, Is.True);
+            Assert.That(savedSettings.MeasurementSpeed, Is.EqualTo(MeasurementSpeed.Slow));
             }
 
         [Test]
@@ -69,7 +69,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
                 {
                 LanguageCultureCode = "fr",
                 ColorAnalyzerChannel = "3",
-                AutoConnectEnabled = true
+                MeasurementSpeed = MeasurementSpeed.Fast
                 };
             string jsonContent = JsonSerializer.Serialize(expectedSettings, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(_testFilePath, jsonContent);
@@ -79,13 +79,13 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             Assert.That(loadedSettings, Is.Not.Null);
             Assert.That(loadedSettings.LanguageCultureCode, Is.EqualTo(expectedSettings.LanguageCultureCode));
             Assert.That(loadedSettings.ColorAnalyzerChannel, Is.EqualTo(expectedSettings.ColorAnalyzerChannel));
-            Assert.That(loadedSettings.AutoConnectEnabled, Is.EqualTo(expectedSettings.AutoConnectEnabled));
+            Assert.That(loadedSettings.MeasurementSpeed, Is.EqualTo(expectedSettings.MeasurementSpeed));
             }
 
         [Test]
         public void LoadSettings_InvalidJson_ReturnsDefaultSettings()
             {
-            string invalidJson = "{ \"languageCultureCode\": \"es\", \"colorAnalyzerChannel\": \"4\", \"autoConnectEnabled\": ";
+            string invalidJson = "{ \"languageCultureCode\": \"es\", \"colorAnalyzerChannel\": \"4\", \"measurementSpeed\": ";
             File.WriteAllText(_testFilePath, invalidJson);
 
             var loadedSettings = _settingsService.LoadSettings();
@@ -93,7 +93,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             Assert.That(loadedSettings, Is.Not.Null);
             Assert.That(loadedSettings.LanguageCultureCode, Is.EqualTo(""));
             Assert.That(loadedSettings.ColorAnalyzerChannel, Is.EqualTo("0"));
-            Assert.That(loadedSettings.AutoConnectEnabled, Is.True);
+            Assert.That(loadedSettings.MeasurementSpeed, Is.EqualTo(MeasurementSpeed.Slow));
             }
 
         [Test]
@@ -103,7 +103,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
                 {
                 LanguageCultureCode = "de",
                 ColorAnalyzerChannel = "5",
-                AutoConnectEnabled = true
+                MeasurementSpeed = MeasurementSpeed.Fast
                 };
 
             _settingsService.SaveSettings(settingsToSave);
@@ -116,7 +116,7 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
             Assert.That(loadedSettings, Is.Not.Null);
             Assert.That(loadedSettings.LanguageCultureCode, Is.EqualTo(settingsToSave.LanguageCultureCode));
             Assert.That(loadedSettings.ColorAnalyzerChannel, Is.EqualTo(settingsToSave.ColorAnalyzerChannel));
-            Assert.That(loadedSettings.AutoConnectEnabled, Is.EqualTo(settingsToSave.AutoConnectEnabled));
+            Assert.That(loadedSettings.MeasurementSpeed, Is.EqualTo(settingsToSave.MeasurementSpeed));
             }
 
         [Test]
