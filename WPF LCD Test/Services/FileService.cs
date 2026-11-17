@@ -84,6 +84,9 @@ namespace WPF_LCD_Test.Services
         /// </summary>
         /// <param name="device">Device under test with measurement data.</param>
         /// <returns>True if save succeeded, false otherwise.</returns>
+        public string SerializeDevice(DeviceUnderTest device) => JsonSerializer.Serialize(device, _saveSerializerOptions);
+
+        /// <inheritdoc/>
         public async Task<bool> SaveDeviceDataToJsonAsync(DeviceUnderTest? device)
             {
             if (device == null)
@@ -98,7 +101,7 @@ namespace WPF_LCD_Test.Services
                 string fileName = $"{device.SerialNumber}.json";
                 string filePath = _fileSystem.Path.Combine(BaseFolderPath, fileName);
 
-                string jsonString = JsonSerializer.Serialize(device, _saveSerializerOptions);
+                string jsonString = SerializeDevice(device);
 
                 await _fileSystem.File.WriteAllTextAsync(filePath, jsonString);
 

@@ -40,6 +40,13 @@ namespace WPF_LCD_Test.Interfaces
         Task<bool> SaveDeviceDataToJsonAsync(DeviceUnderTest device);
 
         /// <summary>
+        /// Serializes the device in the JSON format of the saved files without writing anything to disk.
+        /// </summary>
+        /// <param name="device">Device with the measurements taken so far.</param>
+        /// <returns>The JSON text.</returns>
+        string SerializeDevice(DeviceUnderTest device);
+
+        /// <summary>
         /// Asynchronously saves single measurement data to CSV file in device-specific subfolder.
         /// </summary>
         /// <param name="measurementCsvString">CSV formatted measurement data.</param>
