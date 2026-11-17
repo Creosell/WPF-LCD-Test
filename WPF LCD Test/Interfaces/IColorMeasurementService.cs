@@ -3,7 +3,7 @@
 namespace WPF_LCD_Test.Interfaces
 {
     /// <summary>
-    /// Interface for color measurement device operations with Konica Minolta CA-200/CA-310 analyzers.
+    /// Interface for color measurement device operations with Konica Minolta CA-200/CA-310/CA-410 analyzers.
     /// </summary>
     public interface IColorMeasurementService : IDisposable
     {
@@ -21,6 +21,11 @@ namespace WPF_LCD_Test.Interfaces
         /// Gets or sets the current measurement channel (0-99).
         /// </summary>
         int CurrentChannel { get; set; }
+
+        /// <summary>
+        /// Gets the detected analyzer family, or <see cref="ColorAnalyzerModel.Unknown"/> when not connected.
+        /// </summary>
+        ColorAnalyzerModel Model { get; }
 
         /// <summary>
         /// Gets the probe serial number.

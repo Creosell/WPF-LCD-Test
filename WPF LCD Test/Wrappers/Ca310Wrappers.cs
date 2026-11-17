@@ -1,20 +1,21 @@
 ﻿// В папке Wrappers
-// Файл ColorAnalyzerWrapper.cs
+// Файл Ca310Wrapper.cs
 using CA200SRVRLib; // Прямая ссылка на COM-библиотеку
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using WPF_LCD_Test.Interfaces; // Наши объединенные интерфейсы
+using WPF_LCD_Test.Models;
 
 namespace WPF_LCD_Test.Wrappers
 {
     /// <summary>
     /// Обёртка для объекта CA200SRVRLib.Memory, реализующая IColorAnalyzerMemory.
     /// </summary>
-    public class ColorAnalyzerMemoryWrapper : IColorAnalyzerMemory, IDisposable
+    public class Ca310MemoryWrapper : IColorAnalyzerMemory, IDisposable
     {
         private Memory? _memoryInstance; // Реальный COM-объект CA200SRVRLib.Memory
 
-        public ColorAnalyzerMemoryWrapper(Memory memoryInstance)
+        public Ca310MemoryWrapper(Memory memoryInstance)
         {
             _memoryInstance = memoryInstance ?? throw new ArgumentNullException(nameof(memoryInstance));
         }
@@ -24,12 +25,12 @@ namespace WPF_LCD_Test.Wrappers
         {
             get
             {
-                if (_memoryInstance == null) throw new ObjectDisposedException(nameof(ColorAnalyzerMemoryWrapper));
+                if (_memoryInstance == null) throw new ObjectDisposedException(nameof(Ca310MemoryWrapper));
                 return _memoryInstance.ChannelNO;
             }
             set
             {
-                if (_memoryInstance == null) throw new ObjectDisposedException(nameof(ColorAnalyzerMemoryWrapper));
+                if (_memoryInstance == null) throw new ObjectDisposedException(nameof(Ca310MemoryWrapper));
                 _memoryInstance.ChannelNO = value;
             }
         }
@@ -60,11 +61,11 @@ namespace WPF_LCD_Test.Wrappers
     /// <summary>
     /// Обёртка для объекта CA200SRVRLib.Probe, реализующая IColorAnalyzerProbe.
     /// </summary>
-    public class ColorAnalyzerProbeWrapper : IColorAnalyzerProbe, IDisposable
+    public class Ca310ProbeWrapper : IColorAnalyzerProbe, IDisposable
     {
         private Probe? _probeInstance; // Реальный COM-объект CA200SRVRLib.Probe
 
-        public ColorAnalyzerProbeWrapper(Probe probeInstance)
+        public Ca310ProbeWrapper(Probe probeInstance)
         {
             _probeInstance = probeInstance ?? throw new ArgumentNullException(nameof(probeInstance));
         }
@@ -74,7 +75,7 @@ namespace WPF_LCD_Test.Wrappers
         {
             get
             {
-                if (_probeInstance == null) throw new ObjectDisposedException(nameof(ColorAnalyzerProbeWrapper));
+                if (_probeInstance == null) throw new ObjectDisposedException(nameof(Ca310ProbeWrapper));
                 return _probeInstance.sx;
             }
         }
@@ -83,7 +84,7 @@ namespace WPF_LCD_Test.Wrappers
         {
             get
             {
-                if (_probeInstance == null) throw new ObjectDisposedException(nameof(ColorAnalyzerProbeWrapper));
+                if (_probeInstance == null) throw new ObjectDisposedException(nameof(Ca310ProbeWrapper));
                 return _probeInstance.sy;
             }
         }
@@ -92,7 +93,7 @@ namespace WPF_LCD_Test.Wrappers
         {
             get
             {
-                if (_probeInstance == null) throw new ObjectDisposedException(nameof(ColorAnalyzerProbeWrapper));
+                if (_probeInstance == null) throw new ObjectDisposedException(nameof(Ca310ProbeWrapper));
                 return _probeInstance.Lv;
             }
         }
@@ -101,7 +102,7 @@ namespace WPF_LCD_Test.Wrappers
         {
             get
             {
-                if (_probeInstance == null) throw new ObjectDisposedException(nameof(ColorAnalyzerProbeWrapper));
+                if (_probeInstance == null) throw new ObjectDisposedException(nameof(Ca310ProbeWrapper));
                 return _probeInstance.T;
             }
         }
@@ -110,10 +111,13 @@ namespace WPF_LCD_Test.Wrappers
             {
             get
                 {
-                if (_probeInstance == null) throw new ObjectDisposedException(nameof(ColorAnalyzerProbeWrapper));
+                if (_probeInstance == null) throw new ObjectDisposedException(nameof(Ca310ProbeWrapper));
                 return _probeInstance.SerialNO;
                 }
             }
+
+        /// <inheritdoc/>
+        public string TypeName => string.Empty;
 
         /// <summary>
         /// Releases COM reference.
@@ -145,13 +149,13 @@ namespace WPF_LCD_Test.Wrappers
     /// Он также отвечает за освобождение своих дочерних COM-объектов (Probe, Memory)
     /// путем обнуления ссылок на их обертки.
     /// </summary>
-    public class ColorAnalyzerWrapper : IColorAnalyzer
+    public class Ca310Wrapper : IColorAnalyzer
     {
         private Ca? _caInstance; // Реальный COM-объект CA200SRVRLib.Ca
-        private ColorAnalyzerProbeWrapper? _singleProbeWrapper; // Обёртка для IColorAnalyzerProbe
-        private ColorAnalyzerMemoryWrapper? _memoryWrapper; // Обёртка для IColorAnalyzerMemory 
+        private Ca310ProbeWrapper? _singleProbeWrapper; // Обёртка для IColorAnalyzerProbe
+        private Ca310MemoryWrapper? _memoryWrapper; // Обёртка для IColorAnalyzerMemory 
 
-        public ColorAnalyzerWrapper(Ca caInstance)
+        public Ca310Wrapper(Ca caInstance)
         {
             _caInstance = caInstance ?? throw new ArgumentNullException(nameof(caInstance));
             }
@@ -163,7 +167,7 @@ namespace WPF_LCD_Test.Wrappers
                 {
                 if (_caInstance == null)
                     {
-                    throw new ObjectDisposedException(nameof(ColorAnalyzerWrapper), "Cannot access ID on an uninitialized object.");
+                    throw new ObjectDisposedException(nameof(Ca310Wrapper), "Cannot access ID on an uninitialized object.");
                     }
                 return _caInstance.ID;
                 }
@@ -175,7 +179,7 @@ namespace WPF_LCD_Test.Wrappers
                 {
                 if (_caInstance == null)
                     {
-                    throw new ObjectDisposedException(nameof(ColorAnalyzerWrapper), "Cannot access PortID on an uninitialized object.");
+                    throw new ObjectDisposedException(nameof(Ca310Wrapper), "Cannot access PortID on an uninitialized object.");
                     }
                 return _caInstance.PortID;
                 }
@@ -188,7 +192,7 @@ namespace WPF_LCD_Test.Wrappers
                 {
                 if (_caInstance == null)
                     {
-                    throw new ObjectDisposedException(nameof(ColorAnalyzerWrapper), "Cannot access Number on an uninitialized object.");
+                    throw new ObjectDisposedException(nameof(Ca310Wrapper), "Cannot access Number on an uninitialized object.");
                     }
                 return _caInstance.Number;
                 }
@@ -201,9 +205,9 @@ namespace WPF_LCD_Test.Wrappers
             {
                 if (_caInstance == null)
                 {
-                    throw new ObjectDisposedException(nameof(ColorAnalyzerWrapper), "Cannot access SingleProbe on an uninitialized object.");
+                    throw new ObjectDisposedException(nameof(Ca310Wrapper), "Cannot access SingleProbe on an uninitialized object.");
                 }
-                _singleProbeWrapper ??= new ColorAnalyzerProbeWrapper(_caInstance.SingleProbe);
+                _singleProbeWrapper ??= new Ca310ProbeWrapper(_caInstance.SingleProbe);
                 return _singleProbeWrapper;
             }
         }
@@ -214,9 +218,9 @@ namespace WPF_LCD_Test.Wrappers
             {
                 if (_caInstance == null)
                 {
-                    throw new ObjectDisposedException(nameof(ColorAnalyzerWrapper), "Cannot access Memory on an uninitialized object.");
+                    throw new ObjectDisposedException(nameof(Ca310Wrapper), "Cannot access Memory on an uninitialized object.");
                 }
-                _memoryWrapper ??= new ColorAnalyzerMemoryWrapper(_caInstance.Memory);
+                _memoryWrapper ??= new Ca310MemoryWrapper(_caInstance.Memory);
                 return _memoryWrapper;
             }
         }
@@ -227,7 +231,7 @@ namespace WPF_LCD_Test.Wrappers
         {
             if (_caInstance == null)
             {
-                throw new ObjectDisposedException(nameof(ColorAnalyzerWrapper), "Cannot call CalZero on an uninitialized object.");
+                throw new ObjectDisposedException(nameof(Ca310Wrapper), "Cannot call CalZero on an uninitialized object.");
             }
             _caInstance.CalZero();
         }
@@ -238,7 +242,7 @@ namespace WPF_LCD_Test.Wrappers
             {
                 if (_caInstance == null)
                 {
-                    throw new ObjectDisposedException(nameof(ColorAnalyzerWrapper), "Cannot access SyncMode on an uninitialized object.");
+                    throw new ObjectDisposedException(nameof(Ca310Wrapper), "Cannot access SyncMode on an uninitialized object.");
                 }
                 return (int)_caInstance.SyncMode;
             }
@@ -246,7 +250,7 @@ namespace WPF_LCD_Test.Wrappers
             {
                 if (_caInstance == null)
                 {
-                    throw new ObjectDisposedException(nameof(ColorAnalyzerWrapper), "Cannot set SyncMode on an uninitialized object.");
+                    throw new ObjectDisposedException(nameof(Ca310Wrapper), "Cannot set SyncMode on an uninitialized object.");
                 }
                 _caInstance.SyncMode = value;
             }
@@ -258,7 +262,7 @@ namespace WPF_LCD_Test.Wrappers
             {
                 if (_caInstance == null)
                 {
-                    throw new ObjectDisposedException(nameof(ColorAnalyzerWrapper), "Cannot access AveragingMode on an uninitialized object.");
+                    throw new ObjectDisposedException(nameof(Ca310Wrapper), "Cannot access AveragingMode on an uninitialized object.");
                 }
                 return _caInstance.AveragingMode;
             }
@@ -266,7 +270,7 @@ namespace WPF_LCD_Test.Wrappers
             {
                 if (_caInstance == null)
                 {
-                    throw new ObjectDisposedException(nameof(ColorAnalyzerWrapper), "Cannot set AveragingMode on an uninitialized object.");
+                    throw new ObjectDisposedException(nameof(Ca310Wrapper), "Cannot set AveragingMode on an uninitialized object.");
                 }
                 _caInstance.AveragingMode = value;
             }
@@ -276,7 +280,7 @@ namespace WPF_LCD_Test.Wrappers
         {
             if (_caInstance == null)
             {
-                throw new ObjectDisposedException(nameof(ColorAnalyzerWrapper), "Cannot call SetAnalogRange on an uninitialized object.");
+                throw new ObjectDisposedException(nameof(Ca310Wrapper), "Cannot call SetAnalogRange on an uninitialized object.");
             }
             _caInstance.SetAnalogRange(Range1, Range2);
         }
@@ -287,7 +291,7 @@ namespace WPF_LCD_Test.Wrappers
             {
                 if (_caInstance == null)
                 {
-                    throw new ObjectDisposedException(nameof(ColorAnalyzerWrapper), "Cannot access DisplayMode on an uninitialized object.");
+                    throw new ObjectDisposedException(nameof(Ca310Wrapper), "Cannot access DisplayMode on an uninitialized object.");
                 }
                 return _caInstance.DisplayMode;
             }
@@ -295,7 +299,7 @@ namespace WPF_LCD_Test.Wrappers
             {
                 if (_caInstance == null)
                 {
-                    throw new ObjectDisposedException(nameof(ColorAnalyzerWrapper), "Cannot set DisplayMode on an uninitialized object.");
+                    throw new ObjectDisposedException(nameof(Ca310Wrapper), "Cannot set DisplayMode on an uninitialized object.");
                 }
                 _caInstance.DisplayMode = value;
             }
@@ -305,7 +309,7 @@ namespace WPF_LCD_Test.Wrappers
         {
             if (_caInstance == null)
             {
-                throw new ObjectDisposedException(nameof(ColorAnalyzerWrapper), "Cannot call Measure on an uninitialized object.");
+                throw new ObjectDisposedException(nameof(Ca310Wrapper), "Cannot call Measure on an uninitialized object.");
             }
             _caInstance.Measure();
         }
@@ -354,7 +358,7 @@ namespace WPF_LCD_Test.Wrappers
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine($"ColorAnalyzerWrapper: Error releasing COM object: {ex.Message}");
+                    Console.Error.WriteLine($"Ca310Wrapper: Error releasing COM object: {ex.Message}");
                 }
                 _caInstance = null;
             }
@@ -365,13 +369,13 @@ namespace WPF_LCD_Test.Wrappers
     /// Обёртка для объекта CA200SRVRLib.Ca200, реализующая IColorAnalyzer200.
     /// Отвечает за создание и корректное освобождение корневого COM-объекта Ca200.
     /// </summary>
-    public class ColorAnalyzer200Wrapper : IColorAnalyzer200
+    public class Ca310AnalyzerWrapper : IColorAnalyzer200
     {
         private Ca200? _ca200Instance; // Реальный COM-объект CA200SRVRLib.Ca200
-        private ColorAnalyzerWrapper? _singleCaWrapper; // Обёртка для IColorAnalyzer
+        private Ca310Wrapper? _singleCaWrapper; // Обёртка для IColorAnalyzer
         private bool _disposed = false; // Флаг для реализации IDisposable
 
-        public ColorAnalyzer200Wrapper()
+        public Ca310AnalyzerWrapper()
         {
             try
             {
@@ -393,6 +397,9 @@ namespace WPF_LCD_Test.Wrappers
             }
         }
 
+        /// <inheritdoc/>
+        public ColorAnalyzerModel Model => ColorAnalyzerModel.CA310;
+
         // Реализация свойства SingleCa из IColorAnalyzer200
         public IColorAnalyzer SingleCa
         {
@@ -400,10 +407,10 @@ namespace WPF_LCD_Test.Wrappers
             {
                 if (_disposed || _ca200Instance == null)
                 {
-                    throw new ObjectDisposedException(nameof(ColorAnalyzer200Wrapper), "Cannot access SingleCa on a disposed or uninitialized object.");
+                    throw new ObjectDisposedException(nameof(Ca310AnalyzerWrapper), "Cannot access SingleCa on a disposed or uninitialized object.");
                 }
                 // Создаем обертку для SingleCa только при первом запросе
-                _singleCaWrapper ??= new ColorAnalyzerWrapper(_ca200Instance.SingleCa);
+                _singleCaWrapper ??= new Ca310Wrapper(_ca200Instance.SingleCa);
                 return _singleCaWrapper;
             }
         }
@@ -413,7 +420,7 @@ namespace WPF_LCD_Test.Wrappers
         {
             if (_disposed || _ca200Instance == null)
             {
-                throw new ObjectDisposedException(nameof(ColorAnalyzer200Wrapper), "Cannot call AutoConnect on a disposed or uninitialized object.");
+                throw new ObjectDisposedException(nameof(Ca310AnalyzerWrapper), "Cannot call AutoConnect on a disposed or uninitialized object.");
             }
             _ca200Instance.AutoConnect();
         }
@@ -468,7 +475,7 @@ namespace WPF_LCD_Test.Wrappers
         }
 
         // Финализатор (деструктор) для случая, если Dispose не был вызван явно
-        ~ColorAnalyzer200Wrapper()
+        ~Ca310AnalyzerWrapper()
         {
             Dispose(false);
         }

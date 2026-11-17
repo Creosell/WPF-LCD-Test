@@ -154,6 +154,24 @@ namespace WPF_LCD_Test.Tests
             }
 
         [Test]
+        public async Task CalibrateZeroAsync_ReadsActiveChannelFromDeviceWithoutOverwritingIt()
+            {
+            // Arrange
+            _mockMemory.SetupGet(m => m.ChannelNO).Returns(7);
+            await _service.ConnectAsync();
+            int raisedChannel = -1;
+            _service.CurrentChannelChanged += (sender, channel) => raisedChannel = channel;
+
+            // Act
+            await _service.CalibrateZeroAsync();
+
+            // Assert
+            Assert.That(_service.CurrentChannel, Is.EqualTo(7));
+            Assert.That(raisedChannel, Is.EqualTo(7));
+            _mockMemory.VerifySet(m => m.ChannelNO = It.IsAny<int>(), Times.Never);
+            }
+
+        [Test]
         public async Task CalibrateZeroAsync_ShouldHandleCOMExceptionAndSetUncalibrated()
             {
             // Arrange

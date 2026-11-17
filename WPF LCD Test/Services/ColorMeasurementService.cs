@@ -7,11 +7,12 @@ using static WPF_LCD_Test.Resources.Resources;
 namespace WPF_LCD_Test.Services
     {
     /// <summary>
-    /// Service for handling communications and measurements with Color Analyzer device (CA-200/CA-310).
+    /// Service for handling communications and measurements with Color Analyzer device (CA-410 via CA-SDK2, CA-200/CA-310 via legacy CA-SDK COM).
     /// </summary>
     public class ColorMeasurementService : IDisposable, IColorMeasurementService
         {
         private IColorAnalyzer200? _objCa200;
+        private readonly IReadOnlyList<Func<IColorAnalyzer200>> _analyzerFactories = [];
         private IColorAnalyzer? _objCa = null;
         private IColorAnalyzerMemory? _objMemory = null;
         private bool _isDeviceConnected = false;
@@ -76,6 +77,11 @@ namespace WPF_LCD_Test.Services
         public bool IsDeviceCalibrated => _isDeviceCalibrated;
 
         /// <summary>
+        /// Gets the detected analyzer family, or <see cref="ColorAnalyzerModel.Unknown"/> when not connected.
+        /// </summary>
+        public ColorAnalyzerModel Model => _isDeviceConnected ? _objCa200?.Model ?? ColorAnalyzerModel.Unknown : ColorAnalyzerModel.Unknown;
+
+        /// <summary>
         /// Gets the probe serial number.
         /// </summary>
         public string ProbeSN
@@ -104,6 +110,11 @@ namespace WPF_LCD_Test.Services
         /// </summary>
         public ColorMeasurementService()
             {
+            _analyzerFactories =
+                [
+                () => new Ca410AnalyzerWrapper(),
+                () => new Ca310AnalyzerWrapper()
+                ];
             }
 
         /// <summary>
@@ -123,19 +134,14 @@ namespace WPF_LCD_Test.Services
             {
             await Task.Run(() =>
             {
-                if (_objCa200 == null)
-                    {
-                    _objCa200 = new ColorAnalyzer200Wrapper();
-                    }
-
                 try
                     {
                     if (!_isDeviceConnected)
                         {
                         StatusMessage?.Invoke(this, ConnectingCA);
 
-                        _objCa200.AutoConnect();
-                        _objCa = _objCa200.SingleCa;
+                        OpenAnalyzer();
+                        _objCa = _objCa200!.SingleCa;
                         _objMemory = _objCa.Memory;
 
                         _isDeviceConnected = true;
@@ -157,6 +163,40 @@ namespace WPF_LCD_Test.Services
                     }
             });
             return _isDeviceConnected;
+            }
+
+        /// <summary>
+        /// Connects to the first available analyzer driver. An injected driver is reused as is;
+        /// otherwise every registered driver is probed in order and the failed ones are released.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown when no driver could connect.</exception>
+        private void OpenAnalyzer()
+            {
+            if (_objCa200 != null)
+                {
+                _objCa200.AutoConnect();
+                return;
+                }
+
+            var errors = new List<string>();
+            foreach (var factory in _analyzerFactories)
+                {
+                IColorAnalyzer200? candidate = null;
+                try
+                    {
+                    candidate = factory();
+                    candidate.AutoConnect();
+                    _objCa200 = candidate;
+                    return;
+                    }
+                catch (Exception ex)
+                    {
+                    errors.Add(ex.Message);
+                    candidate?.Dispose();
+                    }
+                }
+
+            throw new InvalidOperationException(string.Join(" | ", errors));
             }
 
         /// <summary>
@@ -190,7 +230,8 @@ namespace WPF_LCD_Test.Services
 
                         if (_objMemory != null)
                             {
-                            _objMemory.ChannelNO = CurrentChannel;
+                            _channel = _objMemory.ChannelNO;
+                            CurrentChannelChanged?.Invoke(this, _channel);
                             }
                         }
 

@@ -1,10 +1,17 @@
-﻿namespace WPF_LCD_Test.Interfaces
+﻿using WPF_LCD_Test.Models;
+
+namespace WPF_LCD_Test.Interfaces
 {
     /// <summary>
     /// Interface wrapper for Konica Minolta CA-200 color analyzer COM object.
     /// </summary>
     public interface IColorAnalyzer200 : IDisposable
     {
+        /// <summary>
+        /// Gets the analyzer family this driver talks to.
+        /// </summary>
+        ColorAnalyzerModel Model { get; }
+
         /// <summary>
         /// Gets the single color analyzer instance.
         /// </summary>
@@ -108,6 +115,11 @@
         /// Gets the probe serial number.
         /// </summary>
         string SerialNO { get; }
+
+        /// <summary>
+        /// Gets the probe type name reported by the device (e.g. "CA-P427"), or an empty string if unsupported.
+        /// </summary>
+        string TypeName { get; }
     }
 
     /// <summary>

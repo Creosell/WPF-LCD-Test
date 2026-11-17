@@ -7,6 +7,8 @@
 	<Nullable>enable</Nullable>
 	<ImplicitUsings>enable</ImplicitUsings>
 	<UseWPF>true</UseWPF>
+	<PlatformTarget>x64</PlatformTarget>
+	<CASDK2Dir Condition="'$(CASDK2Dir)' == ''">C:\Program Files (x86)\KONICA MINOLTA\CA-S40\CA-SDK2\x64\lib</CASDK2Dir>
 	  <ApplicationIcon>Images\AppIcon.ico</ApplicationIcon>
 	  <AssemblyVersion>1.3.0</AssemblyVersion>
 	  <FileVersion>1.3.0</FileVersion>
@@ -48,6 +50,14 @@
 	  <Isolated>false</Isolated>
 	  <EmbedInteropTypes>true</EmbedInteropTypes>
 	</COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
+	<Reference Include="CASDK2Net">
+	  <HintPath>$(CASDK2Dir)\CASDK2Net.dll</HintPath>
+	  <Private>true</Private>
+	</Reference>
+	<None Include="$(CASDK2Dir)\CASDK2.dll;$(CASDK2Dir)\CASDK2Comm.dll;$(CASDK2Dir)\CASDK2Socket.dll;$(CASDK2Dir)\CASDK2Calc.dll" CopyToOutputDirectory="PreserveNewest" Link="%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>

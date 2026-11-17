@@ -53,7 +53,7 @@ dotnet test --filter "FullyQualifiedName~TestClassName.TestMethodName"
 | IMeasurementStatusService | Measurement state tracking |
 | IPathProvider | Centralized path resolution (BaseDirectory, ConfigDirectory, DataDirectory) |
 
-**Testability:** All system dependencies (file system, COM device, MessageBox, WPF Dispatcher) are wrapped in interfaces injected via DI. File system uses `System.IO.Abstractions` (`IFileSystem` / `MockFileSystem`). COM device wrapped in `ColorAnalyzerMemoryWrapper` / `ColorAnalyzerProbeWrapper` with proper `Marshal.ReleaseComObject` cleanup.
+**Testability:** All system dependencies (file system, COM device, MessageBox, WPF Dispatcher) are wrapped in interfaces injected via DI. File system uses `System.IO.Abstractions` (`IFileSystem` / `MockFileSystem`). COM device wrapped in `Ca310MemoryWrapper` / `Ca310ProbeWrapper` with proper `Marshal.ReleaseComObject` cleanup.
 
 **Dependency Injection:** `Microsoft.Extensions.DependencyInjection` container configured in `App.xaml.cs` → `ConfigureServices()`. Singletons: settings, localization, path provider, measurement status. Transients: ViewModels. All services use constructor injection — no static singletons.
 

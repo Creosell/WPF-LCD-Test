@@ -232,7 +232,7 @@ Place YAML device configuration files in `config/device_configs/`. Each configur
 
 #### Wrappers
 Abstractions over system dependencies for testability:
-- **ColorAnalyzerWrappers**: COM device wrappers (`ColorAnalyzerMemoryWrapper`, `ColorAnalyzerProbeWrapper`) with proper `Marshal.ReleaseComObject` disposal
+- **Ca310Wrappers / Ca410Wrappers**: device wrappers (CA-310 via COM: `Ca310MemoryWrapper`, `Ca310ProbeWrapper`; CA-410 via CA-SDK2: `Ca410AnalyzerWrapper`) with proper `Marshal.ReleaseComObject` disposal
 - **IFileSystem** (System.IO.Abstractions): File system abstraction with `MockFileSystem` support in tests
 - **WpfDispatcher**: `IDispatcher` implementation wrapping WPF `Dispatcher` for UI thread access
 - **MessageBoxWrapper**: `IMessageBox` abstraction over `System.Windows.MessageBox`
