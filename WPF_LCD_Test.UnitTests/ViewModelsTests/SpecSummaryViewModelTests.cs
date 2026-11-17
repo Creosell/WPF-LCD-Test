@@ -49,6 +49,16 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             Assert.That(_summary.ProgressText, Is.EqualTo("3 of 14 points"));
             }
 
+        [Test]
+        public void Show_RowsWithNothingToAddHaveNoToolTip()
+            {
+            _summary.Show(Evaluation(SpecVerdict.Pass, true,
+                Check("Brightness", 400, SpecStatus.Pass, 320, 360, null, "Center"),
+                Check("Temperature", null, SpecStatus.Unavailable, 7300, null, 11300, "Center")), 1, 13);
+
+            Assert.That(_summary.Rows.Select(r => r.ToolTip), Is.All.Null);
+            }
+
         [TestCase(SpecVerdict.Fail, true, "Spec: FAIL")]
         [TestCase(SpecVerdict.Warn, false, "Spec: WARN")]
         [TestCase(SpecVerdict.Pass, true, "Spec: PASS")]

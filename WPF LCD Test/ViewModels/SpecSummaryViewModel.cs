@@ -180,11 +180,11 @@ namespace WPF_LCD_Test.ViewModels
             _ => evaluation.Complete ? Text("SpecVerdictPass") : Text("SpecNoIssuesYet")
             };
 
-        private string RowToolTip(SpecCheck check) => check.Status switch
+        private string? RowToolTip(SpecCheck check) => check.Status switch
             {
             SpecStatus.Pending => string.Format(Text("SpecWaitingFor"), string.Join(", ", check.Missing.Select(LocationName))),
             SpecStatus.Warning or SpecStatus.Fail => Describe(check),
-            _ => string.Empty
+            _ => null
             };
 
         private void ClearBadges()

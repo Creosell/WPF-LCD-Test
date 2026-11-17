@@ -36,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - An infinite color temperature (CA-410 reports it for saturated colors) is shown as `T=n/a` in the log and in the button tooltip
 - Saving the device JSON failed when a measurement contained an infinite value (CA-410 reports an infinite color temperature for saturated colors); non-finite values are now written as `null`
 - A repeated zero calibration kept the device reported as calibrated for the whole new calibration; it is now reported as uncalibrated until the calibration finishes
-- The measurement buttons showed an empty tooltip box before the first measurement; the tooltip now appears only when there are measured values to show
+- The measurement buttons and the Device info rows showed an empty tooltip box when there was nothing to tell (before the first measurement, for rows without remarks); a tooltip now appears only when it has text
 - The interface shifted down by a few pixels after a device configuration was selected (the placeholder used a smaller font than the selected name)
 
 ---
