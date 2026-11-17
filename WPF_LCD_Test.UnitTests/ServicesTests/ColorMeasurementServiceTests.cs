@@ -172,6 +172,23 @@ namespace WPF_LCD_Test.Tests
             }
 
         [Test]
+        public async Task CalibrateZeroAsync_WhenAlreadyCalibrated_ReportsUncalibratedBeforeCalibratedAgain()
+            {
+            // Arrange
+            await _service.ConnectAsync();
+            await _service.CalibrateZeroAsync();
+            var statuses = new List<bool>();
+            _service.CalibrationStatusChanged += (sender, isCalibrated) => statuses.Add(isCalibrated);
+
+            // Act
+            await _service.CalibrateZeroAsync();
+
+            // Assert
+            Assert.That(statuses, Is.EqualTo(new[] { false, true }));
+            Assert.That(_service.IsDeviceCalibrated, Is.True);
+            }
+
+        [Test]
         public async Task CalibrateZeroAsync_ShouldHandleCOMExceptionAndSetUncalibrated()
             {
             // Arrange

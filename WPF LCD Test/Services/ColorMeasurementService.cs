@@ -206,6 +206,7 @@ namespace WPF_LCD_Test.Services
 
         /// <summary>
         /// Asynchronously performs zero calibration and configures device settings.
+        /// A device that was already calibrated is reported as uncalibrated for the duration of the new calibration.
         /// </summary>
         /// <returns>True if calibration succeeded, false otherwise.</returns>
         public async Task<bool> CalibrateZeroAsync()
@@ -215,6 +216,12 @@ namespace WPF_LCD_Test.Services
             {
                 try
                     {
+                    if (_isDeviceCalibrated)
+                        {
+                        _isDeviceCalibrated = false;
+                        CalibrationStatusChanged?.Invoke(this, _isDeviceCalibrated);
+                        }
+
                     StatusMessage?.Invoke(this, CalibratingZeroCA);
                     if (_objCa != null)
                         {
