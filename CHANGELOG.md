@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.0] - 2026-11-17
+
+### Added
+- **Konica Minolta CA-410 support** through CA-SDK2 (`CASDK2Net.dll`, x64): connection, zero calibration, channel selection and measurements. The CA-410 is connected directly to the measuring probe, so only the probe serial number is available. The legacy CA-310 (COM) driver is kept as a fallback; the device family is detected automatically during zero calibration (CA-410 first, then CA-310)
+- Zero calibration reads the active channel from the probe instead of overwriting it with the Settings value; the confirmed channel is saved to the settings
+- `analyzers.json` next to the executable remembers the last confirmed channel per probe serial number. When the probe channel differs from the remembered one, a dialog lets the inspector pick either of the two; closing it cancels the calibration
+- Device model and active channel label in the measurement view (shown only after the channel is confirmed) with a probe serial number tooltip
+- Optional `Colorimeter` object (`Model`, `ProbeSN`, `Channel`) in the device JSON header, filled once after calibration; files without it keep the previous format
+
+### Changed
+- The application is built as x64; the CA-SDK2 native DLLs are copied next to the executable
+- CA-310 wrapper classes renamed to `Ca310*` (`ColorAnalyzerWrappers.cs` -> `Ca310Wrappers.cs`)
+
+### Removed
+- Hardcoded QA probe handling (serial number `08954195`, forced channel 1)
+
+### Fixed
+- Saving the device JSON failed when a measurement contained an infinite value (CA-410 reports an infinite color temperature for saturated colors); non-finite values are now written as `null`
+- The interface shifted down by a few pixels after a device configuration was selected (the placeholder used a smaller font than the selected name)
+
+---
+
 ## [1.3.0] - 2026-08-11
 
 ### Added

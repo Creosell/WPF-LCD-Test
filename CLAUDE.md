@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-WPF desktop application for LCD color measurement testing using Konica Minolta CA-200/CA-310 color analyzers. Built with .NET 8.0, WPF, and Material Design themes.
+WPF desktop application for LCD color measurement testing using Konica Minolta CA-200/CA-310 (COM) and CA-410 (CA-SDK2) color analyzers. Built with .NET 8.0, WPF, and Material Design themes.
 
 ## Build & Test Commands
 
@@ -44,7 +44,8 @@ dotnet test --filter "FullyQualifiedName~TestClassName.TestMethodName"
 
 | Service | Purpose |
 |---------|---------|
-| IColorMeasurementService | COM interop with color analyzer device |
+| IColorMeasurementService | Color analyzer device access: CA-410 via CA-SDK2, CA-310 via COM |
+| IAnalyzerRegistryService | Last confirmed channel per probe serial number (`analyzers.json` next to the exe) |
 | ISettingsService | App configuration (singleton) |
 | ILocalizationService | Runtime language switching (singleton) |
 | IFileService | File I/O abstraction, JSON/CSV export |
@@ -59,7 +60,7 @@ dotnet test --filter "FullyQualifiedName~TestClassName.TestMethodName"
 
 **Path Management:** `IPathProvider` / `PathProvider` — single source of truth for `BaseDirectory`, `ConfigDirectory`, `DataDirectory`. No hardcoded `AppDomain.CurrentDomain.BaseDirectory`.
 
-**Constants:** `AppConstants` class. `ColorAnalyzer.MinChannel` = 0, `MaxChannel` = 99. `MeasurementViewModel.COLOR_COORDINATES_TOLERANCE` = 0.15, `QA_PROBE_SN` = "08954195".
+**Constants:** `AppConstants` class. `ColorAnalyzer.MinChannel` = 0, `MaxChannel` = 99. `MeasurementViewModel.COLOR_COORDINATES_TOLERANCE` = 0.15.
 
 **Commands:** ViewModels use `RelayCommand` (in `Commands/`) for ICommand implementation binding to UI actions.
 
@@ -80,7 +81,7 @@ Device test specifications are YAML files in `WPF LCD Test/config/device_configs
 
 ## Version
 
-Current version: **1.3.0** (set in `WPF LCD Test\Screen Checker.csproj` — `AssemblyVersion` / `FileVersion`). See [CHANGELOG.md](CHANGELOG.md) for history.
+Current version: **1.4.0** (set in `WPF LCD Test\Screen Checker.csproj` — `AssemblyVersion` / `FileVersion`). See [CHANGELOG.md](CHANGELOG.md) for history.
 
 ## Localization
 
