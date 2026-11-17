@@ -89,8 +89,19 @@ namespace WPF_LCD_Test.Models
         public string MeasuredValuesString
             {
             get => _measuredValuesString;
-            set => SetProperty(ref _measuredValuesString, value);
+            set
+                {
+                if (SetProperty(ref _measuredValuesString, value))
+                    OnPropertyChanged(nameof(MeasuredValuesToolTip));
+                }
             }
+
+        /// <summary>
+        /// Gets the tooltip of the measurement button: the measured values, or null while there is nothing to show,
+        /// so an empty tooltip box does not pop up before the first measurement.
+        /// </summary>
+        [JsonIgnore]
+        public string? MeasuredValuesToolTip => string.IsNullOrEmpty(_measuredValuesString) ? null : _measuredValuesString;
 
         /// <summary>
         /// Initializes a new instance of MeasurementStatus with specified location.

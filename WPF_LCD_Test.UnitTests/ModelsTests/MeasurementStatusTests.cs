@@ -214,5 +214,23 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
             Assert.That(status.MeasuredValuesString, Is.EqualTo(""));
             Assert.That(status.MeasuredValuesString, Is.Not.Null);
         }
+
+        [Test]
+        public void MeasuredValuesToolTip_IsNullUntilThereAreValuesToShow()
+        {
+            var status = new MeasurementStatus();
+            var changed = new List<string?>();
+            status.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+
+            Assert.That(status.MeasuredValuesToolTip, Is.Null);
+
+            status.MeasuredValuesString = "Result for Center: x=0.3, y=0.3";
+
+            Assert.That(status.MeasuredValuesToolTip, Is.EqualTo("Result for Center: x=0.3, y=0.3"));
+            Assert.That(changed, Does.Contain(nameof(MeasurementStatus.MeasuredValuesToolTip)));
+
+            status.MeasuredValuesString = "";
+            Assert.That(status.MeasuredValuesToolTip, Is.Null);
+        }
     }
 }
