@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The unused `autoConnectEnabled` setting (nothing read it); old settings files that still contain it load fine
 
 ### Fixed
+- The dotted keyboard focus rectangle drawn around views and controls is removed in the whole application
 - Changing the language reset the other settings (channel, auto connect) to their defaults; only the language is updated now
 - The CA-410 ran in LTD.AUTO instead of AUTO because the CA-310 speed constant was passed to it
 - Saving the device JSON failed when a measurement contained an infinite value (CA-410 reports an infinite color temperature for saturated colors); non-finite values are now written as `null`
