@@ -25,6 +25,9 @@
     <system:String x:Key="ZeroCalibration">
         零校准
     </system:String>
+    <system:String x:Key="DeviceCardNoAnalyzer">无分析仪</system:String>
+    <system:String x:Key="DeviceCardPressCalibration">请按“零校准”</system:String>
+    <system:String x:Key="DeviceCardCalibrating">校准中…</system:String>
     <system:String x:Key="MeasurementTimeSec">
         测量时间：
     </system:String>

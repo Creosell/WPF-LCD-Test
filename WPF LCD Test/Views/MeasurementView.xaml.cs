@@ -4,6 +4,7 @@ using System.Windows.Controls; // Нужно для создания экзем�
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using WPF_LCD_Test.Models;
 using WPF_LCD_Test.ViewModels; // Убедись, что используешь пространство имен твоего ViewModel
 
@@ -18,6 +19,8 @@ namespace WPF_LCD_Test.Views
         {
             InitializeComponent(); // Инициализирует элементы UI, описанные в XAML
 
+            _deviceCard = new DeviceCardTransition(DeviceCard, DeviceCardContent);
+
             //this.PreviewMouseDown += UserControl_PreviewMouseDown;
             //this.PreviewKeyDown += UserControl_PreviewKeyDown;
 
@@ -25,7 +28,10 @@ namespace WPF_LCD_Test.Views
 
             // Подписываемся на событие Unloaded для отписки от ViewModel
             this.Unloaded += MeasurementView_Unloaded;
+
         }
+
+        private readonly DeviceCardTransition _deviceCard;
 
         private void DeviceConfigurationButton_Click(object sender, RoutedEventArgs e)
         {
@@ -72,6 +78,7 @@ namespace WPF_LCD_Test.Views
             {
                 newViewModel.PropertyChanged += ViewModel_PropertyChanged;
                 newViewModel.RequestClearInputFocus += ViewModel_RequestClearInputFocus;
+                _deviceCard.ShowImmediately(newViewModel);
             }
 
             // Теперь ViewModel доступен через this.DataContext или sender.DataContext
@@ -108,6 +115,8 @@ namespace WPF_LCD_Test.Views
         // --- Обработчик события изменения коллекции лога ---
         private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            if (sender is MeasurementViewModel viewModel) _deviceCard.OnViewModelPropertyChanged(viewModel, e.PropertyName);
+
             // Если изменилось свойство LogText в ViewModel
             if (e.PropertyName == nameof(MeasurementViewModel.LogText))
             {
@@ -255,6 +264,124 @@ namespace WPF_LCD_Test.Views
 
                 this.Focus();
                 e.Handled = true;
+            }
+        }
+
+        /// <summary>
+        /// Presentation-only animation of the analyzer card: switching between its states fades the old content out,
+        /// eases the card to the width of the new content and fades the new content in. The shown state is derived
+        /// from the <see cref="MeasurementViewModel"/> and published to the XAML triggers through the Tag of the content.
+        /// </summary>
+        private sealed class DeviceCardTransition
+        {
+            private enum State { NotConnected, Calibrating, Ready }
+
+            private const double DimmedOpacity = 0.55;
+
+            private static readonly Duration FadeOutDuration = new(TimeSpan.FromMilliseconds(110));
+            private static readonly Duration FadeInDuration = new(TimeSpan.FromMilliseconds(200));
+            private static readonly Duration ResizeDuration = new(TimeSpan.FromMilliseconds(280));
+
+            private readonly FrameworkElement _card;
+            private readonly FrameworkElement _content;
+            private State _shown = State.NotConnected;
+            private State _requested = State.NotConnected;
+            private bool _isTransitioning;
+
+            /// <summary>
+            /// Initializes the transition for the given card and the content it hosts.
+            /// </summary>
+            /// <param name="card">The card whose width and opacity are animated.</param>
+            /// <param name="content">The content whose Tag selects the visible panel and whose opacity is animated.</param>
+            public DeviceCardTransition(FrameworkElement card, FrameworkElement content)
+            {
+                _card = card;
+                _content = content;
+            }
+
+            /// <summary>
+            /// Shows the state of the given ViewModel without animation (used when the ViewModel is attached).
+            /// </summary>
+            /// <param name="viewModel">The ViewModel the card reflects.</param>
+            public void ShowImmediately(MeasurementViewModel viewModel)
+            {
+                _requested = StateOf(viewModel);
+                Show(_requested);
+                _card.Opacity = OpacityOf(_requested);
+            }
+
+            /// <summary>
+            /// Starts the animated switch when a ViewModel property the card depends on has changed.
+            /// </summary>
+            /// <param name="viewModel">The ViewModel the card reflects.</param>
+            /// <param name="propertyName">Name of the changed property.</param>
+            public void OnViewModelPropertyChanged(MeasurementViewModel viewModel, string? propertyName)
+            {
+                if (propertyName is not (nameof(MeasurementViewModel.IsDeviceConnected) or nameof(MeasurementViewModel.IsChannelConfirmed))) return;
+
+                _requested = StateOf(viewModel);
+                if (!_isTransitioning && _requested != _shown) Run();
+            }
+
+            /// <summary>
+            /// Maps the ViewModel state to what the card should show.
+            /// </summary>
+            private static State StateOf(MeasurementViewModel viewModel) =>
+                !viewModel.IsDeviceConnected ? State.NotConnected
+                : viewModel.IsChannelConfirmed ? State.Ready
+                : State.Calibrating;
+
+            private static double OpacityOf(State state) => state == State.NotConnected ? DimmedOpacity : 1;
+
+            private void Show(State state)
+            {
+                _shown = state;
+                _content.Tag = state.ToString();
+            }
+
+            /// <summary>
+            /// Fades the current content out, swaps it, and eases the card to the width of the new content while
+            /// the new content fades in. A state requested meanwhile is shown right after the running transition.
+            /// </summary>
+            private void Run()
+            {
+                _isTransitioning = true;
+                double fromWidth = _card.ActualWidth;
+
+                var fadeOut = new DoubleAnimation(0, FadeOutDuration) { EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn } };
+                fadeOut.Completed += (_, _) =>
+                {
+                    Show(_requested);
+
+                    _card.BeginAnimation(FrameworkElement.WidthProperty, null);
+                    _card.ClearValue(FrameworkElement.WidthProperty);
+                    _card.UpdateLayout();
+                    double toWidth = _card.ActualWidth;
+
+                    var resize = new DoubleAnimation(fromWidth, toWidth, ResizeDuration)
+                    {
+                        EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut }
+                    };
+                    resize.Completed += (_, _) => _card.BeginAnimation(FrameworkElement.WidthProperty, null);
+                    _card.BeginAnimation(FrameworkElement.WidthProperty, resize);
+
+                    _card.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(OpacityOf(_shown), ResizeDuration));
+
+                    var fadeIn = new DoubleAnimation(0, 1, FadeInDuration)
+                    {
+                        BeginTime = TimeSpan.FromMilliseconds(60),
+                        EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                    };
+                    fadeIn.Completed += (_, _) =>
+                    {
+                        _content.BeginAnimation(UIElement.OpacityProperty, null);
+                        _isTransitioning = false;
+                        if (_requested != _shown) Run();
+                    };
+                    _content.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+                };
+
+                _content.BeginAnimation(UIElement.OpacityProperty, fadeOut);
             }
         }
     }

@@ -400,13 +400,51 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             _mockAnalyzerRegistryService.Verify(r => r.Update("81026182", ColorAnalyzerModel.CA410, 2), Times.Once);
             _mockSettingsService.Verify(s => s.UpdateChannel(2), Times.Once);
             Assert.That(_viewModel.IsChannelConfirmed, Is.True);
-            StringAssert.Contains("81026182", _viewModel.DeviceProbeTooltipText);
+            StringAssert.Contains("81026182", _viewModel.DeviceProbeSerialText);
+            Assert.That(_viewModel.DeviceModelName, Is.EqualTo("CA-410"));
             }
 
         [Test]
-        public void DeviceProbeTooltipText_BeforeChannelConfirmed_IsNull()
+        public void DeviceStateText_FollowsConnectionAndCalibration()
             {
-            Assert.That(_viewModel.DeviceProbeTooltipText, Is.Null);
+            Assert.That(_viewModel.DeviceStateText, Is.EqualTo(DeviceStateNotConnected));
+
+            _viewModel.IsDeviceConnected = true;
+            Assert.That(_viewModel.DeviceStateText, Is.EqualTo(DeviceStateConnectedNotCalibrated));
+
+            _viewModel.IsDeviceCalibrated = true;
+            Assert.That(_viewModel.DeviceStateText, Is.EqualTo(DeviceStateConnectedCalibrated));
+
+            _viewModel.IsDeviceConnected = false;
+            _viewModel.IsDeviceCalibrated = false;
+            Assert.That(_viewModel.DeviceStateText, Is.EqualTo(DeviceStateNotConnected));
+            }
+
+        [Test]
+        public async Task DeviceInfoLabels_WhileRecalibrating_KeepLastConfirmedValues()
+            {
+            // Arrange
+            SetupCalibratedProbe("81026182", 2);
+            _mockAnalyzerRegistryService.Setup(r => r.GetLastChannel("81026182")).Returns((int?)null);
+            await ((RelayCommand)_viewModel.ZeroCalibrationCommand).ExecuteAsync(null);
+
+            // Act: a new calibration starts, the channel has to be confirmed again
+            _viewModel.IsDeviceCalibrated = true;
+            _viewModel.IsDeviceCalibrated = false;
+
+            // Assert
+            Assert.That(_viewModel.IsChannelConfirmed, Is.False);
+            Assert.That(_viewModel.DeviceModelName, Is.EqualTo("CA-410"));
+            StringAssert.Contains("2", _viewModel.DeviceActiveChannelStatusText);
+            StringAssert.Contains("81026182", _viewModel.DeviceProbeSerialText);
+            }
+
+        [Test]
+        public void DeviceInfoLabels_BeforeFirstConfirmation_AreEmpty()
+            {
+            Assert.That(_viewModel.DeviceProbeSerialText, Is.Empty);
+            Assert.That(_viewModel.DeviceActiveChannelStatusText, Is.Empty);
+            Assert.That(_viewModel.DeviceModelName, Is.Empty);
             }
 
         [Test]

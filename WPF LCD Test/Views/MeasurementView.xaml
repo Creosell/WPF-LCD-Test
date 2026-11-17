@@ -109,6 +109,52 @@
             inside a ContextMenu's nested Popups do not reliably raise ICommandSource execution on
             their own in this MaterialDesign setup, so the bridge forces it explicitly.
         -->
+        <!--
+            Analyzer state indicator: gray - not connected, amber (breathing) - connected and calibrating,
+            green - connected and calibrated
+        -->
+        <Style x:Key="StatusDotStyle" TargetType="Ellipse">
+            <Setter Property="Width" Value="10" />
+            <Setter Property="Height" Value="10" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Fill" Value="#8A8A8A" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsDeviceConnected}" Value="True">
+                    <Setter Property="Fill" Value="#FFB020" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsDeviceCalibrated}" Value="True">
+                    <Setter Property="Fill" Value="#4CD964" />
+                </DataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsDeviceConnected}" Value="True" />
+                        <Condition Binding="{Binding IsDeviceCalibrated}" Value="False" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.EnterActions>
+                        <BeginStoryboard x:Name="BreathingStoryboard">
+                            <Storyboard>
+                                <DoubleAnimation
+                                    AutoReverse="True"
+                                    RepeatBehavior="Forever"
+                                    Storyboard.TargetProperty="Opacity"
+                                    From="1"
+                                    To="0.3"
+                                    Duration="0:0:0.8">
+                                    <DoubleAnimation.EasingFunction>
+                                        <SineEase EasingMode="EaseInOut" />
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </MultiDataTrigger.EnterActions>
+                    <MultiDataTrigger.ExitActions>
+                        <StopStoryboard BeginStoryboardName="BreathingStoryboard" />
+                    </MultiDataTrigger.ExitActions>
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <Style x:Key="DeviceConfigMenuItemStyle" TargetType="MenuItem">
             <Setter Property="Template" Value="{StaticResource DeviceConfigMenuItemTemplate}" />
             <Setter Property="FontFamily" Value="Segoe UI" />
@@ -196,40 +242,85 @@
                         MaterialDesign:ButtonAssist.CornerRadius="15"
                         Command="{Binding DataContext.ZeroCalibrationCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                         Content="{DynamicResource ZeroCalibration}" />
-                    <StackPanel
-                        Margin="20,0,10,0"
-                        HorizontalAlignment="Left"
+                    <Border
+                        x:Name="DeviceCard"
+                        Height="52"
+                        Margin="10,5,10,5"
+                        Padding="14,8"
                         VerticalAlignment="Center"
-                        Orientation="Vertical">
-                        <TextBlock
-                            Margin="5,0"
-                            VerticalAlignment="Center"
-                            Foreground="White"
-                            Text="{Binding DeviceConnectionStatusText}" />
-                        <TextBlock
-                            Margin="5,0"
-                            VerticalAlignment="Center"
-                            Foreground="White"
-                            Text="{Binding DeviceCalibrationStatusText}" />
-                    </StackPanel>
-                    <StackPanel
-                        Margin="20,0,10,0"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Center"
-                        Background="Transparent"
-                        Orientation="Vertical"
-                        ToolTip="{Binding DeviceProbeTooltipText}">
-                        <TextBlock
-                            Margin="5,0"
-                            VerticalAlignment="Center"
-                            Foreground="White"
-                            Text="{Binding DeviceModelStatusText}" />
-                        <TextBlock
-                            Margin="5,0"
-                            VerticalAlignment="Center"
-                            Foreground="White"
-                            Text="{Binding DeviceActiveChannelStatusText}" />
-                    </StackPanel>
+                        Background="#26000000"
+                        BorderBrush="#66FFFFFF"
+                        BorderThickness="1"
+                        ClipToBounds="True"
+                        CornerRadius="12"
+                        ToolTip="{Binding DeviceStateText}">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Style="{StaticResource StatusDotStyle}" />
+                            <Grid
+                                x:Name="DeviceCardContent"
+                                VerticalAlignment="Center"
+                                Tag="NotConnected">
+                                <!--  Not connected: hint what to do  -->
+                                <StackPanel>
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Tag, ElementName=DeviceCardContent}" Value="NotConnected">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <TextBlock Foreground="White" Text="{DynamicResource DeviceCardNoAnalyzer}" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="#B5FFFFFF"
+                                        Text="{DynamicResource DeviceCardPressCalibration}" />
+                                </StackPanel>
+                                <!--  Connected, the channel is not confirmed yet  -->
+                                <TextBlock Foreground="#B5FFFFFF" Text="{DynamicResource DeviceCardCalibrating}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Tag, ElementName=DeviceCardContent}" Value="Calibrating">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <!--  Channel confirmed: model, channel and probe serial number  -->
+                                <StackPanel>
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Tag, ElementName=DeviceCardContent}" Value="Ready">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            FontWeight="SemiBold"
+                                            Foreground="White"
+                                            Text="{Binding DeviceModelName}" />
+                                        <TextBlock
+                                            Margin="6,0,0,0"
+                                            Foreground="#B5FFFFFF"
+                                            Text="{Binding DeviceActiveChannelStatusText}" />
+                                    </StackPanel>
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="#B5FFFFFF"
+                                        Text="{Binding DeviceProbeSerialText}" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
                 <Grid Grid.Row="1" Margin="0,10,0,0">
                     <StackPanel Orientation="Horizontal">

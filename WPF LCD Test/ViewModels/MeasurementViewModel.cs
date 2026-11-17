@@ -194,7 +194,7 @@ namespace WPF_LCD_Test.ViewModels
                 if (SetProperty(ref _isDeviceConnected, value))
                     {
                     UpdateUIState();
-                    OnPropertyChanged(nameof(DeviceConnectionStatusText));
+                    OnPropertyChanged(nameof(DeviceStateText));
                     }
                 }
             }
@@ -208,32 +208,39 @@ namespace WPF_LCD_Test.ViewModels
                     {
                     if (!value) IsChannelConfirmed = false;
                     UpdateUIState();
-                    OnPropertyChanged(nameof(DeviceCalibrationStatusText));
+                    OnPropertyChanged(nameof(DeviceStateText));
                     }
                 }
             }
 
-        public string DeviceConnectionStatusText => _isDeviceConnected ? ConnectedCA : DisconnectedCA;
-        public string DeviceCalibrationStatusText => _isDeviceCalibrated ? CalibratedCA : NotCalibratedCa;
+        /// <summary>
+        /// Gets the full description of the analyzer state shown as the tooltip of the state indicator.
+        /// </summary>
+        public string DeviceStateText => !_isDeviceConnected ? DeviceStateNotConnected
+            : _isDeviceCalibrated ? DeviceStateConnectedCalibrated
+            : DeviceStateConnectedNotCalibrated;
 
         /// <summary>
-        /// Gets the detected analyzer model label; shows a placeholder until the device is calibrated.
+        /// Gets the analyzer model name: the live value while the channel is confirmed, the last confirmed one
+        /// while it is being re-confirmed, empty before the first confirmation (the card does not show it then).
         /// </summary>
-        public string DeviceModelStatusText => string.Format(DeviceModelStatus,
-            _isChannelConfirmed ? _colorMeasurementService.Model.ToDisplayName() : ColorAnalyzerModel.Unknown.ToDisplayName());
+        public string DeviceModelName =>
+            _isChannelConfirmed ? _colorMeasurementService.Model.ToDisplayName() : _colorimeter?.Model ?? string.Empty;
 
         /// <summary>
-        /// Gets the active measurement channel label; shows a placeholder until the device is calibrated.
+        /// Gets the active measurement channel label: the live value while the channel is confirmed, the last confirmed one
+        /// while it is being re-confirmed, empty before the first confirmation (the card does not show it then).
         /// </summary>
-        public string DeviceActiveChannelStatusText => string.Format(ActiveChannelStatus,
-            _isChannelConfirmed ? _colorMeasurementService.CurrentChannel.ToString() : ColorAnalyzerModel.Unknown.ToDisplayName());
+        public string DeviceActiveChannelStatusText =>
+            _isChannelConfirmed ? string.Format(ActiveChannelStatus, _colorMeasurementService.CurrentChannel)
+            : _colorimeter != null ? string.Format(ActiveChannelStatus, _colorimeter.Channel)
+            : string.Empty;
 
         /// <summary>
-        /// Gets the tooltip with the probe serial number; null (no tooltip) until the channel is confirmed.
+        /// Gets the probe serial number label: the last confirmed probe, empty before the first confirmation.
         /// </summary>
-        public string? DeviceProbeTooltipText => _isChannelConfirmed && _colorimeter != null
-            ? string.Format(ProbeSerialNumberTooltip, _colorimeter.ProbeSN)
-            : null;
+        public string DeviceProbeSerialText =>
+            _colorimeter != null ? string.Format(ProbeSerialNumberLabel, _colorimeter.ProbeSN) : string.Empty;
 
         /// <summary>
         /// Gets or sets whether the inspector has confirmed the active channel after calibration.
@@ -246,9 +253,9 @@ namespace WPF_LCD_Test.ViewModels
                 {
                 if (SetProperty(ref _isChannelConfirmed, value))
                     {
-                    OnPropertyChanged(nameof(DeviceModelStatusText));
+                    OnPropertyChanged(nameof(DeviceModelName));
                     OnPropertyChanged(nameof(DeviceActiveChannelStatusText));
-                    OnPropertyChanged(nameof(DeviceProbeTooltipText));
+                    OnPropertyChanged(nameof(DeviceProbeSerialText));
                     }
                 }
             }

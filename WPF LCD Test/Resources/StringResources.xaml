@@ -27,6 +27,9 @@
     <system:String x:Key="ZeroCalibration">
         Zero Calibration
     </system:String>
+    <system:String x:Key="DeviceCardNoAnalyzer">No analyzer</system:String>
+    <system:String x:Key="DeviceCardPressCalibration">Press Zero Calibration</system:String>
+    <system:String x:Key="DeviceCardCalibrating">Calibrating…</system:String>
     <system:String x:Key="MeasurementTimeSec">
         Measurement time (s):
     </system:String>

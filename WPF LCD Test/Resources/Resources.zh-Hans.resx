@@ -540,11 +540,8 @@
   <data name="ErrAtChangeChannel" xml:space="preserve">
     <value>更改CA通道时出错：{0}</value>
   </data>
-  <data name="DeviceModelStatus" xml:space="preserve">
-    <value>设备：{0}</value>
-  </data>
   <data name="ActiveChannelStatus" xml:space="preserve">
-    <value>通道：{0}</value>
+    <value>通道 {0}</value>
   </data>
   <data name="ChannelMismatchTitle" xml:space="preserve">
     <value>通道不一致</value>
@@ -558,7 +555,16 @@
   <data name="UseLastChannel" xml:space="preserve">
     <value>使用上次通道 {0}</value>
   </data>
-  <data name="ProbeSerialNumberTooltip" xml:space="preserve">
-    <value>探头序列号：{0}</value>
+  <data name="ProbeSerialNumberLabel" xml:space="preserve">
+    <value>序列号 {0}</value>
+  </data>
+  <data name="DeviceStateNotConnected" xml:space="preserve">
+    <value>未连接</value>
+  </data>
+  <data name="DeviceStateConnectedNotCalibrated" xml:space="preserve">
+    <value>已连接（未校准）</value>
+  </data>
+  <data name="DeviceStateConnectedCalibrated" xml:space="preserve">
+    <value>已连接（已校准）</value>
   </data>
 </root>
