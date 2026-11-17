@@ -90,6 +90,7 @@
     <system:String x:Key="NewDeviceUnderTestButton">
         Save results
     </system:String>
+    <system:String x:Key="CopyLogWindow">Copy log</system:String>
     <system:String x:Key="ClearLogWindow">
         Clear log window
     </system:String>
@@ -99,6 +100,10 @@
     <system:String x:Key="UploadButton">
         Upload reports
     </system:String>
+
+    <system:String x:Key="ResultsTab">Results</system:String>
+    <system:String x:Key="LogTab">Log</system:String>
+    <system:String x:Key="ResultsColumnPoint">Point</system:String>
 
     <!--  Device info panel  -->
     <system:String x:Key="SpecPanelTitle">Device info</system:String>

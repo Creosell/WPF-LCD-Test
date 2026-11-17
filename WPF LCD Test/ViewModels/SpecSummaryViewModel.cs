@@ -24,7 +24,7 @@ namespace WPF_LCD_Test.ViewModels
             };
 
         private readonly IMeasurementStatusService _statusService;
-        private readonly Action<string> _log;
+        private readonly Action<string, LogSeverity> _log;
         private readonly Dictionary<string, SpecStatus> _loggedStatuses = [];
 
         private SpecEvaluation? _evaluation;
@@ -40,8 +40,8 @@ namespace WPF_LCD_Test.ViewModels
         /// Initializes a new instance of SpecSummaryViewModel.
         /// </summary>
         /// <param name="statusService">Service owning the statuses of the measurement buttons that receive the badges.</param>
-        /// <param name="log">Writes a line to the application log.</param>
-        public SpecSummaryViewModel(IMeasurementStatusService statusService, Action<string> log)
+        /// <param name="log">Writes a line with its severity to the application log.</param>
+        public SpecSummaryViewModel(IMeasurementStatusService statusService, Action<string, LogSeverity> log)
             {
             _statusService = statusService;
             _log = log;
@@ -222,7 +222,7 @@ namespace WPF_LCD_Test.ViewModels
                 bool isNew = !_loggedStatuses.TryGetValue(check.Key, out var previous) || previous != check.Status;
                 if (isRemark && isNew)
                     {
-                    _log(string.Format(Text("SpecLogLine"), Describe(check)));
+                    _log(string.Format(Text("SpecLogLine"), Describe(check)), check.Status == SpecStatus.Fail ? LogSeverity.Error : LogSeverity.Warning);
                     }
                 _loggedStatuses[check.Key] = check.Status;
                 }

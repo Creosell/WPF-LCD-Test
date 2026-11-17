@@ -122,12 +122,21 @@ namespace WPF_LCD_Test.Views
             {
                 // Выполняем прокрутку TextBox до конца
                 // Используем Dispatcher, чтобы прокрутка произошла после обновления UI
-                LogTextBox.Dispatcher.InvokeAsync(() =>
+                LogScrollViewer.Dispatcher.InvokeAsync(() =>
                 {
-                    LogTextBox.ScrollToEnd(); // Прокручиваем до конца LogTextBox
+                    LogScrollViewer.ScrollToEnd(); // Прокручиваем до конца журнала
                 }, System.Windows.Threading.DispatcherPriority.ContextIdle);
             }
             // TODO: Сохраните обработку изменений других свойств ViewModel, если необходимо
+        }
+
+        // --- Копирует весь журнал в буфер обмена ---
+        private void CopyLog_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is MeasurementViewModel viewModel && !string.IsNullOrEmpty(viewModel.LogText))
+            {
+                Clipboard.SetText(viewModel.LogText);
+            }
         }
 
         // --- Обработчик события запроса очистки фокуса ввода ---

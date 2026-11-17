@@ -795,6 +795,75 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             }
 
         [Test]
+        public async Task ExecuteMeasureAsync_AcceptedMeasurement_FillsTheResultsRowAndKeepsThePointResultOutOfTheLog()
+            {
+            _viewModel.ExecuteApplySerialNumber("SN12345");
+            _viewModel.IsDeviceConnected = true;
+            _viewModel.IsDeviceCalibrated = true;
+            var location = MeasurementLocation.WhiteColor.ToString();
+            _mockColorMeasurementService.Setup(s => s.MeasureAsync(It.IsAny<int>()))
+                .ReturnsAsync(new Measurement { Location = location, x = 0.3127, y = 0.3290, Lv = 100, T = 6500, IsValid = true });
+
+            await ((RelayCommand)_viewModel.MeasureCommand).ExecuteAsync(location);
+
+            var row = _viewModel.Results.Single(r => r.Location == location);
+            Assert.That((row.X, row.Y, row.Lv, row.T), Is.EqualTo(("0.313", "0.329", "100.0", "6500")));
+            Assert.That(_viewModel.LogText, Does.Not.Contain("x=0.313"));
+            }
+
+        [Test]
+        public async Task ExecuteMeasureAsync_FailedRetry_ClearsTheResultsRowAndLogsAWarning()
+            {
+            _viewModel.ExecuteApplySerialNumber("SN12345");
+            _viewModel.IsDeviceConnected = true;
+            _viewModel.IsDeviceCalibrated = true;
+            var location = MeasurementLocation.WhiteColor.ToString();
+            var good = new Measurement { Location = location, x = 0.3127, y = 0.3290, Lv = 100, T = 6500, IsValid = true };
+            var tooDark = new Measurement { Location = location, x = 0.3127, y = 0.3290, Lv = 1, T = 6500, IsValid = true };
+            _mockColorMeasurementService.SetupSequence(s => s.MeasureAsync(It.IsAny<int>())).ReturnsAsync(good).ReturnsAsync(tooDark);
+
+            await ((RelayCommand)_viewModel.MeasureCommand).ExecuteAsync(location);
+            await ((RelayCommand)_viewModel.MeasureCommand).ExecuteAsync(location);
+
+            var row = _viewModel.Results.Single(r => r.Location == location);
+            Assert.That(row.Lv, Is.EqualTo("—"));
+            Assert.That(_viewModel.LogEntries.Last().Severity, Is.EqualTo(LogSeverity.Warning));
+            }
+
+        [Test]
+        public void UnreadIssues_CountWarningsWhileTheLogTabIsHiddenAndResetWhenItOpens()
+            {
+            _mockDispatcher.Setup(d => d.CheckAccess()).Returns(true);
+            _viewModel.SelectedTabIndex = 1;
+            _viewModel.SelectedTabIndex = 0;
+            Assert.That(_viewModel.UnreadIssues, Is.EqualTo(0));
+
+            _mockColorMeasurementService.Raise(s => s.StatusMessage += null, _mockColorMeasurementService.Object, "info line");
+            Assert.That(_viewModel.UnreadIssues, Is.EqualTo(0), "informational lines are not counted");
+
+            _viewModel.Spec.Show(new SpecEvaluation(SpecVerdict.Warn, false,
+                [new SpecCheck("Brightness", 90, 100, 120, null, SpecStatus.Warning, ["WhiteColor"], [])]), 1, 14);
+            Assert.That(_viewModel.UnreadIssues, Is.EqualTo(1));
+
+            _viewModel.SelectedTabIndex = 1;
+            Assert.That(_viewModel.UnreadIssues, Is.EqualTo(0));
+
+            _viewModel.Spec.Show(new SpecEvaluation(SpecVerdict.Fail, false,
+                [new SpecCheck("Brightness", 50, 100, 120, null, SpecStatus.Fail, ["WhiteColor"], [])]), 1, 14);
+            Assert.That(_viewModel.UnreadIssues, Is.EqualTo(0), "nothing is unread while the log is open");
+            }
+
+        [Test]
+        public void StatusMessageMeasuring_IsNotWrittenToTheLog()
+            {
+            _mockDispatcher.Setup(d => d.CheckAccess()).Returns(true);
+
+            _mockColorMeasurementService.Raise(s => s.StatusMessage += null, _mockColorMeasurementService.Object, Resources.Resources.Measuring);
+
+            Assert.That(_viewModel.LogEntries.Select(e => e.Message), Does.Not.Contain(Resources.Resources.Measuring));
+            }
+
+        [Test]
         public async Task ExecuteMeasureAsync_InfiniteColorTemperature_IsShownAsNotAvailable()
             {
             _viewModel.ExecuteApplySerialNumber("SN12345");

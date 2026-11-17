@@ -10,6 +10,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
         {
         private MeasurementStatusService _statuses;
         private List<string> _log;
+        private List<LogSeverity> _severities;
         private SpecSummaryViewModel _summary;
         private CultureInfo _culture;
 
@@ -20,7 +21,12 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
             _statuses = new MeasurementStatusService();
             _log = [];
-            _summary = new SpecSummaryViewModel(_statuses, _log.Add);
+            _severities = [];
+            _summary = new SpecSummaryViewModel(_statuses, (message, severity) =>
+                {
+                _log.Add(message);
+                _severities.Add(severity);
+                });
             }
 
         [TearDown]
@@ -157,6 +163,16 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             _summary.Show(failure, 2, 13);
 
             Assert.That(_log, Is.EqualTo(new[] { "Spec: Brightness (cd/m²) 348 < typ 360", "Spec: Brightness (cd/m²) 300 < min 320" }));
+            }
+
+        [Test]
+        public void Show_LogsWarningsAndFailuresWithTheirSeverity()
+            {
+            _summary.Show(Evaluation(SpecVerdict.Fail, false,
+                Check("Brightness", 348, SpecStatus.Warning, 320, 360, null, "Center"),
+                Check("Red_x", 0.701, SpecStatus.Fail, 0.612, 0.672, 0.689, "RedColor")), 2, 13);
+
+            Assert.That(_severities, Is.EqualTo(new[] { LogSeverity.Warning, LogSeverity.Error }));
             }
 
         [Test]

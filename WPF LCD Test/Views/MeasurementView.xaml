@@ -277,6 +277,69 @@
             </Style.Triggers>
         </Style>
 
+        <!--  Row of the results table: the dot and the tint follow the status of the point  -->
+        <Style x:Key="ResultRowStyle" TargetType="Border">
+            <Setter Property="Margin" Value="0,1" />
+            <Setter Property="Padding" Value="6,2" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Background" Value="Transparent" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Status.IsPassed}" Value="False">
+                    <Setter Property="Background" Value="#33FF5252" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status.IsPassed}" Value="{x:Null}">
+                    <Setter Property="Opacity" Value="0.6" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsAvailable}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ResultDotStyle" TargetType="Ellipse">
+            <Setter Property="Width" Value="10" />
+            <Setter Property="Height" Value="10" />
+            <Setter Property="Margin" Value="0,0,10,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Fill" Value="#8A8A8A" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Status.IsPassed}" Value="True">
+                    <Setter Property="Fill" Value="#4CAF50" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status.IsPassed}" Value="False">
+                    <Setter Property="Fill" Value="#FF5252" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!--  Color of a log line by its severity  -->
+        <Style x:Key="LogMessageStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#E1E1E1" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Severity}" Value="Warning">
+                    <Setter Property="Foreground" Value="#FFC107" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Severity}" Value="Error">
+                    <Setter Property="Foreground" Value="#FF5252" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!--  Count of warnings and errors added while the Log tab was not shown  -->
+        <Style x:Key="UnreadBadgeStyle" TargetType="Border">
+            <Setter Property="MinWidth" Value="18" />
+            <Setter Property="Height" Value="18" />
+            <Setter Property="Margin" Value="8,0,0,0" />
+            <Setter Property="Padding" Value="4,0" />
+            <Setter Property="CornerRadius" Value="9" />
+            <Setter Property="Background" Value="#FF5252" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding UnreadIssues}" Value="0">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <Style x:Key="SpecDotStyle" TargetType="Ellipse">
             <Setter Property="Width" Value="10" />
             <Setter Property="Height" Value="10" />
@@ -766,33 +829,131 @@
                 <ColumnDefinition Width="48*" />
                 <ColumnDefinition Width="52*" />
             </Grid.ColumnDefinitions>
-            <TextBox
-                x:Name="LogTextBox"
+            <TabControl
                 Grid.Column="0"
-                MinHeight="200"
                 Margin="0,0,5,0"
-                AcceptsReturn="True"
+                Padding="0"
                 Background="#FF2A2828"
-                BorderBrush="White"
+                BorderBrush="{DynamicResource MaterialDesign.Brush.Primary}"
                 BorderThickness="1"
-                Foreground="White"
-                HorizontalScrollBarVisibility="Disabled"
-                IsReadOnly="True"
-                Text="{Binding LogText, Mode=OneWay}"
-                TextWrapping="Wrap"
-                VerticalScrollBarVisibility="Auto">
-                <TextBox.ContextMenu>
-                    <ContextMenu>
+                SelectedIndex="{Binding SelectedTabIndex}">
+                <TabControl.Resources>
+                    <Style BasedOn="{StaticResource MaterialDesignTabItem}" TargetType="TabItem">
+                        <Setter Property="Height" Value="32" />
+                        <Setter Property="Padding" Value="12,0" />
+                    </Style>
+                </TabControl.Resources>
 
-                        <MenuItem Command="ApplicationCommands.Cut" />
-                        <MenuItem Command="ApplicationCommands.Copy" />
-                        <MenuItem Command="ApplicationCommands.Paste" />
-                        <MenuItem Command="{Binding ClearLogCommand}" Header="{DynamicResource ClearLogWindow}" />
-                        <Separator />
-                        <MenuItem Command="ApplicationCommands.SelectAll" />
-                    </ContextMenu>
-                </TextBox.ContextMenu>
-            </TextBox>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock FontSize="14" Text="{DynamicResource ResultsTab}" />
+                    </TabItem.Header>
+                    <Grid Margin="8,4,8,6">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" Margin="6,0,6,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="58" />
+                                <ColumnDefinition Width="58" />
+                                <ColumnDefinition Width="72" />
+                                <ColumnDefinition Width="56" />
+                            </Grid.ColumnDefinitions>
+                            <Ellipse Width="10" Margin="0,0,10,0" Fill="Transparent" />
+                            <TextBlock
+                                Grid.Column="1"
+                                FontSize="12"
+                                Foreground="#B5FFFFFF"
+                                Text="{DynamicResource ResultsColumnPoint}" />
+                            <TextBlock Grid.Column="2" Margin="0,0,6,0" FontSize="12" Foreground="#B5FFFFFF" Text="x" TextAlignment="Right" />
+                            <TextBlock Grid.Column="3" Margin="0,0,6,0" FontSize="12" Foreground="#B5FFFFFF" Text="y" TextAlignment="Right" />
+                            <TextBlock Grid.Column="4" Margin="0,0,6,0" FontSize="12" Foreground="#B5FFFFFF" Text="Lv" TextAlignment="Right" />
+                            <TextBlock Grid.Column="5" Margin="0,0,6,0" FontSize="12" Foreground="#B5FFFFFF" Text="T" TextAlignment="Right" />
+                        </Grid>
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding Results}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource ResultRowStyle}" ToolTip="{Binding Status.MeasuredValuesToolTip}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="58" />
+                                                    <ColumnDefinition Width="58" />
+                                                    <ColumnDefinition Width="72" />
+                                                    <ColumnDefinition Width="56" />
+                                                </Grid.ColumnDefinitions>
+                                                <Ellipse Style="{StaticResource ResultDotStyle}" />
+                                                <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="13" Text="{Binding Name}" />
+                                                <TextBlock Grid.Column="2" Margin="0,0,6,0" VerticalAlignment="Center" FontSize="13" Text="{Binding X}" TextAlignment="Right" />
+                                                <TextBlock Grid.Column="3" Margin="0,0,6,0" VerticalAlignment="Center" FontSize="13" Text="{Binding Y}" TextAlignment="Right" />
+                                                <TextBlock Grid.Column="4" Margin="0,0,6,0" VerticalAlignment="Center" FontSize="13" Text="{Binding Lv}" TextAlignment="Right" />
+                                                <TextBlock Grid.Column="5" Margin="0,0,6,0" VerticalAlignment="Center" FontSize="13" Text="{Binding T}" TextAlignment="Right" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </TabItem>
+
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="14" Text="{DynamicResource LogTab}" />
+                            <Border Style="{StaticResource UnreadBadgeStyle}">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontSize="11"
+                                    FontWeight="Bold"
+                                    Foreground="#1E1E1E"
+                                    Text="{Binding UnreadIssues}" />
+                            </Border>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <ScrollViewer
+                        x:Name="LogScrollViewer"
+                        Margin="8,6"
+                        VerticalScrollBarVisibility="Auto">
+                        <ScrollViewer.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Click="CopyLog_Click" Header="{DynamicResource CopyLogWindow}" />
+                                <MenuItem Command="{Binding ClearLogCommand}" Header="{DynamicResource ClearLogWindow}" />
+                            </ContextMenu>
+                        </ScrollViewer.ContextMenu>
+                        <ItemsControl ItemsSource="{Binding LogEntries}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,1">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            Margin="0,0,10,0"
+                                            FontFamily="Consolas"
+                                            FontSize="13"
+                                            Foreground="#8A8A8A"
+                                            Text="{Binding TimeText}" />
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            FontSize="14"
+                                            Style="{StaticResource LogMessageStyle}"
+                                            Text="{Binding Message}"
+                                            TextWrapping="Wrap" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
             <Border
                 Grid.Column="1"
                 Margin="5,0,0,0"

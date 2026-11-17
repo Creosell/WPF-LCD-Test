@@ -51,6 +51,9 @@ namespace WPF_LCD_Test.ViewModels
         private bool _isUploadingReports;
         private string _logText = string.Empty;
         private int _logLineCount = 0;
+        private LogSeverity _pendingLogSeverity = LogSeverity.Info;
+        private int _selectedTabIndex;
+        private int _unreadIssues;
 
         private readonly Dictionary<string, DeviceConfigTreeNode> _configNodesByPath = [];
         private DeviceConfigTreeNode? _selectedConfigNode;
@@ -59,6 +62,7 @@ namespace WPF_LCD_Test.ViewModels
         private const int MAX_MEASUREMENT_ATTEMPTS_BEFORE_CONFIRM = 1;
         private const double COLOR_COORDINATES_TOLERANCE = 0.15;
         private const string PreviewSerialNumber = "preview";
+        private const int LogTabIndex = 1;
 
         private static readonly Dictionary<string, (double x, double y)> primariesNTSC = new()
         {
@@ -101,7 +105,10 @@ namespace WPF_LCD_Test.ViewModels
             set
                 {
                 if (SetProperty(ref _isTvCheckboxChecked, value))
+                    {
+                    RefreshResults();
                     RequestSpecCheck();
+                    }
                 }
             }
 
@@ -193,6 +200,38 @@ namespace WPF_LCD_Test.ViewModels
             {
             get => _logText;
             set => SetProperty(ref _logText, value);
+            }
+
+        /// <summary>
+        /// Gets the log entries shown in the Log tab (the text of the same entries is <see cref="LogText"/>).
+        /// </summary>
+        public ObservableCollection<LogEntry> LogEntries { get; } = [];
+
+        /// <summary>
+        /// Gets the per-point values of the Results tab.
+        /// </summary>
+        public ObservableCollection<MeasurementResultRow> Results { get; }
+
+        /// <summary>
+        /// Gets or sets the selected tab of the left block: 0 - Results, 1 - Log. Opening the log clears the unread counter.
+        /// </summary>
+        public int SelectedTabIndex
+            {
+            get => _selectedTabIndex;
+            set
+                {
+                if (SetProperty(ref _selectedTabIndex, value) && value == LogTabIndex)
+                    UnreadIssues = 0;
+                }
+            }
+
+        /// <summary>
+        /// Gets the number of warnings and errors added to the log while the Log tab was not shown.
+        /// </summary>
+        public int UnreadIssues
+            {
+            get => _unreadIssues;
+            private set => SetProperty(ref _unreadIssues, value);
             }
 
         public bool IsMeasurementButtonsEnabled
@@ -337,7 +376,8 @@ namespace WPF_LCD_Test.ViewModels
             _analyzerRegistryService = analyzerRegistryService ?? throw new ArgumentNullException(nameof(analyzerRegistryService));
             _specEvaluationService = specEvaluationService ?? throw new ArgumentNullException(nameof(specEvaluationService));
             _logHandler = new LogHandler(_localizationService, AddLogMessage);
-            Spec = new SpecSummaryViewModel(_measurementStatusService, AddLogMessage);
+            Spec = new SpecSummaryViewModel(_measurementStatusService, AppendToLog);
+            Results = new(( _measurementStatusService.AllMeasurementButtonStatuses ?? [] ).Select(status => new MeasurementResultRow(status)));
 
             ZeroCalibrationCommand = new RelayCommand(ExecuteZeroCalibrationAsync, CanExecuteZeroCalibration);
             SaveResultsCommand = new RelayCommand(ExecuteSaveResultsAsync, CanExecuteSaveResults);
@@ -359,8 +399,8 @@ namespace WPF_LCD_Test.ViewModels
             _uploadService.StatusMessage += UploadService_StatusMessage;
             _localizationService.LanguageChanged += LocalizationService_LanguageChanged;
 
-            Log(WelcomeMessage);
             InitializeDeviceConfigurations();
+            RefreshResults();
             RequestSpecCheck();
             UpdateUIState();
             }
@@ -387,11 +427,11 @@ namespace WPF_LCD_Test.ViewModels
                     DeviceConfigurationTree.Add(node);
 
                 if (FindFirstConfiguration(DeviceConfigurationTree) == null)
-                    Log(ConfigDirNotFound, [_pathProvider.ConfigDirectory]);
+                    Log(ConfigDirNotFound, [_pathProvider.ConfigDirectory], LogSeverity.Error);
                 }
             catch (Exception ex)
                 {
-                Log(ErrUnexpected, [ex.Message]);
+                Log(ErrUnexpected, [ex.Message], LogSeverity.Error);
                 }
             }
 
@@ -678,7 +718,7 @@ namespace WPF_LCD_Test.ViewModels
                 }
             catch (Exception ex)
                 {
-                Log(ErrUnexpected, [ex.Message]);
+                Log(ErrUnexpected, [ex.Message], LogSeverity.Error);
                 _dialogService.ShowMessage($"{SaveJSONErrForSN}: {ex.Message}", $"{Err}");
                 return false;
                 }
@@ -754,7 +794,7 @@ namespace WPF_LCD_Test.ViewModels
                 else
                     {
                     messageWithMeasuredValues = measurement != null ? $"{InvalidResultErr}" : $"{ColorAnalyzerErr}";
-                    Log(ColorServiceErr, [measurementLocation]);
+                    Log(ColorServiceErr, [measurementLocation], LogSeverity.Error);
                     }
                 }
             catch (Exception ex)
@@ -767,6 +807,7 @@ namespace WPF_LCD_Test.ViewModels
                 UpdateMeasurementStatus(measurementLocation, isMeasurementSuccess, messageWithMeasuredValues);
                 UpdateCommandsCanExecute();
                 if (!isMeasurementSuccess) _currentDevice?.RemoveMeasurement(measurementLocation);
+                RefreshResults();
                 RequestSpecCheck();
                 }
             }
@@ -804,7 +845,7 @@ namespace WPF_LCD_Test.ViewModels
                 catch (ArgumentException ex)
                     {
                     IsSerialNumberConfirmed = false;
-                    Log(ErrWithArg, [ex.Message]);
+                    Log(ErrWithArg, [ex.Message], LogSeverity.Error);
                     _dialogService.ShowMessage(ex.Message, $"{Err} SN");
                     SerialNumber = "";
                     _currentDevice = null;
@@ -833,6 +874,8 @@ namespace WPF_LCD_Test.ViewModels
         public void ExecuteClearLog()
             {
             LogText = string.Empty;
+            LogEntries.Clear();
+            UnreadIssues = 0;
             _logLineCount = 0;
             }
 
@@ -848,7 +891,7 @@ namespace WPF_LCD_Test.ViewModels
 
                 if (!File.Exists(exePath))
                     {
-                    Log(RunExternalAppNotFoundErr, [exePath]);
+                    Log(RunExternalAppNotFoundErr, [exePath], LogSeverity.Error);
                     return;
                     }
 
@@ -881,7 +924,7 @@ namespace WPF_LCD_Test.ViewModels
                         }
                     catch (Exception ex)
                         {
-                        Log(ErrorInBackgroundTask, [ex.Message]);
+                        Log(ErrorInBackgroundTask, [ex.Message], LogSeverity.Error);
                         }
                     finally
                         {
@@ -891,7 +934,7 @@ namespace WPF_LCD_Test.ViewModels
                 }
             catch (Exception ex)
                 {
-                Log(RunExternalAppUnexpectedErr, [ex.Message]);
+                Log(RunExternalAppUnexpectedErr, [ex.Message], LogSeverity.Error);
                 IsReportGenerating = false;
                 }
             }
@@ -914,7 +957,7 @@ namespace WPF_LCD_Test.ViewModels
                 {
                 if (!await _uploadService.UploadReportsAsync())
                     {
-                    Log(UploadFailed);
+                    Log(UploadFailed, severity: LogSeverity.Error);
                     }
                 }
             finally
@@ -964,7 +1007,8 @@ namespace WPF_LCD_Test.ViewModels
                 string retryMsg = $"{validationMessage} \n{PleaseTryToMeasureAgain}";
                 _dialogService.ShowMessage(retryMsg, $"{Warning}");
                 message = $"{FailedMeasurementForLocation}: {measurement.Location}.\n ({Attempt} {currentAttempt + 1}). {PleaseTryToMeasureAgain}";
-                Log(message);
+                string logMessage = $"{FailedMeasurementForLocation}: {measurement.Location}. {validationMessage.Replace('\n', ' ')}";
+                Log(logMessage, severity: LogSeverity.Warning);
                 }
             else
                 {
@@ -987,11 +1031,10 @@ namespace WPF_LCD_Test.ViewModels
             {
             var (x, y, Lv, T) = FormatMeasurement(measurement);
             message = $"x={x}, y={y}, Lv={Lv}, T={T}";
-            Log(MeasurementResult, [measurement.Location, message]);
             _currentDevice!.AddMeasurement(measurement);
             }
 
-        private static (string x, string y, string Lv, string T) FormatMeasurement(Measurement measurement)
+        internal static (string x, string y, string Lv, string T) FormatMeasurement(Measurement measurement)
             {
             return (
                 measurement.x.ToString("F3", CultureInfo.InvariantCulture),
@@ -1062,16 +1105,26 @@ namespace WPF_LCD_Test.ViewModels
         /// </summary>
         public void ClearAllAttemptCounts() => _measurementAttemptCountersMap.Clear();
 
-        private void Log(string messageOrKey, object[]? args = null, [CallerArgumentExpression(nameof(messageOrKey))] string? resourceName = null) =>
-            _logHandler.Log(messageOrKey, args, resourceName);
+        private void Log(string messageOrKey, object[]? args = null, LogSeverity severity = LogSeverity.Info, [CallerArgumentExpression(nameof(messageOrKey))] string? resourceName = null)
+            {
+            _pendingLogSeverity = severity;
+            try
+                {
+                _logHandler.Log(messageOrKey, args, resourceName);
+                }
+            finally
+                {
+                _pendingLogSeverity = LogSeverity.Info;
+                }
+            }
 
-        private void AddLogMessage(string message) => AppendToLog(message);
+        private void AddLogMessage(string message) => AppendToLog(message, _pendingLogSeverity);
 
         /// <summary>
         /// Appends a message to the log with automatic cleanup of old entries.
         /// Limits log to last 500 lines to prevent memory issues.
         /// </summary>
-        private void AppendToLog(string message)
+        private void AppendToLog(string message, LogSeverity severity = LogSeverity.Info)
             {
             if (string.IsNullOrEmpty(message)) return;
 
@@ -1087,7 +1140,12 @@ namespace WPF_LCD_Test.ViewModels
                 _logLineCount = maxLines;
                 }
 
-            LogText += $"{DateTime.Now:HH:mm:ss} {message}{Environment.NewLine}";
+            var entry = new LogEntry(DateTime.Now, message, severity);
+            if (LogEntries.Count >= maxLines) LogEntries.RemoveAt(0);
+            LogEntries.Add(entry);
+            if (severity != LogSeverity.Info && SelectedTabIndex != LogTabIndex) UnreadIssues++;
+
+            LogText += $"{entry.TimeText} {message}{Environment.NewLine}";
             }
 
         private void UpdateUIState()
@@ -1117,7 +1175,7 @@ namespace WPF_LCD_Test.ViewModels
                 }
             else
                 {
-                Log(MeasButStatusErr, [location]);
+                Log(MeasButStatusErr, [location], LogSeverity.Error);
                 }
             }
 
@@ -1173,12 +1231,29 @@ namespace WPF_LCD_Test.ViewModels
                 if (error != _lastSpecError)
                     {
                     _lastSpecError = error;
-                    AddLogMessage(string.Format(ResourceManager.GetString("SpecUnavailable")!, error));
+                    AppendToLog(string.Format(ResourceManager.GetString("SpecUnavailable")!, error), LogSeverity.Warning);
                     }
             });
             }
 
-        private void LocalizationService_LanguageChanged(object? sender, EventArgs e) => Spec.Refresh();
+        private void LocalizationService_LanguageChanged(object? sender, EventArgs e)
+            {
+            Spec.Refresh();
+            RefreshResults();
+            }
+
+        /// <summary>
+        /// Updates the results table from the measurements of the current device.
+        /// </summary>
+        private void RefreshResults()
+            {
+            foreach (var row in Results)
+                {
+                row.IsAvailable = row.Location != nameof(MeasurementLocation.WhiteColor) || IsTvCheckboxChecked;
+                row.Show(_currentDevice?.Measurements.FirstOrDefault(m => m.Location == row.Location));
+                row.RefreshName();
+                }
+            }
 
         private void ResetMeasurementStatuses()
             {
@@ -1189,6 +1264,7 @@ namespace WPF_LCD_Test.ViewModels
                 status.SpecRemark = SpecStatus.Pass;
                 status.SpecTooltip = "";
                 }
+            RefreshResults();
             }
 
         private void ExecuteThreadInUI(Action action)
@@ -1250,8 +1326,11 @@ namespace WPF_LCD_Test.ViewModels
 
         #region Event Handlers
 
-        private void ColorMeasurementService_StatusMessage(object? sender, string message) =>
+        private void ColorMeasurementService_StatusMessage(object? sender, string message)
+            {
+            if (message == Measuring) return;
             ExecuteThreadInUI(() => AddLogMessage(message));
+            }
 
         private void FileService_StatusMessage(object? sender, string message) =>
             ExecuteThreadInUI(() => AddLogMessage(message));
