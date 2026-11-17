@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Optional `Colorimeter` object (`Model`, `ProbeSN`, `Channel`) in the device JSON header, filled once after calibration; files without it keep the previous format
 
 ### Changed
-- The application is built as x64; the CA-SDK2 native DLLs are copied next to the executable
+- The application is built as x64; the CA-SDK2 libraries are not shipped: they are located in the installed CA-S40 package (registry install location, then the default folder) and the CA-410 driver is skipped when the package is absent
 - CA-310 wrapper classes renamed to `Ca310*` (`ColorAnalyzerWrappers.cs` -> `Ca310Wrappers.cs`)
 
 ### Removed

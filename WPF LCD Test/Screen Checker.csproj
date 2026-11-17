@@ -55,9 +55,8 @@
   <ItemGroup>
 	<Reference Include="CASDK2Net">
 	  <HintPath>$(CASDK2Dir)\CASDK2Net.dll</HintPath>
-	  <Private>true</Private>
+	  <Private>false</Private>
 	</Reference>
-	<None Include="$(CASDK2Dir)\CASDK2.dll;$(CASDK2Dir)\CASDK2Comm.dll;$(CASDK2Dir)\CASDK2Socket.dll;$(CASDK2Dir)\CASDK2Calc.dll" CopyToOutputDirectory="PreserveNewest" Link="%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>

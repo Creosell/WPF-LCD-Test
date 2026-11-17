@@ -1,4 +1,6 @@
 ﻿using System.Runtime.InteropServices;
+using System.IO;
+using System.Runtime.CompilerServices;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
 using WPF_LCD_Test.Wrappers;
@@ -112,10 +114,21 @@ namespace WPF_LCD_Test.Services
             {
             _analyzerFactories =
                 [
-                () => new Ca410AnalyzerWrapper(),
+                CreateCa410Analyzer,
                 () => new Ca310AnalyzerWrapper()
                 ];
             }
+
+        /// <summary>
+        /// Creates the CA-410 driver once the CA-SDK2 libraries are located. Kept out of the lambda so the SDK types
+        /// are not loaded before the libraries are registered.
+        /// </summary>
+        /// <exception cref="FileNotFoundException">Thrown when CA-SDK2 is not installed.</exception>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static IColorAnalyzer200 CreateCa410Analyzer() =>
+            Ca410SdkLoader.TryInitialize()
+                ? new Ca410AnalyzerWrapper()
+                : throw new FileNotFoundException("CA-SDK2 is not installed (CA-S40 setup)");
 
         /// <summary>
         /// Initializes a new instance of ColorMeasurementService with dependency injection for testing.

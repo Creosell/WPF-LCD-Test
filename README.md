@@ -73,7 +73,7 @@ Desktop application for automated testing of LCD display color characteristics u
 
 1. Download the latest release from the releases page
 2. Extract the archive to your desired location
-3. Ensure Konica Minolta CA-SDK2 is installed
+3. Install the Konica Minolta CA-S40 setup (includes CA-SDK2 for the CA-410 and the USB driver) and, for the CA-310, the CA-SDK; the application locates the CA-SDK2 libraries in the CA-S40 install folder and works with the CA-310 only when it is absent
 4. Run `Screen Checker.exe`
 
 ### For Developers
