@@ -963,7 +963,7 @@ namespace WPF_LCD_Test.ViewModels
                 measurement.Location == MeasurementLocation.BlackColor.ToString()
                     ? measurement.Lv.ToString("F6", CultureInfo.InvariantCulture)
                     : measurement.Lv.ToString("F1", CultureInfo.InvariantCulture),
-                measurement.T.ToString("F0", CultureInfo.InvariantCulture)
+                double.IsFinite(measurement.T) ? measurement.T.ToString("F0", CultureInfo.InvariantCulture) : "—"
             );
             }
 

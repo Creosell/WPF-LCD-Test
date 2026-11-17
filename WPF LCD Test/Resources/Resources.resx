@@ -124,7 +124,7 @@
     <value>Calibrating zero...</value>
   </data>
   <data name="CheckConnectionCA" xml:space="preserve">
-    <value>Check the connection of the CA-310 color analyzer. Try reboot it and run zero calibration again</value>
+    <value>Check the connection of the color analyzer. Try reboot it and run zero calibration again</value>
   </data>
   <data name="CheckProbe" xml:space="preserve">
     <value>Check probe! Maybe need to change mode from 0-CAL to MEAS</value>
@@ -139,10 +139,10 @@
     <value>Connected</value>
   </data>
   <data name="ConnectingCA" xml:space="preserve">
-    <value>Connecting to CA-310...</value>
+    <value>Connecting to the color analyzer...</value>
   </data>
   <data name="ConnectionReleasedCA" xml:space="preserve">
-    <value>Connection to CA-310 released</value>
+    <value>Connection to the color analyzer released</value>
   </data>
   <data name="CurrentMeasurementTime" xml:space="preserve">
     <value>Current measurement time is</value>
@@ -283,13 +283,13 @@
     <value>Connection failed or ended with an error</value>
   </data>
   <data name="DisconnectingCA" xml:space="preserve">
-    <value>Disconnecting CA-310...</value>
+    <value>Disconnecting the color analyzer...</value>
   </data>
   <data name="DisconnectedCA" xml:space="preserve">
     <value>Disconnected</value>
   </data>
   <data name="MeasureWihoutConnectionError" xml:space="preserve">
-    <value>Please, connect CA-310 first</value>
+    <value>Please, connect the color analyzer first</value>
   </data>
   <data name="LocalizationServiceKeyErr" xml:space="preserve">
     <value>LocalisationService Error: ResourceManager for key</value>

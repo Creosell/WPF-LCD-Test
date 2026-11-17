@@ -241,7 +241,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Check the connection of the CA-310 color analyzer. Try reboot it and run zero calibration again.
+        ///   Looks up a localized string similar to Check the connection of the color analyzer. Try reboot it and run zero calibration again.
         /// </summary>
         public static string CheckConnectionCA {
             get {
@@ -367,7 +367,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Connecting to CA-310....
+        ///   Looks up a localized string similar to Connecting to the color analyzer....
         /// </summary>
         public static string ConnectingCA {
             get {
@@ -385,7 +385,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Connection to CA-310 released.
+        ///   Looks up a localized string similar to Connection to the color analyzer released.
         /// </summary>
         public static string ConnectionReleasedCA {
             get {
@@ -511,7 +511,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Disconnecting CA-310....
+        ///   Looks up a localized string similar to Disconnecting the color analyzer....
         /// </summary>
         public static string DisconnectingCA {
             get {
@@ -862,7 +862,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please, connect CA-310 first.
+        ///   Looks up a localized string similar to Please, connect the color analyzer first.
         /// </summary>
         public static string MeasureWihoutConnectionError {
             get {

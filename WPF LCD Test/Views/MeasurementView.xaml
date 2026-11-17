@@ -11,6 +11,7 @@
     d:DataContext="{d:DesignInstance Type=viewmodels:MeasurementViewModel}"
     Background="#FF424242"
     Focusable="True"
+    FocusVisualStyle="{x:Null}"
     FontSize="15"
     Foreground="White"
     PreviewKeyDown="UserControl_PreviewKeyDown"
