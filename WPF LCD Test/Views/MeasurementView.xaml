@@ -826,8 +826,8 @@
 
         <Grid Grid.Row="1" MinHeight="200" Margin="0,5,5,5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="48*" />
-                <ColumnDefinition Width="52*" />
+                <ColumnDefinition Width="45*" />
+                <ColumnDefinition Width="55*" />
             </Grid.ColumnDefinitions>
             <TabControl
                 Grid.Column="0"
@@ -841,6 +841,7 @@
                     <Style BasedOn="{StaticResource MaterialDesignTabItem}" TargetType="TabItem">
                         <Setter Property="Height" Value="32" />
                         <Setter Property="Padding" Value="12,0" />
+                        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
                     </Style>
                 </TabControl.Resources>
 
@@ -848,7 +849,7 @@
                     <TabItem.Header>
                         <TextBlock FontSize="14" Text="{DynamicResource ResultsTab}" />
                     </TabItem.Header>
-                    <Grid Margin="8,4,8,6">
+                    <Grid Margin="8,4,8,6" Grid.IsSharedSizeScope="True">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
@@ -856,11 +857,11 @@
                         <Grid Grid.Row="0" Margin="6,0,6,2">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="58" />
-                                <ColumnDefinition Width="58" />
-                                <ColumnDefinition Width="72" />
-                                <ColumnDefinition Width="56" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="ResultName" />
+                                <ColumnDefinition Width="50" />
+                                <ColumnDefinition Width="50" />
+                                <ColumnDefinition Width="60" />
+                                <ColumnDefinition Width="44" />
                             </Grid.ColumnDefinitions>
                             <Ellipse Width="10" Margin="0,0,10,0" Fill="Transparent" />
                             <TextBlock
@@ -881,11 +882,11 @@
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="58" />
-                                                    <ColumnDefinition Width="58" />
-                                                    <ColumnDefinition Width="72" />
-                                                    <ColumnDefinition Width="56" />
+                                                    <ColumnDefinition Width="Auto" SharedSizeGroup="ResultName" />
+                                                    <ColumnDefinition Width="50" />
+                                                    <ColumnDefinition Width="50" />
+                                                    <ColumnDefinition Width="60" />
+                                                    <ColumnDefinition Width="44" />
                                                 </Grid.ColumnDefinitions>
                                                 <Ellipse Style="{StaticResource ResultDotStyle}" />
                                                 <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="13" Text="{Binding Name}" />

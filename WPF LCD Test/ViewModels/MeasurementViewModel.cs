@@ -1329,14 +1329,29 @@ namespace WPF_LCD_Test.ViewModels
         private void ColorMeasurementService_StatusMessage(object? sender, string message)
             {
             if (message == Measuring) return;
-            ExecuteThreadInUI(() => AddLogMessage(message));
+            ExecuteThreadInUI(() => AppendToLog(message, ServiceMessageSeverity(message)));
             }
 
         private void FileService_StatusMessage(object? sender, string message) =>
-            ExecuteThreadInUI(() => AddLogMessage(message));
+            ExecuteThreadInUI(() => AppendToLog(message, ServiceMessageSeverity(message)));
 
         private void UploadService_StatusMessage(object? sender, string message) =>
-            ExecuteThreadInUI(() => AddLogMessage(message));
+            ExecuteThreadInUI(() => AppendToLog(message, ServiceMessageSeverity(message)));
+
+        /// <summary>
+        /// Tells whether a message coming from a service reports a failure, by the localized prefix of its error texts.
+        /// </summary>
+        private static LogSeverity ServiceMessageSeverity(string message)
+            {
+            string[] errorPrefixes =
+                [
+                ConnectionError, CheckConnectionCA, ErrAtCalibration, ErrorAtMeasuringIteration, MeasureWihoutConnectionError,
+                SaveJSONErrDeviceIsEmpty, SaveJSONErrForSN, WorkingFolderInitErr, CsvSnErr, CsvDataErr, CsvLocationErr, ErrCSV, UploadFailed
+                ];
+            return errorPrefixes.Any(prefix => !string.IsNullOrEmpty(prefix) && message.StartsWith(prefix, StringComparison.Ordinal))
+                ? LogSeverity.Error
+                : LogSeverity.Info;
+            }
 
         private void ColorMeasurementService_CalibrationStatusChanged(object? sender, bool isCalibrated) =>
             ExecuteThreadInUI(() => { IsDeviceCalibrated = isCalibrated; UpdateUIState(); });

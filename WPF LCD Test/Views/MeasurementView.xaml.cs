@@ -249,6 +249,7 @@ namespace WPF_LCD_Test.Views
                         current is CheckBox ||   // Флажок
                         current is RadioButton || // Переключатель
                         current is Slider ||     // Слайдер
+                        current is TabItem || // Заголовок вкладки
                         current is ScrollBar  // Полоса прокрутки
                                               // Можете добавить другие типы контролов, если это необходимо
                                               // Например: current is DataGrid, current is TabControl и т.д.
