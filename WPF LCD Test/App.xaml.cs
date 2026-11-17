@@ -31,6 +31,7 @@ namespace WPF_LCD_Test
             services.AddSingleton<ISettingsService, SettingsService>();
             services.AddSingleton<ILocalizationService, LocalizationService>();
             services.AddSingleton<IMeasurementStatusService, MeasurementStatusService>();
+            services.AddSingleton<IAnalyzerRegistryService, AnalyzerRegistryService>();
 
             // Application services
             services.AddSingleton<IColorMeasurementService, ColorMeasurementService>();

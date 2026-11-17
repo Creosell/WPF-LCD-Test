@@ -540,4 +540,25 @@
   <data name="ErrAtChangeChannel" xml:space="preserve">
     <value>Error while changing CA channel: {0}</value>
   </data>
+  <data name="DeviceModelStatus" xml:space="preserve">
+    <value>Device: {0}</value>
+  </data>
+  <data name="ActiveChannelStatus" xml:space="preserve">
+    <value>Channel: {0}</value>
+  </data>
+  <data name="ChannelMismatchTitle" xml:space="preserve">
+    <value>Channel mismatch</value>
+  </data>
+  <data name="ChannelMismatchMessage" xml:space="preserve">
+    <value>Last time this probe was used on channel {0}, but the device is currently set to channel {1}.</value>
+  </data>
+  <data name="UseProbeChannel" xml:space="preserve">
+    <value>Use channel {0} from probe</value>
+  </data>
+  <data name="UseLastChannel" xml:space="preserve">
+    <value>Use last used channel {0}</value>
+  </data>
+  <data name="ProbeSerialNumberTooltip" xml:space="preserve">
+    <value>Probe S/N: {0}</value>
+  </data>
 </root>

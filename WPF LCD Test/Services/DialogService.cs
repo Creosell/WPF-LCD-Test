@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using WPF_LCD_Test.Interfaces;
+using WPF_LCD_Test.Views;
 using WPF_LCD_Test.Wrappers;
 
 namespace WPF_LCD_Test.Services
@@ -41,5 +42,25 @@ namespace WPF_LCD_Test.Services
         /// <param name="caption">Dialog window caption.</param>
         public void ShowMessage(string message, string caption) =>
             _messageBox.Show(message, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+
+        /// <summary>
+        /// Displays a modal dialog with two custom-labelled buttons.
+        /// </summary>
+        /// <param name="message">Message text.</param>
+        /// <param name="caption">Dialog window caption.</param>
+        /// <param name="firstOption">Caption of the first button.</param>
+        /// <param name="secondOption">Caption of the second button.</param>
+        /// <returns>0 or 1 for the chosen button; null if the dialog was closed without a choice.</returns>
+        public int? ShowChoice(string message, string caption, string firstOption, string secondOption)
+            {
+            var dialog = new ChoiceDialogWindow(message, caption, firstOption, secondOption);
+            if (Application.Current?.MainWindow is { IsVisible: true } owner)
+                {
+                dialog.Owner = owner;
+                }
+
+            dialog.ShowDialog();
+            return dialog.SelectedOption;
+            }
         }
     }

@@ -898,6 +898,69 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Probe S/N: {0}.
+        /// </summary>
+        public static string ProbeSerialNumberTooltip {
+            get {
+                return ResourceManager.GetString("ProbeSerialNumberTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Channel mismatch.
+        /// </summary>
+        public static string ChannelMismatchTitle {
+            get {
+                return ResourceManager.GetString("ChannelMismatchTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Last time this probe was used on channel {0}, but the device is currently set to channel {1}..
+        /// </summary>
+        public static string ChannelMismatchMessage {
+            get {
+                return ResourceManager.GetString("ChannelMismatchMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use channel {0} from probe.
+        /// </summary>
+        public static string UseProbeChannel {
+            get {
+                return ResourceManager.GetString("UseProbeChannel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use last used channel {0}.
+        /// </summary>
+        public static string UseLastChannel {
+            get {
+                return ResourceManager.GetString("UseLastChannel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Device: {0}.
+        /// </summary>
+        public static string DeviceModelStatus {
+            get {
+                return ResourceManager.GetString("DeviceModelStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Channel: {0}.
+        /// </summary>
+        public static string ActiveChannelStatus {
+            get {
+                return ResourceManager.GetString("ActiveChannelStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please, try to measure again.
         /// </summary>
         public static string PleaseTryToMeasureAgain {

@@ -22,6 +22,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
         private Mock<ISettingsService> _mockSettingsService;
         private Mock<IPathProvider> _mockPathProvider;
         private Mock<IMeasurementStatusService> _mockMeasurementStatusService;
+        private Mock<IAnalyzerRegistryService> _mockAnalyzerRegistryService;
         private MeasurementViewModel _viewModel;
 
         [SetUp]
@@ -36,6 +37,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             _mockSettingsService = new Mock<ISettingsService>();
             _mockPathProvider = new Mock<IPathProvider>();
             _mockMeasurementStatusService = new Mock<IMeasurementStatusService>();
+            _mockAnalyzerRegistryService = new Mock<IAnalyzerRegistryService>();
 
             // Setup PathProvider
             _mockPathProvider.Setup(p => p.BaseDirectory).Returns("C:\\TestApp");
@@ -73,7 +75,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
                 _mockUploadService.Object,
                 _mockSettingsService.Object,
                 _mockPathProvider.Object,
-                _mockMeasurementStatusService.Object
+                _mockMeasurementStatusService.Object,
+                _mockAnalyzerRegistryService.Object
             );
 
             // Сбрасываем статический счетчик попыток измерений между тестами
@@ -373,23 +376,130 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             _mockColorMeasurementService.Verify(s => s.Disconnect(), Times.Once);
             }
 
-        [Test]
-        public async Task ExecuteZeroCalibrationAsync_QAProbe_SwitchesChannel()
+        private void SetupCalibratedProbe(string probeSN, int deviceChannel)
             {
-            // Arrange
             _mockColorMeasurementService.SetupGet(s => s.IsDeviceConnected).Returns(true);
             _mockColorMeasurementService.Setup(s => s.CalibrateZeroAsync()).ReturnsAsync(true);
-            _mockColorMeasurementService.SetupGet(s => s.ProbeSN).Returns("08954195"); // QA Probe
-            _mockColorMeasurementService.SetupGet(s => s.CurrentChannel).Returns(5);
-            _mockColorMeasurementService.SetupSet(s => s.CurrentChannel = 1).Verifiable();
+            _mockColorMeasurementService.SetupGet(s => s.ProbeSN).Returns(probeSN);
+            _mockColorMeasurementService.SetupGet(s => s.CurrentChannel).Returns(deviceChannel);
+            _mockColorMeasurementService.SetupGet(s => s.Model).Returns(ColorAnalyzerModel.CA410);
+            }
+
+        [Test]
+        public async Task ExecuteZeroCalibrationAsync_UnknownProbe_RegistersChannelWithoutDialog()
+            {
+            // Arrange
+            SetupCalibratedProbe("81026182", 2);
+            _mockAnalyzerRegistryService.Setup(r => r.GetLastChannel("81026182")).Returns((int?)null);
 
             // Act
             await ((RelayCommand)_viewModel.ZeroCalibrationCommand).ExecuteAsync(null);
 
             // Assert
-            _mockColorMeasurementService.VerifySet(s => s.CurrentChannel = 1, Times.Once);
-            _mockSettingsService.Verify(s => s.UpdateChannel(1), Times.Once);
-            _mockDialogService.Verify(d => d.ShowMessage(It.Is<string>(msg => msg.Contains("QA CA-310")), It.IsAny<string>()), Times.Once);
+            _mockDialogService.Verify(d => d.ShowChoice(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _mockAnalyzerRegistryService.Verify(r => r.Update("81026182", ColorAnalyzerModel.CA410, 2), Times.Once);
+            _mockSettingsService.Verify(s => s.UpdateChannel(2), Times.Once);
+            Assert.That(_viewModel.IsChannelConfirmed, Is.True);
+            StringAssert.Contains("81026182", _viewModel.DeviceProbeTooltipText);
+            }
+
+        [Test]
+        public void DeviceProbeTooltipText_BeforeChannelConfirmed_IsNull()
+            {
+            Assert.That(_viewModel.DeviceProbeTooltipText, Is.Null);
+            }
+
+        [Test]
+        public async Task ExecuteZeroCalibrationAsync_ConfirmedChannel_FillsColorimeterOfDevices()
+            {
+            // Arrange
+            SetupCalibratedProbe("81026182", 2);
+            _mockAnalyzerRegistryService.Setup(r => r.GetLastChannel("81026182")).Returns((int?)null);
+            _viewModel.ExecuteApplySerialNumber("SN12345");
+
+            // Act
+            await ((RelayCommand)_viewModel.ZeroCalibrationCommand).ExecuteAsync(null);
+            var expected = new ColorimeterInfo("CA-410", "81026182", 2);
+
+            // Assert
+            Assert.That(_viewModel.CurrentDevice!.Colorimeter, Is.EqualTo(expected), "Device created before calibration receives the colorimeter.");
+
+            _viewModel.CurrentDevice = null;
+            _viewModel.ExecuteApplySerialNumber("SN67890");
+            Assert.That(_viewModel.CurrentDevice!.Colorimeter, Is.EqualTo(expected), "Device created after calibration receives the colorimeter.");
+            }
+
+        [Test]
+        public async Task ExecuteZeroCalibrationAsync_SameChannelAsRegistry_DoesNotShowDialog()
+            {
+            // Arrange
+            SetupCalibratedProbe("81026182", 2);
+            _mockAnalyzerRegistryService.Setup(r => r.GetLastChannel("81026182")).Returns(2);
+
+            // Act
+            await ((RelayCommand)_viewModel.ZeroCalibrationCommand).ExecuteAsync(null);
+
+            // Assert
+            _mockDialogService.Verify(d => d.ShowChoice(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _mockAnalyzerRegistryService.Verify(r => r.Update("81026182", ColorAnalyzerModel.CA410, 2), Times.Once);
+            }
+
+        [Test]
+        public async Task ExecuteZeroCalibrationAsync_ChannelMismatch_ProbeChoiceKeepsDeviceChannel()
+            {
+            // Arrange
+            SetupCalibratedProbe("81026182", 2);
+            _mockAnalyzerRegistryService.Setup(r => r.GetLastChannel("81026182")).Returns(5);
+            _mockDialogService
+                .Setup(d => d.ShowChoice(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(0);
+
+            // Act
+            await ((RelayCommand)_viewModel.ZeroCalibrationCommand).ExecuteAsync(null);
+
+            // Assert
+            _mockColorMeasurementService.VerifySet(s => s.CurrentChannel = It.IsAny<int>(), Times.Never);
+            _mockAnalyzerRegistryService.Verify(r => r.Update("81026182", ColorAnalyzerModel.CA410, 2), Times.Once);
+            Assert.That(_viewModel.IsChannelConfirmed, Is.True);
+            }
+
+        [Test]
+        public async Task ExecuteZeroCalibrationAsync_ChannelMismatch_LastChoiceWritesRegistryChannelToDevice()
+            {
+            // Arrange
+            SetupCalibratedProbe("81026182", 2);
+            _mockAnalyzerRegistryService.Setup(r => r.GetLastChannel("81026182")).Returns(5);
+            _mockDialogService
+                .Setup(d => d.ShowChoice(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(1);
+
+            // Act
+            await ((RelayCommand)_viewModel.ZeroCalibrationCommand).ExecuteAsync(null);
+
+            // Assert
+            _mockColorMeasurementService.VerifySet(s => s.CurrentChannel = 5, Times.Once);
+            _mockAnalyzerRegistryService.Verify(r => r.Update("81026182", ColorAnalyzerModel.CA410, 5), Times.Once);
+            _mockSettingsService.Verify(s => s.UpdateChannel(5), Times.Once);
+            }
+
+        [Test]
+        public async Task ExecuteZeroCalibrationAsync_ChannelMismatch_DialogDismissed_CancelsCalibration()
+            {
+            // Arrange
+            SetupCalibratedProbe("81026182", 2);
+            _mockAnalyzerRegistryService.Setup(r => r.GetLastChannel("81026182")).Returns(5);
+            _mockDialogService
+                .Setup(d => d.ShowChoice(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Returns((int?)null);
+
+            // Act
+            await ((RelayCommand)_viewModel.ZeroCalibrationCommand).ExecuteAsync(null);
+
+            // Assert
+            _mockAnalyzerRegistryService.Verify(r => r.Update(It.IsAny<string>(), It.IsAny<ColorAnalyzerModel>(), It.IsAny<int>()), Times.Never);
+            _mockSettingsService.Verify(s => s.UpdateChannel(It.IsAny<int>()), Times.Never);
+            _mockColorMeasurementService.Verify(s => s.Disconnect(), Times.Once);
+            Assert.That(_viewModel.IsChannelConfirmed, Is.False);
             }
 
         // --- Тесты для ExecuteSaveResultsAsync ---
@@ -1075,7 +1185,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
                 _mockUploadService.Object,
                 _mockSettingsService.Object,
                 _mockPathProvider.Object,
-                _mockMeasurementStatusService.Object);
+                _mockMeasurementStatusService.Object,
+                _mockAnalyzerRegistryService.Object);
             viewModel.ClearAllAttemptCounts();
             return viewModel;
             }

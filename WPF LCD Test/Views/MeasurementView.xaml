@@ -212,6 +212,24 @@
                             Foreground="White"
                             Text="{Binding DeviceCalibrationStatusText}" />
                     </StackPanel>
+                    <StackPanel
+                        Margin="20,0,10,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Background="Transparent"
+                        Orientation="Vertical"
+                        ToolTip="{Binding DeviceProbeTooltipText}">
+                        <TextBlock
+                            Margin="5,0"
+                            VerticalAlignment="Center"
+                            Foreground="White"
+                            Text="{Binding DeviceModelStatusText}" />
+                        <TextBlock
+                            Margin="5,0"
+                            VerticalAlignment="Center"
+                            Foreground="White"
+                            Text="{Binding DeviceActiveChannelStatusText}" />
+                    </StackPanel>
                 </StackPanel>
                 <Grid Grid.Row="1" Margin="0,10,0,0">
                     <StackPanel Orientation="Horizontal">

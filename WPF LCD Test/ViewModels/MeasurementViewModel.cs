@@ -32,6 +32,9 @@ namespace WPF_LCD_Test.ViewModels
         private DeviceUnderTest? _currentDevice;
         private string _serialNumber = string.Empty;
         private bool _isSerialNumberConfirmed;
+        private bool _isChannelConfirmed;
+        private ColorimeterInfo? _colorimeter;
+        private readonly IAnalyzerRegistryService _analyzerRegistryService;
         private int _measurementTime = 2;
         private string _selectedDeviceConfiguration;
         private bool _isMeasurementButtonsEnabled;
@@ -49,8 +52,6 @@ namespace WPF_LCD_Test.ViewModels
         private DeviceConfigTreeNode? _selectedConfigNode;
 
         private const string SERIAL_NUMBER_PATTERN = "^[a-zA-Z0-9]*$";
-        private const string QA_PROBE_SN = "08954195";
-        private const int QA_PROBE_CHANNEL = 1;
         private const int MAX_MEASUREMENT_ATTEMPTS_BEFORE_CONFIRM = 1;
         private const double COLOR_COORDINATES_TOLERANCE = 0.15;
 
@@ -205,6 +206,7 @@ namespace WPF_LCD_Test.ViewModels
                 {
                 if (SetProperty(ref _isDeviceCalibrated, value))
                     {
+                    if (!value) IsChannelConfirmed = false;
                     UpdateUIState();
                     OnPropertyChanged(nameof(DeviceCalibrationStatusText));
                     }
@@ -213,6 +215,43 @@ namespace WPF_LCD_Test.ViewModels
 
         public string DeviceConnectionStatusText => _isDeviceConnected ? ConnectedCA : DisconnectedCA;
         public string DeviceCalibrationStatusText => _isDeviceCalibrated ? CalibratedCA : NotCalibratedCa;
+
+        /// <summary>
+        /// Gets the detected analyzer model label; shows a placeholder until the device is calibrated.
+        /// </summary>
+        public string DeviceModelStatusText => string.Format(DeviceModelStatus,
+            _isChannelConfirmed ? _colorMeasurementService.Model.ToDisplayName() : ColorAnalyzerModel.Unknown.ToDisplayName());
+
+        /// <summary>
+        /// Gets the active measurement channel label; shows a placeholder until the device is calibrated.
+        /// </summary>
+        public string DeviceActiveChannelStatusText => string.Format(ActiveChannelStatus,
+            _isChannelConfirmed ? _colorMeasurementService.CurrentChannel.ToString() : ColorAnalyzerModel.Unknown.ToDisplayName());
+
+        /// <summary>
+        /// Gets the tooltip with the probe serial number; null (no tooltip) until the channel is confirmed.
+        /// </summary>
+        public string? DeviceProbeTooltipText => _isChannelConfirmed && _colorimeter != null
+            ? string.Format(ProbeSerialNumberTooltip, _colorimeter.ProbeSN)
+            : null;
+
+        /// <summary>
+        /// Gets or sets whether the inspector has confirmed the active channel after calibration.
+        /// Model and channel labels stay hidden until then.
+        /// </summary>
+        public bool IsChannelConfirmed
+            {
+            get => _isChannelConfirmed;
+            set
+                {
+                if (SetProperty(ref _isChannelConfirmed, value))
+                    {
+                    OnPropertyChanged(nameof(DeviceModelStatusText));
+                    OnPropertyChanged(nameof(DeviceActiveChannelStatusText));
+                    OnPropertyChanged(nameof(DeviceProbeTooltipText));
+                    }
+                }
+            }
         public ObservableCollection<DeviceConfigTreeNode> DeviceConfigurationTree { get; } = [];
         public IMeasurementStatusService MeasurementStatusService => _measurementStatusService;
 
@@ -258,7 +297,8 @@ namespace WPF_LCD_Test.ViewModels
             IUploadService uploadService,
             ISettingsService settingsService,
             IPathProvider pathProvider,
-            IMeasurementStatusService measurementStatusService)
+            IMeasurementStatusService measurementStatusService,
+            IAnalyzerRegistryService analyzerRegistryService)
             {
             _colorMeasurementService = colorMeasurementService ?? throw new ArgumentNullException(nameof(colorMeasurementService));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
@@ -269,6 +309,7 @@ namespace WPF_LCD_Test.ViewModels
             _uploadService = uploadService ?? throw new ArgumentNullException(nameof(uploadService));
             _pathProvider = pathProvider ?? throw new ArgumentNullException(nameof(pathProvider));
             _measurementStatusService = measurementStatusService ?? throw new ArgumentNullException(nameof(measurementStatusService));
+            _analyzerRegistryService = analyzerRegistryService ?? throw new ArgumentNullException(nameof(analyzerRegistryService));
             _logHandler = new LogHandler(_localizationService, AddLogMessage);
 
             ZeroCalibrationCommand = new RelayCommand(ExecuteZeroCalibrationAsync, CanExecuteZeroCalibration);
@@ -287,6 +328,7 @@ namespace WPF_LCD_Test.ViewModels
             _fileService.StatusMessage += FileService_StatusMessage;
             _colorMeasurementService.ConnectionStatusChanged += ColorMeasurementService_ConnectionStatusChanged;
             _colorMeasurementService.CalibrationStatusChanged += ColorMeasurementService_CalibrationStatusChanged;
+            _colorMeasurementService.CurrentChannelChanged += ColorMeasurementService_CurrentChannelChanged;
             _uploadService.StatusMessage += UploadService_StatusMessage;
 
             Log(WelcomeMessage);
@@ -508,11 +550,10 @@ namespace WPF_LCD_Test.ViewModels
                         _dialogService.ShowMessage($"{ErrAtCalibration}", $"{Err}");
                         return;
                         }
-                    // QA Probe specific logic
-                    if (_colorMeasurementService.ProbeSN.Equals(QA_PROBE_SN) && _colorMeasurementService.CurrentChannel != QA_PROBE_CHANNEL)
+                    if (!ConfirmActiveChannel())
                         {
-                        _settingsService.UpdateChannel(_colorMeasurementService.CurrentChannel = QA_PROBE_CHANNEL);
-                        _dialogService.ShowMessage("Detected QA CA-310. Changed channel to CH01", Warning);
+                        ExecuteDisconnect(force: true);
+                        return;
                         }
                     }
                 }
@@ -528,6 +569,41 @@ namespace WPF_LCD_Test.ViewModels
                 _isDeviceCalibrating = false;
                 UpdateUIState();
                 }
+            }
+
+        /// <summary>
+        /// Reconciles the channel currently set on the probe with the last channel registered for it.
+        /// On mismatch the inspector picks one of the two; the confirmed channel is stored in the registry and in the settings.
+        /// </summary>
+        /// <returns>True when a channel was confirmed; false when the inspector dismissed the dialog.</returns>
+        private bool ConfirmActiveChannel()
+            {
+            string probeSN = _colorMeasurementService.ProbeSN;
+            int channel = _colorMeasurementService.CurrentChannel;
+
+            if (_analyzerRegistryService.GetLastChannel(probeSN) is int lastChannel && lastChannel != channel)
+                {
+                int? choice = _dialogService.ShowChoice(
+                    string.Format(ChannelMismatchMessage, lastChannel, channel),
+                    ChannelMismatchTitle,
+                    string.Format(UseProbeChannel, channel),
+                    string.Format(UseLastChannel, lastChannel));
+
+                if (choice is null) return false;
+
+                if (choice == 1)
+                    {
+                    _colorMeasurementService.CurrentChannel = lastChannel;
+                    channel = lastChannel;
+                    }
+                }
+
+            _analyzerRegistryService.Update(probeSN, _colorMeasurementService.Model, channel);
+            _settingsService.UpdateChannel(channel);
+            _colorimeter = new ColorimeterInfo(_colorMeasurementService.Model.ToDisplayName(), probeSN, channel);
+            if (_currentDevice != null) _currentDevice.Colorimeter = _colorimeter;
+            IsChannelConfirmed = true;
+            return true;
             }
 
         /// <summary>
@@ -679,7 +755,7 @@ namespace WPF_LCD_Test.ViewModels
                 {
                 try
                     {
-                    _currentDevice = new DeviceUnderTest(SerialNumber);
+                    _currentDevice = new DeviceUnderTest(SerialNumber) { Colorimeter = _colorimeter };
                     ResetMeasurementStatuses();
                     }
                 catch (ArgumentException ex)
@@ -820,7 +896,7 @@ namespace WPF_LCD_Test.ViewModels
                     return false;
                     }
 
-                _currentDevice = new DeviceUnderTest(SerialNumber);
+                _currentDevice = new DeviceUnderTest(SerialNumber) { Colorimeter = _colorimeter };
                 Log(TestStartInfo, [_currentDevice.SerialNumber]);
                 ResetMeasurementStatuses();
                 UpdateMeasurementStatus(location, null, $"{Measuring}");
@@ -1044,6 +1120,7 @@ namespace WPF_LCD_Test.ViewModels
             _fileService.StatusMessage -= FileService_StatusMessage;
             _colorMeasurementService.ConnectionStatusChanged -= ColorMeasurementService_ConnectionStatusChanged;
             _colorMeasurementService.CalibrationStatusChanged -= ColorMeasurementService_CalibrationStatusChanged;
+            _colorMeasurementService.CurrentChannelChanged -= ColorMeasurementService_CurrentChannelChanged;
             _uploadService.StatusMessage -= UploadService_StatusMessage;
 
             ( _colorMeasurementService as IDisposable )?.Dispose();
@@ -1081,6 +1158,9 @@ namespace WPF_LCD_Test.ViewModels
 
         private void ColorMeasurementService_ConnectionStatusChanged(object? sender, bool isConnected) =>
             ExecuteThreadInUI(() => { IsDeviceConnected = isConnected; UpdateUIState(); });
+
+        private void ColorMeasurementService_CurrentChannelChanged(object? sender, int channel) =>
+            ExecuteThreadInUI(() => OnPropertyChanged(nameof(DeviceActiveChannelStatusText)));
 
         #endregion
 
