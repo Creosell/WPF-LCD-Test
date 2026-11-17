@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A picked value in the settings view is no longer left highlighted: the focus returns to the view when a list closes or when the click lands outside the inputs
 - Changing the language reset the other settings (channel, auto connect) to their defaults; only the language is updated now
 - The CA-410 ran in LTD.AUTO instead of AUTO because the CA-310 speed constant was passed to it
+- An infinite color temperature (CA-410 reports it for saturated colors) is shown as `T=n/a` in the log and in the button tooltip
 - Saving the device JSON failed when a measurement contained an infinite value (CA-410 reports an infinite color temperature for saturated colors); non-finite values are now written as `null`
 - A repeated zero calibration kept the device reported as calibrated for the whole new calibration; it is now reported as uncalibrated until the calibration finishes
 - The measurement buttons showed an empty tooltip box before the first measurement; the tooltip now appears only when there are measured values to show

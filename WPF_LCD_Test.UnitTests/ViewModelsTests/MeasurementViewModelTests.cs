@@ -795,6 +795,22 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             }
 
         [Test]
+        public async Task ExecuteMeasureAsync_InfiniteColorTemperature_IsShownAsNotAvailable()
+            {
+            _viewModel.ExecuteApplySerialNumber("SN12345");
+            _viewModel.IsDeviceConnected = true;
+            _viewModel.IsDeviceCalibrated = true;
+            var location = MeasurementLocation.WhiteColor.ToString();
+            _mockColorMeasurementService.Setup(s => s.MeasureAsync(It.IsAny<int>()))
+                .ReturnsAsync(new Measurement { Location = location, x = 0.3127, y = 0.3290, Lv = 100, T = double.PositiveInfinity, IsValid = true });
+
+            await ((RelayCommand)_viewModel.MeasureCommand).ExecuteAsync(location);
+
+            var status = _mockMeasurementStatusService.Object.AllMeasurementButtonStatuses.First(s => s.Location == location);
+            Assert.That(status.MeasuredValuesString, Does.EndWith("T=n/a"));
+            }
+
+        [Test]
         public async Task ExecuteMeasureAsync_FailedRetry_DropsThePreviousMeasurementOfThePoint()
             {
             _viewModel.ExecuteApplySerialNumber("SN12345");
