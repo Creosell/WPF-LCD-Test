@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Windows;
-using System.Windows.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
@@ -49,10 +48,14 @@ namespace WPF_LCD_Test
             }
 
         /// <summary>
-        /// Removes the dotted keyboard focus rectangle from every control of the application.
+        /// Removes the dotted keyboard focus rectangle from every element of the application. The value is set locally
+        /// when an element loads, so it also wins over the focus styles of the Material Design templates.
         /// </summary>
         private static void HideFocusVisuals() =>
-            FrameworkElement.FocusVisualStyleProperty.OverrideMetadata(typeof(Control), new FrameworkPropertyMetadata(null));
+            EventManager.RegisterClassHandler(
+                typeof(FrameworkElement),
+                FrameworkElement.LoadedEvent,
+                new RoutedEventHandler((sender, _) => ((FrameworkElement)sender).FocusVisualStyle = null));
 
         /// <summary>
         /// Initializes application services, loads settings, configures localization, and displays main window.
