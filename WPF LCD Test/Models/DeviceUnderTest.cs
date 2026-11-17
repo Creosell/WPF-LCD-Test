@@ -20,6 +20,12 @@ namespace WPF_LCD_Test.Models
         public string DeviceConfiguration { get; set; } = "DefaultConfig";
 
         /// <summary>
+        /// Gets or sets the colorimeter and channel the measurements were taken with; omitted from JSON when unknown.
+        /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public ColorimeterInfo? Colorimeter { get; set; }
+
+        /// <summary>
         /// Gets or sets whether the device is a TV.
         /// </summary>
         public bool IsTV { get; set; }

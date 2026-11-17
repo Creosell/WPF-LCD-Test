@@ -139,6 +139,40 @@ namespace WPF_LCD_Test.UnitTests.ServicesTests
         }
 
         [Test]
+        public async Task SaveDeviceDataToJsonAsync_WritesColorimeterInHeaderWhenKnown()
+        {
+            // Arrange
+            _fileService = new FileService(_mockFileSystem, _mockPathProvider.Object, _mockLocalizationService.Object);
+            var device = new DeviceUnderTest("SN789") { Colorimeter = new ColorimeterInfo("CA-410", "81026182", 2) };
+            string filePath = System.IO.Path.Combine(_testBasePath, "data", "SN789.json");
+
+            // Act
+            await _fileService.SaveDeviceDataToJsonAsync(device);
+
+            // Assert
+            string saved = _mockFileSystem.File.ReadAllText(filePath);
+            Assert.That(saved, Does.Contain("\"Colorimeter\": {"));
+            Assert.That(saved, Does.Contain("\"Model\": \"CA-410\""));
+            Assert.That(saved, Does.Contain("\"ProbeSN\": \"81026182\""));
+            Assert.That(saved, Does.Contain("\"Channel\": 2"));
+            Assert.That(saved.IndexOf("\"Colorimeter\""), Is.LessThan(saved.IndexOf("\"Measurements\"")), "Colorimeter belongs to the header, before the measurements.");
+        }
+
+        [Test]
+        public async Task SaveDeviceDataToJsonAsync_OmitsColorimeterWhenUnknown()
+        {
+            // Arrange
+            _fileService = new FileService(_mockFileSystem, _mockPathProvider.Object, _mockLocalizationService.Object);
+            string filePath = System.IO.Path.Combine(_testBasePath, "data", "SN790.json");
+
+            // Act
+            await _fileService.SaveDeviceDataToJsonAsync(new DeviceUnderTest("SN790"));
+
+            // Assert
+            Assert.That(_mockFileSystem.File.ReadAllText(filePath), Does.Not.Contain("Colorimeter"));
+        }
+
+        [Test]
         public async Task SaveDeviceDataToJsonAsync_HandlesExceptionDuringSave()
         {
             // Arrange
