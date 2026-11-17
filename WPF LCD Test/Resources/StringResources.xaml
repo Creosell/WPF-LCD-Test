@@ -113,7 +113,7 @@
     <system:String x:Key="SaveButton">
         Save
     </system:String>
-    <system:String x:Key="CancelButton">
-        Cancel
+    <system:String x:Key="ResetToDefaultButton">
+        Reset to default
     </system:String>
 </ResourceDictionary>

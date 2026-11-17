@@ -111,7 +111,7 @@
     <system:String x:Key="SaveButton">
         节省
     </system:String>
-    <system:String x:Key="CancelButton">
-        取消
+    <system:String x:Key="ResetToDefaultButton">
+        恢复默认
     </system:String>
 </ResourceDictionary>

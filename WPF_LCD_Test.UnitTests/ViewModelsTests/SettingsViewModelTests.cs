@@ -175,20 +175,22 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             }
 
         [Test]
-        public void CancelSettingsCommand_CanExecute_ReturnsTrue()
+        public void ResetToDefaultCommand_Execute_RestoresMeasurementModesAndKeepsChannel()
             {
-            Assert.That(_viewModel.CancelSettingsCommand.CanExecute(null), Is.True);
-            }
-
-        [Test]
-        public void CancelSettingsCommand_Execute_ReloadsSettings()
-            {
+            _viewModel.ColorAnalyzerChannel = "7";
             _viewModel.MeasurementSpeed = MeasurementSpeed.Fast;
+            _viewModel.SyncMode = SyncMode.Internal;
+            _viewModel.SyncFrequency = "75";
+            _viewModel.IntegrationTime = "250";
 
-            _viewModel.CancelSettingsCommand.Execute(null);
+            _viewModel.ResetToDefaultCommand.Execute(null);
 
-            _mockSettingsService.Verify(s => s.LoadSettings(), Times.Exactly(2));
             Assert.That(_viewModel.MeasurementSpeed, Is.EqualTo(MeasurementSpeed.Slow));
+            Assert.That(_viewModel.SyncMode, Is.EqualTo(SyncMode.Universal));
+            Assert.That(_viewModel.SyncFrequency, Is.EqualTo("60"));
+            Assert.That(_viewModel.IntegrationTime, Is.EqualTo("100"));
+            Assert.That(_viewModel.ColorAnalyzerChannel, Is.EqualTo("7"));
+            _mockSettingsService.Verify(s => s.SaveSettings(It.IsAny<AppSettings>()), Times.Never());
             }
 
         [Test]
@@ -401,11 +403,11 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             }
 
         [Test]
-        public void CancelSettingsCommand_Execute_KeepsTheSyncModeListInstance()
+        public void ResetToDefaultCommand_Execute_KeepsTheSyncModeListInstance()
             {
             var list = _viewModel.AvailableSyncModes;
 
-            _viewModel.CancelSettingsCommand.Execute(null);
+            _viewModel.ResetToDefaultCommand.Execute(null);
 
             Assert.That(_viewModel.AvailableSyncModes, Is.SameAs(list));
             }

@@ -121,8 +121,8 @@
                     Content="{DynamicResource SaveButton}" />
                 <Button
                     Margin="5,0"
-                    Command="{Binding CancelSettingsCommand}"
-                    Content="{DynamicResource CancelButton}" />
+                    Command="{Binding ResetToDefaultCommand}"
+                    Content="{DynamicResource ResetToDefaultButton}" />
             </StackPanel>
         </StackPanel>
     </Grid>

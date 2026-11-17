@@ -147,7 +147,7 @@ namespace WPF_LCD_Test.ViewModels
                 }
             }
         public ICommand SaveSettingsCommand { get; }
-        public ICommand CancelSettingsCommand { get; }
+        public ICommand ResetToDefaultCommand { get; }
 
         // Конструктор: инициализация сервисов, команд, языков и загрузка настроек
         public SettingsViewModel(ISettingsService settingsService, IDialogService dialogService, IColorMeasurementService colorMeasurementService, ILocalizationService localizationService) : base()
@@ -158,7 +158,7 @@ namespace WPF_LCD_Test.ViewModels
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             PopulateAvailableLanguages();
             SaveSettingsCommand = new RelayCommand(ExecuteSaveSettings, CanExecuteSaveSettings);
-            CancelSettingsCommand = new RelayCommand(ExecuteCancelSettings, CanExecuteCancelSettings);
+            ResetToDefaultCommand = new RelayCommand(ExecuteResetToDefault);
             LoadSettings();
             _localizationService.LanguageChanged += LocalizationService_LanguageChanged;
             _colorMeasurementService.CurrentChannelChanged += ColorMeasurementService_CurrentChannelChanged;
@@ -329,8 +329,16 @@ namespace WPF_LCD_Test.ViewModels
             }
 
         private bool CanExecuteSaveSettings(object parameter) => true;
-        private void ExecuteCancelSettings(object parameter) => LoadSettings();
-        private bool CanExecuteCancelSettings(object parameter) => true;
+
+        // Возвращает режимы измерения к значениям по умолчанию (канал и язык не меняются); сохраняется по Save
+        private void ExecuteResetToDefault(object parameter)
+            {
+            var defaults = new AppSettings();
+            MeasurementSpeed = defaults.MeasurementSpeed;
+            SyncMode = defaults.SyncMode;
+            SyncFrequency = FormatValue(AnalyzerCapabilities.DefaultFrequency);
+            IntegrationTime = FormatValue(AnalyzerCapabilities.DefaultIntegrationTime);
+            }
 
         // Освобождает ресурсы и отписывается от событий
         public void Dispose()
