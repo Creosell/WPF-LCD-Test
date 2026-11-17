@@ -33,14 +33,29 @@ namespace WPF_LCD_Test.Converters
         {
             writer.WriteStartObject();
             writer.WriteString("Location", value.Location);
-            writer.WriteNumber("x", Math.Round(value.x, 3, MidpointRounding.AwayFromZero));
-            writer.WriteNumber("y", Math.Round(value.y, 3, MidpointRounding.AwayFromZero));
+            WriteRounded(writer, "x", value.x, 3);
+            WriteRounded(writer, "y", value.y, 3);
 
             int LvPrecision = value.Location.Equals(MeasurementLocation.BlackColor.ToString()) ? 8 : 1;
-            writer.WriteNumber("Lv", Math.Round(value.Lv, LvPrecision, MidpointRounding.AwayFromZero));
-            writer.WriteNumber("T", Math.Round(value.T, 0, MidpointRounding.AwayFromZero));
+            WriteRounded(writer, "Lv", value.Lv, LvPrecision);
+            WriteRounded(writer, "T", value.T, 0);
 
             writer.WriteEndObject();
+        }
+
+        /// <summary>
+        /// Writes a rounded number property; non-finite values (e.g. undefined color temperature reported as Infinity) are written as null, as JSON cannot represent them.
+        /// </summary>
+        /// <param name="writer">The JSON writer.</param>
+        /// <param name="name">Property name.</param>
+        /// <param name="value">Value to write.</param>
+        /// <param name="digits">Number of fractional digits to round to.</param>
+        private static void WriteRounded(Utf8JsonWriter writer, string name, double value, int digits)
+        {
+            if (double.IsFinite(value))
+                writer.WriteNumber(name, Math.Round(value, digits, MidpointRounding.AwayFromZero));
+            else
+                writer.WriteNull(name);
         }
     }
 }

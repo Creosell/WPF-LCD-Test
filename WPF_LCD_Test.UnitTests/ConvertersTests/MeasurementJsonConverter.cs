@@ -38,6 +38,21 @@ namespace WPF_LCD_Test.UnitTests.ConvertersTests
         }
 
         [Test]
+        public void Write_NonFiniteValues_AreWrittenAsNull()
+        {
+            // Arrange
+            var measurement = new Measurement("RedColor", 0.66, double.NaN, 28.8, double.PositiveInfinity);
+            var testObject = new TestObjectWithMeasurement { TestMeasurement = measurement };
+
+            // Act
+            string jsonString = JsonSerializer.Serialize(testObject);
+
+            // Assert
+            string expectedJson = "{\"TestMeasurement\":{\"Location\":\"RedColor\",\"x\":0.66,\"y\":null,\"Lv\":28.8,\"T\":null}}";
+            Assert.That(jsonString, Is.EqualTo(expectedJson));
+        }
+
+        [Test]
         public void Write_LvPrecision_Is8_ForBlackColorLocation()
         {
             // Arrange
