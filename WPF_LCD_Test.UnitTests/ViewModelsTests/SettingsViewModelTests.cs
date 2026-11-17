@@ -372,6 +372,60 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             }
 
         [Test]
+        public void SyncModes_WhenModelIsUnknown_OfferAllModes()
+            {
+            Assert.That(_viewModel.AvailableSyncModes.Select(o => o.Mode), Is.EqualTo(Enum.GetValues<SyncMode>()));
+            }
+
+        [Test]
+        public void SyncModes_AfterCa310Connects_ExcludeManualAndResetUnsupportedSelection()
+            {
+            _viewModel.SyncMode = SyncMode.Manual;
+            _mockColorMeasurementService.SetupGet(s => s.Model).Returns(ColorAnalyzerModel.CA310);
+
+            _mockColorMeasurementService.Raise(s => s.ConnectionStatusChanged += null, _mockColorMeasurementService.Object, true);
+
+            Assert.That(_viewModel.AvailableSyncModes.Select(o => o.Mode), Does.Not.Contain(SyncMode.Manual));
+            Assert.That(_viewModel.SyncMode, Is.EqualTo(SyncMode.Universal));
+            Assert.That(_viewModel.SyncFrequencyHint, Is.EqualTo("40-200 Hz"));
+            }
+
+        [TestCase(SyncMode.Internal, true, false)]
+        [TestCase(SyncMode.Manual, false, true)]
+        [TestCase(SyncMode.Universal, false, false)]
+        public void SyncParameterFields_AreVisibleOnlyForTheirMode(SyncMode mode, bool frequencyVisible, bool timeVisible)
+            {
+            _viewModel.SyncMode = mode;
+
+            Assert.That(_viewModel.IsSyncFrequencyVisible, Is.EqualTo(frequencyVisible));
+            Assert.That(_viewModel.IsIntegrationTimeVisible, Is.EqualTo(timeVisible));
+            }
+
+        [Test]
+        public void SaveSettingsCommand_Execute_SavesInternalSyncFrequency()
+            {
+            _viewModel.SyncMode = SyncMode.Internal;
+            _viewModel.SyncFrequency = "59.94";
+
+            _viewModel.SaveSettingsCommand.Execute(null);
+
+            _mockSettingsService.Verify(s => s.SaveSettings(It.Is<AppSettings>(
+                settings => settings.SyncMode == SyncMode.Internal && settings.SyncFrequency == 59.94)), Times.Once());
+            }
+
+        [Test]
+        public void SaveSettingsCommand_Execute_FrequencyOutOfRange_ShowsMessageAndRestoresDefault()
+            {
+            _viewModel.SyncMode = SyncMode.Internal;
+            _viewModel.SyncFrequency = "300";
+
+            _viewModel.SaveSettingsCommand.Execute(null);
+
+            _mockDialogService.Verify(d => d.ShowMessage(It.Is<string>(m => m.Contains("0.5-240 Hz")), It.IsAny<string>()), Times.Once());
+            Assert.That(_viewModel.SyncFrequency, Is.EqualTo("60"));
+            }
+
+        [Test]
         public void LanguageChanged_UpdatesSelectedLanguage()
             {
             // Arrange

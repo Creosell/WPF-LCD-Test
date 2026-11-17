@@ -1,6 +1,7 @@
 ﻿using MvvmHelpers;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Windows.Input;
 using WPF_LCD_Test.Commands;
 using WPF_LCD_Test.Interfaces;
@@ -37,34 +38,58 @@ namespace WPF_LCD_Test.ViewModels
             }
         public IReadOnlyList<MeasurementSpeed> AvailableMeasurementSpeeds { get; } = Enum.GetValues<MeasurementSpeed>();
 
-        /// <summary>
-        /// Synchronization modes the operator can choose from.
-        /// </summary>
-        public enum SyncModeOption { Universal, Internal }
-        public IReadOnlyList<SyncModeOption> AvailableSyncModes { get; } = Enum.GetValues<SyncModeOption>();
-        private SyncModeOption _syncMode;
-        public SyncModeOption SyncMode
+        public class SyncModeOption
+            {
+            public SyncMode Mode { get; set; }
+            public string Name { get; set; }
+            }
+        private IReadOnlyList<SyncModeOption> _availableSyncModes = [];
+        public IReadOnlyList<SyncModeOption> AvailableSyncModes
+            {
+            get => _availableSyncModes;
+            private set => SetProperty(ref _availableSyncModes, value);
+            }
+        private SyncMode _syncMode;
+        public SyncMode SyncMode
             {
             get => _syncMode;
             set
                 {
-                if (SetProperty(ref _syncMode, value)) OnPropertyChanged(nameof(IsSyncFrequencyEnabled));
+                if (SetProperty(ref _syncMode, value))
+                    {
+                    OnPropertyChanged(nameof(IsSyncFrequencyVisible));
+                    OnPropertyChanged(nameof(IsIntegrationTimeVisible));
+                    }
                 }
             }
-        public bool IsSyncFrequencyEnabled => SyncMode == SyncModeOption.Internal;
-        private string _syncFrequency = DefaultSyncFrequency.ToString();
+        public bool IsSyncFrequencyVisible => SyncMode == SyncMode.Internal;
+        public bool IsIntegrationTimeVisible => SyncMode == SyncMode.Manual;
+        private string _syncFrequency = FormatValue(AnalyzerCapabilities.DefaultFrequency);
         public string SyncFrequency
             {
             get => _syncFrequency;
             set
                 {
-                if (value.Length < 4)
+                if (value.Length < 8)
                     {
                     SetProperty(ref _syncFrequency, value);
                     }
                 }
             }
-        private const int DefaultSyncFrequency = 60;
+        private string _integrationTime = FormatValue(AnalyzerCapabilities.DefaultIntegrationTime);
+        public string IntegrationTime
+            {
+            get => _integrationTime;
+            set
+                {
+                if (value.Length < 8)
+                    {
+                    SetProperty(ref _integrationTime, value);
+                    }
+                }
+            }
+        public string SyncFrequencyHint => FormatRange(AnalyzerCapabilities.GetFrequencyRange(_colorMeasurementService.Model), "Hz");
+        public string IntegrationTimeHint => FormatRange(AnalyzerCapabilities.GetIntegrationTimeRange(), "ms");
         private string _languageCultureCode;
         public string LanguageCultureCode
             {
@@ -124,6 +149,7 @@ namespace WPF_LCD_Test.ViewModels
             LoadSettings();
             _localizationService.LanguageChanged += LocalizationService_LanguageChanged;
             _colorMeasurementService.CurrentChannelChanged += ColorMeasurementService_CurrentChannelChanged;
+            _colorMeasurementService.ConnectionStatusChanged += ColorMeasurementService_ConnectionStatusChanged;
             }
 
         // Заполняет коллекцию доступных языков
@@ -144,6 +170,22 @@ namespace WPF_LCD_Test.ViewModels
             ColorAnalyzerChannel = _colorMeasurementService.CurrentChannel.ToString();
             }
 
+        private void ColorMeasurementService_ConnectionStatusChanged(object sender, bool e) => RefreshSyncOptions();
+
+        // Ограничивает список режимов синхронизации возможностями подключённого прибора
+        private void RefreshSyncOptions()
+            {
+            AvailableSyncModes = AnalyzerCapabilities.GetSyncModes(_colorMeasurementService.Model)
+                .Select(mode => new SyncModeOption { Mode = mode, Name = mode.ToDisplayName() })
+                .ToList();
+            if (AvailableSyncModes.All(option => option.Mode != SyncMode))
+                {
+                SyncMode = SyncMode.Universal;
+                }
+            OnPropertyChanged(nameof(SyncFrequencyHint));
+            OnPropertyChanged(nameof(IntegrationTimeHint));
+            }
+
         // Загружает настройки в ViewModel
         private void LoadSettings()
             {
@@ -162,8 +204,10 @@ namespace WPF_LCD_Test.ViewModels
                     }
                 ColorAnalyzerChannel = currentSettings.ColorAnalyzerChannel;
                 MeasurementSpeed = currentSettings.MeasurementSpeed;
-                SyncMode = currentSettings.SyncFrequency.HasValue ? SyncModeOption.Internal : SyncModeOption.Universal;
-                SyncFrequency = (currentSettings.SyncFrequency ?? DefaultSyncFrequency).ToString();
+                SyncMode = currentSettings.SyncMode;
+                SyncFrequency = FormatValue(currentSettings.SyncFrequency ?? AnalyzerCapabilities.DefaultFrequency);
+                IntegrationTime = FormatValue(currentSettings.IntegrationTime ?? AnalyzerCapabilities.DefaultIntegrationTime);
+                RefreshSyncOptions();
                 }
             catch (Exception ex)
                 {
@@ -190,12 +234,19 @@ namespace WPF_LCD_Test.ViewModels
 
             ExecuteChangeChannel(ColorAnalyzerChannel);
 
+            var saved = _settingsService.LoadSettings();
             AppSettings settingsToSave = new()
                 {
                 LanguageCultureCode = LanguageCultureCode,
                 ColorAnalyzerChannel = ColorAnalyzerChannel,
                 MeasurementSpeed = MeasurementSpeed,
-                SyncFrequency = SyncMode == SyncModeOption.Internal ? GetSyncFrequency(SyncFrequency) : null
+                SyncMode = SyncMode,
+                SyncFrequency = IsSyncFrequencyVisible
+                    ? GetRangedValue(SyncFrequency, AnalyzerCapabilities.GetFrequencyRange(_colorMeasurementService.Model), saved.SyncFrequency, AnalyzerCapabilities.DefaultFrequency, "Hz", value => SyncFrequency = value)
+                    : saved.SyncFrequency,
+                IntegrationTime = IsIntegrationTimeVisible
+                    ? GetRangedValue(IntegrationTime, AnalyzerCapabilities.GetIntegrationTimeRange(), saved.IntegrationTime, AnalyzerCapabilities.DefaultIntegrationTime, "ms", value => IntegrationTime = value)
+                    : saved.IntegrationTime
                 };
             SaveSettings(settingsToSave);
             }
@@ -213,21 +264,25 @@ namespace WPF_LCD_Test.ViewModels
                 }
             }
 
-        // Проверяет частоту внутренней синхронизации; при ошибке возвращает сохранённое значение
-        private int GetSyncFrequency(string frequency)
+        // Проверяет значение параметра синхронизации; при ошибке возвращает сохранённое (или значение по умолчанию)
+        private double GetRangedValue(string text, (double Min, double Max) range, double? saved, double defaultValue, string unit, Action<string> setText)
             {
-            const int min = AppConstants.ColorAnalyzer.MinSyncFrequency;
-            const int max = AppConstants.ColorAnalyzer.MaxSyncFrequency;
-            if (int.TryParse(frequency, out int result) && result >= min && result <= max)
+            if (double.TryParse(text.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out double result)
+                && result >= range.Min && result <= range.Max)
                 {
                 return result;
                 }
 
-            _dialogService.ShowMessage($"Sync frequency range: {min}-{max} Hz", Err);
-            result = _settingsService.LoadSettings().SyncFrequency ?? DefaultSyncFrequency;
-            SyncFrequency = result.ToString();
+            _dialogService.ShowMessage($"Allowed range: {FormatRange(range, unit)}", Err);
+            result = saved is double previous && previous >= range.Min && previous <= range.Max ? previous : defaultValue;
+            setText(FormatValue(result));
             return result;
             }
+
+        private static string FormatValue(double value) => value.ToString(CultureInfo.InvariantCulture);
+
+        private static string FormatRange((double Min, double Max) range, string unit) =>
+            $"{FormatValue(range.Min)}-{FormatValue(range.Max)} {unit}";
 
         private int GetChannel(string channel)
             {
@@ -266,6 +321,7 @@ namespace WPF_LCD_Test.ViewModels
             {
             _localizationService.LanguageChanged -= LocalizationService_LanguageChanged;
             _colorMeasurementService.CurrentChannelChanged -= ColorMeasurementService_CurrentChannelChanged;
+            _colorMeasurementService.ConnectionStatusChanged -= ColorMeasurementService_ConnectionStatusChanged;
             GC.SuppressFinalize(this);
             Debug.WriteLine("SettingsViewModel Dispose Called.");
             }

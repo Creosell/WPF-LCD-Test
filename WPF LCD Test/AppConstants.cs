@@ -19,16 +19,6 @@ namespace WPF_LCD_Test
             /// Maximum valid measurement channel number.
             /// </summary>
             public const int MaxChannel = 99;
-
-            /// <summary>
-            /// Lowest sync mode value that is read as an internal synchronization frequency in Hz.
-            /// </summary>
-            public const int MinSyncFrequency = 40;
-
-            /// <summary>
-            /// Highest internal synchronization frequency in Hz supported by all analyzers.
-            /// </summary>
-            public const int MaxSyncFrequency = 200;
         }
     }
 }

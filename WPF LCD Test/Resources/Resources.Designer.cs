@@ -1204,6 +1204,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The selected sync setting is not supported by {0}; universal sync is used.
+        /// </summary>
+        public static string SyncSettingNotSupported {
+            get {
+                return ResourceManager.GetString("SyncSettingNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This is a test with a number: {0}.
         /// </summary>
         public static string TestFormatString {

@@ -236,7 +236,11 @@ namespace WPF_LCD_Test.Wrappers
             _caInstance.CalZero();
         }
 
-        public int SyncMode
+        /// <summary>
+        /// Gets or sets the sync mode. The COM property is a single value: 0-3 select NTSC, PAL, EXT and UNIV,
+        /// 40-200 is the internal synchronization frequency in Hz.
+        /// </summary>
+        public SyncSetting Sync
         {
             get
             {
@@ -244,7 +248,10 @@ namespace WPF_LCD_Test.Wrappers
                 {
                     throw new ObjectDisposedException(nameof(Ca310Wrapper), "Cannot access SyncMode on an uninitialized object.");
                 }
-                return (int)_caInstance.SyncMode;
+                float value = _caInstance.SyncMode;
+                return value >= AnalyzerCapabilities.GetFrequencyRange(ColorAnalyzerModel.CA310).Min
+                    ? new SyncSetting(SyncMode.Internal, value)
+                    : new SyncSetting((SyncMode)(int)value);
             }
             set
             {
@@ -252,7 +259,11 @@ namespace WPF_LCD_Test.Wrappers
                 {
                     throw new ObjectDisposedException(nameof(Ca310Wrapper), "Cannot set SyncMode on an uninitialized object.");
                 }
-                _caInstance.SyncMode = value;
+                if (!AnalyzerCapabilities.IsSupported(ColorAnalyzerModel.CA310, value))
+                {
+                    throw new NotSupportedException($"CA-310 does not support the sync setting {value.Mode} ({value.Value}).");
+                }
+                _caInstance.SyncMode = value.Mode == SyncMode.Internal ? (float)value.Value : (float)(int)value.Mode;
             }
         }
 

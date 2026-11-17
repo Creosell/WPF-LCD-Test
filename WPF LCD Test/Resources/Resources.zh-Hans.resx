@@ -552,6 +552,9 @@
   <data name="UseProbeChannel" xml:space="preserve">
     <value>使用探头通道 {0}</value>
   </data>
+  <data name="SyncSettingNotSupported" xml:space="preserve">
+    <value>{0} 不支持所选同步设置，改用通用同步</value>
+  </data>
   <data name="UseLastChannel" xml:space="preserve">
     <value>使用上次通道 {0}</value>
   </data>

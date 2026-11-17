@@ -148,7 +148,7 @@ namespace WPF_LCD_Test.Tests
             StringAssert.Contains(Resources.Resources.ZeroCalibratedCA, statusMessage);
 
             _mockCa.Verify(m => m.CalZero(), Times.Once); // Проверяем, что CalZero был вызван
-            _mockCa.VerifySet(m => m.SyncMode = It.IsAny<int>(), Times.Once);
+            _mockCa.VerifySet(m => m.Sync = It.IsAny<SyncSetting>(), Times.Once);
             _mockCa.VerifySet(m => m.AveragingMode = It.IsAny<int>(), Times.Once);
             _mockCa.Verify(m => m.SetAnalogRange(It.IsAny<float>(), It.IsAny<float>()), Times.Once);
             _mockCa.VerifySet(m => m.DisplayMode = It.IsAny<int>(), Times.Once);
@@ -162,22 +162,43 @@ namespace WPF_LCD_Test.Tests
             await _service.CalibrateZeroAsync();
 
             _mockCa.VerifySet(m => m.AveragingMode = (int)MeasurementSpeed.Slow, Times.Once);
-            _mockCa.VerifySet(m => m.SyncMode = 3, Times.Once);
+            _mockCa.VerifySet(m => m.Sync = new SyncSetting(SyncMode.Universal, 0), Times.Once);
             }
 
-        [TestCase(MeasurementSpeed.Fast, null, 1, 3)]
-        [TestCase(MeasurementSpeed.Auto, 75, 2, 75)]
-        public async Task CalibrateZeroAsync_AppliesModesFromSettings(MeasurementSpeed speed, int? frequency, int expectedSpeed, int expectedSync)
+        [TestCase(MeasurementSpeed.Fast, SyncMode.Universal, null, null, 1, 0)]
+        [TestCase(MeasurementSpeed.Auto, SyncMode.Internal, 75.0, null, 2, 75)]
+        [TestCase(MeasurementSpeed.Slow, SyncMode.Manual, null, 250.0, 0, 250)]
+        [TestCase(MeasurementSpeed.Slow, SyncMode.Ntsc, null, null, 0, 0)]
+        public async Task CalibrateZeroAsync_AppliesModesFromSettings(MeasurementSpeed speed, SyncMode mode, double? frequency, double? time, int expectedSpeed, double expectedValue)
             {
             var settings = new Mock<ISettingsService>();
-            settings.SetupGet(s => s.CurrentSettings).Returns(new AppSettings { MeasurementSpeed = speed, SyncFrequency = frequency });
+            settings.SetupGet(s => s.CurrentSettings).Returns(new AppSettings { MeasurementSpeed = speed, SyncMode = mode, SyncFrequency = frequency, IntegrationTime = time });
             var service = new ColorMeasurementService(_mockCa200.Object, settings.Object);
             await service.ConnectAsync();
 
             await service.CalibrateZeroAsync();
 
             _mockCa.VerifySet(m => m.AveragingMode = expectedSpeed, Times.Once);
-            _mockCa.VerifySet(m => m.SyncMode = expectedSync, Times.Once);
+            _mockCa.VerifySet(m => m.Sync = new SyncSetting(mode, expectedValue), Times.Once);
+            }
+
+        [TestCase(SyncMode.Manual, null, 100.0)]
+        [TestCase(SyncMode.Internal, 250.0, null)]
+        [TestCase(SyncMode.Internal, 20.0, null)]
+        public async Task CalibrateZeroAsync_Ca310_FallsBackToUniversalSyncWhenSettingIsNotSupported(SyncMode mode, double? frequency, double? time)
+            {
+            _mockCa200.SetupGet(m => m.Model).Returns(ColorAnalyzerModel.CA310);
+            var settings = new Mock<ISettingsService>();
+            settings.SetupGet(s => s.CurrentSettings).Returns(new AppSettings { SyncMode = mode, SyncFrequency = frequency, IntegrationTime = time });
+            var service = new ColorMeasurementService(_mockCa200.Object, settings.Object);
+            var messages = new List<string>();
+            service.StatusMessage += (_, message) => messages.Add(message);
+            await service.ConnectAsync();
+
+            await service.CalibrateZeroAsync();
+
+            _mockCa.VerifySet(m => m.Sync = new SyncSetting(SyncMode.Universal, 0), Times.Once);
+            Assert.That(messages, Has.Some.Contains("CA-310"));
             }
 
         [Test]

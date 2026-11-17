@@ -28,9 +28,32 @@ namespace WPF_LCD_Test.Models
         public MeasurementSpeed MeasurementSpeed { get; set; } = MeasurementSpeed.Slow;
 
         /// <summary>
-        /// Gets or sets the internal synchronization frequency in Hz; null selects the universal (100 ms) synchronization.
+        /// Gets or sets the synchronization mode applied to the color analyzer during zero calibration.
+        /// </summary>
+        [JsonPropertyName("syncMode")]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public SyncMode SyncMode { get; set; } = SyncMode.Universal;
+
+        /// <summary>
+        /// Gets or sets the internal synchronization frequency in Hz; null selects the default.
         /// </summary>
         [JsonPropertyName("syncFrequency")]
-        public int? SyncFrequency { get; set; }
+        public double? SyncFrequency { get; set; }
+
+        /// <summary>
+        /// Gets or sets the manual integration time in ms; null selects the default.
+        /// </summary>
+        [JsonPropertyName("integrationTime")]
+        public double? IntegrationTime { get; set; }
+
+        /// <summary>
+        /// Builds the synchronization setting (mode with the parameter it needs) from the stored values.
+        /// </summary>
+        public SyncSetting ToSyncSetting() => SyncMode switch
+            {
+            SyncMode.Internal => new(SyncMode, SyncFrequency ?? AnalyzerCapabilities.DefaultFrequency),
+            SyncMode.Manual => new(SyncMode, IntegrationTime ?? AnalyzerCapabilities.DefaultIntegrationTime),
+            _ => new(SyncMode)
+            };
         }
     }

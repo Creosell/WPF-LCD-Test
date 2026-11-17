@@ -29,7 +29,6 @@ namespace WPF_LCD_Test.Services
         private const int NtscSync = 0;
         private const int PalSync = 1;
         private const int ExtSync = 2;
-        private const int UniversalSyncMode = 3;
         private const double DefaultDisplayRange = 2.5;
         private const int LvxyDisplayMode = 0;
         private const int TdudvDisplayMode = 1;
@@ -215,6 +214,19 @@ namespace WPF_LCD_Test.Services
             }
 
         /// <summary>
+        /// Returns the sync setting from the settings when the connected analyzer supports it;
+        /// otherwise reports it and falls back to the universal synchronization.
+        /// </summary>
+        private SyncSetting ResolveSync(AppSettings settings)
+            {
+            var sync = settings.ToSyncSetting();
+            if (AnalyzerCapabilities.IsSupported(Model, sync)) return sync;
+
+            StatusMessage?.Invoke(this, string.Format(SyncSettingNotSupported, Model.ToDisplayName()));
+            return new SyncSetting(SyncMode.Universal);
+            }
+
+        /// <summary>
         /// Disconnects from device by disposing resources.
         /// </summary>
         private void Disconnect() => Dispose(true);
@@ -243,7 +255,7 @@ namespace WPF_LCD_Test.Services
                         _objCa.CalZero();
 
                         var settings = _settingsService?.CurrentSettings ?? new AppSettings();
-                        _objCa.SyncMode = settings.SyncFrequency ?? UniversalSyncMode;
+                        _objCa.Sync = ResolveSync(settings);
                         _objCa.AveragingMode = (int)settings.MeasurementSpeed;
                         _objCa.SetAnalogRange(
                             Convert.ToSingle(DefaultDisplayRange),

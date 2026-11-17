@@ -184,7 +184,9 @@ Settings are stored in `%AppData%\WPF_LCD_Test\settings.json`:
 - **ColorAnalyzerChannel**: Measurement channel (0-99)
 - **LanguageCultureCode**: UI language ("" for default / "zh-Hans" for Chinese Simplified)
 - **MeasurementSpeed**: Analyzer measurement speed ("Slow" by default / "Fast" / "Auto")
-- **SyncFrequency**: Internal synchronization frequency in Hz (40-200); omitted for the universal synchronization
+- **SyncMode**: Synchronization mode ("Universal" by default / "Ntsc" / "Pal" / "Ext" / "Internal" / "Manual" (CA-410 only))
+- **SyncFrequency**: Frequency in Hz for the internal synchronization (40-200 for the CA-310, 0.5-240 for the CA-410)
+- **IntegrationTime**: Integration time in ms for the manual synchronization (CA-410 only, 4-4000)
 
 ### Device Configurations
 

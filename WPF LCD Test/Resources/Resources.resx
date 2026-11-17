@@ -552,6 +552,9 @@
   <data name="UseProbeChannel" xml:space="preserve">
     <value>Use channel {0} from probe</value>
   </data>
+  <data name="SyncSettingNotSupported" xml:space="preserve">
+    <value>The selected sync setting is not supported by {0}; universal sync is used</value>
+  </data>
   <data name="UseLastChannel" xml:space="preserve">
     <value>Use last used channel {0}</value>
   </data>

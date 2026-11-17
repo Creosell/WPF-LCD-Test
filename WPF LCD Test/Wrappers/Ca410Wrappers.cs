@@ -122,8 +122,6 @@ namespace WPF_LCD_Test.Wrappers
     /// </summary>
     public class Ca410Wrapper : IColorAnalyzer, IDisposable
         {
-        private const double DefaultSyncFrequency = 60.0;
-        private const int InternalSyncMode = 4;
         private const int AutoSpeed = (int)MeasurementSpeed.Auto;
         private const int NativeAutoSpeed = 3;
 
@@ -179,21 +177,22 @@ namespace WPF_LCD_Test.Wrappers
             }
 
         /// <inheritdoc/>
-        public int SyncMode
+        public SyncSetting Sync
             {
             get
                 {
                 int mode = 0;
-                double frequency = 0;
-                Ca410Sdk.Check(Ca.get_SyncMode(ref mode, ref frequency), nameof(SyncMode));
-                return mode == InternalSyncMode ? (int)Math.Round(frequency) : mode;
+                double value = 0;
+                Ca410Sdk.Check(Ca.get_SyncMode(ref mode, ref value), nameof(Sync));
+                return new SyncSetting((SyncMode)mode, value);
                 }
             set
                 {
-                bool isInternal = value >= AppConstants.ColorAnalyzer.MinSyncFrequency;
-                Ca410Sdk.Check(
-                    isInternal ? Ca.put_SyncMode(InternalSyncMode, value) : Ca.put_SyncMode(value, DefaultSyncFrequency),
-                    nameof(SyncMode));
+                if (!AnalyzerCapabilities.IsSupported(ColorAnalyzerModel.CA410, value))
+                    {
+                    throw new NotSupportedException($"CA-410 does not support the sync setting {value.Mode} ({value.Value}).");
+                    }
+                Ca410Sdk.Check(Ca.put_SyncMode((int)value.Mode, value.Value), nameof(Sync));
                 }
             }
 
