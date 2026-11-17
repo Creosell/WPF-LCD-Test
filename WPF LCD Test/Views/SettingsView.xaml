@@ -10,7 +10,9 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     Background="#FF424242"
+    Focusable="True"
     Foreground="White"
+    PreviewMouseDown="UserControl_PreviewMouseDown"
     mc:Ignorable="d">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -30,6 +32,7 @@
                     Content="{DynamicResource LanguageMenu}"
                     Foreground="White" />
                 <ComboBox
+                    DropDownClosed="ComboBox_DropDownClosed"
                     Width="200"
                     DisplayMemberPath="DisplayName"
                     ItemsSource="{Binding AvailableLanguages}"
@@ -61,6 +64,7 @@
                     Content="{DynamicResource MeasurementSpeedLabel}"
                     Foreground="White" />
                 <ComboBox
+                    DropDownClosed="ComboBox_DropDownClosed"
                     Width="120"
                     ItemsSource="{Binding AvailableMeasurementSpeeds}"
                     SelectedItem="{Binding MeasurementSpeed}" />
@@ -72,6 +76,7 @@
                     Content="{DynamicResource SyncModeLabel}"
                     Foreground="White" />
                 <ComboBox
+                    DropDownClosed="ComboBox_DropDownClosed"
                     Width="120"
                     DisplayMemberPath="Name"
                     ItemsSource="{Binding AvailableSyncModes}"
