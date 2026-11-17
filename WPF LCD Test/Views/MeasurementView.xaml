@@ -266,7 +266,6 @@
                                                 <DataTrigger Binding="{Binding HasSelectedDeviceConfiguration}" Value="False">
                                                     <Setter Property="Opacity" Value="0.6" />
                                                     <Setter Property="FontStyle" Value="Italic" />
-                                                    <Setter Property="FontSize" Value="13" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
