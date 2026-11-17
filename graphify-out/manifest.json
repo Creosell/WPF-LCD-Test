@@ -12,9 +12,9 @@
     "semantic_hash": ""
   },
   "WPF LCD Test/App.xaml.cs": {
-    "mtime": 1770086646.1581247,
-    "seen": 1794207670.2280777,
-    "ast_hash": "32a96847cb4b5b1cd419629ec5793c60",
+    "mtime": 1794824108.0496192,
+    "seen": 1794885782.4645064,
+    "ast_hash": "8c96559b32694ea55af472bfb66eae42",
     "semantic_hash": ""
   },
   "WPF LCD Test/AppConstants.cs": {
@@ -42,27 +42,27 @@
     "semantic_hash": ""
   },
   "WPF LCD Test/Converters/MeasurementJsonConverter.cs": {
-    "mtime": 1769394870.8581696,
-    "seen": 1794207670.2280822,
-    "ast_hash": "cc22c38d4654779eadb078d44893ff00",
+    "mtime": 1794825435.0242627,
+    "seen": 1794885782.4645126,
+    "ast_hash": "de88246a759df82af872f3aebcf25871",
     "semantic_hash": ""
   },
   "WPF LCD Test/Interfaces/IColorAnalyzerWrappers.cs": {
-    "mtime": 1769394870.868746,
-    "seen": 1794207670.2280831,
-    "ast_hash": "295281888cce6008f4cfc40f06e235a2",
+    "mtime": 1794821919.2312016,
+    "seen": 1794885782.4645152,
+    "ast_hash": "3b1b1fa87c63846f3fb32f416f092e67",
     "semantic_hash": ""
   },
   "WPF LCD Test/Interfaces/IColorMeasurementService.cs": {
-    "mtime": 1769394870.8697517,
-    "seen": 1794207670.2280838,
-    "ast_hash": "145498460e19a0585d1b5aefc03285a5",
+    "mtime": 1794821956.9695277,
+    "seen": 1794885782.4645162,
+    "ast_hash": "286e930ec2ef1792b62efd2e850452de",
     "semantic_hash": ""
   },
   "WPF LCD Test/Interfaces/IDialogService.cs": {
-    "mtime": 1769394870.8707511,
-    "seen": 1794207670.2280848,
-    "ast_hash": "657378085dc3fdded239e3e73d42c0d8",
+    "mtime": 1794824088.5334263,
+    "seen": 1794885782.464517,
+    "ast_hash": "608635509df8e13f0dc0d1bbc2700aba",
     "semantic_hash": ""
   },
   "WPF LCD Test/Interfaces/IDispatcher.cs": {
@@ -126,9 +126,9 @@
     "semantic_hash": ""
   },
   "WPF LCD Test/Models/DeviceUnderTest.cs": {
-    "mtime": 1769394870.8770368,
-    "seen": 1794207670.2280936,
-    "ast_hash": "b111b447c810711516bcb85f16d720d6",
+    "mtime": 1794825435.0242627,
+    "seen": 1794885782.4645307,
+    "ast_hash": "1a1c4d792a4e79f3454cc3ad993a8b30",
     "semantic_hash": ""
   },
   "WPF LCD Test/Models/LogHandler.cs": {
@@ -138,8 +138,8 @@
     "semantic_hash": ""
   },
   "WPF LCD Test/Models/Measurement.cs": {
-    "mtime": 1769394870.8780465,
-    "seen": 1794207670.2280955,
+    "mtime": 1794825435.0232642,
+    "seen": 1794885782.4645324,
     "ast_hash": "304f77a9dd978ac0786d21aacabdfd0e",
     "semantic_hash": ""
   },
@@ -162,9 +162,9 @@
     "semantic_hash": ""
   },
   "WPF LCD Test/Resources/Resources.Designer.cs": {
-    "mtime": 1786434389.3307173,
-    "seen": 1794207670.2280984,
-    "ast_hash": "2b5d6893c3584bb08f707e74c0a2efa4",
+    "mtime": 1794882751.6806498,
+    "seen": 1794885782.464536,
+    "ast_hash": "ae05af57d79d1cc8240f0b23cddae804",
     "semantic_hash": ""
   },
   "WPF LCD Test/Resources/StringResources.xaml": {
@@ -180,21 +180,21 @@
     "semantic_hash": ""
   },
   "WPF LCD Test/Screen Checker.csproj": {
-    "mtime": 1786433375.2049184,
-    "seen": 1794207670.2281005,
-    "ast_hash": "f310bdbe1915f69b9663ac6767627720",
+    "mtime": 1794821909.9319391,
+    "seen": 1794885782.4645386,
+    "ast_hash": "b4fac336b31f2050413e9a86a7289b1a",
     "semantic_hash": ""
   },
   "WPF LCD Test/Services/ColorMeasurementService.cs": {
-    "mtime": 1770086646.164465,
-    "seen": 1794207670.2281015,
-    "ast_hash": "28772d5da9f0545c9a66d1a28c5c7ef0",
+    "mtime": 1794825435.0242627,
+    "seen": 1794885782.4645402,
+    "ast_hash": "fe779e1a9de41bd8ebada311ba491dc9",
     "semantic_hash": ""
   },
   "WPF LCD Test/Services/DialogService.cs": {
-    "mtime": 1769394870.8848794,
-    "seen": 1794207670.2281022,
-    "ast_hash": "7542811f691c882ae53635e268cf9a30",
+    "mtime": 1794824088.5334263,
+    "seen": 1794885782.464541,
+    "ast_hash": "cb5df5e308f5a878b339b04aa967b379",
     "semantic_hash": ""
   },
   "WPF LCD Test/Services/FileService.cs": {
@@ -240,9 +240,9 @@
     "semantic_hash": ""
   },
   "WPF LCD Test/ViewModels/MeasurementViewModel.cs": {
-    "mtime": 1786434226.213346,
-    "seen": 1794207670.2281084,
-    "ast_hash": "c78c4d009e2f88a443c6d371df6ea8b8",
+    "mtime": 1794882751.6821532,
+    "seen": 1794885782.464548,
+    "ast_hash": "a14e183474add5d2fe226df016f57463",
     "semantic_hash": ""
   },
   "WPF LCD Test/ViewModels/SettingsViewModel.cs": {
@@ -264,9 +264,9 @@
     "semantic_hash": ""
   },
   "WPF LCD Test/Views/MeasurementView.xaml": {
-    "mtime": 1786434467.3167171,
-    "seen": 1794207670.2281115,
-    "ast_hash": "5f45fcd9db83a1f1d1b822f5f44daaf4",
+    "mtime": 1794883108.5760443,
+    "seen": 1794885782.464553,
+    "ast_hash": "bff4c0798225e0dd1a23c1613f478f3e",
     "semantic_hash": ""
   },
   "WPF LCD Test/Views/MeasurementView.xaml.cs": {
@@ -285,12 +285,6 @@
     "mtime": 1769394870.8950126,
     "seen": 1794207670.228114,
     "ast_hash": "a54554b5e7fb8222341b1a7b3e70e08d",
-    "semantic_hash": ""
-  },
-  "WPF LCD Test/Wrappers/ColorAnalyzerWrappers.cs": {
-    "mtime": 1770086646.174739,
-    "seen": 1794207670.2281146,
-    "ast_hash": "535df9055a6aada1c8135d2657d7a746",
     "semantic_hash": ""
   },
   "WPF LCD Test/Wrappers/MessageBoxWrapper .cs": {
@@ -324,9 +318,9 @@
     "semantic_hash": ""
   },
   "WPF_LCD_Test.UnitTests/ConvertersTests/MeasurementJsonConverter.cs": {
-    "mtime": 1769394870.9010115,
-    "seen": 1794207670.2281194,
-    "ast_hash": "c205520fd974baadd2affa5f2d39587a",
+    "mtime": 1794825435.0252628,
+    "seen": 1794885782.4645634,
+    "ast_hash": "41c393ee5e100a04893b41c866db2f48",
     "semantic_hash": ""
   },
   "WPF_LCD_Test.UnitTests/Mocks/MockMeasurementViewModel .cs": {
@@ -378,15 +372,15 @@
     "semantic_hash": ""
   },
   "WPF_LCD_Test.UnitTests/Screen Checker.UnitTests.csproj": {
-    "mtime": 1778140046.0663123,
-    "seen": 1794207670.2281268,
-    "ast_hash": "73a09fe124dcef4dd439d9b60da927f7",
+    "mtime": 1794821903.8207,
+    "seen": 1794885782.4645717,
+    "ast_hash": "38cd53b9821d13b4501b9c9309b98670",
     "semantic_hash": ""
   },
   "WPF_LCD_Test.UnitTests/ServicesTests/ColorMeasurementServiceTests.cs": {
-    "mtime": 1770086646.174739,
-    "seen": 1794207670.2281275,
-    "ast_hash": "39c1dbc641bdbc5d7d5d3b6a0f06073b",
+    "mtime": 1794825435.026263,
+    "seen": 1794885782.4645731,
+    "ast_hash": "5842ccfea67c4651e766bcb34a1ef135",
     "semantic_hash": ""
   },
   "WPF_LCD_Test.UnitTests/ServicesTests/DialogServiceTests.cs": {
@@ -396,9 +390,9 @@
     "semantic_hash": ""
   },
   "WPF_LCD_Test.UnitTests/ServicesTests/FileServiceTests.cs": {
-    "mtime": 1770086646.174739,
-    "seen": 1794207670.228129,
-    "ast_hash": "7ee6a1ca842394131bf6e2535cead136",
+    "mtime": 1794825445.480773,
+    "seen": 1794885782.4645753,
+    "ast_hash": "fbd351779d362bd78a4cf2d25af0251a",
     "semantic_hash": ""
   },
   "WPF_LCD_Test.UnitTests/ServicesTests/LocalizationServiceTests.cs": {
@@ -426,15 +420,15 @@
     "semantic_hash": ""
   },
   "WPF_LCD_Test.UnitTests/ViewModelsTests/MainWindowViewModelTests.cs": {
-    "mtime": 1770086646.184613,
-    "seen": 1794207670.228133,
-    "ast_hash": "0fa3a00b8ad3407addc397a2605ea759",
+    "mtime": 1794824167.925405,
+    "seen": 1794885782.4645798,
+    "ast_hash": "b2c217d943dcbd32d8851cc7b46e575d",
     "semantic_hash": ""
   },
   "WPF_LCD_Test.UnitTests/ViewModelsTests/MeasurementViewModelTests.cs": {
-    "mtime": 1786434666.7690926,
-    "seen": 1794207670.2281337,
-    "ast_hash": "4e67dcf87cef43d7df0fc5f4492b5269",
+    "mtime": 1794882757.3154795,
+    "seen": 1794885782.4645805,
+    "ast_hash": "3238ea9e1322f09f014274a7e85c5452",
     "semantic_hash": ""
   },
   "WPF_LCD_Test.UnitTests/ViewModelsTests/SettingsViewModelTests.cs": {
@@ -456,21 +450,21 @@
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1786433391.3434944,
-    "seen": 1794207670.2281368,
-    "ast_hash": "9924b8509a7a13ed433dc90b107b626c",
+    "mtime": 1794822953.7150726,
+    "seen": 1794885782.4645846,
+    "ast_hash": "86231d35026c3db81a990161a1f4ea57",
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1778144666.4592402,
-    "seen": 1794207670.2281375,
-    "ast_hash": "e5b1c9902ae37a9244d0d56289da6082",
+    "mtime": 1794822966.9247131,
+    "seen": 1794885782.4645855,
+    "ast_hash": "18b82460a9406ae38b5ed1cfc22bf6ea",
     "semantic_hash": ""
   },
   "WPF LCD Test/TODO.txt": {
-    "mtime": 1793869571.3115475,
-    "seen": 1794207670.2281382,
-    "ast_hash": "652a56649a8d4ba24865f1d75c84e00b",
+    "mtime": 1794885759.5367856,
+    "seen": 1794885782.4645865,
+    "ast_hash": "24df378928d04808ab2d020a31dc21c6",
     "semantic_hash": ""
   },
   "WPF LCD Test/Images/ButtonsIcons/MeasurementViewIcon.png": {
@@ -525,6 +519,66 @@
     "mtime": 1769394870.868746,
     "seen": 1794207670.2281458,
     "ast_hash": "0eddb6c53c05527f9977792755837dc2",
+    "semantic_hash": ""
+  },
+  "WPF LCD Test/Interfaces/IAnalyzerRegistryService.cs": {
+    "mtime": 1794824061.763414,
+    "seen": 1794885782.4645143,
+    "ast_hash": "9831a660ca29a70f67a8f47d37531aee",
+    "semantic_hash": ""
+  },
+  "WPF LCD Test/Models/AnalyzerRegistryEntry.cs": {
+    "mtime": 1794824059.3542192,
+    "seen": 1794885782.464526,
+    "ast_hash": "137a6d86021df83bc0c249e3c1f8688a",
+    "semantic_hash": ""
+  },
+  "WPF LCD Test/Models/ColorAnalyzerModel.cs": {
+    "mtime": 1794823447.4729428,
+    "seen": 1794885782.4645276,
+    "ast_hash": "1c68f0610d4992db85aeda69ada0b82b",
+    "semantic_hash": ""
+  },
+  "WPF LCD Test/Models/ColorimeterInfo.cs": {
+    "mtime": 1794825328.7509916,
+    "seen": 1794885782.4645286,
+    "ast_hash": "22e88bd17ec041b5210390a43e3dbf99",
+    "semantic_hash": ""
+  },
+  "WPF LCD Test/Services/AnalyzerRegistryService.cs": {
+    "mtime": 1794827748.0834608,
+    "seen": 1794885782.4645393,
+    "ast_hash": "ec631fc1786a1974a84cce56414758b7",
+    "semantic_hash": ""
+  },
+  "WPF LCD Test/Views/ChoiceDialogWindow.xaml": {
+    "mtime": 1794824070.8484032,
+    "seen": 1794885782.4645495,
+    "ast_hash": "b6714cb262204b570943407921bd7a82",
+    "semantic_hash": ""
+  },
+  "WPF LCD Test/Views/ChoiceDialogWindow.xaml.cs": {
+    "mtime": 1794824073.460441,
+    "seen": 1794885782.4645507,
+    "ast_hash": "9f71d201794b968a773204bc07dd0358",
+    "semantic_hash": ""
+  },
+  "WPF LCD Test/Wrappers/Ca310Wrappers.cs": {
+    "mtime": 1794822953.7658377,
+    "seen": 1794885782.4645572,
+    "ast_hash": "7d349ccd4a6f0f59da186544ee7b014d",
+    "semantic_hash": ""
+  },
+  "WPF LCD Test/Wrappers/Ca410Wrappers.cs": {
+    "mtime": 1794822953.782865,
+    "seen": 1794885782.464558,
+    "ast_hash": "cc426b7e7cc03a4da2f2b129a1c54dea",
+    "semantic_hash": ""
+  },
+  "WPF_LCD_Test.UnitTests/ServicesTests/AnalyzerRegistryServiceTests.cs": {
+    "mtime": 1794827809.4556756,
+    "seen": 1794885782.4645724,
+    "ast_hash": "ba425cd8da02ef974049d73b0aff591f",
     "semantic_hash": ""
   }
 }
