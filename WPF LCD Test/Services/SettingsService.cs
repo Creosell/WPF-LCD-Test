@@ -130,5 +130,16 @@ namespace WPF_LCD_Test.Services
             settings.ColorAnalyzerChannel = channel.ToString();
             SaveSettings(settings);
             }
+
+        /// <summary>
+        /// Updates the application language in settings and persists changes.
+        /// </summary>
+        /// <param name="cultureCode">Language culture code to save.</param>
+        public void UpdateLanguage(string cultureCode)
+            {
+            var settings = LoadSettings();
+            settings.LanguageCultureCode = cultureCode;
+            SaveSettings(settings);
+            }
         }
     }

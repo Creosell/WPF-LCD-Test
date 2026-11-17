@@ -15,6 +15,7 @@ namespace WPF_LCD_Test.Services
         {
         private IColorAnalyzer200? _objCa200;
         private readonly IReadOnlyList<Func<IColorAnalyzer200>> _analyzerFactories = [];
+        private readonly ISettingsService? _settingsService;
         private IColorAnalyzer? _objCa = null;
         private IColorAnalyzerMemory? _objMemory = null;
         private bool _isDeviceConnected = false;
@@ -28,10 +29,7 @@ namespace WPF_LCD_Test.Services
         private const int NtscSync = 0;
         private const int PalSync = 1;
         private const int ExtSync = 2;
-        private const int UniverslaSyncMode = 3;
-        private const int SlowMeasuringMode = 0;
-        private const int FastMeasuringMode = 1;
-        private const int AutoMeasuringMode = 2;
+        private const int UniversalSyncMode = 3;
         private const double DefaultDisplayRange = 2.5;
         private const int LvxyDisplayMode = 0;
         private const int TdudvDisplayMode = 1;
@@ -110,8 +108,10 @@ namespace WPF_LCD_Test.Services
         /// <summary>
         /// Initializes a new instance of ColorMeasurementService.
         /// </summary>
-        public ColorMeasurementService()
+        /// <param name="settingsService">Source of the measurement mode settings; defaults are used when omitted.</param>
+        public ColorMeasurementService(ISettingsService? settingsService = null)
             {
+            _settingsService = settingsService;
             _analyzerFactories =
                 [
                 CreateCa410Analyzer,
@@ -134,8 +134,10 @@ namespace WPF_LCD_Test.Services
         /// Initializes a new instance of ColorMeasurementService with dependency injection for testing.
         /// </summary>
         /// <param name="ca200Wrapper">Color analyzer wrapper for testing.</param>
-        internal ColorMeasurementService(IColorAnalyzer200 ca200Wrapper)
+        /// <param name="settingsService">Source of the measurement mode settings; defaults are used when omitted.</param>
+        internal ColorMeasurementService(IColorAnalyzer200 ca200Wrapper, ISettingsService? settingsService = null)
             {
+            _settingsService = settingsService;
             _objCa200 = ca200Wrapper ?? throw new ArgumentNullException(nameof(ca200Wrapper));
             }
 
@@ -240,8 +242,9 @@ namespace WPF_LCD_Test.Services
                         {
                         _objCa.CalZero();
 
-                        _objCa.SyncMode = UniverslaSyncMode;
-                        _objCa.AveragingMode = AutoMeasuringMode;
+                        var settings = _settingsService?.CurrentSettings ?? new AppSettings();
+                        _objCa.SyncMode = settings.SyncFrequency ?? UniversalSyncMode;
+                        _objCa.AveragingMode = (int)settings.MeasurementSpeed;
                         _objCa.SetAnalogRange(
                             Convert.ToSingle(DefaultDisplayRange),
                             Convert.ToSingle(DefaultDisplayRange)

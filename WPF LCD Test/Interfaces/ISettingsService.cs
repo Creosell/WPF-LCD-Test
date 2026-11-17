@@ -29,5 +29,11 @@ namespace WPF_LCD_Test.Interfaces
         /// </summary>
         /// <param name="channel">Channel number to save.</param>
         void UpdateChannel(int channel);
+
+        /// <summary>
+        /// Updates only the application language in settings and persists changes.
+        /// </summary>
+        /// <param name="cultureCode">Language culture code to save.</param>
+        void UpdateLanguage(string cultureCode);
         }
     }

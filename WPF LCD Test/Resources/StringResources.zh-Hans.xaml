@@ -102,6 +102,12 @@
     <system:String x:Key="ColorAnalyzerChannel">
         色彩分析仪通道
     </system:String>
+    <system:String x:Key="MeasurementSpeedLabel">
+        测量速度
+    </system:String>
+    <system:String x:Key="SyncModeLabel">
+        同步模式
+    </system:String>
     <system:String x:Key="AutoConnectLabel">
         自动连接：
     </system:String>

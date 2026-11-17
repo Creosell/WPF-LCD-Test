@@ -134,8 +134,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
 
             _viewModel.SelectedLanguage = newLang;
 
-            _mockSettingsService.Verify(s => s.SaveSettings(It.Is<AppSettings>(
-                settings => settings.LanguageCultureCode == "zh-Hans")), Times.Once());
+            _mockSettingsService.Verify(s => s.UpdateLanguage("zh-Hans"), Times.Once());
             }
 
         [Test]

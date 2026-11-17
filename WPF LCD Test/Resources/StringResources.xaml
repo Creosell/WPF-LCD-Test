@@ -104,6 +104,12 @@
     <system:String x:Key="ColorAnalyzerChannel">
         Color analyzer channel
     </system:String>
+    <system:String x:Key="MeasurementSpeedLabel">
+        Measurement speed
+    </system:String>
+    <system:String x:Key="SyncModeLabel">
+        Sync mode
+    </system:String>
     <system:String x:Key="AutoConnectLabel">
         Auto Connect:
     </system:String>

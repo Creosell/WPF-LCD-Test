@@ -29,6 +29,42 @@ namespace WPF_LCD_Test.ViewModels
                     }
                 }
             }
+        private MeasurementSpeed _measurementSpeed;
+        public MeasurementSpeed MeasurementSpeed
+            {
+            get => _measurementSpeed;
+            set => SetProperty(ref _measurementSpeed, value);
+            }
+        public IReadOnlyList<MeasurementSpeed> AvailableMeasurementSpeeds { get; } = Enum.GetValues<MeasurementSpeed>();
+
+        /// <summary>
+        /// Synchronization modes the operator can choose from.
+        /// </summary>
+        public enum SyncModeOption { Universal, Internal }
+        public IReadOnlyList<SyncModeOption> AvailableSyncModes { get; } = Enum.GetValues<SyncModeOption>();
+        private SyncModeOption _syncMode;
+        public SyncModeOption SyncMode
+            {
+            get => _syncMode;
+            set
+                {
+                if (SetProperty(ref _syncMode, value)) OnPropertyChanged(nameof(IsSyncFrequencyEnabled));
+                }
+            }
+        public bool IsSyncFrequencyEnabled => SyncMode == SyncModeOption.Internal;
+        private string _syncFrequency = DefaultSyncFrequency.ToString();
+        public string SyncFrequency
+            {
+            get => _syncFrequency;
+            set
+                {
+                if (value.Length < 4)
+                    {
+                    SetProperty(ref _syncFrequency, value);
+                    }
+                }
+            }
+        private const int DefaultSyncFrequency = 60;
         private bool _autoConnectEnabled;
         public bool AutoConnectEnabled
             {
@@ -132,6 +168,9 @@ namespace WPF_LCD_Test.ViewModels
                     }
                 ColorAnalyzerChannel = currentSettings.ColorAnalyzerChannel;
                 AutoConnectEnabled = currentSettings.AutoConnectEnabled;
+                MeasurementSpeed = currentSettings.MeasurementSpeed;
+                SyncMode = currentSettings.SyncFrequency.HasValue ? SyncModeOption.Internal : SyncModeOption.Universal;
+                SyncFrequency = (currentSettings.SyncFrequency ?? DefaultSyncFrequency).ToString();
                 }
             catch (Exception ex)
                 {
@@ -162,7 +201,9 @@ namespace WPF_LCD_Test.ViewModels
                 {
                 LanguageCultureCode = LanguageCultureCode,
                 ColorAnalyzerChannel = ColorAnalyzerChannel,
-                AutoConnectEnabled = AutoConnectEnabled
+                AutoConnectEnabled = AutoConnectEnabled,
+                MeasurementSpeed = MeasurementSpeed,
+                SyncFrequency = SyncMode == SyncModeOption.Internal ? GetSyncFrequency(SyncFrequency) : null
                 };
             SaveSettings(settingsToSave);
             }
@@ -170,11 +211,30 @@ namespace WPF_LCD_Test.ViewModels
         // Сохраняет только язык
         private void SaveLanguageToSettings()
             {
-            AppSettings settingsToSave = new()
+            try
                 {
-                LanguageCultureCode = LanguageCultureCode,
-                };
-            SaveSettings(settingsToSave);
+                _settingsService.UpdateLanguage(LanguageCultureCode);
+                }
+            catch (Exception ex)
+                {
+                Debug.WriteLine($"SettingsViewModel Ошибка: Не удалось сохранить язык. Ошибка: {ex.Message}");
+                }
+            }
+
+        // Проверяет частоту внутренней синхронизации; при ошибке возвращает сохранённое значение
+        private int GetSyncFrequency(string frequency)
+            {
+            const int min = AppConstants.ColorAnalyzer.MinSyncFrequency;
+            const int max = AppConstants.ColorAnalyzer.MaxSyncFrequency;
+            if (int.TryParse(frequency, out int result) && result >= min && result <= max)
+                {
+                return result;
+                }
+
+            _dialogService.ShowMessage($"Sync frequency range: {min}-{max} Hz", Err);
+            result = _settingsService.LoadSettings().SyncFrequency ?? DefaultSyncFrequency;
+            SyncFrequency = result.ToString();
+            return result;
             }
 
         private int GetChannel(string channel)

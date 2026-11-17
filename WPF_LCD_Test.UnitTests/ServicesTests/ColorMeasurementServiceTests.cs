@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Runtime.InteropServices;
 using WPF_LCD_Test.Interfaces;
+using WPF_LCD_Test.Models;
 using WPF_LCD_Test.Services;
 
 // Это заглушка для LocalizationService.Instance, если он статичен и вызывает проблемы в тестах.
@@ -151,6 +152,32 @@ namespace WPF_LCD_Test.Tests
             _mockCa.VerifySet(m => m.AveragingMode = It.IsAny<int>(), Times.Once);
             _mockCa.Verify(m => m.SetAnalogRange(It.IsAny<float>(), It.IsAny<float>()), Times.Once);
             _mockCa.VerifySet(m => m.DisplayMode = It.IsAny<int>(), Times.Once);
+            }
+
+        [Test]
+        public async Task CalibrateZeroAsync_WithoutSettings_UsesSlowSpeedAndUniversalSync()
+            {
+            await _service.ConnectAsync();
+
+            await _service.CalibrateZeroAsync();
+
+            _mockCa.VerifySet(m => m.AveragingMode = (int)MeasurementSpeed.Slow, Times.Once);
+            _mockCa.VerifySet(m => m.SyncMode = 3, Times.Once);
+            }
+
+        [TestCase(MeasurementSpeed.Fast, null, 1, 3)]
+        [TestCase(MeasurementSpeed.Auto, 75, 2, 75)]
+        public async Task CalibrateZeroAsync_AppliesModesFromSettings(MeasurementSpeed speed, int? frequency, int expectedSpeed, int expectedSync)
+            {
+            var settings = new Mock<ISettingsService>();
+            settings.SetupGet(s => s.CurrentSettings).Returns(new AppSettings { MeasurementSpeed = speed, SyncFrequency = frequency });
+            var service = new ColorMeasurementService(_mockCa200.Object, settings.Object);
+            await service.ConnectAsync();
+
+            await service.CalibrateZeroAsync();
+
+            _mockCa.VerifySet(m => m.AveragingMode = expectedSpeed, Times.Once);
+            _mockCa.VerifySet(m => m.SyncMode = expectedSync, Times.Once);
             }
 
         [Test]

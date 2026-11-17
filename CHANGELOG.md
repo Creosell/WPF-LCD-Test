@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Zero calibration reads the active channel from the probe instead of overwriting it with the Settings value; the confirmed channel is saved to the settings
 - `analyzers.json` next to the executable remembers the last confirmed channel per probe serial number. When the probe channel differs from the remembered one, a dialog lets the inspector pick either of the two; closing it cancels the calibration
 - Device card in the measurement view: model, active channel and probe serial number (shown only after the channel is confirmed) with a single state dot (gray - not connected, amber - connected, green - connected and calibrated) and a full state tooltip, replacing the separate Connected/Calibrated texts. Before the channel is confirmed the card shows a dimmed "No analyzer / Press Zero Calibration" hint or "Calibrating…" instead of empty placeholders; switching between the states is smooth (old content fades out, the card eases to the new width, new content fades in) and the amber dot gently breathes while the analyzer is calibrating
+- Measurement speed (Slow / Fast / Auto) and synchronization (Universal / Internal with a frequency of 40-200 Hz) settings, applied during zero calibration. Defaults: Slow and Universal. The CA-410 driver translates Auto to its native value (3), which differs from the CA-310 (2)
 - Optional `Colorimeter` object (`Model`, `ProbeSN`, `Channel`) in the device JSON header, filled once after calibration; files without it keep the previous format
 
 ### Changed
@@ -24,6 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Hardcoded QA probe handling (serial number `08954195`, forced channel 1)
 
 ### Fixed
+- Changing the language reset the other settings (channel, auto connect) to their defaults; only the language is updated now
+- The CA-410 ran in LTD.AUTO instead of AUTO because the CA-310 speed constant was passed to it
 - Saving the device JSON failed when a measurement contained an infinite value (CA-410 reports an infinite color temperature for saturated colors); non-finite values are now written as `null`
 - A repeated zero calibration kept the device reported as calibrated for the whole new calibration; it is now reported as uncalibrated until the calibration finishes
 - The interface shifted down by a few pixels after a device configuration was selected (the placeholder used a smaller font than the selected name)

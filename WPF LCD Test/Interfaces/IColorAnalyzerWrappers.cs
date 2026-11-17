@@ -59,12 +59,12 @@ namespace WPF_LCD_Test.Interfaces
         void CalZero();
 
         /// <summary>
-        /// Gets or sets the sync mode.
+        /// Gets or sets the sync mode: 0 NTSC, 1 PAL, 2 EXT, 3 UNIV, or a frequency in Hz (from <see cref="AppConstants.ColorAnalyzer.MinSyncFrequency"/>) for the internal synchronization.
         /// </summary>
         int SyncMode { get; set; }
 
         /// <summary>
-        /// Gets or sets the averaging mode.
+        /// Gets or sets the averaging mode as a <see cref="Models.MeasurementSpeed"/> value: 0 SLOW, 1 FAST, 2 AUTO.
         /// </summary>
         int AveragingMode { get; set; }
 

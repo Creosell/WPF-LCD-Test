@@ -25,5 +25,18 @@ namespace WPF_LCD_Test.Models
         /// </summary>
         [JsonPropertyName("autoConnectEnabled")]
         public bool AutoConnectEnabled { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the measurement speed applied to the color analyzer during zero calibration.
+        /// </summary>
+        [JsonPropertyName("measurementSpeed")]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public MeasurementSpeed MeasurementSpeed { get; set; } = MeasurementSpeed.Slow;
+
+        /// <summary>
+        /// Gets or sets the internal synchronization frequency in Hz; null selects the universal (100 ms) synchronization.
+        /// </summary>
+        [JsonPropertyName("syncFrequency")]
+        public int? SyncFrequency { get; set; }
         }
     }

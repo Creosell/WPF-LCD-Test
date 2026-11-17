@@ -123,6 +123,9 @@ namespace WPF_LCD_Test.Wrappers
     public class Ca410Wrapper : IColorAnalyzer, IDisposable
         {
         private const double DefaultSyncFrequency = 60.0;
+        private const int InternalSyncMode = 4;
+        private const int AutoSpeed = (int)MeasurementSpeed.Auto;
+        private const int NativeAutoSpeed = 3;
 
         private CASDK2Ca? _ca;
         private Ca410ProbeWrapper? _probe;
@@ -183,9 +186,15 @@ namespace WPF_LCD_Test.Wrappers
                 int mode = 0;
                 double frequency = 0;
                 Ca410Sdk.Check(Ca.get_SyncMode(ref mode, ref frequency), nameof(SyncMode));
-                return mode;
+                return mode == InternalSyncMode ? (int)Math.Round(frequency) : mode;
                 }
-            set => Ca410Sdk.Check(Ca.put_SyncMode(value, DefaultSyncFrequency), nameof(SyncMode));
+            set
+                {
+                bool isInternal = value >= AppConstants.ColorAnalyzer.MinSyncFrequency;
+                Ca410Sdk.Check(
+                    isInternal ? Ca.put_SyncMode(InternalSyncMode, value) : Ca.put_SyncMode(value, DefaultSyncFrequency),
+                    nameof(SyncMode));
+                }
             }
 
         /// <inheritdoc/>
@@ -195,9 +204,9 @@ namespace WPF_LCD_Test.Wrappers
                 {
                 int mode = 0;
                 Ca410Sdk.Check(Ca.get_AveragingMode(ref mode), nameof(AveragingMode));
-                return mode;
+                return mode == NativeAutoSpeed ? AutoSpeed : mode;
                 }
-            set => Ca410Sdk.Check(Ca.put_AveragingMode(value), nameof(AveragingMode));
+            set => Ca410Sdk.Check(Ca.put_AveragingMode(value == AutoSpeed ? NativeAutoSpeed : value), nameof(AveragingMode));
             }
 
         /// <inheritdoc/>
