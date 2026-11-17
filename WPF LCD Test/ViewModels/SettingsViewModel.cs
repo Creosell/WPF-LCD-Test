@@ -57,9 +57,22 @@ namespace WPF_LCD_Test.ViewModels
                 {
                 if (SetProperty(ref _syncMode, value))
                     {
+                    OnPropertyChanged(nameof(SelectedSyncMode));
                     OnPropertyChanged(nameof(IsSyncFrequencyVisible));
                     OnPropertyChanged(nameof(IsIntegrationTimeVisible));
                     }
+                }
+            }
+
+        /// <summary>
+        /// Selection binding for the sync mode list; the null the list pushes while its items are replaced is ignored.
+        /// </summary>
+        public SyncMode? SelectedSyncMode
+            {
+            get => SyncMode;
+            set
+                {
+                if (value.HasValue) SyncMode = value.Value;
                 }
             }
         public bool IsSyncFrequencyVisible => SyncMode == SyncMode.Internal;
@@ -175,13 +188,16 @@ namespace WPF_LCD_Test.ViewModels
         // Ограничивает список режимов синхронизации возможностями подключённого прибора
         private void RefreshSyncOptions()
             {
-            AvailableSyncModes = AnalyzerCapabilities.GetSyncModes(_colorMeasurementService.Model)
-                .Select(mode => new SyncModeOption { Mode = mode, Name = mode.ToDisplayName() })
-                .ToList();
-            if (AvailableSyncModes.All(option => option.Mode != SyncMode))
+            var modes = AnalyzerCapabilities.GetSyncModes(_colorMeasurementService.Model);
+            if (!AvailableSyncModes.Select(option => option.Mode).SequenceEqual(modes))
+                {
+                AvailableSyncModes = modes.Select(mode => new SyncModeOption { Mode = mode, Name = mode.ToDisplayName() }).ToList();
+                }
+            if (modes.All(mode => mode != SyncMode))
                 {
                 SyncMode = SyncMode.Universal;
                 }
+            OnPropertyChanged(nameof(SelectedSyncMode));
             OnPropertyChanged(nameof(SyncFrequencyHint));
             OnPropertyChanged(nameof(IntegrationTimeHint));
             }

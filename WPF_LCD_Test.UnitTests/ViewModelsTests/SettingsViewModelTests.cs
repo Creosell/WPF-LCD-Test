@@ -390,6 +390,26 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             Assert.That(_viewModel.SyncFrequencyHint, Is.EqualTo("40-200 Hz"));
             }
 
+        [Test]
+        public void SelectedSyncMode_IgnoresNullFromTheList()
+            {
+            _viewModel.SyncMode = SyncMode.Internal;
+
+            _viewModel.SelectedSyncMode = null;
+
+            Assert.That(_viewModel.SyncMode, Is.EqualTo(SyncMode.Internal));
+            }
+
+        [Test]
+        public void CancelSettingsCommand_Execute_KeepsTheSyncModeListInstance()
+            {
+            var list = _viewModel.AvailableSyncModes;
+
+            _viewModel.CancelSettingsCommand.Execute(null);
+
+            Assert.That(_viewModel.AvailableSyncModes, Is.SameAs(list));
+            }
+
         [TestCase(SyncMode.Internal, true, false)]
         [TestCase(SyncMode.Manual, false, true)]
         [TestCase(SyncMode.Universal, false, false)]

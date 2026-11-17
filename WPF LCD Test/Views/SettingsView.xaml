@@ -75,7 +75,7 @@
                     Width="120"
                     DisplayMemberPath="Name"
                     ItemsSource="{Binding AvailableSyncModes}"
-                    SelectedValue="{Binding SyncMode}"
+                    SelectedValue="{Binding SelectedSyncMode}"
                     SelectedValuePath="Mode" />
                 <StackPanel Orientation="Horizontal" Visibility="{Binding IsSyncFrequencyVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TextBox
