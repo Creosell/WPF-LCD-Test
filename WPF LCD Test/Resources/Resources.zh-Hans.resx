@@ -609,11 +609,6 @@
   <data name="SpecBound_max" xml:space="preserve">
     <value>最大</value>
   </data>
-  <data name="SaveWithSpecFailQuestion" xml:space="preserve">
-    <value>以下数值超出规格:
-{0}
-仍要保存结果吗？</value>
-  </data>
   <data name="SpecGamutArea" xml:space="preserve">
     <value>{0} 色域面积比, {1}</value>
   </data>
@@ -709,5 +704,26 @@
   </data>
   <data name="SpecLocation_BlackColor" xml:space="preserve">
     <value>黑</value>
+  </data>
+  <data name="SpecAttemptSuffix" xml:space="preserve">
+    <value>第 {0} 次</value>
+  </data>
+  <data name="SpecRepeatRecommended" xml:space="preserve">
+    <value>建议重新测量</value>
+  </data>
+  <data name="SpecAttemptsOf" xml:space="preserve">
+    <value>{0}/3</value>
+  </data>
+  <data name="SaveSpecHeader" xml:space="preserve">
+    <value>保存的结果存在规格问题:</value>
+  </data>
+  <data name="SaveSpecHeaderFewAttempts" xml:space="preserve">
+    <value>以下数值不符合规格，部分点位测量次数少于 3 次:</value>
+  </data>
+  <data name="SaveSpecRemeasureHint" xml:space="preserve">
+    <value>请对测量不足 3 次的点位重新测量以获得更好的结果。</value>
+  </data>
+  <data name="SaveSpecQuestion" xml:space="preserve">
+    <value>仍要保存结果吗？</value>
   </data>
 </root>

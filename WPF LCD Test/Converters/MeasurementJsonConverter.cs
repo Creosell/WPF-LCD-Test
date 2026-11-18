@@ -40,7 +40,36 @@ namespace WPF_LCD_Test.Converters
             WriteRounded(writer, "Lv", value.Lv, LvPrecision);
             WriteRounded(writer, "T", value.T, 0);
 
+            if (value.Attempts.Count > 1)
+            {
+                WriteAttempts(writer, value, LvPrecision);
+            }
+
             writer.WriteEndObject();
+        }
+
+        /// <summary>
+        /// Writes every attempt of the point with its time and the flag of the one the measurement holds.
+        /// </summary>
+        /// <param name="writer">The JSON writer.</param>
+        /// <param name="value">The measurement with the attempts.</param>
+        /// <param name="lvPrecision">Number of fractional digits of the luminance.</param>
+        private static void WriteAttempts(Utf8JsonWriter writer, Measurement value, int lvPrecision)
+        {
+            writer.WriteStartArray("Attempts");
+            for (int i = 0; i < value.Attempts.Count; i++)
+            {
+                var attempt = value.Attempts[i];
+                writer.WriteStartObject();
+                writer.WriteString("Time", attempt.Time.ToString("yyyyMMdd_HHmmss", System.Globalization.CultureInfo.InvariantCulture));
+                WriteRounded(writer, "x", attempt.x, 3);
+                WriteRounded(writer, "y", attempt.y, 3);
+                WriteRounded(writer, "Lv", attempt.Lv, lvPrecision);
+                WriteRounded(writer, "T", attempt.T, 0);
+                writer.WriteBoolean("Best", i == value.BestAttemptIndex);
+                writer.WriteEndObject();
+            }
+            writer.WriteEndArray();
         }
 
         /// <summary>

@@ -61,6 +61,14 @@ namespace WPF_LCD_Test.Models
         IReadOnlyList<string> Missing);
 
     /// <summary>
+    /// What the specification check found out about the attempts of one point.
+    /// </summary>
+    /// <param name="Count">Number of accepted attempts.</param>
+    /// <param name="Best">Index of the best attempt (the one the evaluation used).</param>
+    /// <param name="Deviated">True when any attempt had a remark against the specification.</param>
+    public sealed record SpecAttemptInfo(int Count, int Best, bool Deviated);
+
+    /// <summary>
     /// Result of evaluating the measurements of a device against its specification.
     /// </summary>
     /// <param name="Verdict">Verdict over the evaluated checks.</param>
@@ -68,6 +76,11 @@ namespace WPF_LCD_Test.Models
     /// <param name="Checks">All checks that have a specification.</param>
     public sealed record SpecEvaluation(SpecVerdict Verdict, bool Complete, IReadOnlyList<SpecCheck> Checks)
         {
+        /// <summary>
+        /// Gets the attempt summary per measurement location; empty when the generator did not report it.
+        /// </summary>
+        public IReadOnlyDictionary<string, SpecAttemptInfo> Attempts { get; init; } = new Dictionary<string, SpecAttemptInfo>();
+
         /// <summary>
         /// Parses the JSON printed by the report generator in the evaluate mode.
         /// </summary>
@@ -86,12 +99,28 @@ namespace WPF_LCD_Test.Models
                     }
 
                 var checks = root.GetProperty("checks").EnumerateArray().Select(ParseCheck).ToList();
-                return new SpecEvaluation(ParseVerdict(root.GetProperty("device").GetString()), root.GetProperty("complete").GetBoolean(), checks);
+                return new SpecEvaluation(ParseVerdict(root.GetProperty("device").GetString()), root.GetProperty("complete").GetBoolean(), checks) { Attempts = ParseAttempts(root) };
                 }
             catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException)
                 {
                 throw new FormatException($"Unexpected evaluation result: {ex.Message}", ex);
                 }
+            }
+
+        private static Dictionary<string, SpecAttemptInfo> ParseAttempts(JsonElement root)
+            {
+            var attempts = new Dictionary<string, SpecAttemptInfo>();
+            if (!root.TryGetProperty("attempts", out var element) || element.ValueKind != JsonValueKind.Object) return attempts;
+
+            foreach (var property in element.EnumerateObject())
+                {
+                var info = property.Value;
+                attempts[property.Name] = new SpecAttemptInfo(
+                    info.GetProperty("count").GetInt32(),
+                    info.GetProperty("best").GetInt32(),
+                    info.GetProperty("deviated").GetBoolean());
+                }
+            return attempts;
             }
 
         private static SpecCheck ParseCheck(JsonElement element) => new(

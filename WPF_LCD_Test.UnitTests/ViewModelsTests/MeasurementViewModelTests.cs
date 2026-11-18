@@ -812,7 +812,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             }
 
         [Test]
-        public async Task ExecuteMeasureAsync_FailedRetry_ClearsTheResultsRowAndLogsAWarning()
+        public async Task ExecuteMeasureAsync_FailedRetry_KeepsTheResultsRowAndLogsAWarning()
             {
             _viewModel.ExecuteApplySerialNumber("SN12345");
             _viewModel.IsDeviceConnected = true;
@@ -826,7 +826,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             await ((RelayCommand)_viewModel.MeasureCommand).ExecuteAsync(location);
 
             var row = _viewModel.Results.Single(r => r.Location == location);
-            Assert.That(row.Lv, Is.EqualTo("—"));
+            Assert.That(row.Lv, Is.EqualTo("100.0"), "the previous accepted attempt stays");
+            Assert.That(row.Status.IsPassed, Is.False, "only the status of the last measurement is red");
             Assert.That(_viewModel.LogEntries.Last().Severity, Is.EqualTo(LogSeverity.Warning));
             }
 
@@ -880,7 +881,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             }
 
         [Test]
-        public async Task ExecuteMeasureAsync_FailedRetry_DropsThePreviousMeasurementOfThePoint()
+        public async Task ExecuteMeasureAsync_FailedRetry_KeepsThePreviousAttemptsAndOnlyTheButtonTurnsRed()
             {
             _viewModel.ExecuteApplySerialNumber("SN12345");
             _viewModel.IsDeviceConnected = true;
@@ -893,7 +894,115 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             await ((RelayCommand)_viewModel.MeasureCommand).ExecuteAsync(location);
             await ((RelayCommand)_viewModel.MeasureCommand).ExecuteAsync(location);
 
-            Assert.That(_viewModel.CurrentDevice.Measurements, Is.Empty);
+            Assert.That(_viewModel.CurrentDevice.Measurements.Single().Lv, Is.EqualTo(100));
+            Assert.That(_viewModel.CurrentDevice.AttemptCount(location), Is.EqualTo(1), "a rejected measurement is not an attempt");
+            var status = _mockMeasurementStatusService.Object.AllMeasurementButtonStatuses.First(s => s.Location == location);
+            Assert.That(status.IsPassed, Is.False);
+            }
+
+        [Test]
+        public async Task ExecuteMeasureAsync_RepeatedAcceptedMeasurements_AreKeptAsAttemptsOfThePoint()
+            {
+            _viewModel.ExecuteApplySerialNumber("SN12345");
+            _viewModel.IsDeviceConnected = true;
+            _viewModel.IsDeviceCalibrated = true;
+            var location = MeasurementLocation.WhiteColor.ToString();
+            Measurement Attempt(double lv) => new() { Location = location, x = 0.3127, y = 0.3290, Lv = lv, T = 6500, IsValid = true };
+            _mockColorMeasurementService.SetupSequence(s => s.MeasureAsync(It.IsAny<int>()))
+                .ReturnsAsync(Attempt(150)).ReturnsAsync(Attempt(180)).ReturnsAsync(Attempt(170));
+
+            for (int i = 0; i < 3; i++)
+                await ((RelayCommand)_viewModel.MeasureCommand).ExecuteAsync(location);
+
+            var device = _viewModel.CurrentDevice;
+            Assert.That(device.AttemptCount(location), Is.EqualTo(3));
+            Assert.That(device.Measurements.Single().Lv, Is.EqualTo(180), "until the specification check chooses, the best is the brightest");
+            Assert.That(_viewModel.Results.Single(r => r.Location == location).Lv, Is.EqualTo("180.0"));
+            }
+
+        [Test]
+        public async Task ExecuteMeasureAsync_TheSpecificationCheckChoosesTheBestAttemptAndFillsTheCounter()
+            {
+            _mockDispatcher.Setup(d => d.CheckAccess()).Returns(true);
+            _mockFileService.Setup(f => f.SerializeDevice(It.IsAny<DeviceUnderTest>())).Returns("{}");
+            var evaluation = new SpecEvaluation(SpecVerdict.Warn, false,
+                [new SpecCheck("Brightness", 150, 160, 190, null, SpecStatus.Fail, ["WhiteColor"], [])])
+                {
+                Attempts = new Dictionary<string, SpecAttemptInfo> { ["WhiteColor"] = new(2, 0, true) }
+                };
+            _mockSpecEvaluationService.Setup(s => s.EvaluateAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new SpecEvaluationOutcome(evaluation, null));
+            _viewModel.SelectedDeviceConfiguration = "TestConfig";
+            _viewModel.ExecuteApplySerialNumber("SN12345");
+            _viewModel.IsDeviceConnected = true;
+            _viewModel.IsDeviceCalibrated = true;
+            var location = MeasurementLocation.WhiteColor.ToString();
+            Measurement Attempt(double lv) => new() { Location = location, x = 0.3127, y = 0.3290, Lv = lv, T = 6500, IsValid = true };
+            _mockColorMeasurementService.SetupSequence(s => s.MeasureAsync(It.IsAny<int>())).ReturnsAsync(Attempt(150)).ReturnsAsync(Attempt(180));
+
+            await ((RelayCommand)_viewModel.MeasureCommand).ExecuteAsync(location);
+            await ((RelayCommand)_viewModel.MeasureCommand).ExecuteAsync(location);
+            await Task.Delay(50);
+
+            var row = _viewModel.Results.Single(r => r.Location == location);
+            Assert.That(_viewModel.CurrentDevice.Measurements.Single().BestAttemptIndex, Is.EqualTo(0), "the check chose the first attempt");
+            Assert.That(row.Lv, Is.EqualTo("150.0"));
+            Assert.That((row.Tries, row.TriesLevel), Is.EqualTo(("2/3", TriesLevel.Few)));
+            }
+
+        [Test]
+        public async Task ExecuteMeasureAsync_ACheckResultForAnOlderStateOfThePointIsNotApplied()
+            {
+            _mockDispatcher.Setup(d => d.CheckAccess()).Returns(true);
+            _mockFileService.Setup(f => f.SerializeDevice(It.IsAny<DeviceUnderTest>())).Returns("{}");
+            var stale = new SpecEvaluation(SpecVerdict.Pass, false, [])
+                {
+                Attempts = new Dictionary<string, SpecAttemptInfo> { ["WhiteColor"] = new(1, 0, false) }
+                };
+            _mockSpecEvaluationService.Setup(s => s.EvaluateAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new SpecEvaluationOutcome(stale, null));
+            _viewModel.SelectedDeviceConfiguration = "TestConfig";
+            _viewModel.ExecuteApplySerialNumber("SN12345");
+            var location = MeasurementLocation.WhiteColor.ToString();
+            _viewModel.CurrentDevice.RecordAttempt(new Measurement { Location = location, x = 0.3, y = 0.3, Lv = 150, T = 6500 });
+            _viewModel.CurrentDevice.RecordAttempt(new Measurement { Location = location, x = 0.3, y = 0.3, Lv = 180, T = 6500 });
+            _viewModel.CurrentDevice.SelectBestAttempt(location, 1);
+
+            _viewModel.IsTvCheckboxChecked = true;
+            await Task.Delay(50);
+
+            Assert.That(_viewModel.CurrentDevice.Measurements.Single().BestAttemptIndex, Is.EqualTo(1), "an answer about one attempt must not override two");
+            }
+
+        [Test]
+        public async Task SaveResults_WithRemarks_AsksWithTheProblemsAndTheAttemptsAndDeclineCancelsTheSave()
+            {
+            _mockDispatcher.Setup(d => d.CheckAccess()).Returns(true);
+            _mockFileService.Setup(f => f.SerializeDevice(It.IsAny<DeviceUnderTest>())).Returns("{}");
+            var evaluation = new SpecEvaluation(SpecVerdict.Fail, true,
+                [new SpecCheck("Brightness", 268, 290, 300, null, SpecStatus.Fail, ["WhiteColor"], [])])
+                {
+                Attempts = new Dictionary<string, SpecAttemptInfo> { ["WhiteColor"] = new(1, 0, true) }
+                };
+            _mockSpecEvaluationService.Setup(s => s.EvaluateAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new SpecEvaluationOutcome(evaluation, null));
+            string? asked = null;
+            _mockDialogService.Setup(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>()))
+                .Callback<string, string>((message, _) => asked = message).Returns(false);
+            _viewModel.SelectedDeviceConfiguration = "TestConfig";
+            _viewModel.ExecuteApplySerialNumber("SN12345");
+            _viewModel.IsDeviceConnected = true;
+            _viewModel.IsDeviceCalibrated = true;
+            var location = MeasurementLocation.WhiteColor.ToString();
+            _mockColorMeasurementService.Setup(s => s.MeasureAsync(It.IsAny<int>()))
+                .ReturnsAsync(new Measurement { Location = location, x = 0.3127, y = 0.3290, Lv = 268, T = 6500, IsValid = true });
+            await ((RelayCommand)_viewModel.MeasureCommand).ExecuteAsync(location);
+            await Task.Delay(50);
+
+            await ((RelayCommand)_viewModel.SaveResultsCommand).ExecuteAsync(null);
+
+            Assert.That(asked, Does.Contain("Brightness (cd/m²) 268 < min 290").And.Contain("White, 1 of 3").And.Contain("fewer than 3 times").And.Contain("Save the results anyway?"));
+            _mockFileService.Verify(f => f.SaveDeviceDataToJsonAsync(It.IsAny<DeviceUnderTest>()), Times.Never);
             }
 
         [Test]

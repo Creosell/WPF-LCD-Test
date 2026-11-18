@@ -162,7 +162,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             _summary.Show(warning, 2, 13);
             _summary.Show(failure, 2, 13);
 
-            Assert.That(_log, Is.EqualTo(new[] { "Spec: Brightness (cd/m²) 348 < typ 360", "Spec: Brightness (cd/m²) 300 < min 320" }));
+            Assert.That(_log, Is.EqualTo(new[] { "Spec: Brightness (cd/m²) 348 < typ 360", "Spec: Brightness (cd/m²) 300 < min 320. Repeating the measurement is recommended" }));
             }
 
         [Test]
@@ -213,14 +213,76 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             }
 
         [Test]
-        public void DescribeFailures_ListsOnlyTheChecksOutsideTheSpecification()
+        public void DescribeProblems_ListsFailuresBeforeWarningsAndNamesThePointsWithTheirAttempts()
             {
             _summary.Show(Evaluation(SpecVerdict.Fail, true,
                 Check("Brightness", 348, SpecStatus.Warning, 320, 360, null, "Center"),
                 Check("Red_x", 0.701, SpecStatus.Fail, 0.612, 0.672, 0.689, "RedColor"),
-                Check("Delta_e", 5, SpecStatus.Fail, null, 3, 4, "Center")), 2, 13);
+                Check("Contrast", 4789, SpecStatus.Warning, 4125, 5500, null, "WhiteColor", "BlackColor"),
+                Check("Brightness_uniformity", 61, SpecStatus.Pass, 65, 70, null, "TopLeft")) with
+                {
+                Attempts = new Dictionary<string, SpecAttemptInfo>
+                    {
+                    ["Center"] = new(2, 1, true),
+                    ["RedColor"] = new(3, 0, true)
+                    }
+                }, 2, 13);
 
-            Assert.That(_summary.DescribeFailures(), Is.EqualTo(new[] { "Red (x) 0.701 > max 0.689", "ΔE 5 > max 4" }));
+            var problems = _summary.DescribeProblems();
+
+            Assert.That(problems.Select(p => p.Text), Is.EqualTo(new[]
+                {
+                "Red (x) 0.701 > max 0.689   (Red, 3 of 3)",
+                "Brightness (cd/m²) 348 < typ 360   (Center, 2 of 3)",
+                "Contrast ratio 4789 < typ 5500"
+                }));
+            Assert.That(problems.Select(p => p.FewAttempts), Is.EqualTo(new[] { false, true, false }));
+            Assert.That(problems.Select(p => p.Status), Is.EqualTo(new[] { SpecStatus.Fail, SpecStatus.Warning, SpecStatus.Warning }));
+            }
+
+        [Test]
+        public void DescribeProblems_WithoutAttemptInformationDoesNotInventAttempts()
+            {
+            _summary.Show(Evaluation(SpecVerdict.Warn, true, Check("Brightness", 348, SpecStatus.Warning, 320, 360, null, "Center")), 1, 13);
+
+            var problem = _summary.DescribeProblems().Single();
+
+            Assert.That(problem.Text, Is.EqualTo("Brightness (cd/m²) 348 < typ 360"));
+            Assert.That(problem.FewAttempts, Is.False);
+            }
+
+        [Test]
+        public void Show_LogLineOfASinglePointCheckNamesThePointAndTheAttempt()
+            {
+            _summary.Show(Evaluation(SpecVerdict.Fail, false, Check("Brightness", 251, SpecStatus.Fail, 290, 300, null, "Center")) with
+                {
+                Attempts = new Dictionary<string, SpecAttemptInfo> { ["Center"] = new(1, 0, true) }
+                }, 1, 13);
+
+            Assert.That(_log.Single(), Is.EqualTo("Spec: Center: Brightness (cd/m²) 251 < min 290 (attempt 1). Repeating the measurement is recommended"));
+            }
+
+        [Test]
+        public void Show_LogsTheSameRemarkAgainWhenThePointGetsAnotherAttempt()
+            {
+            var first = Evaluation(SpecVerdict.Warn, false, Check("Brightness", 280, SpecStatus.Warning, 250, 300, null, "Center")) with
+                {
+                Attempts = new Dictionary<string, SpecAttemptInfo> { ["Center"] = new(1, 0, true) }
+                };
+            var second = Evaluation(SpecVerdict.Warn, false, Check("Brightness", 285, SpecStatus.Warning, 250, 300, null, "Center")) with
+                {
+                Attempts = new Dictionary<string, SpecAttemptInfo> { ["Center"] = new(2, 1, true) }
+                };
+
+            _summary.Show(first, 1, 13);
+            _summary.Show(first, 1, 13);
+            _summary.Show(second, 1, 13);
+
+            Assert.That(_log, Is.EqualTo(new[]
+                {
+                "Spec: Center: Brightness (cd/m²) 280 < typ 300 (attempt 1)",
+                "Spec: Center: Brightness (cd/m²) 285 < typ 300 (attempt 2)"
+                }));
             }
 
         [Test]

@@ -697,9 +697,8 @@ namespace WPF_LCD_Test.ViewModels
                 _currentDevice.IsTV = IsTvCheckboxChecked;
 
                 await _specTask;
-                var specFailures = Spec.DescribeFailures();
-                if (specFailures.Count > 0 &&
-                    !_dialogService.ShowQuestion(string.Format(ResourceManager.GetString("SaveWithSpecFailQuestion")!, string.Join(Environment.NewLine, specFailures)), $"{Warning}"))
+                var problems = Spec.DescribeProblems();
+                if (problems.Count > 0 && !_dialogService.ShowQuestion(BuildSaveWarning(problems), $"{Warning}"))
                     {
                     Log(SaveCanceled);
                     return false;
@@ -806,7 +805,6 @@ namespace WPF_LCD_Test.ViewModels
                 {
                 UpdateMeasurementStatus(measurementLocation, isMeasurementSuccess, messageWithMeasuredValues);
                 UpdateCommandsCanExecute();
-                if (!isMeasurementSuccess) _currentDevice?.RemoveMeasurement(measurementLocation);
                 RefreshResults();
                 RequestSpecCheck();
                 }
@@ -1031,7 +1029,7 @@ namespace WPF_LCD_Test.ViewModels
             {
             var (x, y, Lv, T) = FormatMeasurement(measurement);
             message = $"x={x}, y={y}, Lv={Lv}, T={T}";
-            _currentDevice!.AddMeasurement(measurement);
+            _currentDevice!.RecordAttempt(measurement);
             }
 
         internal static (string x, string y, string Lv, string T) FormatMeasurement(Measurement measurement)
@@ -1222,6 +1220,7 @@ namespace WPF_LCD_Test.ViewModels
                 if (outcome.Evaluation != null)
                     {
                     _lastSpecError = null;
+                    ApplyAttempts(device, outcome.Evaluation);
                     Spec.Show(outcome.Evaluation, measuredPoints, totalPoints);
                     return;
                     }
@@ -1234,6 +1233,42 @@ namespace WPF_LCD_Test.ViewModels
                     AppendToLog(string.Format(ResourceManager.GetString("SpecUnavailable")!, error), LogSeverity.Warning);
                     }
             });
+            }
+
+        /// <summary>
+        /// Takes over the choice of the best attempt of every point from the specification check and shows the attempts counters.
+        /// A result computed for an older state of the device (a point was measured meanwhile) is not applied.
+        /// </summary>
+        private void ApplyAttempts(DeviceUnderTest device, SpecEvaluation evaluation)
+            {
+            foreach (var (location, info) in evaluation.Attempts)
+                {
+                if (info.Count > 1 && device.AttemptCount(location) == info.Count)
+                    device.SelectBestAttempt(location, info.Best);
+                }
+
+            RefreshResults();
+            foreach (var row in Results)
+                {
+                row.ShowAttempts(evaluation.Attempts.GetValueOrDefault(row.Location));
+                }
+            }
+
+        /// <summary>
+        /// Builds the confirmation text for saving a device that has remarks against the specification.
+        /// </summary>
+        private static string BuildSaveWarning(IReadOnlyList<SpecProblem> problems)
+            {
+            bool fewAttempts = problems.Any(problem => problem.FewAttempts);
+            var lines = new List<string>
+                {
+                ResourceManager.GetString(fewAttempts ? "SaveSpecHeaderFewAttempts" : "SaveSpecHeader")!
+                };
+            lines.AddRange(problems.Select(problem => problem.Text));
+            lines.Add(string.Empty);
+            if (fewAttempts) lines.Add(ResourceManager.GetString("SaveSpecRemeasureHint")!);
+            lines.Add(ResourceManager.GetString("SaveSpecQuestion")!);
+            return string.Join(Environment.NewLine, lines);
             }
 
         private void LocalizationService_LanguageChanged(object? sender, EventArgs e)
@@ -1255,6 +1290,11 @@ namespace WPF_LCD_Test.ViewModels
                 }
             }
 
+        private void ClearAttempts()
+            {
+            foreach (var row in Results) row.ShowAttempts(null);
+            }
+
         private void ResetMeasurementStatuses()
             {
             foreach (var status in _measurementStatusService.AllMeasurementButtonStatuses)
@@ -1265,6 +1305,7 @@ namespace WPF_LCD_Test.ViewModels
                 status.SpecTooltip = "";
                 }
             RefreshResults();
+            ClearAttempts();
             }
 
         private void ExecuteThreadInUI(Action action)

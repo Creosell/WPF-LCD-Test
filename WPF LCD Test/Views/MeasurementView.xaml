@@ -296,6 +296,19 @@
             </Style.Triggers>
         </Style>
 
+        <!--  Attempts counter: dim dash, amber below three attempts, green from three  -->
+        <Style x:Key="TriesTextStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#787878" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding TriesLevel}" Value="Few">
+                    <Setter Property="Foreground" Value="#FFC107" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding TriesLevel}" Value="Enough">
+                    <Setter Property="Foreground" Value="#4CAF50" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <Style x:Key="ResultDotStyle" TargetType="Ellipse">
             <Setter Property="Width" Value="10" />
             <Setter Property="Height" Value="10" />
@@ -901,6 +914,7 @@
                                 <ColumnDefinition Width="50" />
                                 <ColumnDefinition Width="60" />
                                 <ColumnDefinition Width="44" />
+                                <ColumnDefinition Width="46" />
                             </Grid.ColumnDefinitions>
                             <Ellipse Width="10" Margin="0,0,10,0" Fill="Transparent" />
                             <TextBlock
@@ -912,6 +926,7 @@
                             <TextBlock Grid.Column="3" Margin="0,0,6,0" FontSize="12" Foreground="#B5FFFFFF" Text="y" TextAlignment="Right" />
                             <TextBlock Grid.Column="4" Margin="0,0,6,0" FontSize="12" Foreground="#B5FFFFFF" Text="Lv" TextAlignment="Right" />
                             <TextBlock Grid.Column="5" Margin="0,0,6,0" FontSize="12" Foreground="#B5FFFFFF" Text="T" TextAlignment="Right" />
+                            <TextBlock Grid.Column="6" Margin="0,0,6,0" FontSize="12" Foreground="#B5FFFFFF" Text="{DynamicResource ResultsColumnTries}" TextAlignment="Right" />
                         </Grid>
                         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                             <ItemsControl ItemsSource="{Binding Results}">
@@ -926,6 +941,7 @@
                                                     <ColumnDefinition Width="50" />
                                                     <ColumnDefinition Width="60" />
                                                     <ColumnDefinition Width="44" />
+                                                    <ColumnDefinition Width="46" />
                                                 </Grid.ColumnDefinitions>
                                                 <Ellipse Style="{StaticResource ResultDotStyle}" />
                                                 <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="13" Text="{Binding Name}" />
@@ -933,6 +949,7 @@
                                                 <TextBlock Grid.Column="3" Margin="0,0,6,0" VerticalAlignment="Center" FontSize="13" Text="{Binding Y}" TextAlignment="Right" />
                                                 <TextBlock Grid.Column="4" Margin="0,0,6,0" VerticalAlignment="Center" FontSize="13" Text="{Binding Lv}" TextAlignment="Right" />
                                                 <TextBlock Grid.Column="5" Margin="0,0,6,0" VerticalAlignment="Center" FontSize="13" Text="{Binding T}" TextAlignment="Right" />
+                                                <TextBlock Grid.Column="6" Margin="0,0,6,0" VerticalAlignment="Center" FontSize="13" Style="{StaticResource TriesTextStyle}" Text="{Binding Tries}" TextAlignment="Right" />
                                             </Grid>
                                         </Border>
                                     </DataTemplate>

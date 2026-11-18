@@ -1114,13 +1114,38 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to These values are outside the specification:
-        ///{0}
-        ///Save the results anyway?.
+        ///   Looks up a localized string similar to The saved results have remarks against the specification:.
         /// </summary>
-        public static string SaveWithSpecFailQuestion {
+        public static string SaveSpecHeader {
             get {
-                return ResourceManager.GetString("SaveWithSpecFailQuestion", resourceCulture);
+                return ResourceManager.GetString("SaveSpecHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to These values are outside the specification and some points were measured fewer than 3 times:.
+        /// </summary>
+        public static string SaveSpecHeaderFewAttempts {
+            get {
+                return ResourceManager.GetString("SaveSpecHeaderFewAttempts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save the results anyway?.
+        /// </summary>
+        public static string SaveSpecQuestion {
+            get {
+                return ResourceManager.GetString("SaveSpecQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Measure the points with fewer than 3 attempts again to get a better result..
+        /// </summary>
+        public static string SaveSpecRemeasureHint {
+            get {
+                return ResourceManager.GetString("SaveSpecRemeasureHint", resourceCulture);
             }
         }
         
@@ -1175,6 +1200,24 @@ namespace WPF_LCD_Test.Resources {
         public static string SnCantBeEmpty {
             get {
                 return ResourceManager.GetString("SnCantBeEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} of 3.
+        /// </summary>
+        public static string SpecAttemptsOf {
+            get {
+                return ResourceManager.GetString("SpecAttemptsOf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to attempt {0}.
+        /// </summary>
+        public static string SpecAttemptSuffix {
+            get {
+                return ResourceManager.GetString("SpecAttemptSuffix", resourceCulture);
             }
         }
         
@@ -1517,6 +1560,15 @@ namespace WPF_LCD_Test.Resources {
         public static string SpecPointsProgress {
             get {
                 return ResourceManager.GetString("SpecPointsProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Repeating the measurement is recommended.
+        /// </summary>
+        public static string SpecRepeatRecommended {
+            get {
+                return ResourceManager.GetString("SpecRepeatRecommended", resourceCulture);
             }
         }
         

@@ -609,11 +609,6 @@
   <data name="SpecBound_max" xml:space="preserve">
     <value>max</value>
   </data>
-  <data name="SaveWithSpecFailQuestion" xml:space="preserve">
-    <value>These values are outside the specification:
-{0}
-Save the results anyway?</value>
-  </data>
   <data name="SpecGamutArea" xml:space="preserve">
     <value>{0} gamut area, {1}</value>
   </data>
@@ -709,5 +704,26 @@ Save the results anyway?</value>
   </data>
   <data name="SpecLocation_BlackColor" xml:space="preserve">
     <value>Black</value>
+  </data>
+  <data name="SpecAttemptSuffix" xml:space="preserve">
+    <value>attempt {0}</value>
+  </data>
+  <data name="SpecRepeatRecommended" xml:space="preserve">
+    <value>Repeating the measurement is recommended</value>
+  </data>
+  <data name="SpecAttemptsOf" xml:space="preserve">
+    <value>{0} of 3</value>
+  </data>
+  <data name="SaveSpecHeader" xml:space="preserve">
+    <value>The saved results have remarks against the specification:</value>
+  </data>
+  <data name="SaveSpecHeaderFewAttempts" xml:space="preserve">
+    <value>These values are outside the specification and some points were measured fewer than 3 times:</value>
+  </data>
+  <data name="SaveSpecRemeasureHint" xml:space="preserve">
+    <value>Measure the points with fewer than 3 attempts again to get a better result.</value>
+  </data>
+  <data name="SaveSpecQuestion" xml:space="preserve">
+    <value>Save the results anyway?</value>
   </data>
 </root>

@@ -4,12 +4,32 @@ using WPF_LCD_Test.Models;
 namespace WPF_LCD_Test.ViewModels
     {
     /// <summary>
+    /// How the attempts counter of a point is colored.
+    /// </summary>
+    public enum TriesLevel
+        {
+        /// <summary>No counter is shown.</summary>
+        None,
+
+        /// <summary>Fewer than the expected three attempts.</summary>
+        Few,
+
+        /// <summary>Three attempts or more.</summary>
+        Enough
+        }
+
+    /// <summary>
     /// One row of the results table: a measurement point with the values of its accepted measurement.
     /// The status (color of the dot) is the status of the point's button, so the table and the buttons never disagree.
     /// </summary>
     public sealed class MeasurementResultRow : BaseViewModel
         {
         private const string Dash = "—";
+
+        /// <summary>
+        /// The number of attempts a point with a remark is expected to get.
+        /// </summary>
+        public const int EnoughAttempts = 3;
 
         private static readonly Dictionary<string, string> Hotkeys = new()
             {
@@ -25,6 +45,8 @@ namespace WPF_LCD_Test.ViewModels
         private string _lv = Dash;
         private string _t = Dash;
         private bool _isAvailable = true;
+        private string _tries = Dash;
+        private TriesLevel _triesLevel = TriesLevel.None;
 
         /// <summary>
         /// Initializes a new instance of MeasurementResultRow.
@@ -84,6 +106,24 @@ namespace WPF_LCD_Test.ViewModels
             }
 
         /// <summary>
+        /// Gets the attempts counter ("2/3") of a point that had a remark against the specification, or a dash.
+        /// </summary>
+        public string Tries
+            {
+            get => _tries;
+            private set => SetProperty(ref _tries, value);
+            }
+
+        /// <summary>
+        /// Gets how far the attempts of the point are from the usual three.
+        /// </summary>
+        public TriesLevel TriesLevel
+            {
+            get => _triesLevel;
+            private set => SetProperty(ref _triesLevel, value);
+            }
+
+        /// <summary>
         /// Gets or sets whether the point exists for the current device (the white point only does for a TV).
         /// </summary>
         public bool IsAvailable
@@ -105,6 +145,22 @@ namespace WPF_LCD_Test.ViewModels
                 }
 
             (X, Y, Lv, T) = MeasurementViewModel.FormatMeasurement(measurement);
+            }
+
+        /// <summary>
+        /// Shows the attempts counter: only for a point that had a remark against the specification in any attempt.
+        /// </summary>
+        /// <param name="info">What the specification check found out about the attempts of the point, if anything.</param>
+        public void ShowAttempts(SpecAttemptInfo? info)
+            {
+            if (info is not { Deviated: true })
+                {
+                (Tries, TriesLevel) = (Dash, TriesLevel.None);
+                return;
+                }
+
+            Tries = $"{info.Count}/{EnoughAttempts}";
+            TriesLevel = info.Count >= EnoughAttempts ? TriesLevel.Enough : TriesLevel.Few;
             }
 
         /// <summary>

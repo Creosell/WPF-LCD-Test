@@ -8,6 +8,14 @@ using WPF_LCD_Test.Models;
 namespace WPF_LCD_Test.ViewModels
     {
     /// <summary>
+    /// A remark against the specification for the confirmation of saving.
+    /// </summary>
+    /// <param name="Text">The description of the remark.</param>
+    /// <param name="Status">Warning (below typ) or fail (outside min/max).</param>
+    /// <param name="FewAttempts">True when the point was measured fewer than three times.</param>
+    public sealed record SpecProblem(string Text, SpecStatus Status, bool FewAttempts);
+
+    /// <summary>
     /// Presents a <see cref="SpecEvaluation"/>: the device info table, the verdict, the status badges of the
     /// measurement buttons and the log lines about new deviations.
     /// </summary>
@@ -25,7 +33,7 @@ namespace WPF_LCD_Test.ViewModels
 
         private readonly IMeasurementStatusService _statusService;
         private readonly Action<string, LogSeverity> _log;
-        private readonly Dictionary<string, SpecStatus> _loggedStatuses = [];
+        private readonly Dictionary<string, (SpecStatus Status, int Attempts)> _loggedStatuses = [];
 
         private SpecEvaluation? _evaluation;
         private int _measuredPoints;
@@ -139,11 +147,27 @@ namespace WPF_LCD_Test.ViewModels
             }
 
         /// <summary>
-        /// Describes the checks that are outside the specification, one line each.
+        /// Lists the remarks against the specification for the confirmation of saving: the checks outside min/max first,
+        /// then those below typ. A check of one point names the point and how many times it was measured.
         /// </summary>
-        /// <returns>Lines such as "Red (x) 0.701 &gt; max 0.689"; empty when nothing fails.</returns>
-        public IReadOnlyList<string> DescribeFailures() =>
-            _evaluation?.Checks.Where(check => check.Status == SpecStatus.Fail).Select(Describe).ToList() ?? [];
+        /// <returns>The problems; empty when there is none.</returns>
+        public IReadOnlyList<SpecProblem> DescribeProblems()
+            {
+            if (_evaluation == null) return [];
+
+            return _evaluation.Checks
+                .Where(check => check.Status is SpecStatus.Fail or SpecStatus.Warning)
+                .OrderByDescending(check => check.Status)
+                .Select(check =>
+                    {
+                    int attempts = AttemptsOf(_evaluation, check);
+                    string text = attempts > 0
+                        ? $"{Describe(check)}   ({LocationName(check.Locations[0])}, {string.Format(Text("SpecAttemptsOf"), attempts)})"
+                        : Describe(check);
+                    return new SpecProblem(text, check.Status, attempts is > 0 and < MeasurementResultRow.EnoughAttempts);
+                    })
+                .ToList();
+            }
 
         private void Clear()
             {
@@ -219,14 +243,38 @@ namespace WPF_LCD_Test.ViewModels
             foreach (var check in evaluation.Checks)
                 {
                 bool isRemark = check.Status is SpecStatus.Warning or SpecStatus.Fail;
-                bool isNew = !_loggedStatuses.TryGetValue(check.Key, out var previous) || previous != check.Status;
+                var current = (check.Status, Attempts: AttemptsOf(evaluation, check));
+                bool isNew = !_loggedStatuses.TryGetValue(check.Key, out var previous) || previous != current;
                 if (isRemark && isNew)
                     {
-                    _log(string.Format(Text("SpecLogLine"), Describe(check)), check.Status == SpecStatus.Fail ? LogSeverity.Error : LogSeverity.Warning);
+                    _log(LogLine(check, current.Attempts), check.Status == SpecStatus.Fail ? LogSeverity.Error : LogSeverity.Warning);
                     }
-                _loggedStatuses[check.Key] = check.Status;
+                _loggedStatuses[check.Key] = current;
                 }
             }
+
+        /// <summary>
+        /// Builds the log line of a remark: the point, the description, the attempt and, outside min/max, the advice to repeat.
+        /// </summary>
+        private string LogLine(SpecCheck check, int attempts)
+            {
+            string body = Describe(check);
+            if (attempts > 0)
+                {
+                body = $"{LocationName(check.Locations[0])}: {body} ({string.Format(Text("SpecAttemptSuffix"), attempts)})";
+                }
+            if (check.Status == SpecStatus.Fail)
+                {
+                body = $"{body}. {Text("SpecRepeatRecommended")}";
+                }
+            return string.Format(Text("SpecLogLine"), body);
+            }
+
+        /// <summary>
+        /// Returns the number of attempts of the point a single-point check comes from; 0 for other checks or when unknown.
+        /// </summary>
+        private static int AttemptsOf(SpecEvaluation evaluation, SpecCheck check) =>
+            check.Locations.Count == 1 && evaluation.Attempts.TryGetValue(check.Locations[0], out var info) ? info.Count : 0;
 
         private string Describe(SpecCheck check)
             {

@@ -101,6 +101,7 @@
 
     <system:String x:Key="ResultsTab">结果</system:String>
     <system:String x:Key="LogTab">日志</system:String>
+    <system:String x:Key="ResultsColumnTries">次数</system:String>
     <system:String x:Key="ResultsColumnPoint">点位</system:String>
 
     <!--  Device info panel  -->

@@ -45,6 +45,25 @@ namespace WPF_LCD_Test.Models
         public bool IsValid { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets when the measurement was taken.
+        /// </summary>
+        [JsonIgnore]
+        public DateTime Time { get; set; } = DateTime.Now;
+
+        /// <summary>
+        /// Gets or sets all accepted attempts of the point (this measurement holds the values of the best one).
+        /// Empty for a point that was measured once; written to the JSON only when there are several.
+        /// </summary>
+        [JsonIgnore]
+        public List<Measurement> Attempts { get; set; } = [];
+
+        /// <summary>
+        /// Gets or sets the index of the best attempt in <see cref="Attempts"/>.
+        /// </summary>
+        [JsonIgnore]
+        public int BestAttemptIndex { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of Measurement with specified values.
         /// </summary>
         /// <param name="location">Measurement location identifier.</param>

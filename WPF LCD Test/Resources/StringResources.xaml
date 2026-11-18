@@ -103,6 +103,7 @@
 
     <system:String x:Key="ResultsTab">Results</system:String>
     <system:String x:Key="LogTab">Log</system:String>
+    <system:String x:Key="ResultsColumnTries">Tries</system:String>
     <system:String x:Key="ResultsColumnPoint">Point</system:String>
 
     <!--  Device info panel  -->

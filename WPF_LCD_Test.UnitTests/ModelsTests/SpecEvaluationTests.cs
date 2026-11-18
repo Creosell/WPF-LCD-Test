@@ -43,6 +43,24 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
             }
 
         [Test]
+        public void Parse_ReadsTheAttemptSummaryOfThePoints()
+            {
+            var evaluation = SpecEvaluation.Parse("""
+                {"schema": 1, "device": "PASS", "complete": true, "checks": [],
+                 "attempts": {"Center": {"count": 3, "best": 1, "deviated": true}, "RedColor": {"count": 1, "best": 0, "deviated": false}}}
+                """);
+
+            Assert.That(evaluation.Attempts["Center"], Is.EqualTo(new SpecAttemptInfo(3, 1, true)));
+            Assert.That(evaluation.Attempts["RedColor"], Is.EqualTo(new SpecAttemptInfo(1, 0, false)));
+            }
+
+        [Test]
+        public void Parse_WithoutAttemptsLeavesThemEmpty()
+            {
+            Assert.That(SpecEvaluation.Parse(Json).Attempts, Is.Empty);
+            }
+
+        [Test]
         public void Parse_ErrorObject_Throws()
             {
             var ex = Assert.Throws<FormatException>(() => SpecEvaluation.Parse("""{"schema": 1, "error": "spec not found: X"}"""));

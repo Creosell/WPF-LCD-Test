@@ -68,6 +68,67 @@ namespace WPF_LCD_Test.Models
             }
 
         /// <summary>
+        /// Records an accepted measurement of a point as one more attempt. The point keeps all its attempts and its
+        /// measurement holds the best one; until the specification check chooses, the best is the highest luminance.
+        /// </summary>
+        /// <param name="attempt">The accepted measurement.</param>
+        /// <returns>The measurement entry of the point holding the best attempt.</returns>
+        public Measurement RecordAttempt(Measurement attempt)
+            {
+            ArgumentNullException.ThrowIfNull(attempt);
+
+            var existing = Measurements.FirstOrDefault(m => m.Location == attempt.Location);
+            List<Measurement> attempts = existing == null ? [attempt]
+                : existing.Attempts.Count > 0 ? [.. existing.Attempts, attempt]
+                : [existing, attempt];
+
+            int best = 0;
+            for (int i = 1; i < attempts.Count; i++)
+                {
+                if (attempts[i].Lv >= attempts[best].Lv) best = i;
+                }
+            return StoreAttempts(attempts, best);
+            }
+
+        /// <summary>
+        /// Makes another attempt of a point the one its measurement holds (the choice of the specification check).
+        /// </summary>
+        /// <param name="location">Measurement location identifier.</param>
+        /// <param name="index">Index of the attempt.</param>
+        public void SelectBestAttempt(string location, int index)
+            {
+            var existing = Measurements.FirstOrDefault(m => m.Location == location);
+            if (existing == null || index < 0 || index >= existing.Attempts.Count || index == existing.BestAttemptIndex) return;
+
+            StoreAttempts(existing.Attempts, index);
+            }
+
+        /// <summary>
+        /// Gets the number of accepted attempts of a point.
+        /// </summary>
+        /// <param name="location">Measurement location identifier.</param>
+        /// <returns>The number of attempts; 0 when the point has no measurement.</returns>
+        public int AttemptCount(string location) =>
+            Measurements.FirstOrDefault(m => m.Location == location) is { } measurement ? Math.Max(1, measurement.Attempts.Count) : 0;
+
+        private Measurement StoreAttempts(List<Measurement> attempts, int best)
+            {
+            var chosen = attempts[best];
+            var entry = new Measurement(chosen.Location, chosen.x, chosen.y, chosen.Lv, chosen.T)
+                {
+                IsValid = chosen.IsValid,
+                Time = chosen.Time,
+                Attempts = attempts,
+                BestAttemptIndex = best
+                };
+
+            int at = Measurements.FindIndex(m => m.Location == chosen.Location);
+            if (at >= 0) Measurements[at] = entry;
+            else Measurements.Add(entry);
+            return entry;
+            }
+
+        /// <summary>
         /// Removes the measurement of a location (a retry of the point did not pass, so its previous result is no longer valid).
         /// </summary>
         /// <param name="location">Measurement location identifier.</param>
