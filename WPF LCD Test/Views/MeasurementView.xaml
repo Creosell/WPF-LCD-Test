@@ -837,7 +837,10 @@
             </Grid>
         </Grid>
 
-        <Grid Grid.Row="1" MinHeight="200" Margin="0,5,5,5">
+        <Grid
+            Grid.Row="1"
+            MinHeight="200"
+            Margin="0,5,5,5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="45*" />
                 <ColumnDefinition Width="55*" />
@@ -901,7 +904,7 @@
                     <TabItem.Header>
                         <TextBlock FontSize="14" Text="{DynamicResource ResultsTab}" />
                     </TabItem.Header>
-                    <Grid Margin="8,4,8,6" Grid.IsSharedSizeScope="True">
+                    <Grid Margin="0,4,0,6" Grid.IsSharedSizeScope="True">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
@@ -910,23 +913,56 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" SharedSizeGroup="ResultName" />
+                                <ColumnDefinition Width="45" />
+                                <ColumnDefinition Width="45" />
+                                <ColumnDefinition Width="45" />
                                 <ColumnDefinition Width="50" />
                                 <ColumnDefinition Width="50" />
-                                <ColumnDefinition Width="60" />
-                                <ColumnDefinition Width="44" />
-                                <ColumnDefinition Width="46" />
                             </Grid.ColumnDefinitions>
-                            <Ellipse Width="10" Margin="0,0,10,0" Fill="Transparent" />
+                            <Ellipse
+                                Width="10"
+                                Margin="0,0,10,0"
+                                Fill="Transparent" />
                             <TextBlock
                                 Grid.Column="1"
                                 FontSize="12"
                                 Foreground="#B5FFFFFF"
                                 Text="{DynamicResource ResultsColumnPoint}" />
-                            <TextBlock Grid.Column="2" Margin="0,0,6,0" FontSize="12" Foreground="#B5FFFFFF" Text="x" TextAlignment="Right" />
-                            <TextBlock Grid.Column="3" Margin="0,0,6,0" FontSize="12" Foreground="#B5FFFFFF" Text="y" TextAlignment="Right" />
-                            <TextBlock Grid.Column="4" Margin="0,0,6,0" FontSize="12" Foreground="#B5FFFFFF" Text="Lv" TextAlignment="Right" />
-                            <TextBlock Grid.Column="5" Margin="0,0,6,0" FontSize="12" Foreground="#B5FFFFFF" Text="T" TextAlignment="Right" />
-                            <TextBlock Grid.Column="6" Margin="0,0,6,0" FontSize="12" Foreground="#B5FFFFFF" Text="{DynamicResource ResultsColumnTries}" TextAlignment="Right" />
+                            <TextBlock
+                                Grid.Column="2"
+                                Margin="0,0,6,0"
+                                FontSize="12"
+                                Foreground="#B5FFFFFF"
+                                Text="x"
+                                TextAlignment="Center" />
+                            <TextBlock
+                                Grid.Column="3"
+                                Margin="0,0,6,0"
+                                FontSize="12"
+                                Foreground="#B5FFFFFF"
+                                Text="y"
+                                TextAlignment="Center" />
+                            <TextBlock
+                                Grid.Column="4"
+                                Margin="0,0,6,0"
+                                FontSize="12"
+                                Foreground="#B5FFFFFF"
+                                Text="Lv"
+                                TextAlignment="Center" />
+                            <TextBlock
+                                Grid.Column="5"
+                                Margin="0,0,6,0"
+                                FontSize="12"
+                                Foreground="#B5FFFFFF"
+                                Text="T"
+                                TextAlignment="Center" />
+                            <TextBlock
+                                Grid.Column="6"
+                                Margin="0,0,6,0"
+                                FontSize="12"
+                                Foreground="#B5FFFFFF"
+                                Text="{DynamicResource ResultsColumnTries}"
+                                TextAlignment="Center" />
                         </Grid>
                         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                             <ItemsControl ItemsSource="{Binding Results}">
@@ -937,19 +973,55 @@
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto" />
                                                     <ColumnDefinition Width="Auto" SharedSizeGroup="ResultName" />
+                                                    <ColumnDefinition Width="45" />
+                                                    <ColumnDefinition Width="45" />
+                                                    <ColumnDefinition Width="45" />
                                                     <ColumnDefinition Width="50" />
                                                     <ColumnDefinition Width="50" />
-                                                    <ColumnDefinition Width="60" />
-                                                    <ColumnDefinition Width="44" />
-                                                    <ColumnDefinition Width="46" />
                                                 </Grid.ColumnDefinitions>
                                                 <Ellipse Style="{StaticResource ResultDotStyle}" />
-                                                <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="13" Text="{Binding Name}" />
-                                                <TextBlock Grid.Column="2" Margin="0,0,6,0" VerticalAlignment="Center" FontSize="13" Text="{Binding X}" TextAlignment="Right" />
-                                                <TextBlock Grid.Column="3" Margin="0,0,6,0" VerticalAlignment="Center" FontSize="13" Text="{Binding Y}" TextAlignment="Right" />
-                                                <TextBlock Grid.Column="4" Margin="0,0,6,0" VerticalAlignment="Center" FontSize="13" Text="{Binding Lv}" TextAlignment="Right" />
-                                                <TextBlock Grid.Column="5" Margin="0,0,6,0" VerticalAlignment="Center" FontSize="13" Text="{Binding T}" TextAlignment="Right" />
-                                                <TextBlock Grid.Column="6" Margin="0,0,6,0" VerticalAlignment="Center" FontSize="13" Style="{StaticResource TriesTextStyle}" Text="{Binding Tries}" TextAlignment="Right" />
+                                                <TextBlock
+                                                    Grid.Column="1"
+                                                    Margin="0,0,6,0"
+                                                    VerticalAlignment="Center"
+                                                    FontSize="13"
+                                                    Text="{Binding Name}" />
+                                                <TextBlock
+                                                    Grid.Column="2"
+                                                    Margin="0,0,6,0"
+                                                    VerticalAlignment="Center"
+                                                    FontSize="13"
+                                                    Text="{Binding X}"
+                                                    TextAlignment="Center" />
+                                                <TextBlock
+                                                    Grid.Column="3"
+                                                    Margin="0,0,6,0"
+                                                    VerticalAlignment="Center"
+                                                    FontSize="13"
+                                                    Text="{Binding Y}"
+                                                    TextAlignment="Center" />
+                                                <TextBlock
+                                                    Grid.Column="4"
+                                                    Margin="0,0,6,0"
+                                                    VerticalAlignment="Center"
+                                                    FontSize="13"
+                                                    Text="{Binding Lv}"
+                                                    TextAlignment="Center" />
+                                                <TextBlock
+                                                    Grid.Column="5"
+                                                    Margin="0,0,6,0"
+                                                    VerticalAlignment="Center"
+                                                    FontSize="13"
+                                                    Text="{Binding T}"
+                                                    TextAlignment="Center" />
+                                                <TextBlock
+                                                    Grid.Column="6"
+                                                    Margin="0,0,6,0"
+                                                    VerticalAlignment="Center"
+                                                    FontSize="13"
+                                                    Style="{StaticResource TriesTextStyle}"
+                                                    Text="{Binding Tries}"
+                                                    TextAlignment="Center" />
                                             </Grid>
                                         </Border>
                                     </DataTemplate>

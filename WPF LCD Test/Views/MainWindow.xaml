@@ -162,7 +162,7 @@
             BorderBrush="#CCCCCC"
             BorderThickness="0,0,0,0">
             <Grid
-                MinWidth="200"
+                MinWidth="160"
                 MinHeight="150"
                 Margin="0">
                 <Grid.RowDefinitions>
