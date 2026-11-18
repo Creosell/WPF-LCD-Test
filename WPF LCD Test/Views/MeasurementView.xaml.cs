@@ -441,6 +441,8 @@ namespace WPF_LCD_Test.Views
             private static readonly TimeSpan InhaleEnd = TimeSpan.FromMilliseconds(700);
             private static readonly TimeSpan HoldEnd = TimeSpan.FromMilliseconds(2400);
             private static readonly TimeSpan ExhaleEnd = TimeSpan.FromMilliseconds(4600);
+            private static readonly TimeSpan LabelFadeOutStart = TimeSpan.FromMilliseconds(4300);
+            private static readonly TimeSpan LabelFadeInEnd = TimeSpan.FromMilliseconds(5200);
 
             /// <summary>
             /// Starts the breathing on the button; a running one is restarted from the button's own color.
@@ -453,6 +455,7 @@ namespace WPF_LCD_Test.Views
                 if (feedback == ActionFeedback.None) return;
 
                 button.BeginAnimation(ContentControl.ContentProperty, null);
+                button.ClearValue(Control.ForegroundProperty);
                 button.ClearValue(Control.BackgroundProperty);
                 var baseColor = (button.Background as SolidColorBrush)?.Color ?? Colors.Transparent;
                 var brush = new SolidColorBrush(baseColor);
@@ -477,10 +480,31 @@ namespace WPF_LCD_Test.Views
                 };
                 if (textKey != null && button.TryFindResource(textKey) is string text)
                 {
-                    var label = new ObjectAnimationUsingKeyFrames { Duration = HoldEnd, FillBehavior = FillBehavior.Stop };
+                    var label = new ObjectAnimationUsingKeyFrames { Duration = ExhaleEnd, FillBehavior = FillBehavior.Stop };
                     label.KeyFrames.Add(new DiscreteObjectKeyFrame(text.Trim(), TimeSpan.Zero));
                     button.BeginAnimation(ContentControl.ContentProperty, label);
+                    FadeLabelOver(button);
                 }
+            }
+
+            /// <summary>
+            /// Fades the label out at the end of the exhale and fades the button's own text in after the swap.
+            /// </summary>
+            private static void FadeLabelOver(Button button)
+            {
+                if (button.Foreground is not SolidColorBrush original) return;
+
+                var brush = new SolidColorBrush(original.Color);
+                button.Foreground = brush;
+                var fade = new ColorAnimationUsingKeyFrames { Duration = LabelFadeInEnd };
+                fade.KeyFrames.Add(new LinearColorKeyFrame(original.Color, LabelFadeOutStart));
+                fade.KeyFrames.Add(new EasingColorKeyFrame(Color.FromArgb(0, original.Color.R, original.Color.G, original.Color.B), ExhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseIn } });
+                fade.KeyFrames.Add(new EasingColorKeyFrame(original.Color, LabelFadeInEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseOut } });
+                fade.Completed += (_, _) =>
+                {
+                    if (ReferenceEquals(button.Foreground, brush)) button.ClearValue(Control.ForegroundProperty);
+                };
+                brush.BeginAnimation(SolidColorBrush.ColorProperty, fade);
             }
         }
     }

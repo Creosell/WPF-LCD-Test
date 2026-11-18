@@ -36,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Message and confirmation dialogs are WPF windows instead of the native message box, so the feedback animation of a button no longer freezes while a dialog (for example the clear-results question after saving) is open
 - The Save results button no longer looks disabled (greyed) while the clear-results question is open after saving: the command stays enabled and repeated clicks are ignored while it runs
 - Saving asks one question: the "not all measurements have been taken" notice and the specification remarks are shown together in a single dialog instead of two consecutive ones
-- The outcome label on a control button (Saved, Done, ...) now returns to the button's own text after the hold instead of staying
+- The outcome label on a control button (Saved, Done, ...) stays through the whole exhale and then fades into the button's own text
 - Switching between the Measurement and Settings pages took 100-350 ms because the page was rebuilt each time (the DataTemplate of a ContentControl); both pages are now created once and switched by visibility (2-5 ms)
 - Changing the language reset the other settings (channel, auto connect) to their defaults; only the language is updated now
 - The CA-410 ran in LTD.AUTO instead of AUTO because the CA-310 speed constant was passed to it
