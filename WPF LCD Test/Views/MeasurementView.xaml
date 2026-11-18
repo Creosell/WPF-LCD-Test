@@ -878,7 +878,7 @@
                             <ItemsControl ItemsSource="{Binding Results}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Style="{StaticResource ResultRowStyle}" ToolTip="{Binding Status.MeasuredValuesToolTip}">
+                                        <Border Style="{StaticResource ResultRowStyle}">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto" />
