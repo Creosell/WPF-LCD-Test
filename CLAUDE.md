@@ -62,6 +62,8 @@ dotnet test --filter "FullyQualifiedName~TestClassName.TestMethodName"
 
 **Constants:** `AppConstants` class. `ColorAnalyzer.MinChannel` = 0, `MaxChannel` = 99. `MeasurementViewModel.COLOR_COORDINATES_TOLERANCE` = 0.15.
 
+**Feedback animations:** `ActionFeedbackSignal` (Models) is raised by a ViewModel when an action finished; `ActionFeedbackBehavior` (Views/Behaviors) plays the green/red breathing on any element via `behaviors:ActionFeedbackBehavior.Signal="{Binding ...}"` (modes Fill, Underline, Overlay). No code-behind is needed in a page.
+
 **Commands:** ViewModels use `RelayCommand` (in `Commands/`) for ICommand implementation binding to UI actions.
 
 ## Project Map (graphify)

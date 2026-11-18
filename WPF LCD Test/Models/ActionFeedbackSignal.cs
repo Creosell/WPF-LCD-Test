@@ -1,6 +1,6 @@
 using MvvmHelpers;
 
-namespace WPF_LCD_Test.ViewModels
+namespace WPF_LCD_Test.Models
     {
     /// <summary>
     /// Outcome of an action of a control button that the view signals to the operator.

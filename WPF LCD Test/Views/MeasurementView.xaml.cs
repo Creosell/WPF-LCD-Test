@@ -20,7 +20,6 @@ namespace WPF_LCD_Test.Views
             InitializeComponent(); // Инициализирует элементы UI, описанные в XAML
 
             _deviceCard = new DeviceCardTransition(DeviceCard, DeviceCardContent);
-            _feedbackButtons = new Dictionary<ActionFeedbackSignal, Control>();
 
             //this.PreviewMouseDown += UserControl_PreviewMouseDown;
             //this.PreviewKeyDown += UserControl_PreviewKeyDown;
@@ -33,9 +32,6 @@ namespace WPF_LCD_Test.Views
         }
 
         private readonly DeviceCardTransition _deviceCard;
-        private readonly Dictionary<ActionFeedbackSignal, Control> _feedbackButtons;
-        private readonly Dictionary<Control, string> _successTextKeys = new();
-        private readonly Dictionary<ActionFeedbackSignal, FrameworkElement> _feedbackRows = new();
 
         private void DeviceConfigurationButton_Click(object sender, RoutedEventArgs e)
         {
@@ -75,7 +71,6 @@ namespace WPF_LCD_Test.Views
             {
                 oldViewModel.PropertyChanged -= ViewModel_PropertyChanged;
                 oldViewModel.RequestClearInputFocus -= ViewModel_RequestClearInputFocus;
-                UnsubscribeFeedback();
             }
 
             // Подписываемся на событие PropertyChanged у нового ViewModel (если он есть и реализует интерфейс)
@@ -84,7 +79,6 @@ namespace WPF_LCD_Test.Views
                 newViewModel.PropertyChanged += ViewModel_PropertyChanged;
                 newViewModel.RequestClearInputFocus += ViewModel_RequestClearInputFocus;
                 _deviceCard.ShowImmediately(newViewModel);
-                SubscribeFeedback(newViewModel);
             }
 
             // Теперь ViewModel доступен через this.DataContext или sender.DataContext
@@ -134,44 +128,6 @@ namespace WPF_LCD_Test.Views
                 }, System.Windows.Threading.DispatcherPriority.ContextIdle);
             }
             // TODO: Сохраните обработку изменений других свойств ViewModel, если необходимо
-        }
-
-        // --- Обратная связь кнопок управления: дыхание зелёным (успех) или красным (ошибка) ---
-        private void SubscribeFeedback(MeasurementViewModel viewModel)
-        {
-            _feedbackButtons[viewModel.SaveFeedback] = SaveResultsButton;
-            _feedbackButtons[viewModel.ClearFeedback] = ClearResultsButton;
-            _feedbackButtons[viewModel.ReportFeedback] = CreateReportButton;
-            _feedbackButtons[viewModel.UploadFeedback] = UploadReportsButton;
-            _feedbackRows[viewModel.SerialFeedback] = SerialNumberFeedbackLine;
-            _feedbackRows[viewModel.ConfigFeedback] = DeviceConfigurationButton;
-            _successTextKeys[SaveResultsButton] = "FeedbackSaved";
-            _successTextKeys[ClearResultsButton] = "FeedbackCleared";
-            _successTextKeys[CreateReportButton] = "FeedbackDone";
-            _successTextKeys[UploadReportsButton] = "FeedbackUploaded";
-            foreach (var signal in _feedbackButtons.Keys.Concat(_feedbackRows.Keys)) signal.PropertyChanged += FeedbackSignal_PropertyChanged;
-        }
-
-        private void UnsubscribeFeedback()
-        {
-            foreach (var signal in _feedbackButtons.Keys.Concat(_feedbackRows.Keys)) signal.PropertyChanged -= FeedbackSignal_PropertyChanged;
-            _feedbackButtons.Clear();
-            _feedbackRows.Clear();
-        }
-
-        private void FeedbackSignal_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName != nameof(ActionFeedbackSignal.Sequence) || sender is not ActionFeedbackSignal signal) return;
-
-            if (_feedbackButtons.TryGetValue(signal, out var button))
-            {
-                ActionFeedbackBreathing.Play(button, signal.Feedback, _successTextKeys.GetValueOrDefault(button));
-            }
-            else if (_feedbackRows.TryGetValue(signal, out var row))
-            {
-                if (row is Border line) UnderlineBreathing.PlayOverlay(line, signal.Feedback);
-                else UnderlineBreathing.Play((Control)row, signal.Feedback);
-            }
         }
 
         // --- Копирует весь журнал в буфер обмена ---
@@ -436,150 +392,6 @@ namespace WPF_LCD_Test.Views
                 };
 
                 _content.BeginAnimation(UIElement.OpacityProperty, fadeOut);
-            }
-        }
-
-        /// <summary>
-        /// Presentation-only quick feedback of an input field: its underline takes green or red and goes back;
-        /// the exhale is slower than the inhale.
-        /// </summary>
-        private static class UnderlineBreathing
-        {
-            private static readonly Color SuccessColor = Color.FromRgb(0x43, 0xA0, 0x47);
-            private static readonly Color FailureColor = Color.FromRgb(0xE5, 0x39, 0x35);
-            private static readonly TimeSpan InhaleEnd = TimeSpan.FromMilliseconds(300);
-            private static readonly TimeSpan HoldEnd = TimeSpan.FromMilliseconds(800);
-            private static readonly TimeSpan ExhaleEnd = TimeSpan.FromMilliseconds(1600);
-
-            /// <summary>
-            /// Starts the breathing on a separate line laid over the underline of a field; the line is transparent at rest.
-            /// </summary>
-            /// <param name="line">The overlay line.</param>
-            /// <param name="feedback">The outcome that selects the color.</param>
-            public static void PlayOverlay(Border line, ActionFeedback feedback)
-            {
-                if (feedback == ActionFeedback.None) return;
-
-                var target = feedback == ActionFeedback.Success ? SuccessColor : FailureColor;
-                var rest = Color.FromArgb(0, target.R, target.G, target.B);
-                var brush = new SolidColorBrush(rest);
-                line.Background = brush;
-
-                var breathing = new ColorAnimationUsingKeyFrames { Duration = ExhaleEnd };
-                breathing.KeyFrames.Add(new EasingColorKeyFrame(target, InhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseOut } });
-                breathing.KeyFrames.Add(new LinearColorKeyFrame(target, HoldEnd));
-                breathing.KeyFrames.Add(new EasingColorKeyFrame(rest, ExhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut } });
-                breathing.Completed += (_, _) =>
-                {
-                    if (ReferenceEquals(line.Background, brush)) line.ClearValue(Border.BackgroundProperty);
-                };
-                brush.BeginAnimation(SolidColorBrush.ColorProperty, breathing);
-            }
-
-            /// <summary>
-            /// Starts the breathing on the underline (the border brush) of the control; a running one is restarted.
-            /// </summary>
-            /// <param name="field">The field whose underline breathes.</param>
-            /// <param name="feedback">The outcome that selects the color.</param>
-            public static void Play(Control field, ActionFeedback feedback)
-            {
-                if (feedback == ActionFeedback.None) return;
-
-                field.ClearValue(Control.BorderBrushProperty);
-                var rest = (field.BorderBrush as SolidColorBrush)?.Color ?? Colors.Gray;
-                var target = feedback == ActionFeedback.Success ? SuccessColor : FailureColor;
-                var brush = new SolidColorBrush(rest);
-                field.BorderBrush = brush;
-
-                var breathing = new ColorAnimationUsingKeyFrames { Duration = ExhaleEnd };
-                breathing.KeyFrames.Add(new EasingColorKeyFrame(target, InhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseOut } });
-                breathing.KeyFrames.Add(new LinearColorKeyFrame(target, HoldEnd));
-                breathing.KeyFrames.Add(new EasingColorKeyFrame(rest, ExhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut } });
-                breathing.Completed += (_, _) =>
-                {
-                    if (ReferenceEquals(field.BorderBrush, brush)) field.ClearValue(Control.BorderBrushProperty);
-                };
-                brush.BeginAnimation(SolidColorBrush.ColorProperty, breathing);
-            }
-        }
-
-        /// <summary>
-        /// Presentation-only feedback of a control button: the background breathes once between its own color and green
-        /// (the action succeeded) or red (it failed or was canceled) and the label names the outcome while the color is held.
-        /// The exhale back to the style is slower than the inhale.
-        /// </summary>
-        private static class ActionFeedbackBreathing
-        {
-            private static readonly Color SuccessColor = Color.FromRgb(0x43, 0xA0, 0x47);
-            private static readonly Color FailureColor = Color.FromRgb(0xE5, 0x39, 0x35);
-            private static readonly TimeSpan InhaleEnd = TimeSpan.FromMilliseconds(700);
-            private static readonly TimeSpan HoldEnd = TimeSpan.FromMilliseconds(2400);
-            private static readonly TimeSpan ExhaleEnd = TimeSpan.FromMilliseconds(4600);
-            private static readonly TimeSpan LabelFadeOutStart = TimeSpan.FromMilliseconds(4300);
-            private static readonly TimeSpan LabelFadeInEnd = TimeSpan.FromMilliseconds(5200);
-
-            /// <summary>
-            /// Starts the breathing on the button; a running one is restarted from the button's own color.
-            /// </summary>
-            /// <param name="button">The button that finished its action.</param>
-            /// <param name="feedback">The outcome that selects the color and the label.</param>
-            /// <param name="successTextKey">Resource key of the label shown on success.</param>
-            public static void Play(Control button, ActionFeedback feedback, string? successTextKey)
-            {
-                if (feedback == ActionFeedback.None) return;
-
-                button.BeginAnimation(ContentControl.ContentProperty, null);
-                button.ClearValue(Control.ForegroundProperty);
-                button.ClearValue(Control.BackgroundProperty);
-                var target = feedback == ActionFeedback.Success ? SuccessColor : FailureColor;
-                var baseColor = (button.Background as SolidColorBrush)?.Color ?? Colors.Transparent;
-                if (baseColor.A == 0) baseColor = Color.FromArgb(0, target.R, target.G, target.B);
-                var brush = new SolidColorBrush(baseColor);
-                button.Background = brush;
-
-                var breathing = new ColorAnimationUsingKeyFrames { Duration = ExhaleEnd };
-                breathing.KeyFrames.Add(new EasingColorKeyFrame(target, InhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseOut } });
-                breathing.KeyFrames.Add(new LinearColorKeyFrame(target, HoldEnd));
-                breathing.KeyFrames.Add(new EasingColorKeyFrame(baseColor, ExhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut } });
-                breathing.Completed += (_, _) =>
-                {
-                    if (ReferenceEquals(button.Background, brush)) button.ClearValue(Control.BackgroundProperty);
-                };
-                brush.BeginAnimation(SolidColorBrush.ColorProperty, breathing);
-
-                string? textKey = feedback switch
-                {
-                    ActionFeedback.Success => successTextKey,
-                    ActionFeedback.Canceled => "FeedbackCanceled",
-                    _ => "FeedbackFailed"
-                };
-                if (textKey != null && button is ContentControl && button.TryFindResource(textKey) is string text)
-                {
-                    var label = new ObjectAnimationUsingKeyFrames { Duration = ExhaleEnd, FillBehavior = FillBehavior.Stop };
-                    label.KeyFrames.Add(new DiscreteObjectKeyFrame(text.Trim(), TimeSpan.Zero));
-                    button.BeginAnimation(ContentControl.ContentProperty, label);
-                    FadeLabelOver(button);
-                }
-            }
-
-            /// <summary>
-            /// Fades the label out at the end of the exhale and fades the button's own text in after the swap.
-            /// </summary>
-            private static void FadeLabelOver(Control button)
-            {
-                if (button.Foreground is not SolidColorBrush original) return;
-
-                var brush = new SolidColorBrush(original.Color);
-                button.Foreground = brush;
-                var fade = new ColorAnimationUsingKeyFrames { Duration = LabelFadeInEnd };
-                fade.KeyFrames.Add(new LinearColorKeyFrame(original.Color, LabelFadeOutStart));
-                fade.KeyFrames.Add(new EasingColorKeyFrame(Color.FromArgb(0, original.Color.R, original.Color.G, original.Color.B), ExhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseIn } });
-                fade.KeyFrames.Add(new EasingColorKeyFrame(original.Color, LabelFadeInEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseOut } });
-                fade.Completed += (_, _) =>
-                {
-                    if (ReferenceEquals(button.Foreground, brush)) button.ClearValue(Control.ForegroundProperty);
-                };
-                brush.BeginAnimation(SolidColorBrush.ColorProperty, fade);
             }
         }
     }

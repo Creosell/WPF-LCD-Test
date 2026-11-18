@@ -166,6 +166,43 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             }
 
         [Test]
+        public void SaveSettingsCommand_Saved_SignalsSuccess()
+            {
+            _viewModel.SaveSettingsCommand.Execute(null);
+
+            Assert.That(_viewModel.SaveFeedback.Feedback, Is.EqualTo(ActionFeedback.Success));
+            }
+
+        [Test]
+        public void SaveSettingsCommand_WriteFails_SignalsFailure()
+            {
+            _mockSettingsService.Setup(s => s.SaveSettings(It.IsAny<AppSettings>())).Throws(new InvalidOperationException("Test error"));
+
+            _viewModel.SaveSettingsCommand.Execute(null);
+
+            Assert.That(_viewModel.SaveFeedback.Feedback, Is.EqualTo(ActionFeedback.Failure));
+            }
+
+        [Test]
+        public void SaveSettingsCommand_RejectedValue_SignalsFailureEvenThoughTheFallbackIsSaved()
+            {
+            _viewModel.SelectedSyncMode = SyncMode.Internal;
+            _viewModel.SyncFrequency = "300";
+
+            _viewModel.SaveSettingsCommand.Execute(null);
+
+            Assert.That(_viewModel.SaveFeedback.Feedback, Is.EqualTo(ActionFeedback.Failure));
+            }
+
+        [Test]
+        public void ResetToDefaultCommand_SignalsSuccess()
+            {
+            _viewModel.ResetToDefaultCommand.Execute(null);
+
+            Assert.That(_viewModel.ResetFeedback.Feedback, Is.EqualTo(ActionFeedback.Success));
+            }
+
+        [Test]
         public void SaveSettingsCommand_Execute_HandlesException()
             {
             _mockSettingsService.Setup(s => s.SaveSettings(It.IsAny<AppSettings>()))

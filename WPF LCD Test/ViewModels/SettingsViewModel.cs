@@ -146,6 +146,18 @@ namespace WPF_LCD_Test.ViewModels
                     }
                 }
             }
+        /// <summary>
+        /// Gets the signal the Save button breathes on (green: saved, red: a value was rejected or saving failed).
+        /// </summary>
+        public ActionFeedbackSignal SaveFeedback { get; } = new();
+
+        /// <summary>
+        /// Gets the signal the Reset to default button breathes on.
+        /// </summary>
+        public ActionFeedbackSignal ResetFeedback { get; } = new();
+
+        private bool _validationFailed;
+
         public ICommand SaveSettingsCommand { get; }
         public ICommand ResetToDefaultCommand { get; }
 
@@ -232,21 +244,24 @@ namespace WPF_LCD_Test.ViewModels
             }
 
         // Сохраняет настройки
-        private void SaveSettings(AppSettings settingsToSave)
+        private bool SaveSettings(AppSettings settingsToSave)
             {
             try
                 {
                 _settingsService.SaveSettings(settingsToSave);
+                return true;
                 }
             catch (Exception ex)
                 {
                 Debug.WriteLine($"SettingsViewModel Ошибка: Не удалось сохранить настройки. Ошибка: {ex.Message}");
+                return false;
                 }
             }
 
         // Выполняет сохранение текущих настроек
         private void ExecuteSaveSettings(object parameter)
             {
+            _validationFailed = false;
 
             ExecuteChangeChannel(ColorAnalyzerChannel);
 
@@ -264,7 +279,9 @@ namespace WPF_LCD_Test.ViewModels
                     ? GetRangedValue(IntegrationTime, AnalyzerCapabilities.GetIntegrationTimeRange(), saved.IntegrationTime, AnalyzerCapabilities.DefaultIntegrationTime, "ms", value => IntegrationTime = value)
                     : saved.IntegrationTime
                 };
-            SaveSettings(settingsToSave);
+            bool written = SaveSettings(settingsToSave);
+            if (written && !_validationFailed) SaveFeedback.Succeed();
+            else SaveFeedback.Fail();
             }
 
         // Сохраняет только язык
@@ -289,6 +306,7 @@ namespace WPF_LCD_Test.ViewModels
                 return result;
                 }
 
+            _validationFailed = true;
             _dialogService.ShowMessage($"Allowed range: {FormatRange(range, unit)}", Err);
             result = saved is double previous && previous >= range.Min && previous <= range.Max ? previous : defaultValue;
             setText(FormatValue(result));
@@ -304,6 +322,7 @@ namespace WPF_LCD_Test.ViewModels
             {
             if (!int.TryParse(channel, out int result) || result < AppConstants.ColorAnalyzer.MinChannel || result > AppConstants.ColorAnalyzer.MaxChannel)
                 {
+                _validationFailed = true;
                 _dialogService.ShowMessage(
                     !int.TryParse(channel, out _)
                         ? "Invalid channel format"
@@ -338,6 +357,7 @@ namespace WPF_LCD_Test.ViewModels
             SyncMode = defaults.SyncMode;
             SyncFrequency = FormatValue(AnalyzerCapabilities.DefaultFrequency);
             IntegrationTime = FormatValue(AnalyzerCapabilities.DefaultIntegrationTime);
+            ResetFeedback.Succeed();
             }
 
         // Освобождает ресурсы и отписывается от событий
