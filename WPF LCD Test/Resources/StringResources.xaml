@@ -64,7 +64,7 @@
         9. Bottom right
     </system:String>
     <system:String x:Key="LanguageMenu">
-        Language
+        Language / 语言
     </system:String>
     <system:String x:Key="RedPoint">
         R. Red
