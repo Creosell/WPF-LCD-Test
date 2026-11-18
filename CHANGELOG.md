@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - The dotted keyboard focus rectangle drawn around views and controls is removed in the whole application
 - A picked value in the settings view is no longer left highlighted: the focus returns to the view when a list closes or when the click lands outside the inputs
+- Feedback of the control buttons now that the log is on a hidden tab: Save results, Clear results, Create report and Upload reports breathe green when their action succeeded and red when it failed (the background pulses twice and returns to the style); declining a confirmation dialog shows nothing
 - Switching between the Measurement and Settings pages took 100-350 ms because the page was rebuilt each time (the DataTemplate of a ContentControl); both pages are now created once and switched by visibility (2-5 ms)
 - Changing the language reset the other settings (channel, auto connect) to their defaults; only the language is updated now
 - The CA-410 ran in LTD.AUTO instead of AUTO because the CA-310 speed constant was passed to it

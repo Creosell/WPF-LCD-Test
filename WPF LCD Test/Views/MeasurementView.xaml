@@ -1198,6 +1198,7 @@
                 Orientation="Horizontal">
 
                 <Button
+                    x:Name="CreateReportButton"
                     Margin="5"
                     HorizontalAlignment="Left"
                     MaterialDesign:ButtonAssist.CornerRadius="15"
@@ -1205,6 +1206,7 @@
                     CommandParameter="ReportGenerator.exe"
                     Content="{DynamicResource ReportButton}" />
                 <Button
+                    x:Name="UploadReportsButton"
                     Margin="5"
                     HorizontalAlignment="Left"
                     MaterialDesign:ButtonAssist.CornerRadius="15"
@@ -1218,11 +1220,13 @@
                 Orientation="Horizontal">
 
                 <Button
+                    x:Name="SaveResultsButton"
                     Margin="5"
                     MaterialDesign:ButtonAssist.CornerRadius="15"
                     Command="{Binding DataContext.NewDeviceUnderTestCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                     Content="{DynamicResource NewDeviceUnderTestButton}" />
                 <Button
+                    x:Name="ClearResultsButton"
                     Margin="5"
                     MaterialDesign:ButtonAssist.CornerRadius="15"
                     Command="{Binding DataContext.ClearFieldsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"

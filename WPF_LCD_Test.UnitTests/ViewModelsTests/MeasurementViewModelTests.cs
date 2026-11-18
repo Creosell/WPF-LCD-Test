@@ -872,6 +872,85 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             Assert.That(_viewModel.LogEntries.Count, Is.GreaterThan(before));
             }
 
+        private async Task PrepareDeviceWithOneMeasurementAsync()
+            {
+            _viewModel.ExecuteApplySerialNumber("SN12345");
+            _viewModel.IsDeviceConnected = true;
+            _viewModel.IsDeviceCalibrated = true;
+            var location = MeasurementLocation.WhiteColor.ToString();
+            _mockColorMeasurementService.Setup(s => s.MeasureAsync(It.IsAny<int>()))
+                .ReturnsAsync(new Measurement { Location = location, x = 0.3127, y = 0.3290, Lv = 100, T = 6500, IsValid = true });
+            await ((RelayCommand)_viewModel.MeasureCommand).ExecuteAsync(location);
+            }
+
+        [Test]
+        public async Task SaveResults_Saved_SignalsSuccess()
+            {
+            await PrepareDeviceWithOneMeasurementAsync();
+            _mockDialogService.Setup(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+            _mockFileService.Setup(f => f.SaveDeviceDataToJsonAsync(It.IsAny<DeviceUnderTest>())).ReturnsAsync(true);
+
+            await ((RelayCommand)_viewModel.SaveResultsCommand).ExecuteAsync(null);
+
+            Assert.That(_viewModel.SaveFeedback.Feedback, Is.EqualTo(ActionFeedback.Success));
+            }
+
+        [Test]
+        public async Task SaveResults_FailedToSave_SignalsFailure()
+            {
+            await PrepareDeviceWithOneMeasurementAsync();
+            _mockDialogService.Setup(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+            _mockFileService.Setup(f => f.SaveDeviceDataToJsonAsync(It.IsAny<DeviceUnderTest>())).ReturnsAsync(false);
+
+            await ((RelayCommand)_viewModel.SaveResultsCommand).ExecuteAsync(null);
+
+            Assert.That(_viewModel.SaveFeedback.Feedback, Is.EqualTo(ActionFeedback.Failure));
+            }
+
+        [Test]
+        public async Task SaveResults_DeclinedByTheOperator_SignalsNothing()
+            {
+            await PrepareDeviceWithOneMeasurementAsync();
+            _mockDialogService.Setup(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>())).Returns(false);
+
+            await ((RelayCommand)_viewModel.SaveResultsCommand).ExecuteAsync(null);
+
+            Assert.That(_viewModel.SaveFeedback.Sequence, Is.EqualTo(0));
+            }
+
+        [Test]
+        public void ClearFields_Confirmed_SignalsSuccessAndDeclinedSignalsNothing()
+            {
+            _mockDialogService.Setup(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>())).Returns(false);
+            _viewModel.ClearFieldsCommand.Execute(null);
+            Assert.That(_viewModel.ClearFeedback.Sequence, Is.EqualTo(0));
+
+            _mockDialogService.Setup(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+            _viewModel.ClearFieldsCommand.Execute(null);
+
+            Assert.That(_viewModel.ClearFeedback.Feedback, Is.EqualTo(ActionFeedback.Success));
+            }
+
+        [TestCase(true, ActionFeedback.Success)]
+        [TestCase(false, ActionFeedback.Failure)]
+        public async Task UploadReports_SignalsTheOutcome(bool uploaded, ActionFeedback expected)
+            {
+            _viewModel.SelectedDeviceConfiguration = "TestConfig";
+            _mockUploadService.Setup(u => u.UploadReportsAsync()).ReturnsAsync(uploaded);
+
+            await ((RelayCommand)_viewModel.UploadReportsCommand).ExecuteAsync(null);
+
+            Assert.That(_viewModel.UploadFeedback.Feedback, Is.EqualTo(expected));
+            }
+
+        [Test]
+        public async Task UploadReports_WithoutConfiguration_SignalsFailure()
+            {
+            await ((RelayCommand)_viewModel.UploadReportsCommand).ExecuteAsync(null);
+
+            Assert.That(_viewModel.UploadFeedback.Feedback, Is.EqualTo(ActionFeedback.Failure));
+            }
+
         [Test]
         public void StatusMessageMeasuring_IsNotWrittenToTheLog()
             {

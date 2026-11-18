@@ -20,6 +20,7 @@ namespace WPF_LCD_Test.Views
             InitializeComponent(); // Инициализирует элементы UI, описанные в XAML
 
             _deviceCard = new DeviceCardTransition(DeviceCard, DeviceCardContent);
+            _feedbackButtons = new Dictionary<ActionFeedbackSignal, Button>();
 
             //this.PreviewMouseDown += UserControl_PreviewMouseDown;
             //this.PreviewKeyDown += UserControl_PreviewKeyDown;
@@ -32,6 +33,7 @@ namespace WPF_LCD_Test.Views
         }
 
         private readonly DeviceCardTransition _deviceCard;
+        private readonly Dictionary<ActionFeedbackSignal, Button> _feedbackButtons;
 
         private void DeviceConfigurationButton_Click(object sender, RoutedEventArgs e)
         {
@@ -71,6 +73,7 @@ namespace WPF_LCD_Test.Views
             {
                 oldViewModel.PropertyChanged -= ViewModel_PropertyChanged;
                 oldViewModel.RequestClearInputFocus -= ViewModel_RequestClearInputFocus;
+                UnsubscribeFeedback();
             }
 
             // Подписываемся на событие PropertyChanged у нового ViewModel (если он есть и реализует интерфейс)
@@ -79,6 +82,7 @@ namespace WPF_LCD_Test.Views
                 newViewModel.PropertyChanged += ViewModel_PropertyChanged;
                 newViewModel.RequestClearInputFocus += ViewModel_RequestClearInputFocus;
                 _deviceCard.ShowImmediately(newViewModel);
+                SubscribeFeedback(newViewModel);
             }
 
             // Теперь ViewModel доступен через this.DataContext или sender.DataContext
@@ -128,6 +132,31 @@ namespace WPF_LCD_Test.Views
                 }, System.Windows.Threading.DispatcherPriority.ContextIdle);
             }
             // TODO: Сохраните обработку изменений других свойств ViewModel, если необходимо
+        }
+
+        // --- Обратная связь кнопок управления: дыхание зелёным (успех) или красным (ошибка) ---
+        private void SubscribeFeedback(MeasurementViewModel viewModel)
+        {
+            _feedbackButtons[viewModel.SaveFeedback] = SaveResultsButton;
+            _feedbackButtons[viewModel.ClearFeedback] = ClearResultsButton;
+            _feedbackButtons[viewModel.ReportFeedback] = CreateReportButton;
+            _feedbackButtons[viewModel.UploadFeedback] = UploadReportsButton;
+            foreach (var signal in _feedbackButtons.Keys) signal.PropertyChanged += FeedbackSignal_PropertyChanged;
+        }
+
+        private void UnsubscribeFeedback()
+        {
+            foreach (var signal in _feedbackButtons.Keys) signal.PropertyChanged -= FeedbackSignal_PropertyChanged;
+            _feedbackButtons.Clear();
+        }
+
+        private void FeedbackSignal_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ActionFeedbackSignal.Sequence) && sender is ActionFeedbackSignal signal
+                && _feedbackButtons.TryGetValue(signal, out var button))
+            {
+                ActionFeedbackBreathing.Play(button, signal.Feedback);
+            }
         }
 
         // --- Копирует весь журнал в буфер обмена ---
@@ -392,6 +421,45 @@ namespace WPF_LCD_Test.Views
                 };
 
                 _content.BeginAnimation(UIElement.OpacityProperty, fadeOut);
+            }
+        }
+
+        /// <summary>
+        /// Presentation-only feedback of a control button: the background breathes between its own color and green
+        /// (the action succeeded) or red (it failed) a couple of times and then returns to the style.
+        /// </summary>
+        private static class ActionFeedbackBreathing
+        {
+            private static readonly Color SuccessColor = Color.FromRgb(0x43, 0xA0, 0x47);
+            private static readonly Color FailureColor = Color.FromRgb(0xE5, 0x39, 0x35);
+            private static readonly Duration HalfCycle = new(TimeSpan.FromMilliseconds(550));
+            private const int Cycles = 2;
+
+            /// <summary>
+            /// Starts the breathing on the button; a running one is restarted from the button's own color.
+            /// </summary>
+            /// <param name="button">The button that finished its action.</param>
+            /// <param name="feedback">The outcome that selects the color.</param>
+            public static void Play(Button button, ActionFeedback feedback)
+            {
+                if (feedback == ActionFeedback.None) return;
+
+                button.ClearValue(Control.BackgroundProperty);
+                var baseColor = (button.Background as SolidColorBrush)?.Color ?? Colors.Transparent;
+                var brush = new SolidColorBrush(baseColor);
+                button.Background = brush;
+
+                var breathing = new ColorAnimation(baseColor, feedback == ActionFeedback.Success ? SuccessColor : FailureColor, HalfCycle)
+                {
+                    AutoReverse = true,
+                    RepeatBehavior = new RepeatBehavior(Cycles),
+                    EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut }
+                };
+                breathing.Completed += (_, _) =>
+                {
+                    if (ReferenceEquals(button.Background, brush)) button.ClearValue(Control.BackgroundProperty);
+                };
+                brush.BeginAnimation(SolidColorBrush.ColorProperty, breathing);
             }
         }
     }

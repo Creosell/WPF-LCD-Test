@@ -99,6 +99,26 @@ namespace WPF_LCD_Test.ViewModels
         /// </summary>
         public SpecSummaryViewModel Spec { get; }
 
+        /// <summary>
+        /// Gets the signal the Save results button breathes on (green: saved, red: failed).
+        /// </summary>
+        public ActionFeedbackSignal SaveFeedback { get; } = new();
+
+        /// <summary>
+        /// Gets the signal the Clear results button breathes on.
+        /// </summary>
+        public ActionFeedbackSignal ClearFeedback { get; } = new();
+
+        /// <summary>
+        /// Gets the signal the Create report button breathes on.
+        /// </summary>
+        public ActionFeedbackSignal ReportFeedback { get; } = new();
+
+        /// <summary>
+        /// Gets the signal the Upload reports button breathes on.
+        /// </summary>
+        public ActionFeedbackSignal UploadFeedback { get; } = new();
+
         public bool IsTvCheckboxChecked
             {
             get => _isTvCheckboxChecked;
@@ -690,6 +710,7 @@ namespace WPF_LCD_Test.ViewModels
                 if (_currentDevice == null || string.IsNullOrWhiteSpace(_currentDevice.SerialNumber) || _currentDevice.Measurements.Count == 0)
                     {
                     _dialogService.ShowMessage($"{SaveJSONErrDeviceIsEmpty}", $"{Err}");
+                    Flash(SaveFeedback, false);
                     return false;
                     }
 
@@ -713,12 +734,15 @@ namespace WPF_LCD_Test.ViewModels
                         }
                     }
 
-                return await _fileService.SaveDeviceDataToJsonAsync(_currentDevice);
+                bool saved = await _fileService.SaveDeviceDataToJsonAsync(_currentDevice);
+                Flash(SaveFeedback, saved);
+                return saved;
                 }
             catch (Exception ex)
                 {
                 Log(ErrUnexpected, [ex.Message], LogSeverity.Error);
                 _dialogService.ShowMessage($"{SaveJSONErrForSN}: {ex.Message}", $"{Err}");
+                Flash(SaveFeedback, false);
                 return false;
                 }
             }
@@ -741,6 +765,7 @@ namespace WPF_LCD_Test.ViewModels
                 IsSerialNumberConfirmed = false;
                 ResetMeasurementStatuses();
                 Log(ClearFieldsDone);
+                if (parameter?.Equals("CalledFromNewDeviceMethod") != true) Flash(ClearFeedback, true);
                 Spec.Reset();
                 RequestSpecCheck();
                 UpdateUIState();
@@ -890,6 +915,7 @@ namespace WPF_LCD_Test.ViewModels
                 if (!File.Exists(exePath))
                     {
                     Log(RunExternalAppNotFoundErr, [exePath], LogSeverity.Error);
+                    Flash(ReportFeedback, false);
                     return;
                     }
 
@@ -945,6 +971,7 @@ namespace WPF_LCD_Test.ViewModels
             if (string.IsNullOrEmpty(_selectedDeviceConfiguration))
                 {
                 _dialogService.ShowMessage($"{CantStartUpload}", $"{Err}");
+                Flash(UploadFeedback, false);
                 return;
                 }
 
@@ -953,10 +980,12 @@ namespace WPF_LCD_Test.ViewModels
 
             try
                 {
-                if (!await _uploadService.UploadReportsAsync())
+                bool uploaded = await _uploadService.UploadReportsAsync();
+                if (!uploaded)
                     {
                     Log(UploadFailed, severity: LogSeverity.Error);
                     }
+                Flash(UploadFeedback, uploaded);
                 }
             finally
                 {
@@ -1074,6 +1103,7 @@ namespace WPF_LCD_Test.ViewModels
 
         private void HandleReportGenerationResult(ReportExitCode exitCode)
             {
+            Flash(ReportFeedback, exitCode == ReportExitCode.Success);
             string message = exitCode switch
                 {
                     ReportExitCode.Success => $"{ReportGeneratedSuccessfully}",
@@ -1317,6 +1347,16 @@ namespace WPF_LCD_Test.ViewModels
             RefreshResults();
             ClearAttempts();
             }
+
+        /// <summary>
+        /// Signals the outcome of a button action to the view (from any thread).
+        /// </summary>
+        private void Flash(ActionFeedbackSignal signal, bool success) =>
+            ExecuteThreadInUI(() =>
+            {
+                if (success) signal.Succeed();
+                else signal.Fail();
+            });
 
         private void ExecuteThreadInUI(Action action)
             {
