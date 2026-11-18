@@ -113,20 +113,37 @@ namespace WPF_LCD_Test.ViewModels
         /// <summary>
         /// A theme mode offered in the Settings list.
         /// </summary>
-        public class ThemeOption
+        public class ThemeOption : BaseViewModel
             {
-            public ThemeMode Mode { get; set; }
-            public string DisplayName { get; set; } = "";
+            private readonly string _resourceKey;
+
+            public ThemeOption(ThemeMode mode, string resourceKey)
+                {
+                Mode = mode;
+                _resourceKey = resourceKey;
+                }
+
+            public ThemeMode Mode { get; }
+
+            /// <summary>
+            /// Gets the name in the language of the interface.
+            /// </summary>
+            public string DisplayName => Resources.Resources.ResourceManager.GetString(_resourceKey) ?? _resourceKey;
+
+            /// <summary>
+            /// Raises the change of the name after the language of the interface changed.
+            /// </summary>
+            public void Refresh() => OnPropertyChanged(nameof(DisplayName));
             }
 
         /// <summary>
-        /// Gets the theme modes the operator can choose from; the names carry both languages, like the Language label.
+        /// Gets the theme modes the operator can choose from; the names follow the language of the interface.
         /// </summary>
         public IReadOnlyList<ThemeOption> AvailableThemes { get; } =
             [
-            new ThemeOption { Mode = ThemeMode.Dark, DisplayName = "Dark / 深色" },
-            new ThemeOption { Mode = ThemeMode.Light, DisplayName = "Light / 浅色" },
-            new ThemeOption { Mode = ThemeMode.System, DisplayName = "System / 跟随系统" }
+            new ThemeOption(ThemeMode.Dark, "ThemeDark"),
+            new ThemeOption(ThemeMode.Light, "ThemeLight"),
+            new ThemeOption(ThemeMode.System, "ThemeSystem")
             ];
 
         private ThemeOption _selectedTheme;
@@ -224,6 +241,7 @@ namespace WPF_LCD_Test.ViewModels
         private void LocalizationService_LanguageChanged(object sender, EventArgs e)
             {
             Debug.WriteLine("SettingsViewModel: Получено событие LanguageChanged.");
+            foreach (var option in AvailableThemes) option.Refresh();
             }
 
         private void ColorMeasurementService_CurrentChannelChanged(object sender, int e)

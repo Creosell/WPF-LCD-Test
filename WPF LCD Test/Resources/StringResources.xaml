@@ -64,7 +64,7 @@
         9. Bottom right
     </system:String>
     <system:String x:Key="ThemeLabel">
-        Theme / 主题
+        Theme
     </system:String>
     <system:String x:Key="LanguageMenu">
         Language / 语言

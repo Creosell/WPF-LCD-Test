@@ -53,6 +53,19 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             }
 
         [Test]
+        public void ThemeNames_AreRefreshedWhenTheLanguageChanges()
+            {
+            var changed = new List<string?>();
+            var option = _viewModel.AvailableThemes[0];
+            option.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+
+            _mockLocalizationService.Raise(l => l.LanguageChanged += null, EventArgs.Empty);
+
+            Assert.That(changed, Does.Contain("DisplayName"));
+            Assert.That(option.DisplayName, Is.Not.Empty);
+            }
+
+        [Test]
         public void SelectedTheme_ChoiceIsAppliedAtOnce()
             {
             _viewModel.SelectedTheme = _viewModel.AvailableThemes.First(option => option.Mode == ThemeMode.System);
