@@ -147,6 +147,12 @@ namespace WPF_LCD_Test.Views
 
         private void UserControl_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            // Сочетания с Ctrl или Alt (Ctrl+S, Ctrl+R) принадлежат командам-горячим клавишам, а не быстрым клавишам точек замера
+            if ((Keyboard.Modifiers & (ModifierKeys.Control | ModifierKeys.Alt)) != ModifierKeys.None)
+            {
+                return;
+            }
+
             // Получаем элемент, который в данный момент имеет клавиатурный фокус.
 
             // Проверяем, находится ли фокус на элементе ввода (например, TextBox),
