@@ -388,15 +388,18 @@
             </Style.Triggers>
         </Style>
 
-        <!--  Count of warnings and errors added while the Log tab was not shown  -->
+        <!--  Count of warnings and errors added while the Log tab was not shown; amber, red when any of them is an error  -->
         <Style x:Key="UnreadBadgeStyle" TargetType="Border">
             <Setter Property="MinWidth" Value="18" />
             <Setter Property="Height" Value="18" />
             <Setter Property="Margin" Value="8,0,0,0" />
             <Setter Property="Padding" Value="4,0" />
             <Setter Property="CornerRadius" Value="9" />
-            <Setter Property="Background" Value="#FF5252" />
+            <Setter Property="Background" Value="#FFC107" />
             <Style.Triggers>
+                <DataTrigger Binding="{Binding UnreadSeverity}" Value="Error">
+                    <Setter Property="Background" Value="#FF5252" />
+                </DataTrigger>
                 <DataTrigger Binding="{Binding UnreadIssues}" Value="0">
                     <Setter Property="Visibility" Value="Collapsed" />
                 </DataTrigger>

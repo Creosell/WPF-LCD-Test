@@ -202,6 +202,7 @@ namespace WPF_LCD_Test.ViewModels
 
         private bool _isSavingDevice;
         private bool _hasUnsavedMeasurements;
+        private LogSeverity _unreadSeverity;
         private int _pendingReportsCount;
         private Process? _reportProcess;
         private bool _reportCancelRequested;
@@ -263,7 +264,7 @@ namespace WPF_LCD_Test.ViewModels
             set
                 {
                 if (SetProperty(ref _selectedTabIndex, value) && value == LogTabIndex)
-                    UnreadIssues = 0;
+                    ResetUnread();
                 }
             }
 
@@ -274,6 +275,21 @@ namespace WPF_LCD_Test.ViewModels
             {
             get => _unreadIssues;
             private set => SetProperty(ref _unreadIssues, value);
+            }
+
+        /// <summary>
+        /// Gets the most severe level among the unread warnings and errors; colors the counter of the Log tab.
+        /// </summary>
+        public LogSeverity UnreadSeverity
+            {
+            get => _unreadSeverity;
+            private set => SetProperty(ref _unreadSeverity, value);
+            }
+
+        private void ResetUnread()
+            {
+            UnreadIssues = 0;
+            UnreadSeverity = LogSeverity.Info;
             }
 
         public bool IsMeasurementButtonsEnabled
@@ -928,7 +944,7 @@ namespace WPF_LCD_Test.ViewModels
             {
             LogText = string.Empty;
             LogEntries.Clear();
-            UnreadIssues = 0;
+            ResetUnread();
             _logLineCount = 0;
             }
 
@@ -1259,7 +1275,10 @@ namespace WPF_LCD_Test.ViewModels
             const int maxEntries = 500;
             if (LogEntries.Count >= maxEntries) LogEntries.RemoveAt(0);
             LogEntries.Add(entry);
-            if (SelectedTabIndex != LogTabIndex) UnreadIssues++;
+            if (SelectedTabIndex == LogTabIndex) return;
+
+            UnreadIssues++;
+            if (entry.Severity > UnreadSeverity) UnreadSeverity = entry.Severity;
             }
 
         private void UpdateUIState()

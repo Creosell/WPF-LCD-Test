@@ -955,6 +955,21 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             }
 
         [Test]
+        public void UnreadSeverity_FollowsTheMostSevereUnreadEntryAndResetsWhenTheLogIsOpened()
+            {
+            _viewModel.SelectedTabIndex = 1;
+            _viewModel.SelectedTabIndex = 0;
+            Assert.That(_viewModel.UnreadSeverity, Is.EqualTo(LogSeverity.Info));
+
+            _viewModel.ReportGenerateCommand.Execute(null);
+            Assert.That(_viewModel.UnreadSeverity, Is.EqualTo(LogSeverity.Error));
+
+            _viewModel.SelectedTabIndex = 1;
+            Assert.That(_viewModel.UnreadIssues, Is.EqualTo(0));
+            Assert.That(_viewModel.UnreadSeverity, Is.EqualTo(LogSeverity.Info));
+            }
+
+        [Test]
         public void LogEntries_HoldOnlyWarningsAndErrors()
             {
             int before = _viewModel.LogEntries.Count;

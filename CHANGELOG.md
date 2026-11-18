@@ -51,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The save confirmation describes the problems in plain words: bullets like "White: Brightness (cd/m²) is 268, below the minimum 290 (measured once)" instead of "Brightness (cd/m²) 268 < min 290 (White, 1 of 3)", and simpler headers and hint
 - The measurement buttons of the points glow green when a measurement is accepted and red when it is rejected (a colored glow around the button, so it works on the green, red and gray status colors of the buttons themselves)
 - The feedback animations are a little more dynamic: the button breathing takes about 3.4 s instead of 4.6 s, the field underline 1.3 s instead of 1.6 s
+- The counter on the Log tab is amber for unread warnings and red when any unread message is an error
 - Switching between the Measurement and Settings pages took 100-350 ms because the page was rebuilt each time (the DataTemplate of a ContentControl); both pages are now created once and switched by visibility (2-5 ms)
 - Changing the language reset the other settings (channel, auto connect) to their defaults; only the language is updated now
 - The CA-410 ran in LTD.AUTO instead of AUTO because the CA-310 speed constant was passed to it
