@@ -249,12 +249,13 @@ namespace WPF_LCD_Test.Views.Behaviors
     /// </summary>
     internal static class GlowBreathing
     {
-        private static readonly Color SuccessColor = Color.FromRgb(0x66, 0xE0, 0x6B);
-        private static readonly Color FailureColor = Color.FromRgb(0xFF, 0x5C, 0x57);
+        private static readonly Color SuccessColor = Color.FromRgb(0x2E, 0xD1, 0x5C);
+        private static readonly Color FailureColor = Color.FromRgb(0xFF, 0x45, 0x3A);
         private static readonly TimeSpan InhaleEnd = TimeSpan.FromMilliseconds(200);
         private static readonly TimeSpan HoldEnd = TimeSpan.FromMilliseconds(450);
         private static readonly TimeSpan ExhaleEnd = TimeSpan.FromMilliseconds(1300);
-        private const double PeakRadius = 24;
+        private const double PeakRadius = 11;
+        private const double PeakOpacity = 0.85;
 
         /// <summary>
         /// Starts the glow on the element; a running one is restarted.
@@ -275,7 +276,7 @@ namespace WPF_LCD_Test.Views.Behaviors
             element.Effect = glow;
 
             glow.BeginAnimation(DropShadowEffect.BlurRadiusProperty, Pulse(PeakRadius));
-            var opacity = Pulse(1);
+            var opacity = Pulse(PeakOpacity);
             opacity.Completed += (_, _) =>
             {
                 if (ReferenceEquals(element.Effect, glow)) element.ClearValue(UIElement.EffectProperty);
