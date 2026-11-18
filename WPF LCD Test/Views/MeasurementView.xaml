@@ -229,7 +229,7 @@
         <Style x:Key="DeviceConfigDropdownButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderBrush" Value="Black" />
-            <Setter Property="BorderThickness" Value="0,0,0,2" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="FontFamily" Value="Segoe UI" />
             <Setter Property="Template">
@@ -621,22 +621,25 @@
                             VerticalAlignment="Center"
                             Content="{DynamicResource SerialNumber}"
                             Foreground="#E5FFFFFF" />
-                        <TextBox
-                            x:Name="SerialNumberTextBox"
-                            MinWidth="200"
-                            BorderThickness="0,0,0,2"
-                            Margin="5"
-                            VerticalAlignment="Center"
-                            Foreground="White"
-                            LostFocus="SerialNumberTextBox_LostFocus"
-                            Text="{Binding SerialNumber, UpdateSourceTrigger=Explicit}">
-                            <TextBox.InputBindings>
-                                <KeyBinding
-                                    Key="Enter"
-                                    Command="{Binding DataContext.ApplySerialNumberCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
-                                    CommandParameter="{Binding Text, ElementName=SerialNumberTextBox}" />
-                            </TextBox.InputBindings>
-                        </TextBox>
+                        <Grid Margin="5" VerticalAlignment="Center">
+                            <TextBox
+                                x:Name="SerialNumberTextBox"
+                                MinWidth="200"
+                                Margin="0"
+                                VerticalAlignment="Center"
+                                Foreground="White"
+                                LostFocus="SerialNumberTextBox_LostFocus"
+                                Text="{Binding SerialNumber, UpdateSourceTrigger=Explicit}">
+                                <TextBox.InputBindings>
+                                    <KeyBinding
+                                        Key="Enter"
+                                        Command="{Binding DataContext.ApplySerialNumberCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                                        CommandParameter="{Binding Text, ElementName=SerialNumberTextBox}" />
+                                </TextBox.InputBindings>
+                            </TextBox>
+                            <!--  The feedback line lies over the underline of the field so the hover highlight of the field cannot hide it  -->
+                            <Border x:Name="SerialNumberFeedbackLine" Height="1" VerticalAlignment="Bottom" IsHitTestVisible="False" />
+                        </Grid>
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Row="3">

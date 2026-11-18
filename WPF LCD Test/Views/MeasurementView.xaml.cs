@@ -35,7 +35,7 @@ namespace WPF_LCD_Test.Views
         private readonly DeviceCardTransition _deviceCard;
         private readonly Dictionary<ActionFeedbackSignal, Control> _feedbackButtons;
         private readonly Dictionary<Control, string> _successTextKeys = new();
-        private readonly Dictionary<ActionFeedbackSignal, Control> _feedbackRows = new();
+        private readonly Dictionary<ActionFeedbackSignal, FrameworkElement> _feedbackRows = new();
 
         private void DeviceConfigurationButton_Click(object sender, RoutedEventArgs e)
         {
@@ -143,7 +143,7 @@ namespace WPF_LCD_Test.Views
             _feedbackButtons[viewModel.ClearFeedback] = ClearResultsButton;
             _feedbackButtons[viewModel.ReportFeedback] = CreateReportButton;
             _feedbackButtons[viewModel.UploadFeedback] = UploadReportsButton;
-            _feedbackRows[viewModel.SerialFeedback] = SerialNumberTextBox;
+            _feedbackRows[viewModel.SerialFeedback] = SerialNumberFeedbackLine;
             _feedbackRows[viewModel.ConfigFeedback] = DeviceConfigurationButton;
             _successTextKeys[SaveResultsButton] = "FeedbackSaved";
             _successTextKeys[ClearResultsButton] = "FeedbackCleared";
@@ -169,7 +169,8 @@ namespace WPF_LCD_Test.Views
             }
             else if (_feedbackRows.TryGetValue(signal, out var row))
             {
-                UnderlineBreathing.Play(row, signal.Feedback);
+                if (row is Border line) UnderlineBreathing.PlayOverlay(line, signal.Feedback);
+                else UnderlineBreathing.Play((Control)row, signal.Feedback);
             }
         }
 
@@ -449,6 +450,31 @@ namespace WPF_LCD_Test.Views
             private static readonly TimeSpan InhaleEnd = TimeSpan.FromMilliseconds(300);
             private static readonly TimeSpan HoldEnd = TimeSpan.FromMilliseconds(800);
             private static readonly TimeSpan ExhaleEnd = TimeSpan.FromMilliseconds(1600);
+
+            /// <summary>
+            /// Starts the breathing on a separate line laid over the underline of a field; the line is transparent at rest.
+            /// </summary>
+            /// <param name="line">The overlay line.</param>
+            /// <param name="feedback">The outcome that selects the color.</param>
+            public static void PlayOverlay(Border line, ActionFeedback feedback)
+            {
+                if (feedback == ActionFeedback.None) return;
+
+                var target = feedback == ActionFeedback.Success ? SuccessColor : FailureColor;
+                var rest = Color.FromArgb(0, target.R, target.G, target.B);
+                var brush = new SolidColorBrush(rest);
+                line.Background = brush;
+
+                var breathing = new ColorAnimationUsingKeyFrames { Duration = ExhaleEnd };
+                breathing.KeyFrames.Add(new EasingColorKeyFrame(target, InhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseOut } });
+                breathing.KeyFrames.Add(new LinearColorKeyFrame(target, HoldEnd));
+                breathing.KeyFrames.Add(new EasingColorKeyFrame(rest, ExhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut } });
+                breathing.Completed += (_, _) =>
+                {
+                    if (ReferenceEquals(line.Background, brush)) line.ClearValue(Border.BackgroundProperty);
+                };
+                brush.BeginAnimation(SolidColorBrush.ColorProperty, breathing);
+            }
 
             /// <summary>
             /// Starts the breathing on the underline (the border brush) of the control; a running one is restarted.
