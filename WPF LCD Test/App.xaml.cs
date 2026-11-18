@@ -32,6 +32,9 @@ namespace WPF_LCD_Test
             // Core services
             services.AddSingleton<ISettingsService, SettingsService>();
             services.AddSingleton<ILocalizationService, LocalizationService>();
+            services.AddSingleton<ISystemThemeProvider, WindowsSystemThemeProvider>();
+            services.AddSingleton<IThemeApplier, WpfThemeApplier>();
+            services.AddSingleton<IThemeService, ThemeService>();
             services.AddSingleton<IMeasurementStatusService, MeasurementStatusService>();
             services.AddSingleton<IAnalyzerRegistryService, AnalyzerRegistryService>();
 
@@ -86,6 +89,8 @@ namespace WPF_LCD_Test
             var colorMeasurementService = _serviceProvider.GetRequiredService<IColorMeasurementService>();
 
             AppSettings appSettings = settingsService.LoadSettings();
+
+            _serviceProvider.GetRequiredService<IThemeService>().Initialize();
 
             localizationService.LanguageChanged += LocalizationService_LanguageChanged;
             localizationService.SetLanguage(appSettings.LanguageCultureCode);

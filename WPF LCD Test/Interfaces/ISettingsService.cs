@@ -35,5 +35,11 @@ namespace WPF_LCD_Test.Interfaces
         /// </summary>
         /// <param name="cultureCode">Language culture code to save.</param>
         void UpdateLanguage(string cultureCode);
+
+        /// <summary>
+        /// Writes only the theme mode to the settings file.
+        /// </summary>
+        /// <param name="mode">The chosen theme mode.</param>
+        void UpdateTheme(ThemeMode mode);
         }
     }

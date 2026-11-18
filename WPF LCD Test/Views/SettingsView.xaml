@@ -51,6 +51,19 @@
 
             <StackPanel Margin="0,5" Orientation="Horizontal">
                 <Label
+                    Width="120"
+                    Content="{DynamicResource ThemeLabel}"
+                    Foreground="White" />
+                <ComboBox
+                    Width="200"
+                    DisplayMemberPath="DisplayName"
+                    DropDownClosed="ComboBox_DropDownClosed"
+                    ItemsSource="{Binding AvailableThemes}"
+                    SelectedItem="{Binding SelectedTheme}" />
+            </StackPanel>
+
+            <StackPanel Margin="0,5" Orientation="Horizontal">
+                <Label
                     Width="150"
                     Content="{DynamicResource ColorAnalyzerChannel}"
                     Foreground="White" />

@@ -58,7 +58,7 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
             // Act
             string jsonString = JsonSerializer.Serialize(settings);
             // Ожидаем JSON, который соответствует атрибутам JsonPropertyName
-            string expectedJson = "{\"languageCultureCode\":\"zh-Hans\",\"colorAnalyzerChannel\":\"0\",\"measurementSpeed\":\"Auto\",\"syncMode\":\"Universal\",\"syncFrequency\":null,\"integrationTime\":null}";
+            string expectedJson = "{\"languageCultureCode\":\"zh-Hans\",\"colorAnalyzerChannel\":\"0\",\"measurementSpeed\":\"Auto\",\"syncMode\":\"Universal\",\"theme\":\"Dark\",\"syncFrequency\":null,\"integrationTime\":null}";
 
             // Assert
             // Сравниваем JSON, игнорируя возможные различия в форматировании (пробелы, переносы строк)

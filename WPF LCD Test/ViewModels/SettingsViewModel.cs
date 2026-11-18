@@ -17,6 +17,7 @@ namespace WPF_LCD_Test.ViewModels
         private readonly ILocalizationService _localizationService;
         private readonly IColorMeasurementService _colorMeasurementService;
         private readonly IDialogService _dialogService;
+        private readonly IThemeService? _themeService;
         private string _colorAnalyzerChannel;
 
         public string ColorAnalyzerChannel
@@ -109,6 +110,40 @@ namespace WPF_LCD_Test.ViewModels
             get => _languageCultureCode;
             set => SetProperty(ref _languageCultureCode, value);
             }
+        /// <summary>
+        /// A theme mode offered in the Settings list.
+        /// </summary>
+        public class ThemeOption
+            {
+            public ThemeMode Mode { get; set; }
+            public string DisplayName { get; set; } = "";
+            }
+
+        /// <summary>
+        /// Gets the theme modes the operator can choose from; the names carry both languages, like the Language label.
+        /// </summary>
+        public IReadOnlyList<ThemeOption> AvailableThemes { get; } =
+            [
+            new ThemeOption { Mode = ThemeMode.Dark, DisplayName = "Dark / 深色" },
+            new ThemeOption { Mode = ThemeMode.Light, DisplayName = "Light / 浅色" },
+            new ThemeOption { Mode = ThemeMode.System, DisplayName = "System / 跟随系统" }
+            ];
+
+        private ThemeOption _selectedTheme;
+
+        /// <summary>
+        /// Gets or sets the chosen theme mode. A choice is applied and stored at once, like the language; Save and Reset do not touch it.
+        /// </summary>
+        public ThemeOption SelectedTheme
+            {
+            get => _selectedTheme;
+            set
+                {
+                if (value != null && SetProperty(ref _selectedTheme, value))
+                    _themeService?.SetMode(value.Mode);
+                }
+            }
+
         public class LanguageOption
             {
             public string DisplayName { get; set; }
@@ -162,12 +197,13 @@ namespace WPF_LCD_Test.ViewModels
         public ICommand ResetToDefaultCommand { get; }
 
         // Конструктор: инициализация сервисов, команд, языков и загрузка настроек
-        public SettingsViewModel(ISettingsService settingsService, IDialogService dialogService, IColorMeasurementService colorMeasurementService, ILocalizationService localizationService) : base()
+        public SettingsViewModel(ISettingsService settingsService, IDialogService dialogService, IColorMeasurementService colorMeasurementService, ILocalizationService localizationService, IThemeService? themeService = null) : base()
             {
             _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
             _colorMeasurementService = colorMeasurementService ?? throw new ArgumentNullException(nameof(colorMeasurementService));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+            _themeService = themeService;
             PopulateAvailableLanguages();
             SaveSettingsCommand = new RelayCommand(ExecuteSaveSettings, CanExecuteSaveSettings);
             ResetToDefaultCommand = new RelayCommand(ExecuteResetToDefault);
@@ -221,6 +257,8 @@ namespace WPF_LCD_Test.ViewModels
                 {
                 AppSettings currentSettings = _settingsService.LoadSettings();
                 _languageCultureCode = currentSettings.LanguageCultureCode;
+                _selectedTheme = AvailableThemes.First(option => option.Mode == currentSettings.Theme);
+                OnPropertyChanged(nameof(SelectedTheme));
                 SelectedLanguage = AvailableLanguages.FirstOrDefault(lang => lang.CultureCode == _languageCultureCode);
                 if (SelectedLanguage == null)
                     {

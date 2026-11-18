@@ -63,6 +63,9 @@
     <system:String x:Key="BottomRightPoint">
         9. Bottom right
     </system:String>
+    <system:String x:Key="ThemeLabel">
+        Theme / 主题
+    </system:String>
     <system:String x:Key="LanguageMenu">
         Language / 语言
     </system:String>

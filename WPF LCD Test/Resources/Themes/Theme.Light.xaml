@@ -1,0 +1,35 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--  Light theme: the application brushes (surfaces, text, lines, statuses). Both theme files define the same keys; the active one is swapped at runtime.  -->
+    <SolidColorBrush x:Key="AppPageBackground" Color="#FFFAFAFA" />
+    <SolidColorBrush x:Key="AppPanelBackground" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="AppInsetBackground" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="AppPanelBorder" Color="#FFD6D6D6" />
+    <SolidColorBrush x:Key="AppCardBackground" Color="#0F000000" />
+    <SolidColorBrush x:Key="AppCardBorder" Color="#33000000" />
+    <SolidColorBrush x:Key="AppTextPrimary" Color="#FF212121" />
+    <SolidColorBrush x:Key="AppTextLabel" Color="#E0212121" />
+    <SolidColorBrush x:Key="AppTextSecondary" Color="#99212121" />
+    <SolidColorBrush x:Key="AppTextMuted" Color="#FF6B6B6B" />
+    <SolidColorBrush x:Key="AppLogText" Color="#FF212121" />
+    <SolidColorBrush x:Key="AppTabLine" Color="#FF9E9E9E" />
+    <SolidColorBrush x:Key="AppControlBorder" Color="#FF9E9E9E" />
+    <SolidColorBrush x:Key="AppHoverOverlay" Color="#14000000" />
+    <SolidColorBrush x:Key="StatusOkText" Color="#FF1B5E20" />
+    <SolidColorBrush x:Key="StatusWarnText" Color="#FF6B4400" />
+    <SolidColorBrush x:Key="StatusErrText" Color="#FF8E1B1B" />
+    <SolidColorBrush x:Key="StatusOkDot" Color="#FF43A047" />
+    <SolidColorBrush x:Key="StatusWarnDot" Color="#FFFFB300" />
+    <SolidColorBrush x:Key="StatusErrDot" Color="#FFE53935" />
+    <SolidColorBrush x:Key="StatusOkPlate" Color="#FFE3F4E5" />
+    <SolidColorBrush x:Key="StatusWarnPlate" Color="#FFFFF1CC" />
+    <SolidColorBrush x:Key="StatusErrPlate" Color="#FFFDE4E4" />
+    <SolidColorBrush x:Key="ResultOkDot" Color="#FF43A047" />
+    <SolidColorBrush x:Key="ResultWarnDot" Color="#FFFFB300" />
+    <SolidColorBrush x:Key="LogWarnBackground" Color="#FFFFF1CC" />
+    <SolidColorBrush x:Key="LogErrBackground" Color="#FFFDE4E4" />
+    <SolidColorBrush x:Key="LogWarnBar" Color="#FFFFB300" />
+    <SolidColorBrush x:Key="LogErrBar" Color="#FFE53935" />
+    <Thickness x:Key="LogBarThickness">4,0,0,0</Thickness>
+</ResourceDictionary>

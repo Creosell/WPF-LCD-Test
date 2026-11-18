@@ -12,6 +12,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         private Mock<ILocalizationService> _mockLocalizationService;
         private Mock<IColorMeasurementService> _mockColorMeasurementService;
         private Mock<IDialogService> _mockDialogService;
+        private Mock<IThemeService> _mockThemeService;
         private SettingsViewModel _viewModel;
 
         [SetUp]
@@ -21,6 +22,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
             _mockLocalizationService = new Mock<ILocalizationService>();
             _mockColorMeasurementService = new Mock<IColorMeasurementService>();
             _mockDialogService = new Mock<IDialogService>();
+            _mockThemeService = new Mock<IThemeService>();
 
             _mockSettingsService.Setup(s => s.LoadSettings()).Returns(new AppSettings
                 {
@@ -35,8 +37,36 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
                 _mockSettingsService.Object,
                 _mockDialogService.Object,
                 _mockColorMeasurementService.Object,
-                _mockLocalizationService.Object
+                _mockLocalizationService.Object,
+                _mockThemeService.Object
             );
+            }
+
+        [Test]
+        public void SelectedTheme_StartsWithTheStoredThemeWithoutApplyingIt()
+            {
+            _mockSettingsService.Setup(s => s.LoadSettings()).Returns(new AppSettings { Theme = ThemeMode.Light });
+            using var viewModel = new SettingsViewModel(_mockSettingsService.Object, _mockDialogService.Object, _mockColorMeasurementService.Object, _mockLocalizationService.Object, _mockThemeService.Object);
+
+            Assert.That(viewModel.SelectedTheme.Mode, Is.EqualTo(ThemeMode.Light));
+            _mockThemeService.Verify(t => t.SetMode(It.IsAny<ThemeMode>()), Times.Never);
+            }
+
+        [Test]
+        public void SelectedTheme_ChoiceIsAppliedAtOnce()
+            {
+            _viewModel.SelectedTheme = _viewModel.AvailableThemes.First(option => option.Mode == ThemeMode.System);
+
+            _mockThemeService.Verify(t => t.SetMode(ThemeMode.System), Times.Once);
+            }
+
+        [Test]
+        public void SaveAndReset_DoNotTouchTheTheme()
+            {
+            _viewModel.SaveSettingsCommand.Execute(null);
+            _viewModel.ResetToDefaultCommand.Execute(null);
+
+            _mockThemeService.Verify(t => t.SetMode(It.IsAny<ThemeMode>()), Times.Never);
             }
 
         [TearDown]

@@ -37,6 +37,10 @@ namespace WPF_LCD_Test.Models
         /// <summary>
         /// Gets or sets the internal synchronization frequency in Hz; null selects the default.
         /// </summary>
+        [JsonPropertyName("theme")]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public ThemeMode Theme { get; set; } = ThemeMode.Dark;
+
         [JsonPropertyName("syncFrequency")]
         public double? SyncFrequency { get; set; }
 

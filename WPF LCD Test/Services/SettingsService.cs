@@ -135,6 +135,17 @@ namespace WPF_LCD_Test.Services
         /// Updates the application language in settings and persists changes.
         /// </summary>
         /// <param name="cultureCode">Language culture code to save.</param>
+        /// <summary>
+        /// Writes only the theme mode to the settings file.
+        /// </summary>
+        /// <param name="mode">The chosen theme mode.</param>
+        public void UpdateTheme(ThemeMode mode)
+            {
+            var settings = LoadSettings();
+            settings.Theme = mode;
+            SaveSettings(settings);
+            }
+
         public void UpdateLanguage(string cultureCode)
             {
             var settings = LoadSettings();
