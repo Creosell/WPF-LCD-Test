@@ -184,6 +184,7 @@ namespace WPF_LCD_Test.ViewModels
                 }
             }
 
+        private bool _isSavingDevice;
         private Process? _reportProcess;
         private bool _reportCancelRequested;
 
@@ -407,7 +408,7 @@ namespace WPF_LCD_Test.ViewModels
             ClearFieldsCommand = new RelayCommand(ExecuteClearFields, CanExecuteClearFields);
             ClearLogCommand = new RelayCommand(ExecuteClearLog);
             SwitchLanguageCommand = new RelayCommand(ExecuteSwitchLanguage, CanExecuteSwitchLanguage);
-            NewDeviceUnderTestCommand = new RelayCommand(ExecuteNewDeviceUnderTest, CanExecuteNewDeviceUnderTest);
+            NewDeviceUnderTestCommand = new RelayCommand(ExecuteNewDeviceUnderTest, CanExecuteNewDeviceUnderTest, allowConcurrentExecution: true);
             ReportGenerateCommand = new RelayCommand(ExecuteReportGenerateCommand, CanExecuteReportGenerateCommand);
             MeasureCommand = new RelayCommand(ExecuteMeasureAsync, CanExecuteMeasure);
             ApplySerialNumberCommand = new RelayCommand(ExecuteApplySerialNumber, CanExecuteApplySerialNumber);
@@ -889,8 +890,18 @@ namespace WPF_LCD_Test.ViewModels
         /// </summary>
         private async Task ExecuteNewDeviceUnderTest(object parameter)
             {
-            if (await ExecuteSaveResultsAsync(parameter))
-                ExecuteClearFields("CalledFromNewDeviceMethod");
+            if (_isSavingDevice) return;
+
+            _isSavingDevice = true;
+            try
+                {
+                if (await ExecuteSaveResultsAsync(parameter))
+                    ExecuteClearFields("CalledFromNewDeviceMethod");
+                }
+            finally
+                {
+                _isSavingDevice = false;
+                }
             UpdateUIState();
             }
 
