@@ -1125,11 +1125,83 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Not measured yet: {0}..
+        /// </summary>
+        public static string SaveNotFullMissing {
+            get {
+                return ResourceManager.GetString("SaveNotFullMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Not all measurements have been taken..
         /// </summary>
         public static string SaveNotFullNote {
             get {
                 return ResourceManager.GetString("SaveNotFullNote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is {1}, above the maximum {2}.
+        /// </summary>
+        public static string SaveProblemAboveMax {
+            get {
+                return ResourceManager.GetString("SaveProblemAboveMax", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is {1}, above the recommended {2}.
+        /// </summary>
+        public static string SaveProblemAboveTyp {
+            get {
+                return ResourceManager.GetString("SaveProblemAboveTyp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is {1}, below the minimum {2}.
+        /// </summary>
+        public static string SaveProblemBelowMin {
+            get {
+                return ResourceManager.GetString("SaveProblemBelowMin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is {1}, below the recommended {2}.
+        /// </summary>
+        public static string SaveProblemBelowTyp {
+            get {
+                return ResourceManager.GetString("SaveProblemBelowTyp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to measured once.
+        /// </summary>
+        public static string SaveProblemMeasuredOnce {
+            get {
+                return ResourceManager.GetString("SaveProblemMeasuredOnce", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to measured {0} times.
+        /// </summary>
+        public static string SaveProblemMeasuredTimes {
+            get {
+                return ResourceManager.GetString("SaveProblemMeasuredTimes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}: {1} ({2}).
+        /// </summary>
+        public static string SaveProblemPoint {
+            get {
+                return ResourceManager.GetString("SaveProblemPoint", resourceCulture);
             }
         }
         
@@ -1143,7 +1215,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The saved results have remarks against the specification:.
+        ///   Looks up a localized string similar to Some values do not meet the specification:.
         /// </summary>
         public static string SaveSpecHeader {
             get {
@@ -1152,7 +1224,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to These values are outside the specification and some points were measured fewer than 3 times:.
+        ///   Looks up a localized string similar to Some values do not meet the specification, and some points were measured fewer than 3 times:.
         /// </summary>
         public static string SaveSpecHeaderFewAttempts {
             get {
@@ -1170,7 +1242,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Measure the points with fewer than 3 attempts again to get a better result..
+        ///   Looks up a localized string similar to Measure those points again to get a more reliable result..
         /// </summary>
         public static string SaveSpecRemeasureHint {
             get {

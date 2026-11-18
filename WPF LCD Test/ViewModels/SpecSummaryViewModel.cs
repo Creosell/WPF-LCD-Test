@@ -162,8 +162,8 @@ namespace WPF_LCD_Test.ViewModels
                     {
                     int attempts = AttemptsOf(_evaluation, check);
                     string text = attempts > 0
-                        ? $"{Describe(check)}   ({LocationName(check.Locations[0])}, {string.Format(Text("SpecAttemptsOf"), attempts)})"
-                        : Describe(check);
+                        ? string.Format(Text("SaveProblemPoint"), LocationName(check.Locations[0]), DescribeInWords(check), MeasuredText(attempts))
+                        : DescribeInWords(check);
                     return new SpecProblem(text, check.Status, attempts is > 0 and < MeasurementResultRow.EnoughAttempts);
                     })
                 .ToList();
@@ -275,6 +275,29 @@ namespace WPF_LCD_Test.ViewModels
         /// </summary>
         private static int AttemptsOf(SpecEvaluation evaluation, SpecCheck check) =>
             check.Locations.Count == 1 && evaluation.Attempts.TryGetValue(check.Locations[0], out var info) ? info.Count : 0;
+
+        private static string MeasuredText(int attempts) =>
+            attempts == 1 ? Text("SaveProblemMeasuredOnce") : string.Format(Text("SaveProblemMeasuredTimes"), attempts);
+
+        /// <summary>
+        /// Describes what is wrong with a check in plain words for the operator, e.g. "Brightness (cd/m²) is 42, below the minimum 290".
+        /// </summary>
+        private string DescribeInWords(SpecCheck check)
+            {
+            var name = NameOf(check.Key);
+            var value = FormatNumber(check.Value);
+
+            if (check.Status == SpecStatus.Fail)
+                {
+                if (check.Min is double min && check.Value < min) return string.Format(Text("SaveProblemBelowMin"), name, value, FormatNumber(min));
+                if (check.Max is double max && check.Value > max) return string.Format(Text("SaveProblemAboveMax"), name, value, FormatNumber(max));
+                }
+            if (check.Typ is double typ)
+                {
+                return string.Format(Text(check.Key == "Delta_e" ? "SaveProblemAboveTyp" : "SaveProblemBelowTyp"), name, value, FormatNumber(typ));
+                }
+            return $"{name} {value}";
+            }
 
         private string Describe(SpecCheck check)
             {

@@ -232,9 +232,9 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
 
             Assert.That(problems.Select(p => p.Text), Is.EqualTo(new[]
                 {
-                "Red (x) 0.701 > max 0.689   (Red, 3 of 3)",
-                "Brightness (cd/m²) 348 < typ 360   (Center, 2 of 3)",
-                "Contrast ratio 4789 < typ 5500"
+                "Red: Red (x) is 0.701, above the maximum 0.689 (measured 3 times)",
+                "Center: Brightness (cd/m²) is 348, below the recommended 360 (measured 2 times)",
+                "Contrast ratio is 4789, below the recommended 5500"
                 }));
             Assert.That(problems.Select(p => p.FewAttempts), Is.EqualTo(new[] { false, true, false }));
             Assert.That(problems.Select(p => p.Status), Is.EqualTo(new[] { SpecStatus.Fail, SpecStatus.Warning, SpecStatus.Warning }));
@@ -247,7 +247,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
 
             var problem = _summary.DescribeProblems().Single();
 
-            Assert.That(problem.Text, Is.EqualTo("Brightness (cd/m²) 348 < typ 360"));
+            Assert.That(problem.Text, Is.EqualTo("Brightness (cd/m²) is 348, below the recommended 360"));
             Assert.That(problem.FewAttempts, Is.False);
             }
 

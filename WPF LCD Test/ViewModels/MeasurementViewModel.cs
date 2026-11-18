@@ -744,7 +744,7 @@ namespace WPF_LCD_Test.ViewModels
                 await _specTask;
                 var problems = Spec.DescribeProblems();
                 bool incomplete = !AreAllStatusesRepresentedInMeasurements();
-                if ((problems.Count > 0 || incomplete) && !_dialogService.ShowQuestion(BuildSaveWarning(problems, incomplete), $"{Warning}"))
+                if ((problems.Count > 0 || incomplete) && !_dialogService.ShowQuestion(BuildSaveWarning(problems, incomplete, GetMissingLocationNames()), $"{Warning}"))
                     {
                     Log(SaveCanceled);
                     return false;
@@ -1373,20 +1373,22 @@ namespace WPF_LCD_Test.ViewModels
         /// <summary>
         /// Builds the confirmation text for saving a device that has remarks against the specification.
         /// </summary>
-        private static string BuildSaveWarning(IReadOnlyList<SpecProblem> problems, bool incomplete)
+        private static string BuildSaveWarning(IReadOnlyList<SpecProblem> problems, bool incomplete, IReadOnlyList<string> missing)
             {
             bool fewAttempts = problems.Any(problem => problem.FewAttempts);
             var lines = new List<string>();
             if (incomplete)
                 {
-                lines.Add(ResourceManager.GetString("SaveNotFullNote")!);
+                string note = ResourceManager.GetString("SaveNotFullNote")!;
+                if (missing.Count > 0) note += " " + string.Format(ResourceManager.GetString("SaveNotFullMissing")!, string.Join(", ", missing));
+                lines.Add(note);
                 if (problems.Count > 0) lines.Add(string.Empty);
                 }
 
             if (problems.Count > 0)
                 {
                 lines.Add(ResourceManager.GetString(fewAttempts ? "SaveSpecHeaderFewAttempts" : "SaveSpecHeader")!);
-                lines.AddRange(problems.Select(problem => problem.Text));
+                lines.AddRange(problems.Select(problem => "• " + problem.Text));
                 }
 
             if (fewAttempts)
@@ -1399,6 +1401,16 @@ namespace WPF_LCD_Test.ViewModels
             lines.Add(ResourceManager.GetString("SaveSpecQuestion")!);
             return string.Join(Environment.NewLine, lines);
             }
+
+        /// <summary>
+        /// Lists the localized names of the measurement points that have no measurement yet (the White point is not expected for a non-TV device).
+        /// </summary>
+        private List<string> GetMissingLocationNames() =>
+            _measurementStatusService.AllMeasurementButtonStatuses
+                .Where(status => !( status.Location == MeasurementLocation.WhiteColor.ToString() && _currentDevice?.IsTV != true )
+                    && _currentDevice?.Measurements.Any(measurement => measurement.Location == status.Location) != true)
+                .Select(status => ResourceManager.GetString($"SpecLocation_{status.Location}") is { Length: > 0 } name ? name : status.Location)
+                .ToList();
 
         private void LocalizationService_LanguageChanged(object? sender, EventArgs e)
             {

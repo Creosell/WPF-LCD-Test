@@ -1184,7 +1184,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
 
             await ((RelayCommand)_viewModel.SaveResultsCommand).ExecuteAsync(null);
 
-            Assert.That(asked, Does.Contain("Brightness (cd/m²) 268 < min 290").And.Contain("White, 1 of 3").And.Contain("fewer than 3 times").And.Contain("Save the results anyway?"));
+            Assert.That(asked, Does.Contain("White: Brightness (cd/m²) is 268, below the minimum 290 (measured once)").And.Contain("fewer than 3 times").And.Contain("Not measured yet:").And.Contain("Save the results anyway?"));
             _mockFileService.Verify(f => f.SaveDeviceDataToJsonAsync(It.IsAny<DeviceUnderTest>()), Times.Never);
             }
 

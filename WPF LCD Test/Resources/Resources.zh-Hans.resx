@@ -721,13 +721,13 @@
     <value>{0}/3</value>
   </data>
   <data name="SaveSpecHeader" xml:space="preserve">
-    <value>保存的结果存在规格问题:</value>
+    <value>部分数值不符合规格:</value>
   </data>
   <data name="SaveSpecHeaderFewAttempts" xml:space="preserve">
-    <value>以下数值不符合规格，部分点位测量次数少于 3 次:</value>
+    <value>部分数值不符合规格，且部分点位测量次数少于 3 次:</value>
   </data>
   <data name="SaveSpecRemeasureHint" xml:space="preserve">
-    <value>请对测量不足 3 次的点位重新测量以获得更好的结果。</value>
+    <value>请对这些点位重新测量，以获得更可靠的结果。</value>
   </data>
   <data name="SaveNotFullNote" xml:space="preserve">
     <value>尚未完成所有测量。</value>
@@ -736,6 +736,30 @@
     <value>当前设备的测量结果尚未保存。
 
 仍要关闭应用程序吗？</value>
+  </data>
+  <data name="SaveProblemBelowMin" xml:space="preserve">
+    <value>{0}为 {1}，低于最小值 {2}</value>
+  </data>
+  <data name="SaveProblemAboveMax" xml:space="preserve">
+    <value>{0}为 {1}，高于最大值 {2}</value>
+  </data>
+  <data name="SaveProblemBelowTyp" xml:space="preserve">
+    <value>{0}为 {1}，低于推荐值 {2}</value>
+  </data>
+  <data name="SaveProblemAboveTyp" xml:space="preserve">
+    <value>{0}为 {1}，高于推荐值 {2}</value>
+  </data>
+  <data name="SaveProblemPoint" xml:space="preserve">
+    <value>{0}：{1}（{2}）</value>
+  </data>
+  <data name="SaveProblemMeasuredOnce" xml:space="preserve">
+    <value>测量 1 次</value>
+  </data>
+  <data name="SaveProblemMeasuredTimes" xml:space="preserve">
+    <value>测量 {0} 次</value>
+  </data>
+  <data name="SaveNotFullMissing" xml:space="preserve">
+    <value>尚未测量: {0}。</value>
   </data>
   <data name="SaveSpecQuestion" xml:space="preserve">
     <value>仍要保存结果吗？</value>

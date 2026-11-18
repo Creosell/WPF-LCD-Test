@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The Language label in Settings reads "Language / 语言" in both languages, so it can be found which language is active
 - The Settings page behaves like the Measurement page: Save and Reset to default breathe (green: saved or reset, red: a value was rejected or saving failed) with the outcome on the label, have the same rounded look, and Ctrl+S saves the settings
 - The feedback animations are an attached behavior (`ActionFeedbackBehavior`, `Views/Behaviors`) that any element enables from XAML with a signal binding, so a page needs no code-behind for it; `ActionFeedbackSignal` moved to `Models`
+- The save confirmation describes the problems in plain words: bullets like "White: Brightness (cd/m²) is 268, below the minimum 290 (measured once)" instead of "Brightness (cd/m²) 268 < min 290 (White, 1 of 3)", simpler headers and hint, and the list of points that are not measured yet
 - Switching between the Measurement and Settings pages took 100-350 ms because the page was rebuilt each time (the DataTemplate of a ContentControl); both pages are now created once and switched by visibility (2-5 ms)
 - Changing the language reset the other settings (channel, auto connect) to their defaults; only the language is updated now
 - The CA-410 ran in LTD.AUTO instead of AUTO because the CA-310 speed constant was passed to it

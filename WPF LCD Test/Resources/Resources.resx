@@ -721,13 +721,13 @@
     <value>{0} of 3</value>
   </data>
   <data name="SaveSpecHeader" xml:space="preserve">
-    <value>The saved results have remarks against the specification:</value>
+    <value>Some values do not meet the specification:</value>
   </data>
   <data name="SaveSpecHeaderFewAttempts" xml:space="preserve">
-    <value>These values are outside the specification and some points were measured fewer than 3 times:</value>
+    <value>Some values do not meet the specification, and some points were measured fewer than 3 times:</value>
   </data>
   <data name="SaveSpecRemeasureHint" xml:space="preserve">
-    <value>Measure the points with fewer than 3 attempts again to get a better result.</value>
+    <value>Measure those points again to get a more reliable result.</value>
   </data>
   <data name="SaveNotFullNote" xml:space="preserve">
     <value>Not all measurements have been taken.</value>
@@ -736,6 +736,30 @@
     <value>The measurements of the current device are not saved.
 
 Close the application anyway?</value>
+  </data>
+  <data name="SaveProblemBelowMin" xml:space="preserve">
+    <value>{0} is {1}, below the minimum {2}</value>
+  </data>
+  <data name="SaveProblemAboveMax" xml:space="preserve">
+    <value>{0} is {1}, above the maximum {2}</value>
+  </data>
+  <data name="SaveProblemBelowTyp" xml:space="preserve">
+    <value>{0} is {1}, below the recommended {2}</value>
+  </data>
+  <data name="SaveProblemAboveTyp" xml:space="preserve">
+    <value>{0} is {1}, above the recommended {2}</value>
+  </data>
+  <data name="SaveProblemPoint" xml:space="preserve">
+    <value>{0}: {1} ({2})</value>
+  </data>
+  <data name="SaveProblemMeasuredOnce" xml:space="preserve">
+    <value>measured once</value>
+  </data>
+  <data name="SaveProblemMeasuredTimes" xml:space="preserve">
+    <value>measured {0} times</value>
+  </data>
+  <data name="SaveNotFullMissing" xml:space="preserve">
+    <value>Not measured yet: {0}.</value>
   </data>
   <data name="SaveSpecQuestion" xml:space="preserve">
     <value>Save the results anyway?</value>
