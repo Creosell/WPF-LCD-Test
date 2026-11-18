@@ -957,7 +957,7 @@ namespace WPF_LCD_Test.ViewModels
                         if (_reportCancelRequested)
                             {
                             Log(ReportGenerationCanceled, severity: LogSeverity.Warning);
-                            Flash(ReportFeedback, false);
+                            FlashCanceled(ReportFeedback);
                             }
                         else
                             {
@@ -1030,7 +1030,7 @@ namespace WPF_LCD_Test.ViewModels
             catch (OperationCanceledException)
                 {
                 Log(UploadCanceled, severity: LogSeverity.Warning);
-                Flash(UploadFeedback, false);
+                FlashCanceled(UploadFeedback);
                 }
             finally
                 {
@@ -1402,6 +1402,11 @@ namespace WPF_LCD_Test.ViewModels
                 if (success) signal.Succeed();
                 else signal.Fail();
             });
+
+        /// <summary>
+        /// Signals that the operator canceled a button action (from any thread).
+        /// </summary>
+        private void FlashCanceled(ActionFeedbackSignal signal) => ExecuteThreadInUI(signal.Cancel);
 
         private void ExecuteThreadInUI(Action action)
             {

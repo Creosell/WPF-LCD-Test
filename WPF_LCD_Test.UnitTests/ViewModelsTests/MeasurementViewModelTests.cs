@@ -226,14 +226,14 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             }
 
         [Test]
-        public async Task UploadReports_Canceled_SignalsFailureAndFreesTheButton()
+        public async Task UploadReports_Canceled_SignalsCanceledAndFreesTheButton()
             {
             _viewModel.SelectedDeviceConfiguration = "TestConfig";
             _mockUploadService.Setup(u => u.UploadReportsAsync()).ThrowsAsync(new OperationCanceledException());
 
             await ((RelayCommand)_viewModel.UploadReportsCommand).ExecuteAsync(null);
 
-            Assert.That(_viewModel.UploadFeedback.Feedback, Is.EqualTo(ActionFeedback.Failure));
+            Assert.That(_viewModel.UploadFeedback.Feedback, Is.EqualTo(ActionFeedback.Canceled));
             Assert.That(_viewModel.IsUploadingReports, Is.False);
             }
 

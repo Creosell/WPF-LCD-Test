@@ -14,7 +14,10 @@ namespace WPF_LCD_Test.ViewModels
         Success,
 
         /// <summary>The action failed.</summary>
-        Failure
+        Failure,
+
+        /// <summary>The operator canceled the action.</summary>
+        Canceled
         }
 
     /// <summary>
@@ -53,6 +56,11 @@ namespace WPF_LCD_Test.ViewModels
         /// Signals that the action failed.
         /// </summary>
         public void Fail() => Raise(ActionFeedback.Failure);
+
+        /// <summary>
+        /// Signals that the operator canceled the action.
+        /// </summary>
+        public void Cancel() => Raise(ActionFeedback.Canceled);
 
         private void Raise(ActionFeedback feedback)
             {

@@ -97,6 +97,12 @@
     <system:String x:Key="ReportButtonBusy">Processing...</system:String>
     <system:String x:Key="UploadButtonBusy">Uploading...</system:String>
     <system:String x:Key="CancelOnClickToolTip">Click again to cancel</system:String>
+    <system:String x:Key="FeedbackSaved">Saved</system:String>
+    <system:String x:Key="FeedbackCleared">Cleared</system:String>
+    <system:String x:Key="FeedbackDone">Done</system:String>
+    <system:String x:Key="FeedbackUploaded">Uploaded</system:String>
+    <system:String x:Key="FeedbackFailed">Failed</system:String>
+    <system:String x:Key="FeedbackCanceled">Canceled</system:String>
     <system:String x:Key="ReportButton">
         Create report
     </system:String>

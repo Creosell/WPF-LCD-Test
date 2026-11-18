@@ -34,6 +34,7 @@ namespace WPF_LCD_Test.Views
 
         private readonly DeviceCardTransition _deviceCard;
         private readonly Dictionary<ActionFeedbackSignal, Button> _feedbackButtons;
+        private readonly Dictionary<Button, string> _successTextKeys = new();
 
         private void DeviceConfigurationButton_Click(object sender, RoutedEventArgs e)
         {
@@ -141,6 +142,10 @@ namespace WPF_LCD_Test.Views
             _feedbackButtons[viewModel.ClearFeedback] = ClearResultsButton;
             _feedbackButtons[viewModel.ReportFeedback] = CreateReportButton;
             _feedbackButtons[viewModel.UploadFeedback] = UploadReportsButton;
+            _successTextKeys[SaveResultsButton] = "FeedbackSaved";
+            _successTextKeys[ClearResultsButton] = "FeedbackCleared";
+            _successTextKeys[CreateReportButton] = "FeedbackDone";
+            _successTextKeys[UploadReportsButton] = "FeedbackUploaded";
             foreach (var signal in _feedbackButtons.Keys) signal.PropertyChanged += FeedbackSignal_PropertyChanged;
         }
 
@@ -155,7 +160,7 @@ namespace WPF_LCD_Test.Views
             if (e.PropertyName == nameof(ActionFeedbackSignal.Sequence) && sender is ActionFeedbackSignal signal
                 && _feedbackButtons.TryGetValue(signal, out var button))
             {
-                ActionFeedbackBreathing.Play(button, signal.Feedback);
+                ActionFeedbackBreathing.Play(button, signal.Feedback, _successTextKeys.GetValueOrDefault(button));
             }
         }
 
@@ -425,39 +430,57 @@ namespace WPF_LCD_Test.Views
         }
 
         /// <summary>
-        /// Presentation-only feedback of a control button: the background breathes between its own color and green
-        /// (the action succeeded) or red (it failed or was canceled) once and then returns to the style.
+        /// Presentation-only feedback of a control button: the background breathes once between its own color and green
+        /// (the action succeeded) or red (it failed or was canceled) and the label names the outcome while the color is held.
+        /// The exhale back to the style is slower than the inhale.
         /// </summary>
         private static class ActionFeedbackBreathing
         {
             private static readonly Color SuccessColor = Color.FromRgb(0x43, 0xA0, 0x47);
             private static readonly Color FailureColor = Color.FromRgb(0xE5, 0x39, 0x35);
-            private static readonly Duration HalfCycle = new(TimeSpan.FromMilliseconds(1100));
+            private static readonly TimeSpan InhaleEnd = TimeSpan.FromMilliseconds(700);
+            private static readonly TimeSpan HoldEnd = TimeSpan.FromMilliseconds(2400);
+            private static readonly TimeSpan ExhaleEnd = TimeSpan.FromMilliseconds(4600);
 
             /// <summary>
             /// Starts the breathing on the button; a running one is restarted from the button's own color.
             /// </summary>
             /// <param name="button">The button that finished its action.</param>
-            /// <param name="feedback">The outcome that selects the color.</param>
-            public static void Play(Button button, ActionFeedback feedback)
+            /// <param name="feedback">The outcome that selects the color and the label.</param>
+            /// <param name="successTextKey">Resource key of the label shown on success.</param>
+            public static void Play(Button button, ActionFeedback feedback, string? successTextKey)
             {
                 if (feedback == ActionFeedback.None) return;
 
+                button.BeginAnimation(ContentControl.ContentProperty, null);
                 button.ClearValue(Control.BackgroundProperty);
                 var baseColor = (button.Background as SolidColorBrush)?.Color ?? Colors.Transparent;
                 var brush = new SolidColorBrush(baseColor);
                 button.Background = brush;
 
-                var breathing = new ColorAnimation(baseColor, feedback == ActionFeedback.Success ? SuccessColor : FailureColor, HalfCycle)
-                {
-                    AutoReverse = true,
-                    EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut }
-                };
+                var target = feedback == ActionFeedback.Success ? SuccessColor : FailureColor;
+                var breathing = new ColorAnimationUsingKeyFrames { Duration = ExhaleEnd };
+                breathing.KeyFrames.Add(new EasingColorKeyFrame(target, InhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseOut } });
+                breathing.KeyFrames.Add(new LinearColorKeyFrame(target, HoldEnd));
+                breathing.KeyFrames.Add(new EasingColorKeyFrame(baseColor, ExhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut } });
                 breathing.Completed += (_, _) =>
                 {
                     if (ReferenceEquals(button.Background, brush)) button.ClearValue(Control.BackgroundProperty);
                 };
                 brush.BeginAnimation(SolidColorBrush.ColorProperty, breathing);
+
+                string? textKey = feedback switch
+                {
+                    ActionFeedback.Success => successTextKey,
+                    ActionFeedback.Canceled => "FeedbackCanceled",
+                    _ => "FeedbackFailed"
+                };
+                if (textKey != null && button.TryFindResource(textKey) is string text)
+                {
+                    var label = new ObjectAnimationUsingKeyFrames { Duration = HoldEnd };
+                    label.KeyFrames.Add(new DiscreteObjectKeyFrame(text.Trim(), TimeSpan.Zero));
+                    button.BeginAnimation(ContentControl.ContentProperty, label);
+                }
             }
         }
     }

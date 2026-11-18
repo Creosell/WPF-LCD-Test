@@ -95,6 +95,12 @@
     <system:String x:Key="ReportButtonBusy">处理中...</system:String>
     <system:String x:Key="UploadButtonBusy">上传中...</system:String>
     <system:String x:Key="CancelOnClickToolTip">再次点击可取消</system:String>
+    <system:String x:Key="FeedbackSaved">已保存</system:String>
+    <system:String x:Key="FeedbackCleared">已清除</system:String>
+    <system:String x:Key="FeedbackDone">完成</system:String>
+    <system:String x:Key="FeedbackUploaded">已上传</system:String>
+    <system:String x:Key="FeedbackFailed">失败</system:String>
+    <system:String x:Key="FeedbackCanceled">已取消</system:String>
     <system:String x:Key="ReportButton">
         创建报告
     </system:String>
