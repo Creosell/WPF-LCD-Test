@@ -49,7 +49,7 @@ namespace WPF_LCD_Test.Converters
         }
 
         /// <summary>
-        /// Writes every attempt of the point with its time and the flag of the one the measurement holds.
+        /// Writes every attempt of the point with the flag of the one the measurement holds.
         /// </summary>
         /// <param name="writer">The JSON writer.</param>
         /// <param name="value">The measurement with the attempts.</param>
@@ -61,7 +61,6 @@ namespace WPF_LCD_Test.Converters
             {
                 var attempt = value.Attempts[i];
                 writer.WriteStartObject();
-                writer.WriteString("Time", attempt.Time.ToString("yyyyMMdd_HHmmss", System.Globalization.CultureInfo.InvariantCulture));
                 WriteRounded(writer, "x", attempt.x, 3);
                 WriteRounded(writer, "y", attempt.y, 3);
                 WriteRounded(writer, "Lv", attempt.Lv, lvPrecision);

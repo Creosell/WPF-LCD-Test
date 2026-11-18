@@ -81,7 +81,7 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
             Assert.That(attempts[0].GetProperty("Best").GetBoolean(), Is.True);
             Assert.That(attempts[1].GetProperty("Best").GetBoolean(), Is.False);
             Assert.That(attempts[1].GetProperty("T").ValueKind, Is.EqualTo(JsonValueKind.Null));
-            Assert.That(attempts[0].GetProperty("Time").GetString(), Does.Match(@"^\d{8}_\d{6}$"));
+            Assert.That(attempts[0].TryGetProperty("Time", out _), Is.False);
             }
         }
     }
