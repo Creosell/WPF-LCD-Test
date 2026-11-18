@@ -758,9 +758,6 @@ Close the application anyway?</value>
   <data name="SaveProblemMeasuredTimes" xml:space="preserve">
     <value>measured {0} times</value>
   </data>
-  <data name="SaveNotFullMissing" xml:space="preserve">
-    <value>Not measured yet: {0}.</value>
-  </data>
   <data name="SaveSpecQuestion" xml:space="preserve">
     <value>Save the results anyway?</value>
   </data>
