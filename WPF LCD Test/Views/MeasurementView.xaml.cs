@@ -35,7 +35,7 @@ namespace WPF_LCD_Test.Views
         private readonly DeviceCardTransition _deviceCard;
         private readonly Dictionary<ActionFeedbackSignal, Control> _feedbackButtons;
         private readonly Dictionary<Control, string> _successTextKeys = new();
-        private readonly Dictionary<ActionFeedbackSignal, Panel> _feedbackRows = new();
+        private readonly Dictionary<ActionFeedbackSignal, Control> _feedbackRows = new();
 
         private void DeviceConfigurationButton_Click(object sender, RoutedEventArgs e)
         {
@@ -143,8 +143,8 @@ namespace WPF_LCD_Test.Views
             _feedbackButtons[viewModel.ClearFeedback] = ClearResultsButton;
             _feedbackButtons[viewModel.ReportFeedback] = CreateReportButton;
             _feedbackButtons[viewModel.UploadFeedback] = UploadReportsButton;
-            _feedbackRows[viewModel.SerialFeedback] = SerialNumberRow;
-            _feedbackRows[viewModel.ConfigFeedback] = ConfigurationRow;
+            _feedbackRows[viewModel.SerialFeedback] = SerialNumberTextBox;
+            _feedbackRows[viewModel.ConfigFeedback] = DeviceConfigurationButton;
             _successTextKeys[SaveResultsButton] = "FeedbackSaved";
             _successTextKeys[ClearResultsButton] = "FeedbackCleared";
             _successTextKeys[CreateReportButton] = "FeedbackDone";
@@ -169,7 +169,7 @@ namespace WPF_LCD_Test.Views
             }
             else if (_feedbackRows.TryGetValue(signal, out var row))
             {
-                RowBreathing.Play(row, signal.Feedback);
+                UnderlineBreathing.Play(row, signal.Feedback);
             }
         }
 
@@ -439,36 +439,39 @@ namespace WPF_LCD_Test.Views
         }
 
         /// <summary>
-        /// Presentation-only quick feedback of an input row (the line with the label and the value): its background
-        /// takes a translucent green or red and goes back; the exhale is slower than the inhale.
+        /// Presentation-only quick feedback of an input field: its underline takes green or red and goes back;
+        /// the exhale is slower than the inhale.
         /// </summary>
-        private static class RowBreathing
+        private static class UnderlineBreathing
         {
-            private static readonly TimeSpan InhaleEnd = TimeSpan.FromMilliseconds(220);
-            private static readonly TimeSpan HoldEnd = TimeSpan.FromMilliseconds(520);
-            private static readonly TimeSpan ExhaleEnd = TimeSpan.FromMilliseconds(1100);
+            private static readonly Color SuccessColor = Color.FromRgb(0x43, 0xA0, 0x47);
+            private static readonly Color FailureColor = Color.FromRgb(0xE5, 0x39, 0x35);
+            private static readonly TimeSpan InhaleEnd = TimeSpan.FromMilliseconds(300);
+            private static readonly TimeSpan HoldEnd = TimeSpan.FromMilliseconds(800);
+            private static readonly TimeSpan ExhaleEnd = TimeSpan.FromMilliseconds(1600);
 
             /// <summary>
-            /// Starts the breathing on the row; a running one is restarted.
+            /// Starts the breathing on the underline (the border brush) of the control; a running one is restarted.
             /// </summary>
-            /// <param name="row">The row panel whose background breathes.</param>
+            /// <param name="field">The field whose underline breathes.</param>
             /// <param name="feedback">The outcome that selects the color.</param>
-            public static void Play(Panel row, ActionFeedback feedback)
+            public static void Play(Control field, ActionFeedback feedback)
             {
                 if (feedback == ActionFeedback.None) return;
 
-                var peak = feedback == ActionFeedback.Success ? Color.FromArgb(0x70, 0x43, 0xA0, 0x47) : Color.FromArgb(0x70, 0xE5, 0x39, 0x35);
-                var rest = Color.FromArgb(0, peak.R, peak.G, peak.B);
+                field.ClearValue(Control.BorderBrushProperty);
+                var rest = (field.BorderBrush as SolidColorBrush)?.Color ?? Colors.Gray;
+                var target = feedback == ActionFeedback.Success ? SuccessColor : FailureColor;
                 var brush = new SolidColorBrush(rest);
-                row.Background = brush;
+                field.BorderBrush = brush;
 
                 var breathing = new ColorAnimationUsingKeyFrames { Duration = ExhaleEnd };
-                breathing.KeyFrames.Add(new EasingColorKeyFrame(peak, InhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseOut } });
-                breathing.KeyFrames.Add(new LinearColorKeyFrame(peak, HoldEnd));
+                breathing.KeyFrames.Add(new EasingColorKeyFrame(target, InhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseOut } });
+                breathing.KeyFrames.Add(new LinearColorKeyFrame(target, HoldEnd));
                 breathing.KeyFrames.Add(new EasingColorKeyFrame(rest, ExhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut } });
                 breathing.Completed += (_, _) =>
                 {
-                    if (ReferenceEquals(row.Background, brush)) row.ClearValue(Panel.BackgroundProperty);
+                    if (ReferenceEquals(field.BorderBrush, brush)) field.ClearValue(Control.BorderBrushProperty);
                 };
                 brush.BeginAnimation(SolidColorBrush.ColorProperty, breathing);
             }

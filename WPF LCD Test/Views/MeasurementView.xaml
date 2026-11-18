@@ -228,6 +228,7 @@
         -->
         <Style x:Key="DeviceConfigDropdownButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Black" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="FontFamily" Value="Segoe UI" />
             <Setter Property="Template">
@@ -235,7 +236,7 @@
                     <ControlTemplate TargetType="Button">
                         <Border
                             x:Name="Underline"
-                            BorderBrush="Black"
+                            BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="0,0,0,1">
                             <ContentPresenter Margin="0,0,0,4" />
                         </Border>
@@ -561,7 +562,7 @@
                     </Border>
                 </StackPanel>
                 <Grid Grid.Row="1" Margin="0,10,0,0">
-                    <StackPanel x:Name="ConfigurationRow" Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal">
                         <Label
                             VerticalAlignment="Center"
                             Content="{DynamicResource DeviceConfiguration}"
@@ -613,10 +614,7 @@
                 </Grid>
 
                 <Grid Grid.Row="2">
-                    <StackPanel
-                        x:Name="SerialNumberRow"
-                        Margin="0,5,30,5"
-                        Orientation="Horizontal">
+                    <StackPanel Margin="0,5,30,5" Orientation="Horizontal">
                         <Label
                             VerticalAlignment="Center"
                             Content="{DynamicResource SerialNumber}"
