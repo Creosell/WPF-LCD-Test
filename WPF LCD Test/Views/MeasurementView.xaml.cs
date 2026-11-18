@@ -35,6 +35,7 @@ namespace WPF_LCD_Test.Views
         private readonly DeviceCardTransition _deviceCard;
         private readonly Dictionary<ActionFeedbackSignal, Control> _feedbackButtons;
         private readonly Dictionary<Control, string> _successTextKeys = new();
+        private readonly Dictionary<ActionFeedbackSignal, Panel> _feedbackRows = new();
 
         private void DeviceConfigurationButton_Click(object sender, RoutedEventArgs e)
         {
@@ -142,27 +143,33 @@ namespace WPF_LCD_Test.Views
             _feedbackButtons[viewModel.ClearFeedback] = ClearResultsButton;
             _feedbackButtons[viewModel.ReportFeedback] = CreateReportButton;
             _feedbackButtons[viewModel.UploadFeedback] = UploadReportsButton;
-            _feedbackButtons[viewModel.SerialFeedback] = SerialNumberTextBox;
-            _feedbackButtons[viewModel.ConfigFeedback] = DeviceConfigurationButton;
+            _feedbackRows[viewModel.SerialFeedback] = SerialNumberRow;
+            _feedbackRows[viewModel.ConfigFeedback] = ConfigurationRow;
             _successTextKeys[SaveResultsButton] = "FeedbackSaved";
             _successTextKeys[ClearResultsButton] = "FeedbackCleared";
             _successTextKeys[CreateReportButton] = "FeedbackDone";
             _successTextKeys[UploadReportsButton] = "FeedbackUploaded";
-            foreach (var signal in _feedbackButtons.Keys) signal.PropertyChanged += FeedbackSignal_PropertyChanged;
+            foreach (var signal in _feedbackButtons.Keys.Concat(_feedbackRows.Keys)) signal.PropertyChanged += FeedbackSignal_PropertyChanged;
         }
 
         private void UnsubscribeFeedback()
         {
-            foreach (var signal in _feedbackButtons.Keys) signal.PropertyChanged -= FeedbackSignal_PropertyChanged;
+            foreach (var signal in _feedbackButtons.Keys.Concat(_feedbackRows.Keys)) signal.PropertyChanged -= FeedbackSignal_PropertyChanged;
             _feedbackButtons.Clear();
+            _feedbackRows.Clear();
         }
 
         private void FeedbackSignal_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(ActionFeedbackSignal.Sequence) && sender is ActionFeedbackSignal signal
-                && _feedbackButtons.TryGetValue(signal, out var button))
+            if (e.PropertyName != nameof(ActionFeedbackSignal.Sequence) || sender is not ActionFeedbackSignal signal) return;
+
+            if (_feedbackButtons.TryGetValue(signal, out var button))
             {
                 ActionFeedbackBreathing.Play(button, signal.Feedback, _successTextKeys.GetValueOrDefault(button));
+            }
+            else if (_feedbackRows.TryGetValue(signal, out var row))
+            {
+                RowBreathing.Play(row, signal.Feedback);
             }
         }
 
@@ -428,6 +435,42 @@ namespace WPF_LCD_Test.Views
                 };
 
                 _content.BeginAnimation(UIElement.OpacityProperty, fadeOut);
+            }
+        }
+
+        /// <summary>
+        /// Presentation-only quick feedback of an input row (the line with the label and the value): its background
+        /// takes a translucent green or red and goes back; the exhale is slower than the inhale.
+        /// </summary>
+        private static class RowBreathing
+        {
+            private static readonly TimeSpan InhaleEnd = TimeSpan.FromMilliseconds(220);
+            private static readonly TimeSpan HoldEnd = TimeSpan.FromMilliseconds(520);
+            private static readonly TimeSpan ExhaleEnd = TimeSpan.FromMilliseconds(1100);
+
+            /// <summary>
+            /// Starts the breathing on the row; a running one is restarted.
+            /// </summary>
+            /// <param name="row">The row panel whose background breathes.</param>
+            /// <param name="feedback">The outcome that selects the color.</param>
+            public static void Play(Panel row, ActionFeedback feedback)
+            {
+                if (feedback == ActionFeedback.None) return;
+
+                var peak = feedback == ActionFeedback.Success ? Color.FromArgb(0x70, 0x43, 0xA0, 0x47) : Color.FromArgb(0x70, 0xE5, 0x39, 0x35);
+                var rest = Color.FromArgb(0, peak.R, peak.G, peak.B);
+                var brush = new SolidColorBrush(rest);
+                row.Background = brush;
+
+                var breathing = new ColorAnimationUsingKeyFrames { Duration = ExhaleEnd };
+                breathing.KeyFrames.Add(new EasingColorKeyFrame(peak, InhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseOut } });
+                breathing.KeyFrames.Add(new LinearColorKeyFrame(peak, HoldEnd));
+                breathing.KeyFrames.Add(new EasingColorKeyFrame(rest, ExhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut } });
+                breathing.Completed += (_, _) =>
+                {
+                    if (ReferenceEquals(row.Background, brush)) row.ClearValue(Panel.BackgroundProperty);
+                };
+                brush.BeginAnimation(SolidColorBrush.ColorProperty, breathing);
             }
         }
 
