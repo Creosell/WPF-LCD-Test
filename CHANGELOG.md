@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - The dotted keyboard focus rectangle drawn around views and controls is removed in the whole application
 - A picked value in the settings view is no longer left highlighted: the focus returns to the view when a list closes or when the click lands outside the inputs
+- Switching between the Measurement and Settings pages took 100-350 ms because the page was rebuilt each time (the DataTemplate of a ContentControl); both pages are now created once and switched by visibility (2-5 ms)
 - Changing the language reset the other settings (channel, auto connect) to their defaults; only the language is updated now
 - The CA-410 ran in LTD.AUTO instead of AUTO because the CA-310 speed constant was passed to it
 - An infinite color temperature (CA-410 reports it for saturated colors) is shown as `T=n/a` in the log and in the button tooltip

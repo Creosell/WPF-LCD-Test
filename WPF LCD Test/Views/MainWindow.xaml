@@ -22,6 +22,7 @@
     mc:Ignorable="d">
 
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <Style x:Key="NavigationButtonStyle" TargetType="RadioButton">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Foreground" Value="White" />
@@ -222,9 +223,10 @@
             </Grid>
         </Border>
 
-        <ContentControl
-            Grid.Row="1"
-            Grid.Column="1"
-            Content="{Binding CurrentPageViewModel}" />
+        <!--  Both pages are created once and switched by visibility: re-creating a page (the DataTemplate of a ContentControl) took 100-350 ms per switch  -->
+        <Grid Grid.Row="1" Grid.Column="1">
+            <ContentControl Content="{Binding MeasurementPage}" Visibility="{Binding IsMeasurementPageVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            <ContentControl Content="{Binding SettingsPage}" Visibility="{Binding IsSettingsPageVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        </Grid>
     </Grid>
 </Window>

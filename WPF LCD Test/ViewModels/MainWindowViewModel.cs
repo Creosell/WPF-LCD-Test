@@ -32,8 +32,36 @@ namespace WPF_LCD_Test.ViewModels
         public BaseViewModel CurrentPageViewModel
         {
             get => _currentPageViewModel;
-            set => SetProperty(ref _currentPageViewModel, value);
+            set
+            {
+                if (SetProperty(ref _currentPageViewModel, value))
+                {
+                    OnPropertyChanged(nameof(IsMeasurementPageVisible));
+                    OnPropertyChanged(nameof(IsSettingsPageVisible));
+                }
+            }
         }
+
+        /// <summary>
+        /// Gets the Measurement page ViewModel (created once, on first use).
+        /// </summary>
+        public MeasurementViewModel MeasurementPage => _measurementViewModel ??= _serviceProvider.GetRequiredService<MeasurementViewModel>();
+
+        /// <summary>
+        /// Gets the Settings page ViewModel (created once, on first use).
+        /// </summary>
+        public SettingsViewModel SettingsPage => _settingsViewModel ??= _serviceProvider.GetRequiredService<SettingsViewModel>();
+
+        /// <summary>
+        /// Gets whether the Measurement page is the shown one. Both pages stay alive and are switched by visibility,
+        /// so changing the page does not rebuild a view.
+        /// </summary>
+        public bool IsMeasurementPageVisible => CurrentPageViewModel is MeasurementViewModel;
+
+        /// <summary>
+        /// Gets whether the Settings page is the shown one.
+        /// </summary>
+        public bool IsSettingsPageVisible => CurrentPageViewModel is SettingsViewModel;
 
         /// <summary>
         /// Gets the command for navigating between pages.
@@ -69,17 +97,11 @@ namespace WPF_LCD_Test.ViewModels
             BaseViewModel? targetViewModel = null;
             switch (pageName)
             {
-                case "Measurement":
-                    _measurementViewModel ??= _serviceProvider.GetRequiredService<MeasurementViewModel>();
-                    targetViewModel = _measurementViewModel;
-                    break;
                 case "Settings":
-                    _settingsViewModel ??= _serviceProvider.GetRequiredService<SettingsViewModel>();
-                    targetViewModel = _settingsViewModel;
+                    targetViewModel = SettingsPage;
                     break;
                 default:
-                    _measurementViewModel ??= _serviceProvider.GetRequiredService<MeasurementViewModel>();
-                    targetViewModel = _measurementViewModel;
+                    targetViewModel = MeasurementPage;
                     break;
             }
             if (targetViewModel != null && targetViewModel != _currentPageViewModel)
