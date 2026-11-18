@@ -489,6 +489,12 @@
   <data name="CantStartUpload" xml:space="preserve">
     <value>无法开始上传：设备名称未知</value>
   </data>
+  <data name="ReportGenerationCanceled" xml:space="preserve">
+    <value>已取消创建报告</value>
+  </data>
+  <data name="UploadCanceled" xml:space="preserve">
+    <value>已取消上传报告</value>
+  </data>
   <data name="StartingReportUploading" xml:space="preserve">
     <value>开始上传报告...</value>
   </data>

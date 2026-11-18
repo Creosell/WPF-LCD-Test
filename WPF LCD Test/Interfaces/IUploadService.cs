@@ -15,5 +15,11 @@
         /// </summary>
         /// <returns>True if all uploads completed successfully, false if any upload failed.</returns>
         Task<bool> UploadReportsAsync();
+
+        /// <summary>
+        /// Cancels the running upload: the CLI processes are killed and <see cref="UploadReportsAsync"/> throws <see cref="OperationCanceledException"/>.
+        /// Does nothing when no upload is running.
+        /// </summary>
+        void CancelUpload();
         }
     }

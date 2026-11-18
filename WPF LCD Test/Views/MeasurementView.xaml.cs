@@ -426,14 +426,13 @@ namespace WPF_LCD_Test.Views
 
         /// <summary>
         /// Presentation-only feedback of a control button: the background breathes between its own color and green
-        /// (the action succeeded) or red (it failed) a couple of times and then returns to the style.
+        /// (the action succeeded) or red (it failed or was canceled) once and then returns to the style.
         /// </summary>
         private static class ActionFeedbackBreathing
         {
             private static readonly Color SuccessColor = Color.FromRgb(0x43, 0xA0, 0x47);
             private static readonly Color FailureColor = Color.FromRgb(0xE5, 0x39, 0x35);
-            private static readonly Duration HalfCycle = new(TimeSpan.FromMilliseconds(550));
-            private const int Cycles = 2;
+            private static readonly Duration HalfCycle = new(TimeSpan.FromMilliseconds(1100));
 
             /// <summary>
             /// Starts the breathing on the button; a running one is restarted from the button's own color.
@@ -452,7 +451,6 @@ namespace WPF_LCD_Test.Views
                 var breathing = new ColorAnimation(baseColor, feedback == ActionFeedback.Success ? SuccessColor : FailureColor, HalfCycle)
                 {
                     AutoReverse = true,
-                    RepeatBehavior = new RepeatBehavior(Cycles),
                     EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut }
                 };
                 breathing.Completed += (_, _) =>

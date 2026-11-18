@@ -997,6 +997,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Report generation canceled.
+        /// </summary>
+        public static string ReportGenerationCanceled {
+            get {
+                return ResourceManager.GetString("ReportGenerationCanceled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Report generation failed.
         /// </summary>
         public static string ReportGenerationFailed {
@@ -1731,6 +1740,15 @@ namespace WPF_LCD_Test.Resources {
         public static string UnexpectedMeasurementErr {
             get {
                 return ResourceManager.GetString("UnexpectedMeasurementErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reports upload canceled.
+        /// </summary>
+        public static string UploadCanceled {
+            get {
+                return ResourceManager.GetString("UploadCanceled", resourceCulture);
             }
         }
         

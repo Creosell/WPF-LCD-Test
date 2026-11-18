@@ -24,6 +24,32 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
+        <!--  A button of a cancelable action: while the action runs its label tells so and a second click cancels it  -->
+        <Style
+            x:Key="CreateReportButtonStyle"
+            BasedOn="{StaticResource {x:Type Button}}"
+            TargetType="Button">
+            <Setter Property="Content" Value="{DynamicResource ReportButton}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.IsReportGenerating, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                    <Setter Property="Content" Value="{DynamicResource ReportButtonBusy}" />
+                    <Setter Property="ToolTip" Value="{DynamicResource CancelOnClickToolTip}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style
+            x:Key="UploadReportsButtonStyle"
+            BasedOn="{StaticResource {x:Type Button}}"
+            TargetType="Button">
+            <Setter Property="Content" Value="{DynamicResource UploadButton}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.IsUploadingReports, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                    <Setter Property="Content" Value="{DynamicResource UploadButtonBusy}" />
+                    <Setter Property="ToolTip" Value="{DynamicResource CancelOnClickToolTip}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <!--  HierarchicalDataTemplate driving the cascading device configuration menu; propagates recursively to nested folder submenus.  -->
         <HierarchicalDataTemplate DataType="{x:Type models:DeviceConfigTreeNode}" ItemsSource="{Binding Children}">
             <TextBlock Text="{Binding DisplayName}" />
@@ -1204,14 +1230,14 @@
                     MaterialDesign:ButtonAssist.CornerRadius="15"
                     Command="{Binding DataContext.ReportGenerateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                     CommandParameter="ReportGenerator.exe"
-                    Content="{DynamicResource ReportButton}" />
+                    Style="{StaticResource CreateReportButtonStyle}" />
                 <Button
                     x:Name="UploadReportsButton"
                     Margin="5"
                     HorizontalAlignment="Left"
                     MaterialDesign:ButtonAssist.CornerRadius="15"
                     Command="{Binding DataContext.UploadReportsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                    Content="{DynamicResource UploadButton}" />
+                    Style="{StaticResource UploadReportsButtonStyle}" />
             </StackPanel>
 
             <StackPanel

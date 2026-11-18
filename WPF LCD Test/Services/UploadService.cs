@@ -25,6 +25,8 @@ namespace WPF_LCD_Test.Services
         private const string RemoteBasePath = "SCT";
         private const string FilenameRegexPattern = @"^(.+?)_(\d{8}_\d{4})\.zip$";
 
+        private CancellationTokenSource? _uploadCts;
+
         public event EventHandler<string>? StatusMessage;
 
         /// <summary>
@@ -63,6 +65,34 @@ namespace WPF_LCD_Test.Services
         /// <returns>True if all uploads succeeded, false if any failed.</returns>
         public async Task<bool> UploadReportsAsync()
             {
+            using var cts = new CancellationTokenSource();
+            _uploadCts = cts;
+            try
+                {
+                return await UploadReportsAsync(cts.Token);
+                }
+            finally
+                {
+                _uploadCts = null;
+                }
+            }
+
+        /// <summary>
+        /// Cancels the running upload; does nothing when no upload is running.
+        /// </summary>
+        public void CancelUpload()
+            {
+            try
+                {
+                _uploadCts?.Cancel();
+                }
+            catch (ObjectDisposedException)
+                {
+                }
+            }
+
+        private async Task<bool> UploadReportsAsync(CancellationToken cancellationToken)
+            {
             var uploadItems = ScanLocalFolders();
 
             if (!uploadItems.Any())
@@ -91,7 +121,7 @@ namespace WPF_LCD_Test.Services
 
                     var processingTask = Task.Run(async () =>
                     {
-                        bool success = await ExecuteSingleFileUploadAsync(currentPath, remoteDir);
+                        bool success = await ExecuteSingleFileUploadAsync(currentPath, remoteDir, cancellationToken);
 
                         if (success)
                             {
@@ -232,7 +262,8 @@ namespace WPF_LCD_Test.Services
         /// <param name="localPathArg">Local file path to upload.</param>
         /// <param name="remoteDir">Remote directory path.</param>
         /// <returns>True if upload succeeded, false otherwise.</returns>
-        private async Task<bool> ExecuteSingleFileUploadAsync(string localPathArg, string remoteDir)
+        /// <param name="cancellationToken">Kills the CLI process and throws <see cref="OperationCanceledException"/> when canceled.</param>
+        private async Task<bool> ExecuteSingleFileUploadAsync(string localPathArg, string remoteDir, CancellationToken cancellationToken)
             {
             var fileName = _fileSystem.Path.GetFileName(localPathArg);
             var remoteFullPath = remoteDir + fileName;
@@ -257,7 +288,15 @@ namespace WPF_LCD_Test.Services
                     };
 
                 await Task.Run(() => process.Start());
-                await process.WaitForExitAsync();
+                try
+                    {
+                    await process.WaitForExitAsync(cancellationToken);
+                    }
+                catch (OperationCanceledException)
+                    {
+                    if (!process.HasExited) process.Kill(true);
+                    throw;
+                    }
 
                 if (process.ExitCode == 0)
                     {
@@ -270,6 +309,10 @@ namespace WPF_LCD_Test.Services
                     ReportStatus(CLI_ErrorFor, [fileName, process.ExitCode, errorOutput]);
                     return false;
                     }
+                }
+            catch (OperationCanceledException)
+                {
+                throw;
                 }
             catch (Exception ex)
                 {

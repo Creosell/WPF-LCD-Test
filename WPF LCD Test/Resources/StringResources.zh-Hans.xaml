@@ -92,6 +92,9 @@
     <system:String x:Key="ClearLogWindow">
         清除日志窗口
     </system:String>
+    <system:String x:Key="ReportButtonBusy">处理中...</system:String>
+    <system:String x:Key="UploadButtonBusy">上传中...</system:String>
+    <system:String x:Key="CancelOnClickToolTip">再次点击可取消</system:String>
     <system:String x:Key="ReportButton">
         创建报告
     </system:String>

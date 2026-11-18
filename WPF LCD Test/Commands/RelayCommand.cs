@@ -10,6 +10,7 @@ namespace WPF_LCD_Test.Commands
         private readonly Action<object>? _execute;
         private readonly Func<object, Task>? _executeAsync;
         private readonly Func<object, bool>? _canExecute;
+        private readonly bool _allowConcurrentExecution;
         private bool _isExecuting;
 
         /// <summary>
@@ -22,10 +23,11 @@ namespace WPF_LCD_Test.Commands
         /// </summary>
         /// <param name="executeAsync">The async execution logic with parameter.</param>
         /// <param name="canExecute">Optional logic to determine if the command can execute.</param>
-        public RelayCommand(Func<object, Task> executeAsync, Func<object, bool>? canExecute = null)
+        public RelayCommand(Func<object, Task> executeAsync, Func<object, bool>? canExecute = null, bool allowConcurrentExecution = false)
         {
             _executeAsync = executeAsync ?? throw new ArgumentNullException(nameof(executeAsync));
             _canExecute = canExecute;
+            _allowConcurrentExecution = allowConcurrentExecution;
         }
 
         /// <summary>
@@ -69,7 +71,7 @@ namespace WPF_LCD_Test.Commands
         public bool CanExecute(object? parameter)
         {
             bool baseCanExecute = _canExecute?.Invoke(parameter) ?? true;
-            return _executeAsync != null ? !_isExecuting && baseCanExecute : baseCanExecute;
+            return _executeAsync != null && !_allowConcurrentExecution ? !_isExecuting && baseCanExecute : baseCanExecute;
         }
 
         /// <summary>

@@ -525,6 +525,12 @@
   <data name="CantStartUpload" xml:space="preserve">
     <value>Cannot start upload: Device name is unknown</value>
   </data>
+  <data name="ReportGenerationCanceled" xml:space="preserve">
+    <value>Report generation canceled</value>
+  </data>
+  <data name="UploadCanceled" xml:space="preserve">
+    <value>Reports upload canceled</value>
+  </data>
   <data name="StartingReportUploading" xml:space="preserve">
     <value>Starting reports upload...</value>
   </data>

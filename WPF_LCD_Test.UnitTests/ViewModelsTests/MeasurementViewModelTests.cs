@@ -200,11 +200,41 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             }
 
         [Test]
-        public void ReportGenerateCommand_IsInactive_WhenGenerating()
+        public void ReportGenerateCommand_StaysActive_WhenGeneratingSoThatItCanBeCanceled()
             {
             _viewModel.IsReportGenerating = true;
             var canExecute = _viewModel.ReportGenerateCommand.CanExecute(null);
-            Assert.That(canExecute, Is.False);
+            Assert.That(canExecute, Is.True);
+            }
+
+        [Test]
+        public async Task UploadReports_SecondClickWhileUploading_CancelsTheUpload()
+            {
+            _viewModel.SelectedDeviceConfiguration = "TestConfig";
+            var release = new TaskCompletionSource<bool>();
+            _mockUploadService.Setup(u => u.UploadReportsAsync()).Returns(release.Task);
+            var command = (RelayCommand)_viewModel.UploadReportsCommand;
+
+            var running = command.ExecuteAsync(null);
+            Assert.That(_viewModel.IsUploadingReports, Is.True);
+            await command.ExecuteAsync(null);
+
+            _mockUploadService.Verify(u => u.CancelUpload(), Times.Once);
+            _mockUploadService.Verify(u => u.UploadReportsAsync(), Times.Once);
+            release.SetResult(true);
+            await running;
+            }
+
+        [Test]
+        public async Task UploadReports_Canceled_SignalsFailureAndFreesTheButton()
+            {
+            _viewModel.SelectedDeviceConfiguration = "TestConfig";
+            _mockUploadService.Setup(u => u.UploadReportsAsync()).ThrowsAsync(new OperationCanceledException());
+
+            await ((RelayCommand)_viewModel.UploadReportsCommand).ExecuteAsync(null);
+
+            Assert.That(_viewModel.UploadFeedback.Feedback, Is.EqualTo(ActionFeedback.Failure));
+            Assert.That(_viewModel.IsUploadingReports, Is.False);
             }
 
         // --- Тесты для ExecuteApplySerialNumber ---

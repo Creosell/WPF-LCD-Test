@@ -184,6 +184,9 @@ namespace WPF_LCD_Test.ViewModels
                 }
             }
 
+        private Process? _reportProcess;
+        private bool _reportCancelRequested;
+
         public bool IsReportGenerating
             {
             get => _isReportGenerating;
@@ -408,7 +411,7 @@ namespace WPF_LCD_Test.ViewModels
             ReportGenerateCommand = new RelayCommand(ExecuteReportGenerateCommand, CanExecuteReportGenerateCommand);
             MeasureCommand = new RelayCommand(ExecuteMeasureAsync, CanExecuteMeasure);
             ApplySerialNumberCommand = new RelayCommand(ExecuteApplySerialNumber, CanExecuteApplySerialNumber);
-            UploadReportsCommand = new RelayCommand(ExecuteUploadReportsAsync, CanExecuteUploadReportsAsync);
+            UploadReportsCommand = new RelayCommand(ExecuteUploadReportsAsync, CanExecuteUploadReportsAsync, allowConcurrentExecution: true);
             SelectDeviceConfigurationCommand = new RelayCommand(ExecuteSelectDeviceConfiguration, CanExecuteSelectDeviceConfiguration);
 
             _colorMeasurementService.StatusMessage += ColorMeasurementService_StatusMessage;
@@ -907,6 +910,12 @@ namespace WPF_LCD_Test.ViewModels
         /// </summary>
         private void ExecuteReportGenerateCommand(object parameter)
             {
+            if (IsReportGenerating)
+                {
+                CancelReportGeneration();
+                return;
+                }
+
             try
                 {
                 var appDir = AppDomain.CurrentDomain.BaseDirectory;
@@ -920,6 +929,7 @@ namespace WPF_LCD_Test.ViewModels
                     }
 
                 Log(StartingReportGeneration);
+                _reportCancelRequested = false;
                 IsReportGenerating = true;
 
                 Task.Run(() =>
@@ -940,11 +950,19 @@ namespace WPF_LCD_Test.ViewModels
                     try
                         {
                         process.Start();
+                        _reportProcess = process;
                         process.BeginOutputReadLine();
                         process.BeginErrorReadLine();
                         process.WaitForExit();
-                        var exitCode = (ReportExitCode)process.ExitCode;
-                        HandleReportGenerationResult(exitCode);
+                        if (_reportCancelRequested)
+                            {
+                            Log(ReportGenerationCanceled, severity: LogSeverity.Warning);
+                            Flash(ReportFeedback, false);
+                            }
+                        else
+                            {
+                            HandleReportGenerationResult((ReportExitCode)process.ExitCode);
+                            }
                         }
                     catch (Exception ex)
                         {
@@ -952,6 +970,7 @@ namespace WPF_LCD_Test.ViewModels
                         }
                     finally
                         {
+                        _reportProcess = null;
                         ExecuteThreadInUI(() => IsReportGenerating = false);
                         }
                 });
@@ -964,10 +983,31 @@ namespace WPF_LCD_Test.ViewModels
             }
 
         /// <summary>
-        /// Uploads the generated reports using the upload service.
+        /// Cancels the running report generation by killing the generator process.
+        /// </summary>
+        private void CancelReportGeneration()
+            {
+            _reportCancelRequested = true;
+            try
+                {
+                _reportProcess?.Kill(true);
+                }
+            catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception)
+                {
+                }
+            }
+
+        /// <summary>
+        /// Uploads the generated reports using the upload service; calling it again while the upload runs cancels it.
         /// </summary>
         private async Task ExecuteUploadReportsAsync(object parameter)
             {
+            if (IsUploadingReports)
+                {
+                _uploadService.CancelUpload();
+                return;
+                }
+
             if (string.IsNullOrEmpty(_selectedDeviceConfiguration))
                 {
                 _dialogService.ShowMessage($"{CantStartUpload}", $"{Err}");
@@ -986,6 +1026,11 @@ namespace WPF_LCD_Test.ViewModels
                     Log(UploadFailed, severity: LogSeverity.Error);
                     }
                 Flash(UploadFeedback, uploaded);
+                }
+            catch (OperationCanceledException)
+                {
+                Log(UploadCanceled, severity: LogSeverity.Warning);
+                Flash(UploadFeedback, false);
                 }
             finally
                 {
@@ -1374,8 +1419,8 @@ namespace WPF_LCD_Test.ViewModels
         private bool CanExecuteSwitchLanguage(object parameter) => parameter is string code && !string.IsNullOrWhiteSpace(code);
         private bool CanExecuteMeasure(object parameter) => IsDeviceConnected && !_isDeviceCalibrating && !_isDeviceConnecting && IsDeviceCalibrated && !string.IsNullOrWhiteSpace(SerialNumber) && MeasurementTime > 0;
         private bool CanExecuteApplySerialNumber(object parameter) => !string.IsNullOrWhiteSpace(parameter as string);
-        private bool CanExecuteReportGenerateCommand(object parameter) => !IsReportGenerating;
-        private bool CanExecuteUploadReportsAsync(object parameter) => !IsUploadingReports;
+        private bool CanExecuteReportGenerateCommand(object parameter) => true;
+        private bool CanExecuteUploadReportsAsync(object parameter) => true;
 
         #endregion
 

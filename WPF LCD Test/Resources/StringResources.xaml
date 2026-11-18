@@ -94,6 +94,9 @@
     <system:String x:Key="ClearLogWindow">
         Clear log window
     </system:String>
+    <system:String x:Key="ReportButtonBusy">Processing...</system:String>
+    <system:String x:Key="UploadButtonBusy">Uploading...</system:String>
+    <system:String x:Key="CancelOnClickToolTip">Click again to cancel</system:String>
     <system:String x:Key="ReportButton">
         Create report
     </system:String>
