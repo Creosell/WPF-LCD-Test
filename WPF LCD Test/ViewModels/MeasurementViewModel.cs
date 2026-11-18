@@ -1286,6 +1286,7 @@ namespace WPF_LCD_Test.ViewModels
                 {
                 status.IsPassed = isPassed;
                 status.MeasuredValuesString = measuredValuesString;
+                if (isPassed is bool passed) Flash(status.Feedback, passed);
                 }
             else
                 {

@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Effects;
 using WPF_LCD_Test.Models;
 
 namespace WPF_LCD_Test.Views.Behaviors
@@ -20,7 +21,10 @@ namespace WPF_LCD_Test.Views.Behaviors
         Underline,
 
         /// <summary>A separate border element laid over an underline breathes; it is transparent at rest.</summary>
-        Overlay
+        Overlay,
+
+        /// <summary>A colored glow around the element pulses; works on elements whose own background carries a status color.</summary>
+        Glow
     }
 
     /// <summary>
@@ -85,6 +89,9 @@ namespace WPF_LCD_Test.Views.Behaviors
                 case ActionFeedbackMode.Underline when element is Control field:
                     UnderlineBreathing.Play(field, feedback);
                     break;
+                case ActionFeedbackMode.Glow:
+                    GlowBreathing.Play(element, feedback);
+                    break;
                 case ActionFeedbackMode.Fill when element is Control control:
                     ActionFeedbackBreathing.Play(control, feedback, GetSuccessText(element));
                     break;
@@ -100,9 +107,9 @@ namespace WPF_LCD_Test.Views.Behaviors
     {
         private static readonly Color SuccessColor = Color.FromRgb(0x43, 0xA0, 0x47);
         private static readonly Color FailureColor = Color.FromRgb(0xE5, 0x39, 0x35);
-        private static readonly TimeSpan InhaleEnd = TimeSpan.FromMilliseconds(300);
-        private static readonly TimeSpan HoldEnd = TimeSpan.FromMilliseconds(800);
-        private static readonly TimeSpan ExhaleEnd = TimeSpan.FromMilliseconds(1600);
+        private static readonly TimeSpan InhaleEnd = TimeSpan.FromMilliseconds(220);
+        private static readonly TimeSpan HoldEnd = TimeSpan.FromMilliseconds(600);
+        private static readonly TimeSpan ExhaleEnd = TimeSpan.FromMilliseconds(1300);
 
         /// <summary>
         /// Starts the breathing on a separate line laid over the underline of a field; the line is transparent at rest.
@@ -165,11 +172,11 @@ namespace WPF_LCD_Test.Views.Behaviors
     {
         private static readonly Color SuccessColor = Color.FromRgb(0x43, 0xA0, 0x47);
         private static readonly Color FailureColor = Color.FromRgb(0xE5, 0x39, 0x35);
-        private static readonly TimeSpan InhaleEnd = TimeSpan.FromMilliseconds(700);
-        private static readonly TimeSpan HoldEnd = TimeSpan.FromMilliseconds(2400);
-        private static readonly TimeSpan ExhaleEnd = TimeSpan.FromMilliseconds(4600);
-        private static readonly TimeSpan LabelFadeOutStart = TimeSpan.FromMilliseconds(4300);
-        private static readonly TimeSpan LabelFadeInEnd = TimeSpan.FromMilliseconds(5200);
+        private static readonly TimeSpan InhaleEnd = TimeSpan.FromMilliseconds(450);
+        private static readonly TimeSpan HoldEnd = TimeSpan.FromMilliseconds(1700);
+        private static readonly TimeSpan ExhaleEnd = TimeSpan.FromMilliseconds(3400);
+        private static readonly TimeSpan LabelFadeOutStart = TimeSpan.FromMilliseconds(3100);
+        private static readonly TimeSpan LabelFadeInEnd = TimeSpan.FromMilliseconds(3900);
 
         /// <summary>
         /// Starts the breathing on the button; a running one is restarted from the button's own color.
@@ -200,7 +207,7 @@ namespace WPF_LCD_Test.Views.Behaviors
             };
             brush.BeginAnimation(SolidColorBrush.ColorProperty, breathing);
 
-            string? textKey = feedback switch
+            string? textKey = successTextKey == null ? null : feedback switch
             {
                 ActionFeedback.Success => successTextKey,
                 ActionFeedback.Canceled => "FeedbackCanceled",
@@ -233,6 +240,56 @@ namespace WPF_LCD_Test.Views.Behaviors
                 if (ReferenceEquals(button.Foreground, brush)) button.ClearValue(Control.ForegroundProperty);
             };
             brush.BeginAnimation(SolidColorBrush.ColorProperty, fade);
+        }
+    }
+
+    /// <summary>
+    /// Presentation-only feedback that does not touch the background of the element: a colored glow around it pulses
+    /// (green: success, red: failure) and fades; the exhale is slower than the inhale.
+    /// </summary>
+    internal static class GlowBreathing
+    {
+        private static readonly Color SuccessColor = Color.FromRgb(0x66, 0xE0, 0x6B);
+        private static readonly Color FailureColor = Color.FromRgb(0xFF, 0x5C, 0x57);
+        private static readonly TimeSpan InhaleEnd = TimeSpan.FromMilliseconds(200);
+        private static readonly TimeSpan HoldEnd = TimeSpan.FromMilliseconds(450);
+        private static readonly TimeSpan ExhaleEnd = TimeSpan.FromMilliseconds(1300);
+        private const double PeakRadius = 24;
+
+        /// <summary>
+        /// Starts the glow on the element; a running one is restarted.
+        /// </summary>
+        /// <param name="element">The element that glows.</param>
+        /// <param name="feedback">The outcome that selects the color.</param>
+        public static void Play(FrameworkElement element, ActionFeedback feedback)
+        {
+            if (feedback == ActionFeedback.None) return;
+
+            var glow = new DropShadowEffect
+            {
+                Color = feedback == ActionFeedback.Success ? SuccessColor : FailureColor,
+                ShadowDepth = 0,
+                BlurRadius = 0,
+                Opacity = 0
+            };
+            element.Effect = glow;
+
+            glow.BeginAnimation(DropShadowEffect.BlurRadiusProperty, Pulse(PeakRadius));
+            var opacity = Pulse(1);
+            opacity.Completed += (_, _) =>
+            {
+                if (ReferenceEquals(element.Effect, glow)) element.ClearValue(UIElement.EffectProperty);
+            };
+            glow.BeginAnimation(DropShadowEffect.OpacityProperty, opacity);
+        }
+
+        private static DoubleAnimationUsingKeyFrames Pulse(double peak)
+        {
+            var pulse = new DoubleAnimationUsingKeyFrames { Duration = ExhaleEnd };
+            pulse.KeyFrames.Add(new EasingDoubleKeyFrame(peak, InhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseOut } });
+            pulse.KeyFrames.Add(new LinearDoubleKeyFrame(peak, HoldEnd));
+            pulse.KeyFrames.Add(new EasingDoubleKeyFrame(0, ExhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut } });
+            return pulse;
         }
     }
 }

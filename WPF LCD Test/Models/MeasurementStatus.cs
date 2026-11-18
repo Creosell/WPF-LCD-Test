@@ -20,6 +20,12 @@ namespace WPF_LCD_Test.Models
         public string Location { get; set; }
 
         /// <summary>
+        /// Gets the signal the measurement button of this point glows on when a measurement of the point is accepted or rejected.
+        /// </summary>
+        [JsonIgnore]
+        public ActionFeedbackSignal Feedback { get; } = new();
+
+        /// <summary>
         /// Gets or sets whether the measurement passed validation criteria.
         /// Null indicates no measurement has been performed yet.
         /// </summary>

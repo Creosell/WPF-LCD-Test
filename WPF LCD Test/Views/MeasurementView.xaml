@@ -684,6 +684,8 @@
                             Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{x:Static models:MeasurementLocation.TopLeft}"
                             Content="{DynamicResource TopLeftPoint}"
+                            behaviors:ActionFeedbackBehavior.Mode="Glow"
+                            behaviors:ActionFeedbackBehavior.Signal="{Binding DataContext.MeasurementStatusService.Statuses[TopLeft].Feedback, RelativeSource={RelativeSource AncestorType=UserControl}}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[TopLeft].MeasuredValuesToolTip, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
                         <ContentControl
@@ -699,6 +701,8 @@
                             Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{x:Static models:MeasurementLocation.TopCenter}"
                             Content="{DynamicResource TopCenterPoint}"
+                            behaviors:ActionFeedbackBehavior.Mode="Glow"
+                            behaviors:ActionFeedbackBehavior.Signal="{Binding DataContext.MeasurementStatusService.Statuses[TopCenter].Feedback, RelativeSource={RelativeSource AncestorType=UserControl}}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[TopCenter].MeasuredValuesToolTip, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
                         <ContentControl
@@ -715,6 +719,8 @@
                             Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{x:Static models:MeasurementLocation.TopRight}"
                             Content="{DynamicResource TopRightPoint}"
+                            behaviors:ActionFeedbackBehavior.Mode="Glow"
+                            behaviors:ActionFeedbackBehavior.Signal="{Binding DataContext.MeasurementStatusService.Statuses[TopRight].Feedback, RelativeSource={RelativeSource AncestorType=UserControl}}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[TopRight].MeasuredValuesToolTip, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
                         <ContentControl
@@ -731,6 +737,8 @@
                             Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{x:Static models:MeasurementLocation.MiddleLeft}"
                             Content="{DynamicResource MiddleLeftPoint}"
+                            behaviors:ActionFeedbackBehavior.Mode="Glow"
+                            behaviors:ActionFeedbackBehavior.Signal="{Binding DataContext.MeasurementStatusService.Statuses[MiddleLeft].Feedback, RelativeSource={RelativeSource AncestorType=UserControl}}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[MiddleLeft].MeasuredValuesToolTip, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
                         <ContentControl
@@ -747,6 +755,8 @@
                             Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{x:Static models:MeasurementLocation.Center}"
                             Content="{DynamicResource CenterPoint}"
+                            behaviors:ActionFeedbackBehavior.Mode="Glow"
+                            behaviors:ActionFeedbackBehavior.Signal="{Binding DataContext.MeasurementStatusService.Statuses[Center].Feedback, RelativeSource={RelativeSource AncestorType=UserControl}}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[Center].MeasuredValuesToolTip, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
                         <ContentControl
@@ -763,6 +773,8 @@
                             Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{x:Static models:MeasurementLocation.MiddleRight}"
                             Content="{DynamicResource MiddleRightPoint}"
+                            behaviors:ActionFeedbackBehavior.Mode="Glow"
+                            behaviors:ActionFeedbackBehavior.Signal="{Binding DataContext.MeasurementStatusService.Statuses[MiddleRight].Feedback, RelativeSource={RelativeSource AncestorType=UserControl}}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[MiddleRight].MeasuredValuesToolTip, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
                         <ContentControl
@@ -779,6 +791,8 @@
                             Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{x:Static models:MeasurementLocation.BottomLeft}"
                             Content="{DynamicResource BottomLeftPoint}"
+                            behaviors:ActionFeedbackBehavior.Mode="Glow"
+                            behaviors:ActionFeedbackBehavior.Signal="{Binding DataContext.MeasurementStatusService.Statuses[BottomLeft].Feedback, RelativeSource={RelativeSource AncestorType=UserControl}}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[BottomLeft].MeasuredValuesToolTip, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
                         <ContentControl
@@ -795,6 +809,8 @@
                             Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{x:Static models:MeasurementLocation.BottomCenter}"
                             Content="{DynamicResource BottomCenterPoint}"
+                            behaviors:ActionFeedbackBehavior.Mode="Glow"
+                            behaviors:ActionFeedbackBehavior.Signal="{Binding DataContext.MeasurementStatusService.Statuses[BottomCenter].Feedback, RelativeSource={RelativeSource AncestorType=UserControl}}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[BottomCenter].MeasuredValuesToolTip, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
                         <ContentControl
@@ -811,6 +827,8 @@
                             Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{x:Static models:MeasurementLocation.BottomRight}"
                             Content="{DynamicResource BottomRightPoint}"
+                            behaviors:ActionFeedbackBehavior.Mode="Glow"
+                            behaviors:ActionFeedbackBehavior.Signal="{Binding DataContext.MeasurementStatusService.Statuses[BottomRight].Feedback, RelativeSource={RelativeSource AncestorType=UserControl}}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[BottomRight].MeasuredValuesToolTip, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
                         <ContentControl
@@ -839,6 +857,8 @@
                             Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{x:Static models:MeasurementLocation.RedColor}"
                             Content="{DynamicResource RedPoint}"
+                            behaviors:ActionFeedbackBehavior.Mode="Glow"
+                            behaviors:ActionFeedbackBehavior.Signal="{Binding DataContext.MeasurementStatusService.Statuses[RedColor].Feedback, RelativeSource={RelativeSource AncestorType=UserControl}}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[RedColor].MeasuredValuesToolTip, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
                         <ContentControl
@@ -851,6 +871,8 @@
                             Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{x:Static models:MeasurementLocation.GreenColor}"
                             Content="{DynamicResource GreenPoint}"
+                            behaviors:ActionFeedbackBehavior.Mode="Glow"
+                            behaviors:ActionFeedbackBehavior.Signal="{Binding DataContext.MeasurementStatusService.Statuses[GreenColor].Feedback, RelativeSource={RelativeSource AncestorType=UserControl}}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[GreenColor].MeasuredValuesToolTip, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
                         <ContentControl
@@ -863,6 +885,8 @@
                             Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{x:Static models:MeasurementLocation.BlueColor}"
                             Content="{DynamicResource BluePoint}"
+                            behaviors:ActionFeedbackBehavior.Mode="Glow"
+                            behaviors:ActionFeedbackBehavior.Signal="{Binding DataContext.MeasurementStatusService.Statuses[BlueColor].Feedback, RelativeSource={RelativeSource AncestorType=UserControl}}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[BlueColor].MeasuredValuesToolTip, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
                         <ContentControl
@@ -875,6 +899,8 @@
                             Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{x:Static models:MeasurementLocation.WhiteColor}"
                             Content="{DynamicResource WhitePoint}"
+                            behaviors:ActionFeedbackBehavior.Mode="Glow"
+                            behaviors:ActionFeedbackBehavior.Signal="{Binding DataContext.MeasurementStatusService.Statuses[WhiteColor].Feedback, RelativeSource={RelativeSource AncestorType=UserControl}}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[WhiteColor].MeasuredValuesToolTip, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             Visibility="{Binding IsTvCheckboxChecked, Converter={StaticResource BooleanToVisibilityConverter}}" />
@@ -888,6 +914,8 @@
                             Command="{Binding DataContext.MeasureCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                             CommandParameter="{x:Static models:MeasurementLocation.BlackColor}"
                             Content="{DynamicResource BlackPoint}"
+                            behaviors:ActionFeedbackBehavior.Mode="Glow"
+                            behaviors:ActionFeedbackBehavior.Signal="{Binding DataContext.MeasurementStatusService.Statuses[BlackColor].Feedback, RelativeSource={RelativeSource AncestorType=UserControl}}"
                             Style="{StaticResource MeasurementButtonsStyle}"
                             ToolTip="{Binding DataContext.MeasurementStatusService.Statuses[BlackColor].MeasuredValuesToolTip, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
                         <ContentControl

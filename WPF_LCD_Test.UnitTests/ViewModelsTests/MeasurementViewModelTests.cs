@@ -906,6 +906,16 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             }
 
         [Test]
+        public async Task Measure_AcceptedMeasurement_SignalsSuccessOnTheButtonOfThePoint()
+            {
+            await PrepareDeviceWithOneMeasurementAsync();
+
+            var status = _mockMeasurementStatusService.Object.AllMeasurementButtonStatuses
+                .First(s => s.Location == MeasurementLocation.WhiteColor.ToString());
+            Assert.That(status.Feedback.Feedback, Is.EqualTo(ActionFeedback.Success));
+            }
+
+        [Test]
         public async Task SaveCommands_AreDisabledWithoutConfiguration()
             {
             await PrepareDeviceWithOneMeasurementAsync();
