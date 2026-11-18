@@ -203,6 +203,7 @@ namespace WPF_LCD_Test.ViewModels
         private bool _isSavingDevice;
         private bool _hasUnsavedMeasurements;
         private LogSeverity _unreadSeverity;
+        private const int MaxUnreadShown = 99;
         private int _pendingReportsCount;
         private Process? _reportProcess;
         private bool _reportCancelRequested;
@@ -274,8 +275,17 @@ namespace WPF_LCD_Test.ViewModels
         public int UnreadIssues
             {
             get => _unreadIssues;
-            private set => SetProperty(ref _unreadIssues, value);
+            private set
+                {
+                if (SetProperty(ref _unreadIssues, value))
+                    OnPropertyChanged(nameof(UnreadIssuesText));
+                }
             }
+
+        /// <summary>
+        /// Gets the text of the Log tab counter: the number of unread issues, "99+" when there are more than 99.
+        /// </summary>
+        public string UnreadIssuesText => _unreadIssues > MaxUnreadShown ? $"{MaxUnreadShown}+" : _unreadIssues.ToString();
 
         /// <summary>
         /// Gets the most severe level among the unread warnings and errors; colors the counter of the Log tab.

@@ -969,6 +969,19 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             Assert.That(_viewModel.UnreadSeverity, Is.EqualTo(LogSeverity.Info));
             }
 
+        [TestCase(1, "1")]
+        [TestCase(99, "99")]
+        [TestCase(100, "99+")]
+        [TestCase(250, "99+")]
+        public void UnreadIssuesText_IsCappedAt99Plus(int errors, string expected)
+            {
+            _viewModel.SelectedTabIndex = 1;
+            _viewModel.SelectedTabIndex = 0;
+            for (int i = 0; i < errors; i++) _viewModel.ReportGenerateCommand.Execute(null);
+
+            Assert.That(_viewModel.UnreadIssuesText, Is.EqualTo(expected));
+            }
+
         [Test]
         public void LogEntries_HoldOnlyWarningsAndErrors()
             {

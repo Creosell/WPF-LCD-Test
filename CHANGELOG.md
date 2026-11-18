@@ -53,6 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The feedback animations are a little more dynamic: the button breathing takes about 3.4 s instead of 4.6 s, the field underline 1.3 s instead of 1.6 s
 - The counter on the Log tab is amber for unread warnings and red when any unread message is an error
 - Ctrl+R no longer starts the measurement of the Red point (the quick keys of the points ignore combinations with Ctrl or Alt), so the Ctrl+R and Ctrl+S hotkeys work
+- The unread counter of the Log tab shows "99+" instead of a larger number
 - Switching between the Measurement and Settings pages took 100-350 ms because the page was rebuilt each time (the DataTemplate of a ContentControl); both pages are now created once and switched by visibility (2-5 ms)
 - Changing the language reset the other settings (channel, auto connect) to their defaults; only the language is updated now
 - The CA-410 ran in LTD.AUTO instead of AUTO because the CA-310 speed constant was passed to it

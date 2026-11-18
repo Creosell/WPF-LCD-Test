@@ -1135,7 +1135,7 @@
                                     FontSize="11"
                                     FontWeight="Bold"
                                     Foreground="#1E1E1E"
-                                    Text="{Binding UnreadIssues}" />
+                                    Text="{Binding UnreadIssuesText}" />
                             </Border>
                         </StackPanel>
                     </TabItem.Header>
