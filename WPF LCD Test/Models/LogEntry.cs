@@ -26,6 +26,6 @@ namespace WPF_LCD_Test.Models
         /// <summary>
         /// Gets the time of the entry as shown in the log.
         /// </summary>
-        public string TimeText => Time.ToString("HH:mm:ss");
+        public string TimeText => Time.ToString("HH:mm");
         }
     }

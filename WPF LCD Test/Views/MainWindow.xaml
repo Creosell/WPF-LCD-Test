@@ -18,6 +18,7 @@
     Background="#FF212121"
     ResizeMode="CanResizeWithGrip"
     WindowStartupLocation="CenterScreen"
+    Closing="Window_Closing"
     WindowStyle="None"
     mc:Ignorable="d">
 

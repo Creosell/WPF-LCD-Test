@@ -37,6 +37,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The Save results button no longer looks disabled (greyed) while the clear-results question is open after saving: the command stays enabled and repeated clicks are ignored while it runs
 - Saving asks one question: the "not all measurements have been taken" notice and the specification remarks are shown together in a single dialog instead of two consecutive ones
 - The outcome label on a control button (Saved, Done, ...) stays through the whole exhale and then fades into the button's own text
+- Saving results is refused without a selected device configuration (message, warning in the log, red feedback)
+- The serial number field and the device configuration selector breathe green when a serial number is applied or a configuration is chosen (red for a rejected serial number)
+- Hotkeys: Ctrl+S saves the results (like the Save results button), Ctrl+R creates the report
+- Closing the application with unsaved measurements asks for confirmation
+- The Upload reports button shows how many reports wait for upload, for example "Upload reports (3)"
+- The Log tab lists only warnings and errors with a compact time (HH:mm); the copied log text still contains everything with seconds
+- In the confirmation dialogs the last paragraph (the question) is shown apart at the bottom
 - Switching between the Measurement and Settings pages took 100-350 ms because the page was rebuilt each time (the DataTemplate of a ContentControl); both pages are now created once and switched by visibility (2-5 ms)
 - Changing the language reset the other settings (channel, auto connect) to their defaults; only the language is updated now
 - The CA-410 ran in LTD.AUTO instead of AUTO because the CA-310 speed constant was passed to it

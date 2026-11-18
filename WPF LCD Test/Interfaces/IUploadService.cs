@@ -21,5 +21,11 @@
         /// Does nothing when no upload is running.
         /// </summary>
         void CancelUpload();
+
+        /// <summary>
+        /// Counts the report archives waiting for upload.
+        /// </summary>
+        /// <returns>Number of archives in the report archive folder that match the report naming.</returns>
+        int GetPendingReportCount();
         }
     }

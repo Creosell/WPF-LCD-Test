@@ -13,6 +13,13 @@
             x:Name="MessageText"
             Margin="0,0,0,20"
             TextWrapping="Wrap" />
+        <Separator x:Name="QuestionSeparator" Margin="0,0,0,12" Visibility="Collapsed" />
+        <TextBlock
+            x:Name="QuestionText"
+            Margin="0,0,0,20"
+            FontWeight="SemiBold"
+            TextWrapping="Wrap"
+            Visibility="Collapsed" />
         <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
             <Button
                 x:Name="PrimaryButton"

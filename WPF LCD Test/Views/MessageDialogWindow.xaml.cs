@@ -26,7 +26,7 @@ namespace WPF_LCD_Test.Views
             {
             InitializeComponent();
             Title = caption;
-            MessageText.Text = message;
+            ShowMessage(message);
 
             if (buttons == MessageBoxButton.YesNo)
                 {
@@ -43,6 +43,25 @@ namespace WPF_LCD_Test.Views
                 }
 
             Result = _secondaryResult;
+            }
+
+        /// <summary>
+        /// Shows the message; when it has several paragraphs the last one (the question) is shown apart at the bottom.
+        /// </summary>
+        private void ShowMessage(string message)
+            {
+            var normalized = message.Replace("\r\n", "\n");
+            int split = normalized.LastIndexOf("\n\n", StringComparison.Ordinal);
+            if (split < 0)
+                {
+                MessageText.Text = message;
+                return;
+                }
+
+            MessageText.Text = normalized[..split].TrimEnd();
+            QuestionText.Text = normalized[(split + 2)..].Trim();
+            QuestionText.Visibility = QuestionSeparator.Visibility = Visibility.Visible;
+            MessageText.Margin = new Thickness(0, 0, 0, 16);
             }
 
         private static string Caption(string resourceKey, string fallback) =>

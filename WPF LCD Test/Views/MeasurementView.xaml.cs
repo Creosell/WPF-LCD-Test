@@ -20,7 +20,7 @@ namespace WPF_LCD_Test.Views
             InitializeComponent(); // Инициализирует элементы UI, описанные в XAML
 
             _deviceCard = new DeviceCardTransition(DeviceCard, DeviceCardContent);
-            _feedbackButtons = new Dictionary<ActionFeedbackSignal, Button>();
+            _feedbackButtons = new Dictionary<ActionFeedbackSignal, Control>();
 
             //this.PreviewMouseDown += UserControl_PreviewMouseDown;
             //this.PreviewKeyDown += UserControl_PreviewKeyDown;
@@ -33,8 +33,8 @@ namespace WPF_LCD_Test.Views
         }
 
         private readonly DeviceCardTransition _deviceCard;
-        private readonly Dictionary<ActionFeedbackSignal, Button> _feedbackButtons;
-        private readonly Dictionary<Button, string> _successTextKeys = new();
+        private readonly Dictionary<ActionFeedbackSignal, Control> _feedbackButtons;
+        private readonly Dictionary<Control, string> _successTextKeys = new();
 
         private void DeviceConfigurationButton_Click(object sender, RoutedEventArgs e)
         {
@@ -142,6 +142,8 @@ namespace WPF_LCD_Test.Views
             _feedbackButtons[viewModel.ClearFeedback] = ClearResultsButton;
             _feedbackButtons[viewModel.ReportFeedback] = CreateReportButton;
             _feedbackButtons[viewModel.UploadFeedback] = UploadReportsButton;
+            _feedbackButtons[viewModel.SerialFeedback] = SerialNumberTextBox;
+            _feedbackButtons[viewModel.ConfigFeedback] = DeviceConfigurationButton;
             _successTextKeys[SaveResultsButton] = "FeedbackSaved";
             _successTextKeys[ClearResultsButton] = "FeedbackCleared";
             _successTextKeys[CreateReportButton] = "FeedbackDone";
@@ -450,18 +452,19 @@ namespace WPF_LCD_Test.Views
             /// <param name="button">The button that finished its action.</param>
             /// <param name="feedback">The outcome that selects the color and the label.</param>
             /// <param name="successTextKey">Resource key of the label shown on success.</param>
-            public static void Play(Button button, ActionFeedback feedback, string? successTextKey)
+            public static void Play(Control button, ActionFeedback feedback, string? successTextKey)
             {
                 if (feedback == ActionFeedback.None) return;
 
                 button.BeginAnimation(ContentControl.ContentProperty, null);
                 button.ClearValue(Control.ForegroundProperty);
                 button.ClearValue(Control.BackgroundProperty);
+                var target = feedback == ActionFeedback.Success ? SuccessColor : FailureColor;
                 var baseColor = (button.Background as SolidColorBrush)?.Color ?? Colors.Transparent;
+                if (baseColor.A == 0) baseColor = Color.FromArgb(0, target.R, target.G, target.B);
                 var brush = new SolidColorBrush(baseColor);
                 button.Background = brush;
 
-                var target = feedback == ActionFeedback.Success ? SuccessColor : FailureColor;
                 var breathing = new ColorAnimationUsingKeyFrames { Duration = ExhaleEnd };
                 breathing.KeyFrames.Add(new EasingColorKeyFrame(target, InhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseOut } });
                 breathing.KeyFrames.Add(new LinearColorKeyFrame(target, HoldEnd));
@@ -478,7 +481,7 @@ namespace WPF_LCD_Test.Views
                     ActionFeedback.Canceled => "FeedbackCanceled",
                     _ => "FeedbackFailed"
                 };
-                if (textKey != null && button.TryFindResource(textKey) is string text)
+                if (textKey != null && button is ContentControl && button.TryFindResource(textKey) is string text)
                 {
                     var label = new ObjectAnimationUsingKeyFrames { Duration = ExhaleEnd, FillBehavior = FillBehavior.Stop };
                     label.KeyFrames.Add(new DiscreteObjectKeyFrame(text.Trim(), TimeSpan.Zero));
@@ -490,7 +493,7 @@ namespace WPF_LCD_Test.Views
             /// <summary>
             /// Fades the label out at the end of the exhale and fades the button's own text in after the swap.
             /// </summary>
-            private static void FadeLabelOver(Button button)
+            private static void FadeLabelOver(Control button)
             {
                 if (button.Foreground is not SolidColorBrush original) return;
 

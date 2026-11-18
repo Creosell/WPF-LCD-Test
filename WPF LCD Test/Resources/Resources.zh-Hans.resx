@@ -732,6 +732,14 @@
   <data name="SaveNotFullNote" xml:space="preserve">
     <value>尚未完成所有测量。</value>
   </data>
+  <data name="SaveNeedsConfiguration" xml:space="preserve">
+    <value>保存结果前请先选择设备配置。</value>
+  </data>
+  <data name="CloseUnsavedQuestion" xml:space="preserve">
+    <value>当前设备的测量结果尚未保存。
+
+仍要关闭应用程序吗？</value>
+  </data>
   <data name="SaveSpecQuestion" xml:space="preserve">
     <value>仍要保存结果吗？</value>
   </data>

@@ -47,6 +47,17 @@ namespace WPF_LCD_Test.Views
         }
 
         /// <summary>
+        /// Cancels closing when the operator declines to discard unsaved measurements.
+        /// </summary>
+        private void Window_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (DataContext is WPF_LCD_Test.ViewModels.MainWindowViewModel viewModel && !viewModel.ConfirmClose())
+            {
+                e.Cancel = true;
+            }
+        }
+
+        /// <summary>
         /// Handles close button click to close the window.
         /// </summary>
         /// <param name="sender">Event sender.</param>

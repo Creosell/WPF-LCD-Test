@@ -91,6 +91,20 @@ namespace WPF_LCD_Test.Services
                 }
             }
 
+        /// <summary>
+        /// Counts the report archives waiting for upload.
+        /// </summary>
+        /// <returns>Number of archives in the report archive folder that match the report naming.</returns>
+        public int GetPendingReportCount()
+            {
+            var archivePath = _fileSystem.Path.Combine(_pathProvider.BaseDirectory, ArchiveFolderName);
+            if (!_fileSystem.Directory.Exists(archivePath)) return 0;
+
+            var regex = new Regex(FilenameRegexPattern, RegexOptions.IgnoreCase);
+            return _fileSystem.Directory.EnumerateFiles(archivePath, "*.zip", SearchOption.TopDirectoryOnly)
+                .Count(file => regex.IsMatch(_fileSystem.Path.GetFileName(file)));
+            }
+
         private async Task<bool> UploadReportsAsync(CancellationToken cancellationToken)
             {
             var uploadItems = ScanLocalFolders();

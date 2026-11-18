@@ -21,6 +21,17 @@
         d:DesignWidth="800"
     -->
 
+    <UserControl.InputBindings>
+        <KeyBinding
+            Key="S"
+            Command="{Binding NewDeviceUnderTestCommand}"
+            Modifiers="Control" />
+        <KeyBinding
+            Key="R"
+            Command="{Binding ReportGenerateCommand}"
+            CommandParameter="ReportGenerator.exe"
+            Modifiers="Control" />
+    </UserControl.InputBindings>
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
@@ -42,9 +53,19 @@
             BasedOn="{StaticResource {x:Type Button}}"
             TargetType="Button">
             <Setter Property="Content" Value="{DynamicResource UploadButton}" />
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock>
+                            <Run Text="{Binding Mode=OneWay}" /><Run Text="{Binding DataContext.PendingReportsSuffix, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}" />
+                        </TextBlock>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding DataContext.IsUploadingReports, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
                     <Setter Property="Content" Value="{DynamicResource UploadButtonBusy}" />
+                    <Setter Property="ContentTemplate" Value="{x:Null}" />
                     <Setter Property="ToolTip" Value="{DynamicResource CancelOnClickToolTip}" />
                 </DataTrigger>
             </Style.Triggers>

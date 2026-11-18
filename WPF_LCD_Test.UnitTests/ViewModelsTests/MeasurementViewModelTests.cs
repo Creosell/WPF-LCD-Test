@@ -610,6 +610,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             {
             // Arrange
             _viewModel.ExecuteApplySerialNumber("SN12345");
+            _viewModel.SelectedDeviceConfiguration = "TestConfig";
             _viewModel.CurrentDevice!.AddMeasurement(new Measurement { Location = MeasurementLocation.RedColor.ToString(), IsValid = true });
             _mockDialogService.Setup(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>())).Returns(true); // User accepts
 
@@ -626,6 +627,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             {
             // Arrange
             _viewModel.ExecuteApplySerialNumber("SN12345");
+            _viewModel.SelectedDeviceConfiguration = "TestConfig";
             _viewModel.CurrentDevice!.AddMeasurement(new Measurement { Location = MeasurementLocation.RedColor.ToString(), IsValid = true, x = 0.3, y = 0.3, Lv = 100, T = 6500 });
 
             // Verify that not all statuses are represented (this should trigger ShowQuestion)
@@ -658,6 +660,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             {
             // Arrange
             _viewModel.ExecuteApplySerialNumber("SN12345");
+            _viewModel.SelectedDeviceConfiguration = "TestConfig";
             var allStatuses = _mockMeasurementStatusService.Object.AllMeasurementButtonStatuses;
             foreach (var status in allStatuses)
                 {
@@ -893,18 +896,72 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             _mockDispatcher.Setup(d => d.BeginInvoke(It.IsAny<Action>())).Callback<Action>(queued.Add);
             int before = _viewModel.LogEntries.Count;
 
-            _viewModel.ExecuteApplySerialNumber("SN12345");
+            _viewModel.ReportGenerateCommand.Execute(null);
 
             Assert.That(_viewModel.LogEntries.Count, Is.EqualTo(before), "the bound collection must not change on a foreign thread");
-            Assert.That(_viewModel.LogText, Does.Contain("SN12345"), "the text of the log is updated at once");
+            Assert.That(_viewModel.LogText, Does.Contain("ReportGenerator.exe"), "the text of the log is updated at once");
 
             queued.ForEach(action => action());
             Assert.That(_viewModel.LogEntries.Count, Is.GreaterThan(before));
             }
 
+        [Test]
+        public async Task SaveResults_WithoutConfiguration_IsRefusedWithAMessageAndRedFeedback()
+            {
+            await PrepareDeviceWithOneMeasurementAsync();
+            _viewModel.SelectedDeviceConfiguration = string.Empty;
+
+            await ((RelayCommand)_viewModel.SaveResultsCommand).ExecuteAsync(null);
+
+            _mockFileService.Verify(f => f.SaveDeviceDataToJsonAsync(It.IsAny<DeviceUnderTest>()), Times.Never);
+            _mockDialogService.Verify(d => d.ShowMessage(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            Assert.That(_viewModel.SaveFeedback.Feedback, Is.EqualTo(ActionFeedback.Failure));
+            }
+
+        [Test]
+        public async Task ConfirmClose_AsksOnlyWhileMeasurementsAreUnsaved()
+            {
+            Assert.That(_viewModel.ConfirmClose(), Is.True, "nothing measured, no question");
+            _mockDialogService.Verify(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+
+            await PrepareDeviceWithOneMeasurementAsync();
+            _mockDialogService.Setup(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>())).Returns(false);
+            Assert.That(_viewModel.ConfirmClose(), Is.False);
+
+            _mockDialogService.Setup(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+            _mockFileService.Setup(f => f.SaveDeviceDataToJsonAsync(It.IsAny<DeviceUnderTest>())).ReturnsAsync(true);
+            await ((RelayCommand)_viewModel.SaveResultsCommand).ExecuteAsync(null);
+            _mockDialogService.Invocations.Clear();
+            Assert.That(_viewModel.ConfirmClose(), Is.True, "saved results can be closed without a question");
+            _mockDialogService.Verify(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            }
+
+        [Test]
+        public void PendingReportsSuffix_ShowsTheCountOfReportsWaitingForUpload()
+            {
+            _mockUploadService.Setup(u => u.GetPendingReportCount()).Returns(3);
+            using var viewModel = CreateViewModelWithConfigDirectory(_ => { });
+
+            Assert.That(viewModel.PendingReportsSuffix, Is.EqualTo(" (3)"));
+            }
+
+        [Test]
+        public void LogEntries_HoldOnlyWarningsAndErrors()
+            {
+            int before = _viewModel.LogEntries.Count;
+            _viewModel.ExecuteApplySerialNumber("SN12345");
+            Assert.That(_viewModel.LogEntries.Count, Is.EqualTo(before), "info goes to the copyable text only");
+            Assert.That(_viewModel.LogText, Does.Contain("SN12345"));
+
+            _viewModel.ReportGenerateCommand.Execute(null);
+
+            Assert.That(_viewModel.LogEntries.Count, Is.EqualTo(before + 1));
+            }
+
         private async Task PrepareDeviceWithOneMeasurementAsync()
             {
             _viewModel.ExecuteApplySerialNumber("SN12345");
+            _viewModel.SelectedDeviceConfiguration = "TestConfig";
             _viewModel.IsDeviceConnected = true;
             _viewModel.IsDeviceCalibrated = true;
             var location = MeasurementLocation.WhiteColor.ToString();

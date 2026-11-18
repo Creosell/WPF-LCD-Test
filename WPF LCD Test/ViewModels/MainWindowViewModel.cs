@@ -112,6 +112,12 @@ namespace WPF_LCD_Test.ViewModels
         }
 
         /// <summary>
+        /// Asks to confirm closing the application when there are unsaved measurements.
+        /// </summary>
+        /// <returns>True if the application may close.</returns>
+        public bool ConfirmClose() => _measurementViewModel?.ConfirmClose() ?? true;
+
+        /// <summary>
         /// Releases resources used by all ViewModels.
         /// </summary>
         public void Dispose()

@@ -119,6 +119,21 @@ namespace WPF_LCD_Test.ViewModels
         /// </summary>
         public ActionFeedbackSignal UploadFeedback { get; } = new();
 
+        /// <summary>
+        /// Gets the signal the serial number field breathes on (green: applied, red: rejected).
+        /// </summary>
+        public ActionFeedbackSignal SerialFeedback { get; } = new();
+
+        /// <summary>
+        /// Gets the signal the device configuration selector breathes on when a configuration is chosen.
+        /// </summary>
+        public ActionFeedbackSignal ConfigFeedback { get; } = new();
+
+        /// <summary>
+        /// Gets the suffix of the Upload reports button label with the number of reports waiting for upload (empty when none).
+        /// </summary>
+        public string PendingReportsSuffix => _pendingReportsCount > 0 ? $" ({_pendingReportsCount})" : string.Empty;
+
         public bool IsTvCheckboxChecked
             {
             get => _isTvCheckboxChecked;
@@ -185,6 +200,8 @@ namespace WPF_LCD_Test.ViewModels
             }
 
         private bool _isSavingDevice;
+        private bool _hasUnsavedMeasurements;
+        private int _pendingReportsCount;
         private Process? _reportProcess;
         private bool _reportCancelRequested;
 
@@ -413,6 +430,7 @@ namespace WPF_LCD_Test.ViewModels
             MeasureCommand = new RelayCommand(ExecuteMeasureAsync, CanExecuteMeasure);
             ApplySerialNumberCommand = new RelayCommand(ExecuteApplySerialNumber, CanExecuteApplySerialNumber);
             UploadReportsCommand = new RelayCommand(ExecuteUploadReportsAsync, CanExecuteUploadReportsAsync, allowConcurrentExecution: true);
+            RefreshPendingReports();
             SelectDeviceConfigurationCommand = new RelayCommand(ExecuteSelectDeviceConfiguration, CanExecuteSelectDeviceConfiguration);
 
             _colorMeasurementService.StatusMessage += ColorMeasurementService_StatusMessage;
@@ -542,6 +560,7 @@ namespace WPF_LCD_Test.ViewModels
         private void ExecuteSelectDeviceConfiguration(object parameter)
             {
             SelectedDeviceConfiguration = (string)parameter;
+            Flash(ConfigFeedback, true);
             }
 
         /// <summary>
@@ -718,6 +737,14 @@ namespace WPF_LCD_Test.ViewModels
                     return false;
                     }
 
+                if (string.IsNullOrEmpty(SelectedDeviceConfiguration))
+                    {
+                    Log(SaveNeedsConfiguration, severity: LogSeverity.Warning);
+                    _dialogService.ShowMessage(ResourceManager.GetString("SaveNeedsConfiguration")!, $"{Err}");
+                    Flash(SaveFeedback, false);
+                    return false;
+                    }
+
                 _currentDevice.DeviceConfiguration = SelectedDeviceConfiguration;
                 _currentDevice.IsTV = IsTvCheckboxChecked;
 
@@ -731,6 +758,7 @@ namespace WPF_LCD_Test.ViewModels
                     }
 
                 bool saved = await _fileService.SaveDeviceDataToJsonAsync(_currentDevice);
+                if (saved) _hasUnsavedMeasurements = false;
                 Flash(SaveFeedback, saved);
                 return saved;
                 }
@@ -761,6 +789,7 @@ namespace WPF_LCD_Test.ViewModels
                 IsSerialNumberConfirmed = false;
                 ResetMeasurementStatuses();
                 Log(ClearFieldsDone);
+                _hasUnsavedMeasurements = false;
                 if (parameter?.Equals("CalledFromNewDeviceMethod") != true) Flash(ClearFeedback, true);
                 Spec.Reset();
                 RequestSpecCheck();
@@ -844,11 +873,13 @@ namespace WPF_LCD_Test.ViewModels
                 SerialNumber = enteredSerialNumber;
                 IsSerialNumberConfirmed = true;
                 Log(CurrentSN, [SerialNumber]);
+                Flash(SerialFeedback, true);
                 RequestClearInputFocus?.Invoke(this, EventArgs.Empty);
                 }
             else
                 {
                 IsSerialNumberConfirmed = false;
+                Flash(SerialFeedback, false);
                 _dialogService.ShowMessage($"{IncorrectFormatForSNErr}", $"{Err}");
                 return;
                 }
@@ -1024,6 +1055,7 @@ namespace WPF_LCD_Test.ViewModels
             try
                 {
                 bool uploaded = await _uploadService.UploadReportsAsync();
+                RefreshPendingReports();
                 if (!uploaded)
                     {
                     Log(UploadFailed, severity: LogSeverity.Error);
@@ -1033,6 +1065,7 @@ namespace WPF_LCD_Test.ViewModels
             catch (OperationCanceledException)
                 {
                 Log(UploadCanceled, severity: LogSeverity.Warning);
+                RefreshPendingReports();
                 FlashCanceled(UploadFeedback);
                 }
             finally
@@ -1107,6 +1140,7 @@ namespace WPF_LCD_Test.ViewModels
             var (x, y, Lv, T) = FormatMeasurement(measurement);
             message = $"x={x}, y={y}, Lv={Lv}, T={T}";
             _currentDevice!.RecordAttempt(measurement);
+            _hasUnsavedMeasurements = true;
             }
 
         internal static (string x, string y, string Lv, string T) FormatMeasurement(Measurement measurement)
@@ -1152,6 +1186,7 @@ namespace WPF_LCD_Test.ViewModels
         private void HandleReportGenerationResult(ReportExitCode exitCode)
             {
             Flash(ReportFeedback, exitCode == ReportExitCode.Success);
+            ExecuteThreadInUI(RefreshPendingReports);
             string message = exitCode switch
                 {
                     ReportExitCode.Success => $"{ReportGeneratedSuccessfully}",
@@ -1217,9 +1252,9 @@ namespace WPF_LCD_Test.ViewModels
                 }
 
             var entry = new LogEntry(DateTime.Now, message, severity);
-            ExecuteThreadInUI(() => AddLogEntry(entry));
+            if (severity != LogSeverity.Info) ExecuteThreadInUI(() => AddLogEntry(entry));
 
-            LogText += $"{entry.TimeText} {message}{Environment.NewLine}";
+            LogText += $"{entry.Time:HH:mm:ss} {message}{Environment.NewLine}";
             }
 
         /// <summary>
@@ -1231,7 +1266,7 @@ namespace WPF_LCD_Test.ViewModels
             const int maxEntries = 500;
             if (LogEntries.Count >= maxEntries) LogEntries.RemoveAt(0);
             LogEntries.Add(entry);
-            if (entry.Severity != LogSeverity.Info && SelectedTabIndex != LogTabIndex) UnreadIssues++;
+            if (SelectedTabIndex != LogTabIndex) UnreadIssues++;
             }
 
         private void UpdateUIState()
@@ -1361,8 +1396,13 @@ namespace WPF_LCD_Test.ViewModels
                 lines.AddRange(problems.Select(problem => problem.Text));
                 }
 
+            if (fewAttempts)
+                {
+                lines.Add(string.Empty);
+                lines.Add(ResourceManager.GetString("SaveSpecRemeasureHint")!);
+                }
+
             lines.Add(string.Empty);
-            if (fewAttempts) lines.Add(ResourceManager.GetString("SaveSpecRemeasureHint")!);
             lines.Add(ResourceManager.GetString("SaveSpecQuestion")!);
             return string.Join(Environment.NewLine, lines);
             }
@@ -1413,6 +1453,23 @@ namespace WPF_LCD_Test.ViewModels
                 if (success) signal.Succeed();
                 else signal.Fail();
             });
+
+        /// <summary>
+        /// Recounts the reports waiting for upload for the label of the Upload reports button.
+        /// </summary>
+        private void RefreshPendingReports()
+            {
+            _pendingReportsCount = _uploadService.GetPendingReportCount();
+            OnPropertyChanged(nameof(PendingReportsSuffix));
+            }
+
+        /// <summary>
+        /// Asks the operator to confirm closing the application when the measurements of the current device are not saved.
+        /// </summary>
+        /// <returns>True if the application may close.</returns>
+        public bool ConfirmClose() =>
+            !_hasUnsavedMeasurements
+            || _dialogService.ShowQuestion(ResourceManager.GetString("CloseUnsavedQuestion")!, $"{Warning}");
 
         /// <summary>
         /// Signals that the operator canceled a button action (from any thread).

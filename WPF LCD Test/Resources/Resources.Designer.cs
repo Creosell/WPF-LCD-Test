@@ -322,6 +322,17 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The measurements of the current device are not saved.
+        ///
+        ///Close the application anyway?.
+        /// </summary>
+        public static string CloseUnsavedQuestion {
+            get {
+                return ResourceManager.GetString("CloseUnsavedQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Code.
         /// </summary>
         public static string Code {
@@ -1101,6 +1112,15 @@ namespace WPF_LCD_Test.Resources {
         public static string SaveJSONErrForSN {
             get {
                 return ResourceManager.GetString("SaveJSONErrForSN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select a device configuration before saving the results..
+        /// </summary>
+        public static string SaveNeedsConfiguration {
+            get {
+                return ResourceManager.GetString("SaveNeedsConfiguration", resourceCulture);
             }
         }
         

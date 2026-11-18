@@ -732,6 +732,14 @@
   <data name="SaveNotFullNote" xml:space="preserve">
     <value>Not all measurements have been taken.</value>
   </data>
+  <data name="SaveNeedsConfiguration" xml:space="preserve">
+    <value>Select a device configuration before saving the results.</value>
+  </data>
+  <data name="CloseUnsavedQuestion" xml:space="preserve">
+    <value>The measurements of the current device are not saved.
+
+Close the application anyway?</value>
+  </data>
   <data name="SaveSpecQuestion" xml:space="preserve">
     <value>Save the results anyway?</value>
   </data>
