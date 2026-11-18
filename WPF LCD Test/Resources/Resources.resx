@@ -729,6 +729,9 @@
   <data name="SaveSpecRemeasureHint" xml:space="preserve">
     <value>Measure the points with fewer than 3 attempts again to get a better result.</value>
   </data>
+  <data name="SaveNotFullNote" xml:space="preserve">
+    <value>Not all measurements have been taken.</value>
+  </data>
   <data name="SaveSpecQuestion" xml:space="preserve">
     <value>Save the results anyway?</value>
   </data>

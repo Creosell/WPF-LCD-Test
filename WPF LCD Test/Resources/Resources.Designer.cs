@@ -1114,6 +1114,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Not all measurements have been taken..
+        /// </summary>
+        public static string SaveNotFullNote {
+            get {
+                return ResourceManager.GetString("SaveNotFullNote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Save results.
         /// </summary>
         public static string SaveResultsButton {

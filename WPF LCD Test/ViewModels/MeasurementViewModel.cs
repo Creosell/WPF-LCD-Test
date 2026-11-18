@@ -723,19 +723,11 @@ namespace WPF_LCD_Test.ViewModels
 
                 await _specTask;
                 var problems = Spec.DescribeProblems();
-                if (problems.Count > 0 && !_dialogService.ShowQuestion(BuildSaveWarning(problems), $"{Warning}"))
+                bool incomplete = !AreAllStatusesRepresentedInMeasurements();
+                if ((problems.Count > 0 || incomplete) && !_dialogService.ShowQuestion(BuildSaveWarning(problems, incomplete), $"{Warning}"))
                     {
                     Log(SaveCanceled);
                     return false;
-                    }
-
-                if (!AreAllStatusesRepresentedInMeasurements())
-                    {
-                    if (!_dialogService.ShowQuestion($"{SavingNotFullWarning}", $"{Warning}"))
-                        {
-                        Log(SaveCanceled);
-                        return false;
-                        }
                     }
 
                 bool saved = await _fileService.SaveDeviceDataToJsonAsync(_currentDevice);
@@ -1353,14 +1345,22 @@ namespace WPF_LCD_Test.ViewModels
         /// <summary>
         /// Builds the confirmation text for saving a device that has remarks against the specification.
         /// </summary>
-        private static string BuildSaveWarning(IReadOnlyList<SpecProblem> problems)
+        private static string BuildSaveWarning(IReadOnlyList<SpecProblem> problems, bool incomplete)
             {
             bool fewAttempts = problems.Any(problem => problem.FewAttempts);
-            var lines = new List<string>
+            var lines = new List<string>();
+            if (incomplete)
                 {
-                ResourceManager.GetString(fewAttempts ? "SaveSpecHeaderFewAttempts" : "SaveSpecHeader")!
-                };
-            lines.AddRange(problems.Select(problem => problem.Text));
+                lines.Add(ResourceManager.GetString("SaveNotFullNote")!);
+                if (problems.Count > 0) lines.Add(string.Empty);
+                }
+
+            if (problems.Count > 0)
+                {
+                lines.Add(ResourceManager.GetString(fewAttempts ? "SaveSpecHeaderFewAttempts" : "SaveSpecHeader")!);
+                lines.AddRange(problems.Select(problem => problem.Text));
+                }
+
             lines.Add(string.Empty);
             if (fewAttempts) lines.Add(ResourceManager.GetString("SaveSpecRemeasureHint")!);
             lines.Add(ResourceManager.GetString("SaveSpecQuestion")!);

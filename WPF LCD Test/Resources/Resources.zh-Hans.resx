@@ -729,6 +729,9 @@
   <data name="SaveSpecRemeasureHint" xml:space="preserve">
     <value>请对测量不足 3 次的点位重新测量以获得更好的结果。</value>
   </data>
+  <data name="SaveNotFullNote" xml:space="preserve">
+    <value>尚未完成所有测量。</value>
+  </data>
   <data name="SaveSpecQuestion" xml:space="preserve">
     <value>仍要保存结果吗？</value>
   </data>

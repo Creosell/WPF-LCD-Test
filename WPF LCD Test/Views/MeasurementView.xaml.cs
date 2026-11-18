@@ -477,7 +477,7 @@ namespace WPF_LCD_Test.Views
                 };
                 if (textKey != null && button.TryFindResource(textKey) is string text)
                 {
-                    var label = new ObjectAnimationUsingKeyFrames { Duration = HoldEnd };
+                    var label = new ObjectAnimationUsingKeyFrames { Duration = HoldEnd, FillBehavior = FillBehavior.Stop };
                     label.KeyFrames.Add(new DiscreteObjectKeyFrame(text.Trim(), TimeSpan.Zero));
                     button.BeginAnimation(ContentControl.ContentProperty, label);
                 }
