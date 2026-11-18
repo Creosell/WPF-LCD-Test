@@ -38,7 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Saving asks one question: the "not all measurements have been taken" notice and the specification remarks are shown together in a single dialog instead of two consecutive ones
 - The outcome label on a control button (Saved, Done, ...) stays through the whole exhale and then fades into the button's own text
 - Saving results is disabled (the Save results button is inactive, like the measurement buttons without a serial number) until a device configuration is selected
-- The underline of the serial number field and of the device configuration selector breathes quickly (about 1.6 s) green as a 2 pixel line (the hover highlight does not override it) when a serial number is applied or a configuration is chosen (red for a rejected serial number)
+- The underline of the serial number field and of the device configuration selector breathes quickly (about 1.6 s) green (the hover highlight does not override it); both underlines are 2 pixels thick when a serial number is applied or a configuration is chosen (red for a rejected serial number)
 - Hotkeys: Ctrl+S saves the results (like the Save results button), Ctrl+R creates the report
 - Closing the application with unsaved measurements asks for confirmation
 - The Upload reports button shows how many reports wait for upload, for example "Upload reports (3)"

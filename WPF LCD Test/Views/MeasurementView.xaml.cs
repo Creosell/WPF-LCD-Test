@@ -450,26 +450,14 @@ namespace WPF_LCD_Test.Views
             private static readonly TimeSpan HoldEnd = TimeSpan.FromMilliseconds(800);
             private static readonly TimeSpan ExhaleEnd = TimeSpan.FromMilliseconds(1600);
 
-            private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Control, object> Originals = new();
-
             /// <summary>
             /// Starts the breathing on the underline (the border brush) of the control; a running one is restarted.
-            /// During the breathing the underline is 2 pixels thick; the bottom margin shrinks by the same pixel so the layout does not move.
             /// </summary>
             /// <param name="field">The field whose underline breathes.</param>
             /// <param name="feedback">The outcome that selects the color.</param>
             public static void Play(Control field, ActionFeedback feedback)
             {
                 if (feedback == ActionFeedback.None) return;
-
-                if (!Originals.TryGetValue(field, out var saved))
-                {
-                    Originals.Add(field, saved = (field.ReadLocalValue(Control.BorderThicknessProperty), field.Margin));
-                    var thickness = field.BorderThickness;
-                    field.BorderThickness = new Thickness(thickness.Left, thickness.Top, thickness.Right, 2);
-                    var margin = field.Margin;
-                    field.Margin = new Thickness(margin.Left, margin.Top, margin.Right, Math.Max(0, margin.Bottom - (2 - thickness.Bottom)));
-                }
 
                 field.ClearValue(Control.BorderBrushProperty);
                 var rest = (field.BorderBrush as SolidColorBrush)?.Color ?? Colors.Gray;
@@ -483,14 +471,7 @@ namespace WPF_LCD_Test.Views
                 breathing.KeyFrames.Add(new EasingColorKeyFrame(rest, ExhaleEnd) { EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut } });
                 breathing.Completed += (_, _) =>
                 {
-                    if (!ReferenceEquals(field.BorderBrush, brush)) return;
-
-                    field.ClearValue(Control.BorderBrushProperty);
-                    var (localThickness, margin) = ((object, Thickness))saved;
-                    if (localThickness == DependencyProperty.UnsetValue) field.ClearValue(Control.BorderThicknessProperty);
-                    else field.BorderThickness = (Thickness)localThickness;
-                    field.Margin = margin;
-                    Originals.Remove(field);
+                    if (ReferenceEquals(field.BorderBrush, brush)) field.ClearValue(Control.BorderBrushProperty);
                 };
                 brush.BeginAnimation(SolidColorBrush.ColorProperty, breathing);
             }
