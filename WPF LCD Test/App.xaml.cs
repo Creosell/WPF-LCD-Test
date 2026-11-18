@@ -133,7 +133,7 @@ namespace WPF_LCD_Test
                 {
                 var oldDictionaries = Application.Current.Resources.MergedDictionaries
                     .Where(d => d.Source != null &&
-                               !d.Source.OriginalString.Contains("MaterialDesignThemes.Wpf") &&
+                               d.Source.OriginalString.Contains("/Resources/StringResources", StringComparison.OrdinalIgnoreCase) &&
                                !d.Source.OriginalString.Equals(new Uri(defaultResourcePath, UriKind.RelativeOrAbsolute).OriginalString, StringComparison.OrdinalIgnoreCase))
                     .ToList();
 
