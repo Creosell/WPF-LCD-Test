@@ -254,7 +254,7 @@ namespace WPF_LCD_Test.Views.Behaviors
         private static readonly TimeSpan InhaleEnd = TimeSpan.FromMilliseconds(200);
         private static readonly TimeSpan HoldEnd = TimeSpan.FromMilliseconds(450);
         private static readonly TimeSpan ExhaleEnd = TimeSpan.FromMilliseconds(1300);
-        private const double PeakRadius = 11;
+        private const double PeakRadius = 16;
         private const double PeakOpacity = 0.85;
 
         /// <summary>
