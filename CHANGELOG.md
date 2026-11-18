@@ -44,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The Upload reports button shows how many reports wait for upload, for example "Upload reports (3)"
 - The Log tab lists only warnings and errors with a compact time (HH:mm); the copied log text still contains everything with seconds
 - In the confirmation dialogs the last paragraph (the question) is shown apart at the bottom
+- The underline of the device configuration selector uses the same border and hover colors as the serial number field (it was black)
 - Switching between the Measurement and Settings pages took 100-350 ms because the page was rebuilt each time (the DataTemplate of a ContentControl); both pages are now created once and switched by visibility (2-5 ms)
 - Changing the language reset the other settings (channel, auto connect) to their defaults; only the language is updated now
 - The CA-410 ran in LTD.AUTO instead of AUTO because the CA-310 speed constant was passed to it

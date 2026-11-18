@@ -228,7 +228,7 @@
         -->
         <Style x:Key="DeviceConfigDropdownButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderBrush" Value="Black" />
+            <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.TextBox.Border}" />
             <Setter Property="BorderThickness" Value="0,0,0,1" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="FontFamily" Value="Segoe UI" />
@@ -247,7 +247,7 @@
             <!--  Hover is a style trigger on the button's own BorderBrush, so the local brush of the feedback breathing wins over it  -->
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.TextBox.HoverBorder}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
