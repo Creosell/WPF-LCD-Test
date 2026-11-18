@@ -906,16 +906,15 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             }
 
         [Test]
-        public async Task SaveResults_WithoutConfiguration_IsRefusedWithAMessageAndRedFeedback()
+        public async Task SaveCommands_AreDisabledWithoutConfiguration()
             {
             await PrepareDeviceWithOneMeasurementAsync();
+            Assert.That(_viewModel.NewDeviceUnderTestCommand.CanExecute(null), Is.True);
+
             _viewModel.SelectedDeviceConfiguration = string.Empty;
 
-            await ((RelayCommand)_viewModel.SaveResultsCommand).ExecuteAsync(null);
-
-            _mockFileService.Verify(f => f.SaveDeviceDataToJsonAsync(It.IsAny<DeviceUnderTest>()), Times.Never);
-            _mockDialogService.Verify(d => d.ShowMessage(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-            Assert.That(_viewModel.SaveFeedback.Feedback, Is.EqualTo(ActionFeedback.Failure));
+            Assert.That(_viewModel.NewDeviceUnderTestCommand.CanExecute(null), Is.False);
+            Assert.That(_viewModel.SaveResultsCommand.CanExecute(null), Is.False);
             }
 
         [Test]

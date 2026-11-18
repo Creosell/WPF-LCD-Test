@@ -1116,15 +1116,6 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select a device configuration before saving the results..
-        /// </summary>
-        public static string SaveNeedsConfiguration {
-            get {
-                return ResourceManager.GetString("SaveNeedsConfiguration", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The result for this measurement point still appears to be incorrect. Do you want to save it anyway?.
         /// </summary>
         public static string SaveNotCorrectResultQuestion {

@@ -156,6 +156,7 @@ namespace WPF_LCD_Test.ViewModels
                     {
                     OnPropertyChanged(nameof(SelectedDeviceConfigurationDisplayName));
                     OnPropertyChanged(nameof(HasSelectedDeviceConfiguration));
+                    UpdateCommandsCanExecute();
                     UpdateSelectedConfigNodeHighlight();
                     RequestSpecCheck();
                     }
@@ -733,14 +734,6 @@ namespace WPF_LCD_Test.ViewModels
                 if (_currentDevice == null || string.IsNullOrWhiteSpace(_currentDevice.SerialNumber) || _currentDevice.Measurements.Count == 0)
                     {
                     _dialogService.ShowMessage($"{SaveJSONErrDeviceIsEmpty}", $"{Err}");
-                    Flash(SaveFeedback, false);
-                    return false;
-                    }
-
-                if (string.IsNullOrEmpty(SelectedDeviceConfiguration))
-                    {
-                    Log(SaveNeedsConfiguration, severity: LogSeverity.Warning);
-                    _dialogService.ShowMessage(ResourceManager.GetString("SaveNeedsConfiguration")!, $"{Err}");
                     Flash(SaveFeedback, false);
                     return false;
                     }
@@ -1486,7 +1479,7 @@ namespace WPF_LCD_Test.ViewModels
         private bool CanExecuteConnect() => !IsDeviceConnected && !_isDeviceCalibrating && !_isDeviceConnecting;
         private bool CanExecuteDisconnect() => !_isDeviceCalibrating && !_isDeviceConnecting;
         private bool CanExecuteZeroCalibration(object parameter) => !_isDeviceConnecting && !_isDeviceCalibrating;
-        private bool CanExecuteSaveResults(object parameter) => _currentDevice != null && !string.IsNullOrWhiteSpace(_currentDevice.SerialNumber) && _currentDevice.Measurements.Count > 0;
+        private bool CanExecuteSaveResults(object parameter) => HasSelectedDeviceConfiguration && _currentDevice != null && !string.IsNullOrWhiteSpace(_currentDevice.SerialNumber) && _currentDevice.Measurements.Count > 0;
         private bool CanExecuteNewDeviceUnderTest(object parameter) => CanExecuteSaveResults(parameter);
         private bool CanExecuteClearFields(object parameter) => true;
         private bool CanExecuteSwitchLanguage(object parameter) => parameter is string code && !string.IsNullOrWhiteSpace(code);
