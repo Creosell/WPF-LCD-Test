@@ -101,6 +101,9 @@
     <system:String x:Key="FeedbackUploaded">已上传</system:String>
     <system:String x:Key="FeedbackFailed">失败</system:String>
     <system:String x:Key="FeedbackCanceled">已取消</system:String>
+    <system:String x:Key="DialogYes">是</system:String>
+    <system:String x:Key="DialogNo">否</system:String>
+    <system:String x:Key="DialogOk">确定</system:String>
     <system:String x:Key="ReportButton">
         创建报告
     </system:String>

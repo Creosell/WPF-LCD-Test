@@ -103,6 +103,9 @@
     <system:String x:Key="FeedbackUploaded">Uploaded</system:String>
     <system:String x:Key="FeedbackFailed">Failed</system:String>
     <system:String x:Key="FeedbackCanceled">Canceled</system:String>
+    <system:String x:Key="DialogYes">Yes</system:String>
+    <system:String x:Key="DialogNo">No</system:String>
+    <system:String x:Key="DialogOk">OK</system:String>
     <system:String x:Key="ReportButton">
         Create report
     </system:String>
