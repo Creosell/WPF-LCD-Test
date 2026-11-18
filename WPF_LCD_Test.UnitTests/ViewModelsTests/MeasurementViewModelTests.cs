@@ -38,6 +38,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             _mockSettingsService = new Mock<ISettingsService>();
             _mockPathProvider = new Mock<IPathProvider>();
             _mockMeasurementStatusService = new Mock<IMeasurementStatusService>();
+            _mockDispatcher.Setup(d => d.CheckAccess()).Returns(true);
             _mockSpecEvaluationService = new Mock<ISpecEvaluationService>();
             _mockAnalyzerRegistryService = new Mock<IAnalyzerRegistryService>();
 
@@ -852,6 +853,23 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             _viewModel.Spec.Show(new SpecEvaluation(SpecVerdict.Fail, false,
                 [new SpecCheck("Brightness", 50, 100, 120, null, SpecStatus.Fail, ["WhiteColor"], [])]), 1, 14);
             Assert.That(_viewModel.UnreadIssues, Is.EqualTo(0), "nothing is unread while the log is open");
+            }
+
+        [Test]
+        public void Log_FromAnotherThread_TouchesTheBoundCollectionOnlyThroughTheDispatcher()
+            {
+            _mockDispatcher.Setup(d => d.CheckAccess()).Returns(false);
+            var queued = new List<Action>();
+            _mockDispatcher.Setup(d => d.BeginInvoke(It.IsAny<Action>())).Callback<Action>(queued.Add);
+            int before = _viewModel.LogEntries.Count;
+
+            _viewModel.ExecuteApplySerialNumber("SN12345");
+
+            Assert.That(_viewModel.LogEntries.Count, Is.EqualTo(before), "the bound collection must not change on a foreign thread");
+            Assert.That(_viewModel.LogText, Does.Contain("SN12345"), "the text of the log is updated at once");
+
+            queued.ForEach(action => action());
+            Assert.That(_viewModel.LogEntries.Count, Is.GreaterThan(before));
             }
 
         [Test]

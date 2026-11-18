@@ -1139,11 +1139,21 @@ namespace WPF_LCD_Test.ViewModels
                 }
 
             var entry = new LogEntry(DateTime.Now, message, severity);
-            if (LogEntries.Count >= maxLines) LogEntries.RemoveAt(0);
-            LogEntries.Add(entry);
-            if (severity != LogSeverity.Info && SelectedTabIndex != LogTabIndex) UnreadIssues++;
+            ExecuteThreadInUI(() => AddLogEntry(entry));
 
             LogText += $"{entry.TimeText} {message}{Environment.NewLine}";
+            }
+
+        /// <summary>
+        /// Adds an entry to the collection the Log tab shows; must run on the UI thread because the collection is bound
+        /// (messages may be logged from background tasks, e.g. when the report generator finishes).
+        /// </summary>
+        private void AddLogEntry(LogEntry entry)
+            {
+            const int maxEntries = 500;
+            if (LogEntries.Count >= maxEntries) LogEntries.RemoveAt(0);
+            LogEntries.Add(entry);
+            if (entry.Severity != LogSeverity.Info && SelectedTabIndex != LogTabIndex) UnreadIssues++;
             }
 
         private void UpdateUIState()
