@@ -838,10 +838,41 @@
                 BorderThickness="1"
                 SelectedIndex="{Binding SelectedTabIndex}">
                 <TabControl.Resources>
-                    <Style BasedOn="{StaticResource MaterialDesignTabItem}" TargetType="TabItem">
-                        <Setter Property="Height" Value="32" />
-                        <Setter Property="Padding" Value="12,0" />
+                    <!--  Tab headers look like the buttons of the page: white text, purple outline, filled when selected, highlighted on hover  -->
+                    <Style TargetType="TabItem">
+                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="FontSize" Value="14" />
+                        <Setter Property="Cursor" Value="Hand" />
+                        <Setter Property="Margin" Value="6,5,0,5" />
                         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TabItem">
+                                    <Border
+                                        x:Name="Chrome"
+                                        Height="28"
+                                        Padding="16,0"
+                                        Background="Transparent"
+                                        BorderBrush="{DynamicResource MaterialDesign.Brush.Primary}"
+                                        BorderThickness="1"
+                                        CornerRadius="14">
+                                        <ContentPresenter
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            ContentSource="Header"
+                                            TextElement.Foreground="White" />
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Chrome" Property="Background" Value="#40FFFFFF" />
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
                     </Style>
                 </TabControl.Resources>
 
