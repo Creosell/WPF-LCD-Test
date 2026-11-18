@@ -3,6 +3,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     MinWidth="320"
+    Background="{DynamicResource MaterialDesign.Brush.Background}"
+    TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
     MaxWidth="520"
     ResizeMode="NoResize"
     ShowInTaskbar="False"

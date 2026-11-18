@@ -64,6 +64,8 @@ dotnet test --filter "FullyQualifiedName~TestClassName.TestMethodName"
 
 **Feedback animations:** `ActionFeedbackSignal` (Models) is raised by a ViewModel when an action finished; `ActionFeedbackBehavior` (Views/Behaviors) plays the green/red breathing on any element via `behaviors:ActionFeedbackBehavior.Signal="{Binding ...}"` (modes Fill, Underline, Overlay). No code-behind is needed in a page.
 
+**Themes:** `IThemeService` (singleton) resolves `ThemeMode` (Dark, Light, System), applies it through `IThemeApplier` (`WpfThemeApplier`: Material Design base theme plus the dictionary `Resources/Themes/Theme.{Dark|Light}.xaml`) and stores it via `ISettingsService.UpdateTheme`. Views use `{DynamicResource App...|Status...|Log...}` keys, never hardcoded page colors; both theme files must define the same keys (a unit test checks it).
+
 **Commands:** ViewModels use `RelayCommand` (in `Commands/`) for ICommand implementation binding to UI actions.
 
 ## Project Map (graphify)

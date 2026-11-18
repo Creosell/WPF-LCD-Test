@@ -10,10 +10,10 @@
     xmlns:services="clr-namespace:WPF_LCD_Test.Services"
     xmlns:viewmodels="clr-namespace:WPF_LCD_Test.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:MeasurementViewModel}"
-    Background="#FF424242"
+    Background="{DynamicResource AppPageBackground}"
     Focusable="True"
     FontSize="15"
-    Foreground="White"
+    Foreground="{DynamicResource AppTextPrimary}"
     PreviewKeyDown="UserControl_PreviewKeyDown"
     PreviewMouseDown="UserControl_PreviewMouseDown"
     mc:Ignorable="d">
@@ -125,7 +125,7 @@
                         VerticalOffset="-6">
                         <Border
                             Background="{DynamicResource MaterialDesignPaper}"
-                            BorderBrush="#FFAAAAAA"
+                            BorderBrush="{DynamicResource AppControlBorder}"
                             BorderThickness="1">
                             <ItemsPresenter />
                         </Border>
@@ -134,7 +134,7 @@
             </Border>
             <ControlTemplate.Triggers>
                 <Trigger Property="IsHighlighted" Value="True">
-                    <Setter TargetName="Bg" Property="Background" Value="#22000000" />
+                    <Setter TargetName="Bg" Property="Background" Value="{DynamicResource AppHoverOverlay}" />
                 </Trigger>
                 <Trigger Property="IsChecked" Value="True">
                     <Setter TargetName="CheckGlyph" Property="Visibility" Value="Visible" />
@@ -166,13 +166,13 @@
             <Setter Property="Height" Value="10" />
             <Setter Property="Margin" Value="0,0,8,0" />
             <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Fill" Value="#8A8A8A" />
+            <Setter Property="Fill" Value="{DynamicResource AppTextMuted}" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsDeviceConnected}" Value="True">
-                    <Setter Property="Fill" Value="#FFB020" />
+                    <Setter Property="Fill" Value="{DynamicResource ResultWarnDot}" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding IsDeviceCalibrated}" Value="True">
-                    <Setter Property="Fill" Value="#4CD964" />
+                    <Setter Property="Fill" Value="{DynamicResource ResultOkDot}" />
                 </DataTrigger>
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>
@@ -271,8 +271,8 @@
                         <Grid>
                             <Ellipse
                                 x:Name="Dot"
-                                Fill="#FFC107"
-                                Stroke="#FF424242"
+                                Fill="{DynamicResource StatusWarnDot}"
+                                Stroke="{DynamicResource AppPageBackground}"
                                 StrokeThickness="2" />
                             <TextBlock
                                 x:Name="Glyph"
@@ -286,7 +286,7 @@
                         </Grid>
                         <ControlTemplate.Triggers>
                             <DataTrigger Binding="{Binding SpecBadge}" Value="Fail">
-                                <Setter TargetName="Dot" Property="Fill" Value="#FF5252" />
+                                <Setter TargetName="Dot" Property="Fill" Value="{DynamicResource StatusErrDot}" />
                                 <Setter TargetName="Glyph" Property="FontFamily" Value="Segoe UI Symbol" />
                                 <Setter TargetName="Glyph" Property="FontSize" Value="10" />
                                 <Setter TargetName="Glyph" Property="Text" Value="&#x2716;" />
@@ -313,10 +313,10 @@
             <Setter Property="Background" Value="Transparent" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Status}" Value="Warning">
-                    <Setter Property="Background" Value="#33FFC107" />
+                    <Setter Property="Background" Value="{DynamicResource StatusWarnPlate}" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Status}" Value="Fail">
-                    <Setter Property="Background" Value="#33FF5252" />
+                    <Setter Property="Background" Value="{DynamicResource StatusErrPlate}" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Status}" Value="Pending">
                     <Setter Property="Opacity" Value="0.6" />
@@ -335,7 +335,7 @@
             <Setter Property="Background" Value="Transparent" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Status.IsPassed}" Value="False">
-                    <Setter Property="Background" Value="#33FF5252" />
+                    <Setter Property="Background" Value="{DynamicResource StatusErrPlate}" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Status.IsPassed}" Value="{x:Null}">
                     <Setter Property="Opacity" Value="0.6" />
@@ -348,13 +348,13 @@
 
         <!--  Attempts counter: dim dash, amber below three attempts, green from three  -->
         <Style x:Key="TriesTextStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#787878" />
+            <Setter Property="Foreground" Value="{DynamicResource AppTextMuted}" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding TriesLevel}" Value="Few">
-                    <Setter Property="Foreground" Value="#FFC107" />
+                    <Setter Property="Foreground" Value="{DynamicResource StatusWarnText}" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding TriesLevel}" Value="Enough">
-                    <Setter Property="Foreground" Value="#4CAF50" />
+                    <Setter Property="Foreground" Value="{DynamicResource StatusOkText}" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -364,26 +364,47 @@
             <Setter Property="Height" Value="10" />
             <Setter Property="Margin" Value="0,0,10,0" />
             <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Fill" Value="#8A8A8A" />
+            <Setter Property="Fill" Value="{DynamicResource AppTextMuted}" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Status.IsPassed}" Value="True">
-                    <Setter Property="Fill" Value="#4CAF50" />
+                    <Setter Property="Fill" Value="{DynamicResource StatusOkDot}" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Status.IsPassed}" Value="False">
-                    <Setter Property="Fill" Value="#FF5252" />
+                    <Setter Property="Fill" Value="{DynamicResource StatusErrDot}" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
 
         <!--  Color of a log line by its severity  -->
         <Style x:Key="LogMessageStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#E1E1E1" />
+            <Setter Property="Foreground" Value="{DynamicResource AppLogText}" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Severity}" Value="Warning">
-                    <Setter Property="Foreground" Value="#FFC107" />
+                    <Setter Property="Foreground" Value="{DynamicResource StatusWarnText}" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Severity}" Value="Error">
-                    <Setter Property="Foreground" Value="#FF5252" />
+                    <Setter Property="Foreground" Value="{DynamicResource StatusErrText}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!--
+            Row of the log: a colored plate with a bar on the left for warnings and errors in the light theme
+            (the dark theme defines these brushes transparent and the bar thickness zero)
+        -->
+        <Style x:Key="LogRowStyle" TargetType="Border">
+            <Setter Property="Margin" Value="0,1" />
+            <Setter Property="Padding" Value="6,1" />
+            <Setter Property="BorderThickness" Value="{DynamicResource LogBarThickness}" />
+            <Setter Property="CornerRadius" Value="3" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Severity}" Value="Warning">
+                    <Setter Property="Background" Value="{DynamicResource LogWarnBackground}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource LogWarnBar}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Severity}" Value="Error">
+                    <Setter Property="Background" Value="{DynamicResource LogErrBackground}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource LogErrBar}" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -395,10 +416,10 @@
             <Setter Property="Margin" Value="8,0,0,0" />
             <Setter Property="Padding" Value="4,0" />
             <Setter Property="CornerRadius" Value="9" />
-            <Setter Property="Background" Value="#FFC107" />
+            <Setter Property="Background" Value="{DynamicResource StatusWarnDot}" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding UnreadSeverity}" Value="Error">
-                    <Setter Property="Background" Value="#FF5252" />
+                    <Setter Property="Background" Value="{DynamicResource StatusErrDot}" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding UnreadIssues}" Value="0">
                     <Setter Property="Visibility" Value="Collapsed" />
@@ -411,16 +432,16 @@
             <Setter Property="Height" Value="10" />
             <Setter Property="Margin" Value="0,0,10,0" />
             <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Fill" Value="#8A8A8A" />
+            <Setter Property="Fill" Value="{DynamicResource AppTextMuted}" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Status}" Value="Pass">
-                    <Setter Property="Fill" Value="#4CAF50" />
+                    <Setter Property="Fill" Value="{DynamicResource StatusOkDot}" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Status}" Value="Warning">
-                    <Setter Property="Fill" Value="#FFC107" />
+                    <Setter Property="Fill" Value="{DynamicResource StatusWarnDot}" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Status}" Value="Fail">
-                    <Setter Property="Fill" Value="#FF5252" />
+                    <Setter Property="Fill" Value="{DynamicResource StatusErrDot}" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -429,16 +450,16 @@
             <Setter Property="Padding" Value="10,2" />
             <Setter Property="CornerRadius" Value="12" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="BorderBrush" Value="#4CAF50" />
-            <Setter Property="Background" Value="#334CAF50" />
+            <Setter Property="BorderBrush" Value="{DynamicResource StatusOkDot}" />
+            <Setter Property="Background" Value="{DynamicResource StatusOkPlate}" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Spec.Verdict}" Value="Warn">
-                    <Setter Property="BorderBrush" Value="#FFC107" />
-                    <Setter Property="Background" Value="#33FFC107" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource StatusWarnDot}" />
+                    <Setter Property="Background" Value="{DynamicResource StatusWarnPlate}" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Spec.Verdict}" Value="Fail">
-                    <Setter Property="BorderBrush" Value="#FF5252" />
-                    <Setter Property="Background" Value="#33FF5252" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource StatusErrDot}" />
+                    <Setter Property="Background" Value="{DynamicResource StatusErrPlate}" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Spec.VerdictText}" Value="">
                     <Setter Property="Visibility" Value="Collapsed" />
@@ -492,8 +513,8 @@
                         Margin="10,5,10,5"
                         Padding="14,8"
                         VerticalAlignment="Center"
-                        Background="#26000000"
-                        BorderBrush="#66FFFFFF"
+                        Background="{DynamicResource AppCardBackground}"
+                        BorderBrush="{DynamicResource AppCardBorder}"
                         BorderThickness="1"
                         ClipToBounds="True"
                         CornerRadius="12"
@@ -516,14 +537,14 @@
                                             </Style.Triggers>
                                         </Style>
                                     </StackPanel.Style>
-                                    <TextBlock Foreground="White" Text="{DynamicResource DeviceCardNoAnalyzer}" />
+                                    <TextBlock Foreground="{DynamicResource AppTextPrimary}" Text="{DynamicResource DeviceCardNoAnalyzer}" />
                                     <TextBlock
                                         FontSize="12"
-                                        Foreground="#B5FFFFFF"
+                                        Foreground="{DynamicResource AppTextSecondary}"
                                         Text="{DynamicResource DeviceCardPressCalibration}" />
                                 </StackPanel>
                                 <!--  Connected, the channel is not confirmed yet  -->
-                                <TextBlock Foreground="#B5FFFFFF" Text="{DynamicResource DeviceCardCalibrating}">
+                                <TextBlock Foreground="{DynamicResource AppTextSecondary}" Text="{DynamicResource DeviceCardCalibrating}">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Visibility" Value="Collapsed" />
@@ -550,16 +571,16 @@
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock
                                             FontWeight="SemiBold"
-                                            Foreground="White"
+                                            Foreground="{DynamicResource AppTextPrimary}"
                                             Text="{Binding DeviceModelName}" />
                                         <TextBlock
                                             Margin="6,0,0,0"
-                                            Foreground="#B5FFFFFF"
+                                            Foreground="{DynamicResource AppTextSecondary}"
                                             Text="{Binding DeviceActiveChannelStatusText}" />
                                     </StackPanel>
                                     <TextBlock
                                         FontSize="12"
-                                        Foreground="#B5FFFFFF"
+                                        Foreground="{DynamicResource AppTextSecondary}"
                                         Text="{Binding DeviceProbeSerialText}" />
                                 </StackPanel>
                             </Grid>
@@ -571,7 +592,7 @@
                         <Label
                             VerticalAlignment="Center"
                             Content="{DynamicResource DeviceConfiguration}"
-                            Foreground="White" />
+                            Foreground="{DynamicResource AppTextPrimary}" />
                         <Button
                             x:Name="DeviceConfigurationButton"
                             behaviors:ActionFeedbackBehavior.Mode="Underline"
@@ -582,7 +603,7 @@
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             Click="DeviceConfigurationButton_Click"
-                            Foreground="White"
+                            Foreground="{DynamicResource AppTextPrimary}"
                             Style="{StaticResource DeviceConfigDropdownButtonStyle}"
                             Tag="{Binding}">
                             <Button.ContextMenu>
@@ -625,14 +646,14 @@
                         <Label
                             VerticalAlignment="Center"
                             Content="{DynamicResource SerialNumber}"
-                            Foreground="#E5FFFFFF" />
+                            Foreground="{DynamicResource AppTextLabel}" />
                         <Grid Margin="5" VerticalAlignment="Center">
                             <TextBox
                                 x:Name="SerialNumberTextBox"
                                 MinWidth="200"
                                 Margin="0"
                                 VerticalAlignment="Center"
-                                Foreground="White"
+                                Foreground="{DynamicResource AppTextPrimary}"
                                 LostFocus="SerialNumberTextBox_LostFocus"
                                 Text="{Binding SerialNumber, UpdateSourceTrigger=Explicit}">
                                 <TextBox.InputBindings>
@@ -655,7 +676,7 @@
                 </Grid>
                 <Grid Grid.Row="3">
                     <StackPanel Margin="0,5,30,5" Orientation="Horizontal">
-                        <Label Content="{DynamicResource TV}" Foreground="White" />
+                        <Label Content="{DynamicResource TV}" Foreground="{DynamicResource AppTextPrimary}" />
                         <CheckBox Margin="5" IsChecked="{Binding IsTvCheckboxChecked}" />
                     </StackPanel>
                 </Grid>
@@ -942,14 +963,14 @@
                 Grid.Column="0"
                 Margin="0,0,5,0"
                 Padding="0"
-                Background="#FF2A2828"
+                Background="{DynamicResource AppPanelBackground}"
                 BorderBrush="{DynamicResource MaterialDesign.Brush.Primary}"
                 BorderThickness="1"
                 SelectedIndex="{Binding SelectedTabIndex}">
                 <TabControl.Resources>
                     <!--  Tab headers: white text, a purple line under the selected one, a thin light line on hover  -->
                     <Style TargetType="TabItem">
-                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="Foreground" Value="{DynamicResource AppTextPrimary}" />
                         <Setter Property="FontSize" Value="14" />
                         <Setter Property="Cursor" Value="Hand" />
                         <Setter Property="Margin" Value="6,4,0,2" />
@@ -968,12 +989,12 @@
                                             VerticalAlignment="Center"
                                             ContentSource="Header"
                                             TextElement.FontWeight="Normal"
-                                            TextElement.Foreground="White" />
+                                            TextElement.Foreground="{DynamicResource AppTextPrimary}" />
                                         <Rectangle
                                             x:Name="Line"
                                             Height="1"
                                             VerticalAlignment="Bottom"
-                                            Fill="#C8C8C8"
+                                            Fill="{DynamicResource AppTabLine}"
                                             Visibility="Collapsed" />
                                     </Grid>
                                     <ControlTemplate.Triggers>
@@ -1019,41 +1040,41 @@
                             <TextBlock
                                 Grid.Column="1"
                                 FontSize="12"
-                                Foreground="#B5FFFFFF"
+                                Foreground="{DynamicResource AppTextSecondary}"
                                 Text="{DynamicResource ResultsColumnPoint}" />
                             <TextBlock
                                 Grid.Column="2"
                                 Margin="0,0,6,0"
                                 FontSize="12"
-                                Foreground="#B5FFFFFF"
+                                Foreground="{DynamicResource AppTextSecondary}"
                                 Text="x"
                                 TextAlignment="Center" />
                             <TextBlock
                                 Grid.Column="3"
                                 Margin="0,0,6,0"
                                 FontSize="12"
-                                Foreground="#B5FFFFFF"
+                                Foreground="{DynamicResource AppTextSecondary}"
                                 Text="y"
                                 TextAlignment="Center" />
                             <TextBlock
                                 Grid.Column="4"
                                 Margin="0,0,6,0"
                                 FontSize="12"
-                                Foreground="#B5FFFFFF"
+                                Foreground="{DynamicResource AppTextSecondary}"
                                 Text="Lv"
                                 TextAlignment="Center" />
                             <TextBlock
                                 Grid.Column="5"
                                 Margin="0,0,6,0"
                                 FontSize="12"
-                                Foreground="#B5FFFFFF"
+                                Foreground="{DynamicResource AppTextSecondary}"
                                 Text="T"
                                 TextAlignment="Center" />
                             <TextBlock
                                 Grid.Column="6"
                                 Margin="0,0,6,0"
                                 FontSize="12"
-                                Foreground="#B5FFFFFF"
+                                Foreground="{DynamicResource AppTextSecondary}"
                                 Text="{DynamicResource ResultsColumnTries}"
                                 TextAlignment="Center" />
                         </Grid>
@@ -1152,24 +1173,26 @@
                         <ItemsControl ItemsSource="{Binding LogEntries}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Margin="0,1">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock
-                                            Margin="0,0,10,0"
-                                            FontFamily="Consolas"
-                                            FontSize="13"
-                                            Foreground="#8A8A8A"
-                                            Text="{Binding TimeText}" />
-                                        <TextBlock
-                                            Grid.Column="1"
-                                            FontSize="14"
-                                            Style="{StaticResource LogMessageStyle}"
-                                            Text="{Binding Message}"
-                                            TextWrapping="Wrap" />
-                                    </Grid>
+                                    <Border Style="{StaticResource LogRowStyle}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock
+                                                Margin="0,0,10,0"
+                                                FontFamily="Consolas"
+                                                FontSize="13"
+                                                Foreground="{DynamicResource AppTextMuted}"
+                                                Text="{Binding TimeText}" />
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                FontSize="14"
+                                                Style="{StaticResource LogMessageStyle}"
+                                                Text="{Binding Message}"
+                                                TextWrapping="Wrap" />
+                                        </Grid>
+                                    </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
@@ -1179,8 +1202,8 @@
             <Border
                 Grid.Column="1"
                 Margin="5,0,0,0"
-                Background="#FF2C2C2C"
-                BorderBrush="#FF5A5A5A"
+                Background="{DynamicResource AppInsetBackground}"
+                BorderBrush="{DynamicResource AppPanelBorder}"
                 BorderThickness="1"
                 CornerRadius="4">
                 <Grid Margin="8">
@@ -1207,7 +1230,7 @@
                             Style="{StaticResource SpecVerdictChipStyle}">
                             <TextBlock
                                 FontSize="13"
-                                Foreground="White"
+                                Foreground="{DynamicResource AppTextPrimary}"
                                 Text="{Binding Spec.VerdictText}" />
                         </Border>
                         <TextBlock
@@ -1215,7 +1238,7 @@
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
                             FontSize="13"
-                            Foreground="#B5FFFFFF"
+                            Foreground="{DynamicResource AppTextSecondary}"
                             Text="{Binding Spec.ProgressText}" />
                     </Grid>
 
@@ -1255,7 +1278,7 @@
                                                 Grid.Column="3"
                                                 VerticalAlignment="Center"
                                                 FontSize="12"
-                                                Foreground="#B5FFFFFF"
+                                                Foreground="{DynamicResource AppTextSecondary}"
                                                 Text="{Binding SpecText}" />
                                         </Grid>
                                     </Border>
@@ -1268,7 +1291,7 @@
                         Grid.Row="2"
                         Margin="4,6,4,0"
                         FontSize="13"
-                        Foreground="#B5FFFFFF"
+                        Foreground="{DynamicResource AppTextSecondary}"
                         Text="{Binding Spec.HintText}"
                         TextWrapping="Wrap" />
                 </Grid>
