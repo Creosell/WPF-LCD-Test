@@ -227,6 +227,36 @@
             which reads as inconsistent next to the plain underline hover of the SN TextBox. This template
             keeps only a bottom underline that brightens on hover, matching the TextBox's affordance.
         -->
+        <!--  Plain field with a one pixel underline: the line keeps its thickness in every state (focus and hover only recolor it)  -->
+        <Style x:Key="SerialNumberTextBoxStyle" TargetType="TextBox">
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="Padding" Value="0,4" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="CaretBrush" Value="{DynamicResource AppTextPrimary}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border
+                            x:Name="Line"
+                            Padding="{TemplateBinding Padding}"
+                            Background="Transparent"
+                            BorderBrush="{DynamicResource MaterialDesign.Brush.TextBox.Border}"
+                            BorderThickness="0,0,0,1">
+                            <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center" Focusable="False" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Line" Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.TextBox.HoverBorder}" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Line" Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style x:Key="DeviceConfigDropdownButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.TextBox.Border}" />
@@ -658,6 +688,7 @@
                                 VerticalAlignment="Center"
                                 Foreground="{DynamicResource AppTextPrimary}"
                                 LostFocus="SerialNumberTextBox_LostFocus"
+                                Style="{StaticResource SerialNumberTextBoxStyle}"
                                 Text="{Binding SerialNumber, UpdateSourceTrigger=Explicit}">
                                 <TextBox.InputBindings>
                                     <KeyBinding
