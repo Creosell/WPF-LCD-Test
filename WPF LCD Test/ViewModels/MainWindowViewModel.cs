@@ -2,7 +2,6 @@
 using System.Windows.Input;
 using Microsoft.Extensions.DependencyInjection;
 using WPF_LCD_Test.Commands;
-using WPF_LCD_Test.Interfaces;
 
 namespace WPF_LCD_Test.ViewModels
 {
@@ -94,16 +93,7 @@ namespace WPF_LCD_Test.ViewModels
         {
             string? pageName = parameter as string;
             if (string.IsNullOrEmpty(pageName)) return;
-            BaseViewModel? targetViewModel = null;
-            switch (pageName)
-            {
-                case "Settings":
-                    targetViewModel = SettingsPage;
-                    break;
-                default:
-                    targetViewModel = MeasurementPage;
-                    break;
-            }
+            BaseViewModel? targetViewModel = pageName == "Settings" ? SettingsPage : MeasurementPage;
             if (targetViewModel != null && targetViewModel != _currentPageViewModel)
             {
                 CurrentPageViewModel = targetViewModel;

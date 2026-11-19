@@ -100,17 +100,5 @@ namespace WPF_LCD_Test.Models
             string formattedT = Math.Round(T, 0, MidpointRounding.AwayFromZero).ToString("F0", CultureInfo.InvariantCulture);
             return $"Location: {Location}, x: {formattedX}, y: {formattedY}, Lv: {formattedLv}, T: {formattedT}";
             }
-
-        /// <summary>
-        /// Converts measurement to CSV format with invariant culture.
-        /// </summary>
-        /// <returns>CSV formatted string.</returns>
-        public string ToCsvString()
-            {
-            return $"{Location},{x.ToString(CultureInfo.InvariantCulture)}," +
-                $"{y.ToString(CultureInfo.InvariantCulture)}," +
-                $"{Lv.ToString(CultureInfo.InvariantCulture)}," +
-                $"{T.ToString(CultureInfo.InvariantCulture)}";
-            }
         }
     }

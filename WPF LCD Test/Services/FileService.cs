@@ -17,7 +17,6 @@ namespace WPF_LCD_Test.Services
 
         private readonly IFileSystem _fileSystem;
         private readonly IPathProvider _pathProvider;
-        private readonly ILocalizationService _localizationService;
 
         private static readonly JsonSerializerOptions _saveSerializerOptions = new()
             {
@@ -50,11 +49,10 @@ namespace WPF_LCD_Test.Services
         /// <param name="fileSystem">File system abstraction for file operations.</param>
         /// <param name="pathProvider">Path provider for application directories.</param>
         /// <param name="localizationService">Service for localized messages.</param>
-        public FileService(IFileSystem fileSystem, IPathProvider pathProvider, ILocalizationService localizationService)
+        public FileService(IFileSystem fileSystem, IPathProvider pathProvider)
             {
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
             _pathProvider = pathProvider ?? throw new ArgumentNullException(nameof(pathProvider));
-            _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             InitializeWorkingFolders();
             }
 

@@ -23,22 +23,8 @@ namespace WPF_LCD_Test.Services
         private int _channel = 0;
         private string _probeSN = "Unknown";
 
-        private const int RemoteModeOFF = 0;
-        private const int RemoteModeON = 1;
-        private const int RemoteModeLOCKED = 2;
-        private const int NtscSync = 0;
-        private const int PalSync = 1;
-        private const int ExtSync = 2;
         private const double DefaultDisplayRange = 2.5;
         private const int LvxyDisplayMode = 0;
-        private const int TdudvDisplayMode = 1;
-        private const int NoDisplayMode = 2;
-        private const int GDisplayMode = 3;
-        private const int RDisplayMode = 4;
-        private const int uvDisplayMode = 5;
-        private const int FmaDisplayMode = 6;
-        private const int XYZDisplayMode = 7;
-        private const int JeitaDisplayMode = 8;
 
         /// <summary>
         /// Occurs when device connection status changes.

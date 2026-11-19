@@ -141,12 +141,6 @@
   <data name="ConnectingCA" xml:space="preserve">
     <value>连接至彩色分析仪...</value>
   </data>
-  <data name="ConnectionReleasedCA" xml:space="preserve">
-    <value>与彩色分析仪的连接已释放</value>
-  </data>
-  <data name="CurrentMeasurementTime" xml:space="preserve">
-    <value>当前测量时间为</value>
-  </data>
   <data name="CurrentSN" xml:space="preserve">
     <value>当前序列号：{0}</value>
   </data>
@@ -159,26 +153,11 @@
   <data name="ErrCSV" xml:space="preserve">
     <value>保存为 CSV 时出错</value>
   </data>
-  <data name="ErrIn" xml:space="preserve">
-    <value>错误</value>
-  </data>
   <data name="ErrMsgLangSwitchFailed" xml:space="preserve">
     <value>语言切换失败</value>
   </data>
   <data name="ErrorAtMeasuringIteration" xml:space="preserve">
     <value>迭代时的误差测量 </value>
-  </data>
-  <data name="ErrReleaseConnectionCA" xml:space="preserve">
-    <value>释放连接错误</value>
-  </data>
-  <data name="ErrSavingJSON" xml:space="preserve">
-    <value>尝试保存结果时出错。请检查文件路径并重试</value>
-  </data>
-  <data name="ErrSerialNumberInput" xml:space="preserve">
-    <value>输入无效，请输入不含特殊符号的有效 SN</value>
-  </data>
-  <data name="ErrTimeInput" xml:space="preserve">
-    <value>输入无效，请输入数字。测量时间设置为默认值</value>
   </data>
   <data name="ErrUnexpected" xml:space="preserve">
     <value>发生意外错误: {0}</value>
@@ -189,26 +168,14 @@
   <data name="MakeZeroCalibration" xml:space="preserve">
     <value>请先进行零点校准 !</value>
   </data>
-  <data name="MeasuredValuesPrefix" xml:space="preserve">
-    <value>测量值</value>
-  </data>
   <data name="Measuring" xml:space="preserve">
     <value>测量...</value>
-  </data>
-  <data name="MsgLanguageSwitchedTo" xml:space="preserve">
-    <value>语言切换为</value>
   </data>
   <data name="ResultsForSN" xml:space="preserve">
     <value>SN 的结果</value>
   </data>
   <data name="SavedToJSON" xml:space="preserve">
     <value>中保存为 JSON 格式</value>
-  </data>
-  <data name="SavingNotFullWarning" xml:space="preserve">
-    <value>尚未完成所有测量，您确定要保存结果吗？</value>
-  </data>
-  <data name="Seconds" xml:space="preserve">
-    <value>秒钟</value>
   </data>
   <data name="Warning" xml:space="preserve">
     <value>警告</value>
@@ -282,17 +249,11 @@
   <data name="ConnectionError" xml:space="preserve">
     <value>连接失败或结束了错误</value>
   </data>
-  <data name="DisconnectingCA" xml:space="preserve">
-    <value>断开彩色分析仪...</value>
-  </data>
   <data name="DisconnectedCA" xml:space="preserve">
     <value>断开连接</value>
   </data>
   <data name="MeasureWihoutConnectionError" xml:space="preserve">
     <value>请首先连接彩色分析仪</value>
-  </data>
-  <data name="LocalizationServiceKeyErr" xml:space="preserve">
-    <value>LocalisationService错误：键的ResourceManager</value>
   </data>
   <data name="LocalizationServiceResErr" xml:space="preserve">
     <value>Loctisationservice警告：在.resx中未找到的钥匙的资源用于文化</value>
@@ -339,9 +300,6 @@
   <data name="LvIsTooLow" xml:space="preserve">
     <value>注意：测得的亮度LV太低</value>
   </data>
-  <data name="MeasurementResult" xml:space="preserve">
-    <value>结果为 {0}: {1}</value>
-  </data>
   <data name="InvalidResultErr" xml:space="preserve">
     <value>结果无效</value>
   </data>
@@ -359,9 +317,6 @@
   </data>
   <data name="AlreadyActivated" xml:space="preserve">
     <value>已经激活了</value>
-  </data>
-  <data name="IncorrectMeasTimeFormat" xml:space="preserve">
-    <value>输入正确的测量时间（大于0）</value>
   </data>
   <data name="MeasButStatusErr" xml:space="preserve">
     <value>错误：无法找到用于更新的测量点的状态</value>
@@ -396,32 +351,14 @@
   <data name="RunExternalAppUnexpectedErr" xml:space="preserve">
     <value>启动外部程序时出错: {0}</value>
   </data>
-  <data name="CalibratedCA" xml:space="preserve">
-    <value>校准</value>
-  </data>
-  <data name="NotCalibratedCa" xml:space="preserve">
-    <value>未校准</value>
-  </data>
   <data name="TestFormatString" xml:space="preserve">
     <value>这是一个数字测试： {0}</value>
-  </data>
-  <data name="RunExternalAppInvalidPathErr" xml:space="preserve">
-    <value>调用外部程序的路径不正确</value>
-  </data>
-  <data name="WelcomeMessage" xml:space="preserve">
-    <value>按 “零点校准 ”按钮连接色彩分析仪，填写 SN 开始测量</value>
   </data>
   <data name="ConfigDirNotFound" xml:space="preserve">
     <value>未找到配置目录 : {0}</value>
   </data>
   <data name="ChooseConfiguration" xml:space="preserve">
     <value>选择配置…</value>
-  </data>
-  <data name="ErrMeasurementValidation" xml:space="preserve">
-    <value>测量验证中出现未知错误</value>
-  </data>
-  <data name="SkippedMeasurementValidaton" xml:space="preserve">
-    <value>测量验证被跳过</value>
   </data>
   <data name="LvIsTooHigh" xml:space="preserve">
     <value>黑色亮度意外偏高，请检查色彩分析仪位置</value>
@@ -458,12 +395,6 @@
   </data>
   <data name="Files" xml:space="preserve">
     <value>文件</value>
-  </data>
-  <data name="Batches" xml:space="preserve">
-    <value>批次</value>
-  </data>
-  <data name="Containing" xml:space="preserve">
-    <value>含有</value>
   </data>
   <data name="Code" xml:space="preserve">
     <value>代码</value>
@@ -716,9 +647,6 @@
   </data>
   <data name="SpecRepeatRecommended" xml:space="preserve">
     <value>建议重新测量</value>
-  </data>
-  <data name="SpecAttemptsOf" xml:space="preserve">
-    <value>{0}/3</value>
   </data>
   <data name="SaveSpecHeader" xml:space="preserve">
     <value>部分数值不符合规格:</value>

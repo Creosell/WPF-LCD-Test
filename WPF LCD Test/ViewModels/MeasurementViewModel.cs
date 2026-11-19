@@ -402,7 +402,6 @@ namespace WPF_LCD_Test.ViewModels
         public ICommand SwitchLanguageCommand { get; }
         public ICommand MeasureCommand { get; }
         public ICommand ApplySerialNumberCommand { get; }
-        public ICommand ApplyMeasurementTimeCommand { get; }
         public ICommand NewDeviceUnderTestCommand { get; }
         public ICommand ReportGenerateCommand { get; }
         public ICommand UploadReportsCommand { get; }

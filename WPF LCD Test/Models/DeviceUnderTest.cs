@@ -129,12 +129,6 @@ namespace WPF_LCD_Test.Models
             }
 
         /// <summary>
-        /// Removes the measurement of a location (a retry of the point did not pass, so its previous result is no longer valid).
-        /// </summary>
-        /// <param name="location">Measurement location identifier.</param>
-        public void RemoveMeasurement(string location) => Measurements.RemoveAll(m => m.Location == location);
-
-        /// <summary>
         /// Returns formatted string representation of device and its measurements.
         /// </summary>
         /// <returns>Formatted device information string.</returns>

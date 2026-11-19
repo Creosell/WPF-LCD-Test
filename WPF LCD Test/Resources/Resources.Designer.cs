@@ -115,15 +115,6 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to batches.
-        /// </summary>
-        public static string Batches {
-            get {
-                return ResourceManager.GetString("Batches", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to 0. Black.
         /// </summary>
         public static string BlackPoint {
@@ -174,15 +165,6 @@ namespace WPF_LCD_Test.Resources {
         public static string Brightness {
             get {
                 return ResourceManager.GetString("Brightness", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Calibrated.
-        /// </summary>
-        public static string CalibratedCA {
-            get {
-                return ResourceManager.GetString("CalibratedCA", resourceCulture);
             }
         }
         
@@ -396,24 +378,6 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Connection to the color analyzer released.
-        /// </summary>
-        public static string ConnectionReleasedCA {
-            get {
-                return ResourceManager.GetString("ConnectionReleasedCA", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to containing.
-        /// </summary>
-        public static string Containing {
-            get {
-                return ResourceManager.GetString("Containing", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Copy of uploaded report archives in folder: {0}.
         /// </summary>
         public static string CopyOfUploadedArchivesInFolder {
@@ -468,15 +432,6 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Current measurement time is.
-        /// </summary>
-        public static string CurrentMeasurementTime {
-            get {
-                return ResourceManager.GetString("CurrentMeasurementTime", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Current SN: {0}.
         /// </summary>
         public static string CurrentSN {
@@ -518,15 +473,6 @@ namespace WPF_LCD_Test.Resources {
         public static string DisconnectedCA {
             get {
                 return ResourceManager.GetString("DisconnectedCA", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Disconnecting the color analyzer....
-        /// </summary>
-        public static string DisconnectingCA {
-            get {
-                return ResourceManager.GetString("DisconnectingCA", resourceCulture);
             }
         }
         
@@ -576,29 +522,11 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error in.
-        /// </summary>
-        public static string ErrIn {
-            get {
-                return ResourceManager.GetString("ErrIn", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Measurement is out of expected range for this color.
         /// </summary>
         public static string ErrMeasurementOutOfRange {
             get {
                 return ResourceManager.GetString("ErrMeasurementOutOfRange", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unknown error in measurement validation.
-        /// </summary>
-        public static string ErrMeasurementValidation {
-            get {
-                return ResourceManager.GetString("ErrMeasurementValidation", resourceCulture);
             }
         }
         
@@ -626,42 +554,6 @@ namespace WPF_LCD_Test.Resources {
         public static string ErrorInBackgroundTask {
             get {
                 return ResourceManager.GetString("ErrorInBackgroundTask", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Error releasing connection.
-        /// </summary>
-        public static string ErrReleaseConnectionCA {
-            get {
-                return ResourceManager.GetString("ErrReleaseConnectionCA", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Error while trying to save results. Please, check file path and try again.
-        /// </summary>
-        public static string ErrSavingJSON {
-            get {
-                return ResourceManager.GetString("ErrSavingJSON", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Invalid input, please a valid SN without special symbols.
-        /// </summary>
-        public static string ErrSerialNumberInput {
-            get {
-                return ResourceManager.GetString("ErrSerialNumberInput", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Invalid input, please enter a number. Measurement time set to default.
-        /// </summary>
-        public static string ErrTimeInput {
-            get {
-                return ResourceManager.GetString("ErrTimeInput", resourceCulture);
             }
         }
         
@@ -738,15 +630,6 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enter the correct measurement time (greater than 0).
-        /// </summary>
-        public static string IncorrectMeasTimeFormat {
-            get {
-                return ResourceManager.GetString("IncorrectMeasTimeFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Invalid report configuration.
         /// </summary>
         public static string InvalidReportConfiguration {
@@ -779,15 +662,6 @@ namespace WPF_LCD_Test.Resources {
         public static string LocalizationServiceFormatErr {
             get {
                 return ResourceManager.GetString("LocalizationServiceFormatErr", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to LocalisationService Error: ResourceManager for key.
-        /// </summary>
-        public static string LocalizationServiceKeyErr {
-            get {
-                return ResourceManager.GetString("LocalizationServiceKeyErr", resourceCulture);
             }
         }
         
@@ -833,24 +707,6 @@ namespace WPF_LCD_Test.Resources {
         public static string MeasButStatusErr {
             get {
                 return ResourceManager.GetString("MeasButStatusErr", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Measured values.
-        /// </summary>
-        public static string MeasuredValuesPrefix {
-            get {
-                return ResourceManager.GetString("MeasuredValuesPrefix", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Result for {0}: {1}.
-        /// </summary>
-        public static string MeasurementResult {
-            get {
-                return ResourceManager.GetString("MeasurementResult", resourceCulture);
             }
         }
         
@@ -909,15 +765,6 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Language is switched to.
-        /// </summary>
-        public static string MsgLanguageSwitchedTo {
-            get {
-                return ResourceManager.GetString("MsgLanguageSwitchedTo", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to No data.
         /// </summary>
         public static string NoData {
@@ -950,15 +797,6 @@ namespace WPF_LCD_Test.Resources {
         public static string NoSNErr {
             get {
                 return ResourceManager.GetString("NoSNErr", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Not calibrated.
-        /// </summary>
-        public static string NotCalibratedCa {
-            get {
-                return ResourceManager.GetString("NotCalibratedCa", resourceCulture);
             }
         }
         
@@ -1040,15 +878,6 @@ namespace WPF_LCD_Test.Resources {
         public static string ResultsSaved {
             get {
                 return ResourceManager.GetString("ResultsSaved", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Incorrect path for calling an external program.
-        /// </summary>
-        public static string RunExternalAppInvalidPathErr {
-            get {
-                return ResourceManager.GetString("RunExternalAppInvalidPathErr", resourceCulture);
             }
         }
         
@@ -1251,24 +1080,6 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Not all measurements have been taken, are you sure you want to save the result?.
-        /// </summary>
-        public static string SavingNotFullWarning {
-            get {
-                return ResourceManager.GetString("SavingNotFullWarning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to seconds.
-        /// </summary>
-        public static string Seconds {
-            get {
-                return ResourceManager.GetString("Seconds", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Serial number:.
         /// </summary>
         public static string SerialNumber {
@@ -1278,29 +1089,11 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Measurement validation is skipped.
-        /// </summary>
-        public static string SkippedMeasurementValidaton {
-            get {
-                return ResourceManager.GetString("SkippedMeasurementValidaton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The serial number cannot be empty.
         /// </summary>
         public static string SnCantBeEmpty {
             get {
                 return ResourceManager.GetString("SnCantBeEmpty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} of 3.
-        /// </summary>
-        public static string SpecAttemptsOf {
-            get {
-                return ResourceManager.GetString("SpecAttemptsOf", resourceCulture);
             }
         }
         
@@ -1958,15 +1751,6 @@ namespace WPF_LCD_Test.Resources {
         public static string WarningFailedToCleanup {
             get {
                 return ResourceManager.GetString("WarningFailedToCleanup", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Press the “Zero Calibration” button to connect the color analyzer and fill in the SN to start the measurements.
-        /// </summary>
-        public static string WelcomeMessage {
-            get {
-                return ResourceManager.GetString("WelcomeMessage", resourceCulture);
             }
         }
         

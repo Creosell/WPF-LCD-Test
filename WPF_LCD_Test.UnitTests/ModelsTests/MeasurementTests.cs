@@ -98,35 +98,6 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
             Assert.That(result, Is.EqualTo(expected), "ToString() output is not correctly formatted.");
         }
 
-        // Тест для метода ToCsvString()
-        [Test]
-        public void ToCsvString_ReturnsCorrectlyFormattedCsvString()
-        {
-            // Arrange
-            // Используем значения, которые проверят форматирование (без явного Fx)
-            // По умолчанию double.ToString() с InvariantCulture не добавляет нули после запятой, если они не нужны,
-            // и использует экспоненциальную нотацию для очень маленьких/больших чисел.
-            Measurement measurement = new Measurement("Report", 12.345, 67.8, 9.123456789, 30.0);
-
-            // Act
-            string result = measurement.ToCsvString();
-
-            // Assert
-            // В вашем коде ToCsvString использует просто ToString(CultureInfo.InvariantCulture)
-            // Это будет давать:
-            // x: 12.345
-            // y: 67.8
-            // Lv: 9.123456789 (или 9.123456789E+00 если число очень мало)
-            // T: 30
-            //
-            // Если вы хотите точное форматирование для CSV, как в закомментированной строке в ToCsvString(),
-            // то нужно активировать ее и обновить ожидаемый результат.
-            // Например, для Lv с F4: 9.1235
-            // Для T с F0: 30
-            string expected = $"Report,{12.345.ToString(CultureInfo.InvariantCulture)},{67.8.ToString(CultureInfo.InvariantCulture)},{9.123456789.ToString(CultureInfo.InvariantCulture)},{30.0.ToString(CultureInfo.InvariantCulture)}";
-            Assert.That(result, Is.EqualTo(expected), "ToCsvString() output is not correctly formatted.");
-        }
-
         // Тест для IsValid свойства
         [Test]
         public void IsValid_CanBeSetToFalse()

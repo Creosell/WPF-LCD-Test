@@ -38,7 +38,6 @@ namespace WPF_LCD_Test.ViewModels
         private SpecEvaluation? _evaluation;
         private int _measuredPoints;
         private int _totalPoints;
-        private string _message = string.Empty;
         private string _verdictText = string.Empty;
         private string _progressText = string.Empty;
         private string _hintText = string.Empty;
@@ -112,7 +111,6 @@ namespace WPF_LCD_Test.ViewModels
             _evaluation = evaluation;
             _measuredPoints = measuredPoints;
             _totalPoints = totalPoints;
-            _message = string.Empty;
             Render();
             LogNewDeviations(evaluation);
             }
@@ -124,7 +122,6 @@ namespace WPF_LCD_Test.ViewModels
         public void ShowMessage(string message)
             {
             Clear();
-            _message = message;
             HintText = message;
             }
 
@@ -134,7 +131,6 @@ namespace WPF_LCD_Test.ViewModels
         public void Reset()
             {
             Clear();
-            _message = string.Empty;
             HintText = string.Empty;
             }
 
