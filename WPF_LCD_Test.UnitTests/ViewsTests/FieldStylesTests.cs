@@ -466,10 +466,15 @@ namespace WPF_LCD_Test.UnitTests.ViewsTests
                 var atRest = button.Effect;
 
                 if (success) signal.Succeed(); else signal.Fail();
-                Pump(250);
-                var glow = button.Effect as System.Windows.Media.Effects.DropShadowEffect;
+                System.Windows.Media.Effects.DropShadowEffect? glow = null;
+                double radius = 0;
+                for (int i = 0; i < 8 && radius <= 0; i++)
+                    {
+                    Pump(100);
+                    glow = button.Effect as System.Windows.Media.Effects.DropShadowEffect;
+                    radius = glow?.BlurRadius ?? 0;
+                    }
                 var color = glow?.Color;
-                double radius = glow?.BlurRadius ?? 0;
 
                 Pump(2000);
                 var afterwards = button.Effect;

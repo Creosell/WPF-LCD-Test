@@ -23,6 +23,12 @@ namespace WPF_LCD_Test.ViewModels
         {
         private const string Dash = "—";
 
+        /// <summary>A check of more points than this (the uniformity over nine) would mark half of the buttons and says nothing about any of them.</summary>
+        private const int MaxBadgePoints = 3;
+
+        /// <summary>The metrics where a lower value is better: their bounds are read the other way round.</summary>
+        private static bool IsLowerBetter(string key) => key is "Delta_e" or "Black_luminance";
+
         private static readonly Dictionary<string, string> GamutSpaces = new()
             {
             ["rgb"] = "sRGB",
@@ -159,10 +165,30 @@ namespace WPF_LCD_Test.ViewModels
                     int attempts = AttemptsOf(_evaluation, check);
                     string text = attempts > 0
                         ? string.Format(Text("SaveProblemPoint"), LocationName(check.Locations[0]), DescribeInWords(check), MeasuredText(attempts))
-                        : DescribeInWords(check);
-                    return new SpecProblem(text, check.Status, attempts is > 0 and < MeasurementResultRow.EnoughAttempts);
+                        : check.Locations.Count > 1 ? DescribeWithPoints(_evaluation, check) : DescribeInWords(check);
+                    return new SpecProblem(text, check.Status, FewAttemptsOf(_evaluation, check));
                     })
                 .ToList();
+            }
+
+        /// <summary>
+        /// Tells whether a point the check comes from was measured fewer than three times; a point that already has three attempts
+        /// is never asked to be measured again.
+        /// </summary>
+        private static bool FewAttemptsOf(SpecEvaluation evaluation, SpecCheck check) =>
+            check.Locations.Any(location => evaluation.Attempts.TryGetValue(location, out var info) && info.Count is > 0 and < MeasurementResultRow.EnoughAttempts);
+
+        /// <summary>
+        /// Describes a check of several points and names each point with how many times it was measured, e.g.
+        /// "Contrast ratio is 3000, below the minimum 4125 (White: measured once, Black: measured 3 times)".
+        /// </summary>
+        private string DescribeWithPoints(SpecEvaluation evaluation, SpecCheck check)
+            {
+            var points = check.Locations
+                .Where(location => evaluation.Attempts.ContainsKey(location))
+                .Select(location => $"{LocationName(location)}: {MeasuredText(evaluation.Attempts[location].Count)}")
+                .ToList();
+            return points.Count == 0 ? DescribeInWords(check) : $"{DescribeInWords(check)} ({string.Join(", ", points)})";
             }
 
         private void Clear()
@@ -221,18 +247,25 @@ namespace WPF_LCD_Test.ViewModels
             ClearBadges();
 
             var remarks = evaluation.Checks
-                .Where(check => check.Locations.Count == 1 && check.Status is SpecStatus.Warning or SpecStatus.Fail)
-                .GroupBy(check => check.Locations[0]);
+                .Where(check => check.Status is SpecStatus.Warning or SpecStatus.Fail && check.Locations.Count is > 0 and <= MaxBadgePoints)
+                .SelectMany(check => check.Locations.Select(location => (Location: location, Check: check)))
+                .GroupBy(item => item.Location);
             foreach (var group in remarks)
                 {
                 var status = _statusService.AllMeasurementButtonStatuses.FirstOrDefault(s => s.Location == group.Key);
                 if (status == null) continue;
 
-                var ordered = group.OrderByDescending(check => check.Status).ThenBy(check => check.Key).ToList();
+                var ordered = group.Select(item => item.Check).OrderByDescending(check => check.Status).ThenBy(check => check.Key).ToList();
                 status.SpecRemark = ordered[0].Status;
-                status.SpecTooltip = string.Join(Environment.NewLine, ordered.Select(Describe));
+                status.SpecTooltip = string.Join(Environment.NewLine, ordered.Select(BadgeLine));
                 }
             }
+
+        /// <summary>
+        /// A line of a badge tooltip: what is wrong; a check of several points adds the points it comes from, e.g. "Contrast ratio 3000 &lt; min 4125 (White + Black)".
+        /// </summary>
+        private string BadgeLine(SpecCheck check) =>
+            check.Locations.Count > 1 ? $"{Describe(check)} ({string.Join(" + ", check.Locations.Select(LocationName))})" : Describe(check);
 
         private void LogNewDeviations(SpecEvaluation evaluation)
             {
@@ -285,12 +318,19 @@ namespace WPF_LCD_Test.ViewModels
 
             if (check.Status == SpecStatus.Fail)
                 {
-                if (check.Min is double min && check.Value < min) return string.Format(Text("SaveProblemBelowMin"), name, value, FormatNumber(min));
-                if (check.Max is double max && check.Value > max) return string.Format(Text("SaveProblemAboveMax"), name, value, FormatNumber(max));
+                if (IsLowerBetter(check.Key))
+                    {
+                    if (WorstBoundBelow(check) is var (_, bound)) return string.Format(Text("SaveProblemAboveMax"), name, value, FormatNumber(bound));
+                    }
+                else
+                    {
+                    if (check.Min is double min && check.Value < min) return string.Format(Text("SaveProblemBelowMin"), name, value, FormatNumber(min));
+                    if (check.Max is double max && check.Value > max) return string.Format(Text("SaveProblemAboveMax"), name, value, FormatNumber(max));
+                    }
                 }
             if (check.Typ is double typ)
                 {
-                return string.Format(Text(check.Key == "Delta_e" ? "SaveProblemAboveTyp" : "SaveProblemBelowTyp"), name, value, FormatNumber(typ));
+                return string.Format(Text(IsLowerBetter(check.Key) ? "SaveProblemAboveTyp" : "SaveProblemBelowTyp"), name, value, FormatNumber(typ));
                 }
             return $"{name} {value}";
             }
@@ -299,18 +339,38 @@ namespace WPF_LCD_Test.ViewModels
             {
             var name = NameOf(check.Key);
             var value = FormatNumber(check.Value);
-            bool lowerIsBetter = check.Key == "Delta_e";
+            bool lowerIsBetter = IsLowerBetter(check.Key);
 
             if (check.Status == SpecStatus.Fail)
                 {
-                if (check.Min is double min && check.Value < min) return $"{name} {value} < {Text("SpecBound_min")} {FormatNumber(min)}";
-                if (check.Max is double max && check.Value > max) return $"{name} {value} > {Text("SpecBound_max")} {FormatNumber(max)}";
+                if (lowerIsBetter)
+                    {
+                    if (WorstBoundBelow(check) is var (label, bound)) return $"{name} {value} > {Text($"SpecBound_{label}")} {FormatNumber(bound)}";
+                    }
+                else
+                    {
+                    if (check.Min is double min && check.Value < min) return $"{name} {value} < {Text("SpecBound_min")} {FormatNumber(min)}";
+                    if (check.Max is double max && check.Value > max) return $"{name} {value} > {Text("SpecBound_max")} {FormatNumber(max)}";
+                    }
                 }
             if (check.Typ is double typ)
                 {
                 return lowerIsBetter ? $"{name} {value} > {Text("SpecBound_typ")} {FormatNumber(typ)}" : $"{name} {value} < {Text("SpecBound_typ")} {FormatNumber(typ)}";
                 }
             return $"{name} {value}";
+            }
+
+        /// <summary>
+        /// For a metric where lower is better, finds the bound the value is above that fails it: the largest such bound
+        /// (a spec lists them as min 4, typ 3, max 2 for the color difference, so "min" is the worst allowed one).
+        /// </summary>
+        private static (string Label, double Bound)? WorstBoundBelow(SpecCheck check)
+            {
+            var exceeded = new[] { ("min", check.Min), ("max", check.Max) }
+                .Where(bound => bound.Item2 is double limit && check.Value > limit)
+                .OrderByDescending(bound => bound.Item2)
+                .ToList();
+            return exceeded.Count == 0 ? null : (exceeded[0].Item1, exceeded[0].Item2!.Value);
             }
 
         private static string FormatBounds(SpecCheck check)

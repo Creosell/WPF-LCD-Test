@@ -88,20 +88,86 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             }
 
         [Test]
-        public void Show_PutsBadgesOnSinglePointChecksOnly()
+        public void Show_PutsBadgesOnEveryPointOfACheckOfUpToThreePoints()
             {
-            Status(MeasurementLocation.WhiteColor).IsPassed = true;
-            Status(MeasurementLocation.RedColor).IsPassed = true;
-            Status(MeasurementLocation.BlackColor).IsPassed = true;
+            foreach (var location in new[] { MeasurementLocation.WhiteColor, MeasurementLocation.RedColor, MeasurementLocation.GreenColor, MeasurementLocation.BlueColor, MeasurementLocation.BlackColor })
+                {
+                Status(location).IsPassed = true;
+                }
 
             _summary.Show(Evaluation(SpecVerdict.Fail, true,
                 Check("Brightness", 348, SpecStatus.Warning, 320, 360, null, "WhiteColor"),
                 Check("Red_x", 0.701, SpecStatus.Fail, 0.612, 0.672, 0.689, "RedColor"),
-                Check("Contrast", 4789, SpecStatus.Fail, 5000, null, null, "WhiteColor", "BlackColor")), 3, 14);
+                Check("Contrast", 4789, SpecStatus.Fail, 5000, null, null, "WhiteColor", "BlackColor"),
+                Check("Cg_rgb_area", 80, SpecStatus.Warning, 70, 90, null, "RedColor", "GreenColor", "BlueColor")), 5, 14);
 
-            Assert.That(Status(MeasurementLocation.WhiteColor).SpecBadge, Is.EqualTo(SpecStatus.Warning));
-            Assert.That(Status(MeasurementLocation.RedColor).SpecBadge, Is.EqualTo(SpecStatus.Fail));
-            Assert.That(Status(MeasurementLocation.BlackColor).SpecBadge, Is.EqualTo(SpecStatus.Pass), "a check of two points is shown in the table only");
+            Assert.Multiple(() =>
+                {
+                Assert.That(Status(MeasurementLocation.WhiteColor).SpecBadge, Is.EqualTo(SpecStatus.Fail), "its own remark and the contrast: the worst one shows");
+                Assert.That(Status(MeasurementLocation.BlackColor).SpecBadge, Is.EqualTo(SpecStatus.Fail), "the black point takes part in the contrast");
+                Assert.That(Status(MeasurementLocation.RedColor).SpecBadge, Is.EqualTo(SpecStatus.Fail));
+                Assert.That(Status(MeasurementLocation.GreenColor).SpecBadge, Is.EqualTo(SpecStatus.Warning), "the green point takes part in the gamut");
+                Assert.That(Status(MeasurementLocation.BlueColor).SpecBadge, Is.EqualTo(SpecStatus.Warning));
+                });
+            }
+
+        [Test]
+        public void Show_BadgeTooltipOfACompositeCheckNamesItsPoints()
+            {
+            Status(MeasurementLocation.BlackColor).IsPassed = true;
+
+            _summary.Show(Evaluation(SpecVerdict.Fail, true,
+                Check("Contrast", 4789, SpecStatus.Fail, 5000, null, null, "WhiteColor", "BlackColor")), 2, 14);
+
+            Assert.That(Status(MeasurementLocation.BlackColor).SpecTooltip, Is.EqualTo("Contrast ratio 4789 < min 5000 (White + Black)"));
+            }
+
+        [Test]
+        public void Show_NoBadgesForACheckOfManyPoints()
+            {
+            Status(MeasurementLocation.Center).IsPassed = true;
+            Status(MeasurementLocation.TopLeft).IsPassed = true;
+            string[] nine = ["TopLeft", "TopCenter", "TopRight", "MiddleLeft", "Center", "MiddleRight", "BottomLeft", "BottomCenter", "BottomRight"];
+
+            _summary.Show(Evaluation(SpecVerdict.Fail, true, Check("Brightness_uniformity", 60, SpecStatus.Fail, 65, 70, null, nine)), 9, 14);
+
+            Assert.That(Status(MeasurementLocation.Center).SpecBadge, Is.EqualTo(SpecStatus.Pass), "the uniformity over nine points says nothing about one of them: the table shows it");
+            }
+
+        [Test]
+        public void DescribeProblems_ACompositeCheckAsksToMeasureOnlyWhenAPointHasFewerThanThreeAttempts()
+            {
+            SpecEvaluation Contrast(int white, int black) => Evaluation(SpecVerdict.Fail, true,
+                Check("Contrast", 3000, SpecStatus.Fail, 4125, 5500, null, "WhiteColor", "BlackColor")) with
+                {
+                Attempts = new Dictionary<string, SpecAttemptInfo> { ["WhiteColor"] = new(white, 0, true), ["BlackColor"] = new(black, 0, true) }
+                };
+
+            _summary.Show(Contrast(1, 3), 2, 14);
+            var few = _summary.DescribeProblems().Single();
+            _summary.Reset();
+            _summary.Show(Contrast(3, 3), 2, 14);
+            var enough = _summary.DescribeProblems().Single();
+
+            Assert.Multiple(() =>
+                {
+                Assert.That(few.FewAttempts, Is.True);
+                Assert.That(few.Text, Does.Contain("White: measured once").And.Contain("Black: measured 3 times"));
+                Assert.That(enough.FewAttempts, Is.False, "both points have three attempts: they are not asked to be measured again");
+                });
+            }
+
+        [TestCase("Delta_e", 5.0, 4.0, 3.0, 2.0, true, "ΔE 5 > min 4")]
+        [TestCase("Delta_e", 3.5, 4.0, 3.0, 2.0, false, "ΔE 3.5 > typ 3")]
+        [TestCase("Black_luminance", 0.4, null, 0.2, 0.3, true, "Black luminance (cd/m²) 0.4 > max 0.3")]
+        [TestCase("Black_luminance", 0.25, null, 0.2, 0.3, false, "Black luminance (cd/m²) 0.25 > typ 0.2")]
+        public void LowerIsBetterMetrics_ReadTheBoundsTheOtherWayRound(string key, double value, double? min, double? typ, double? max, bool fail, string expected)
+            {
+            var status = fail ? SpecStatus.Fail : SpecStatus.Warning;
+
+            _summary.Show(Evaluation(status == SpecStatus.Fail ? SpecVerdict.Fail : SpecVerdict.Warn, true, Check(key, value, status, min, typ, max, "Center")), 1, 13);
+
+            Assert.That(_log.Single(), Does.StartWith(expected));
             }
 
         [Test]
