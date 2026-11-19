@@ -1,12 +1,16 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:MaterialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <!--
         Shared look of the input controls of every page: a field is a plain text on a one pixel underline that has the same
         thickness and color in every state (only the hover recolors it), and a button of an action is a rounded Material button.
         Pages take these styles instead of drawing the controls on their own.
     -->
+
+    <!--  The text size of the pages  -->
+    <sys:Double x:Key="AppFontSize">15</sys:Double>
 
     <!--  A rounded button of an action (Save, Create report, ...)  -->
     <Style

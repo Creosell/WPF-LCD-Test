@@ -12,7 +12,7 @@
     d:DataContext="{d:DesignInstance Type=viewmodels:MeasurementViewModel}"
     Background="{DynamicResource AppPageBackground}"
     Focusable="True"
-    FontSize="15"
+    FontSize="{StaticResource AppFontSize}"
     Foreground="{DynamicResource AppTextPrimary}"
     PreviewKeyDown="UserControl_PreviewKeyDown"
     PreviewMouseDown="UserControl_PreviewMouseDown"
