@@ -48,7 +48,7 @@
                         <Grid>
                             <TextBlock Text="{DynamicResource ReportButton}" Visibility="Hidden" />
                             <TextBlock Text="{DynamicResource ReportButtonBusy}" Visibility="Hidden" />
-                            <TextBlock Text="{Binding}" />
+                            <TextBlock HorizontalAlignment="Center" Text="{Binding}" />
                         </Grid>
                     </DataTemplate>
                 </Setter.Value>
@@ -74,7 +74,7 @@
                                 <TextBlock Text="{DynamicResource UploadButton}" />
                                 <TextBlock Text=" (99)" />
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal">
+                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                                 <TextBlock Text="{Binding}" />
                                 <TextBlock Text="{Binding DataContext.PendingReportsSuffix, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}">
                                     <TextBlock.Style>

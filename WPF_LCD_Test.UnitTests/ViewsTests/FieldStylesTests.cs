@@ -402,6 +402,44 @@ namespace WPF_LCD_Test.UnitTests.ViewsTests
                 });
             }
 
+        /// <summary>The content template a style of MeasurementView.xaml gives to its buttons, taken from the file as it is.</summary>
+        private static DataTemplate ContentTemplateOf(string styleKey, [System.Runtime.CompilerServices.CallerFilePath] string testFile = "")
+            {
+            var file = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(testFile)!, "..", "..", "WPF LCD Test", "Views", "MeasurementView.xaml"));
+            var style = System.Xml.Linq.XDocument.Load(file).Descendants()
+                .First(e => e.Name.LocalName == "Style" && e.Attributes().Any(a => a.Name.LocalName == "Key" && a.Value == styleKey));
+            var template = style.Descendants().First(e => e.Name.LocalName == "DataTemplate");
+            return (DataTemplate)System.Windows.Markup.XamlReader.Parse(template.ToString());
+            }
+
+        [TestCase("CreateReportButtonStyle", "Done")]
+        [TestCase("CreateReportButtonStyle", "Processing...")]
+        [TestCase("UploadReportsButtonStyle", "Uploading...")]
+        [TestCase("UploadReportsButtonStyle", "Uploaded")]
+        public void ButtonWithReservedRoom_CentersAShorterText(string styleKey, string shown)
+            {
+            Ui(() =>
+                {
+                var resources = new ResourceDictionary
+                    {
+                    ["ReportButton"] = "Create report",
+                    ["ReportButtonBusy"] = "Processing...",
+                    ["UploadButton"] = "Upload reports",
+                    ["UploadButtonBusy"] = "Uploading..."
+                    };
+                var button = new Button { Style = (Style)_resources["ActionButtonStyle"], ContentTemplate = ContentTemplateOf(styleKey), Content = shown, HorizontalAlignment = HorizontalAlignment.Left };
+                var host = new StackPanel { Resources = resources, Children = { button } };
+                var window = Show(host);
+
+                var text = Descendants<TextBlock>(button).First(t => t.Visibility == Visibility.Visible && t.Text == shown);
+                var box = text.TransformToAncestor(button).TransformBounds(new Rect(0, 0, text.ActualWidth, text.ActualHeight));
+                double left = box.Left, right = button.ActualWidth - box.Right;
+                window.Close();
+
+                Assert.That(left, Is.EqualTo(right).Within(2), $"the text \"{shown}\" has {left:0.#} px on the left and {right:0.#} px on the right");
+                });
+            }
+
         [Test]
         public void ComboBox_TheGrowingLineHasTheThicknessOfTheUnderline()
             {

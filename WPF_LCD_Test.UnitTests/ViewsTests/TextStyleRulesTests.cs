@@ -116,6 +116,22 @@ namespace WPF_LCD_Test.UnitTests.ViewsTests
             }
 
         [Test]
+        public void TemplatesThatReserveRoomForSeveralTexts_CenterTheShownText()
+            {
+            // A button that is as wide as its longest text holds the invisible copies of every text and the shown one in one cell:
+            // the shown one must be centered, or a shorter text sticks to the left edge.
+            var uncentered = Pages()
+                .SelectMany(p => p.Document.Descendants().Where(e => e.Name.LocalName == "DataTemplate").Select(e => (p.File, Template: e)))
+                .Where(t => t.Template.Descendants().Any(e => (string?)e.Attribute("Visibility") == "Hidden"))
+                .SelectMany(t => t.Template.Descendants().Where(e => e.Parent?.Name.LocalName == "Grid" && e.Parent.Parent == t.Template
+                    && (string?)e.Attribute("Visibility") != "Hidden"
+                    && (string?)e.Attribute("HorizontalAlignment") != "Center")
+                    .Select(e => $"{t.File}: {e.Name.LocalName} {e.Attribute("Text")?.Value}"));
+
+            Assert.That(uncentered, Is.Empty, "the shown text of a template with reserved room needs HorizontalAlignment=\"Center\"");
+            }
+
+        [Test]
         public void FieldsOfThePages_UseTheSharedStyles()
             {
             var fields = Pages()
