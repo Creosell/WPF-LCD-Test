@@ -58,7 +58,7 @@
 
     <system:String x:Key="ResultsTab">Результаты</system:String>
     <system:String x:Key="LogTab">Журнал</system:String>
-    <system:String x:Key="ResultsColumnTries">Попыт.</system:String>
+    <system:String x:Key="ResultsColumnTries">Поп.</system:String>
     <system:String x:Key="ResultsColumnPoint">Точка</system:String>
 
     <!--  Device info panel  -->

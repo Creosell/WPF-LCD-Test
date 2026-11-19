@@ -361,7 +361,7 @@
     <value>Папка конфигураций не найдена: {0}</value>
   </data>
   <data name="ChooseConfiguration" xml:space="preserve">
-    <value>Выберите конфигурацию…</value>
+    <value>Выберите…</value>
   </data>
   <data name="LvIsTooHigh" xml:space="preserve">
     <value>Яркость чёрного неожиданно высокая, проверьте положение цветового анализатора</value>
