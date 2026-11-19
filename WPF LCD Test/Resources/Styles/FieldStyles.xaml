@@ -9,6 +9,11 @@
         Pages take these styles instead of drawing the controls on their own.
     -->
 
+    <!--  The text of a label: the primary text color of the theme, so a page does not set it label by label  -->
+    <Style BasedOn="{StaticResource {x:Type Label}}" TargetType="Label">
+        <Setter Property="Foreground" Value="{DynamicResource AppTextPrimary}" />
+    </Style>
+
     <!--  The text size of the pages  -->
     <sys:Double x:Key="AppFontSize">15</sys:Double>
 
@@ -24,6 +29,7 @@
     <!--  A text field on an underline: on hover and on focus a line of the primary color of the theme grows over the underline from its center  -->
     <Style x:Key="UnderlinedTextBoxStyle" TargetType="TextBox">
         <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="Foreground" Value="{DynamicResource AppTextPrimary}" />
         <Setter Property="Padding" Value="0,4" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="CaretBrush" Value="{DynamicResource AppTextPrimary}" />
@@ -147,6 +153,7 @@
         <Setter Property="BorderBrush" Value="{DynamicResource AppFieldLine}" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="Foreground" Value="{DynamicResource AppTextPrimary}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">

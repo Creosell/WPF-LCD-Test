@@ -560,8 +560,7 @@
                     <StackPanel Orientation="Horizontal">
                         <Label
                             VerticalAlignment="Center"
-                            Content="{DynamicResource DeviceConfiguration}"
-                            Foreground="{DynamicResource AppTextPrimary}" />
+                            Content="{DynamicResource DeviceConfiguration}" />
                         <Grid Margin="5" VerticalAlignment="Center">
                             <Button
                                 x:Name="DeviceConfigurationButton"
@@ -569,7 +568,6 @@
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 Click="DeviceConfigurationButton_Click"
-                                Foreground="{DynamicResource AppTextPrimary}"
                                 Style="{StaticResource UnderlinedDropdownButtonStyle}"
                                 Tag="{Binding}">
                                 <Button.ContextMenu>
@@ -637,15 +635,13 @@
                     <StackPanel Margin="0,5,30,5" Orientation="Horizontal">
                         <Label
                             VerticalAlignment="Center"
-                            Content="{DynamicResource SerialNumber}"
-                            Foreground="{DynamicResource AppTextPrimary}" />
+                            Content="{DynamicResource SerialNumber}" />
                         <Grid Margin="5" VerticalAlignment="Center">
                             <TextBox
                                 x:Name="SerialNumberTextBox"
                                 MinWidth="200"
                                 Margin="0"
                                 VerticalAlignment="Center"
-                                Foreground="{DynamicResource AppTextPrimary}"
                                 LostFocus="SerialNumberTextBox_LostFocus"
                                 Style="{StaticResource UnderlinedTextBoxStyle}"
                                 Text="{Binding SerialNumber, UpdateSourceTrigger=Explicit}">
@@ -669,7 +665,7 @@
                 </Grid>
                 <Grid Grid.Row="3">
                     <StackPanel Margin="0,5,30,5" Orientation="Horizontal">
-                        <Label Content="{DynamicResource TV}" Foreground="{DynamicResource AppTextPrimary}" />
+                        <Label Content="{DynamicResource TV}" />
                         <CheckBox Margin="5" IsChecked="{Binding IsTvCheckboxChecked}" />
                     </StackPanel>
                 </Grid>

@@ -39,8 +39,7 @@
                 <Label
                     Width="200"
                     VerticalAlignment="Center"
-                    Content="{DynamicResource LanguageMenu}"
-                    Foreground="{DynamicResource AppTextPrimary}" />
+                    Content="{DynamicResource LanguageMenu}" />
                 <ComboBox
                     Style="{StaticResource UnderlinedComboBoxStyle}"
                     DropDownClosed="ComboBox_DropDownClosed"
@@ -55,8 +54,7 @@
                 <Label
                     Width="200"
                     VerticalAlignment="Center"
-                    Content="{DynamicResource ThemeLabel}"
-                    Foreground="{DynamicResource AppTextPrimary}" />
+                    Content="{DynamicResource ThemeLabel}" />
                 <ComboBox
                     Style="{StaticResource UnderlinedComboBoxStyle}"
                     DisplayMemberPath="DisplayName"
@@ -69,8 +67,7 @@
                 <Label
                     Width="200"
                     VerticalAlignment="Center"
-                    Content="{DynamicResource ColorAnalyzerChannel}"
-                    Foreground="{DynamicResource AppTextPrimary}" />
+                    Content="{DynamicResource ColorAnalyzerChannel}" />
                 <TextBox
                     Style="{StaticResource UnderlinedTextBoxStyle}"
                     x:Name="ColorAnalyzerChannelTextBox"
@@ -79,7 +76,6 @@
                     VerticalAlignment="Center"
                     HorizontalContentAlignment="Center"
                     VerticalContentAlignment="Center"
-                    Foreground="{DynamicResource AppTextPrimary}"
                     Text="{Binding ColorAnalyzerChannel, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     TextAlignment="Center" />
             </StackPanel>
@@ -88,8 +84,7 @@
                 <Label
                     Width="200"
                     VerticalAlignment="Center"
-                    Content="{DynamicResource MeasurementSpeedLabel}"
-                    Foreground="{DynamicResource AppTextPrimary}" />
+                    Content="{DynamicResource MeasurementSpeedLabel}" />
                 <ComboBox
                     Style="{StaticResource UnderlinedComboBoxStyle}"
                     DropDownClosed="ComboBox_DropDownClosed"
@@ -101,8 +96,7 @@
                 <Label
                     Width="200"
                     VerticalAlignment="Center"
-                    Content="{DynamicResource SyncModeLabel}"
-                    Foreground="{DynamicResource AppTextPrimary}" />
+                    Content="{DynamicResource SyncModeLabel}" />
                 <ComboBox
                     Style="{StaticResource UnderlinedComboBoxStyle}"
                     DropDownClosed="ComboBox_DropDownClosed"
@@ -118,14 +112,12 @@
                         VerticalAlignment="Center"
                         HorizontalContentAlignment="Center"
                         VerticalContentAlignment="Center"
-                        Foreground="{DynamicResource AppTextPrimary}"
                         Text="{Binding SyncFrequency, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         TextAlignment="Center"
                         ToolTip="{Binding SyncFrequencyHint}" />
                     <Label
                         VerticalAlignment="Center"
-                        Content="Hz"
-                        Foreground="{DynamicResource AppTextPrimary}" />
+                        Content="Hz" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Visibility="{Binding IsIntegrationTimeVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TextBox
@@ -135,14 +127,12 @@
                         VerticalAlignment="Center"
                         HorizontalContentAlignment="Center"
                         VerticalContentAlignment="Center"
-                        Foreground="{DynamicResource AppTextPrimary}"
                         Text="{Binding IntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         TextAlignment="Center"
                         ToolTip="{Binding IntegrationTimeHint}" />
                     <Label
                         VerticalAlignment="Center"
-                        Content="ms"
-                        Foreground="{DynamicResource AppTextPrimary}" />
+                        Content="ms" />
                 </StackPanel>
             </StackPanel>
 

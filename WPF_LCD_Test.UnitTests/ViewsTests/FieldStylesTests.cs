@@ -379,6 +379,30 @@ namespace WPF_LCD_Test.UnitTests.ViewsTests
             }
 
         [Test]
+        public void ControlsOfOneRow_ShareTheTypeOfTheText()
+            {
+            Ui(() =>
+                {
+                var page = new UserControl { FontSize = (double)_resources["AppFontSize"] };
+                page.SetResourceReference(Control.ForegroundProperty, "AppTextPrimary");
+                var label = new Label { Content = "Label" };
+                var box = new TextBox { Style = (Style)_resources["UnderlinedTextBoxStyle"], Text = "Field" };
+                var combo = NewFitComboBox("Option");
+                var dropdown = new Button { Style = (Style)_resources["UnderlinedDropdownButtonStyle"], Content = "Dropdown" };
+                page.Content = new StackPanel { Children = { label, box, combo, dropdown } };
+                var window = Show(page);
+
+                Control[] controls = [label, box, combo, dropdown];
+                var looks = controls
+                    .Select(c => (c.GetType().Name, Look: $"{c.FontFamily.Source} {c.FontSize} {c.FontWeight} {(c.Foreground as SolidColorBrush)?.Color}"))
+                    .ToList();
+                window.Close();
+
+                Assert.That(looks.Select(l => l.Look).Distinct().Count(), Is.EqualTo(1), string.Join("; ", looks.Select(l => $"{l.Name}: {l.Look}")));
+                });
+            }
+
+        [Test]
         public void ComboBox_TheGrowingLineHasTheThicknessOfTheUnderline()
             {
             Ui(() =>
