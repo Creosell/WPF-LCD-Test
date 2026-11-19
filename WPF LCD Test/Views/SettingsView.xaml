@@ -38,6 +38,7 @@
             <StackPanel Margin="0,5" Orientation="Horizontal">
                 <Label
                     Width="200"
+                    VerticalAlignment="Center"
                     Content="{DynamicResource LanguageMenu}"
                     Foreground="{DynamicResource AppTextPrimary}" />
                 <ComboBox
@@ -54,6 +55,7 @@
             <StackPanel Margin="0,5" Orientation="Horizontal">
                 <Label
                     Width="200"
+                    VerticalAlignment="Center"
                     Content="{DynamicResource ThemeLabel}"
                     Foreground="{DynamicResource AppTextPrimary}" />
                 <ComboBox
@@ -68,13 +70,14 @@
             <StackPanel Margin="0,5" Orientation="Horizontal">
                 <Label
                     Width="200"
+                    VerticalAlignment="Center"
                     Content="{DynamicResource ColorAnalyzerChannel}"
                     Foreground="{DynamicResource AppTextPrimary}" />
                 <TextBox
                     Style="{StaticResource UnderlinedTextBoxStyle}"
                     x:Name="ColorAnalyzerChannelTextBox"
                     MinWidth="30"
-                    Margin="5"
+                    Margin="0,5"
                     VerticalAlignment="Center"
                     HorizontalContentAlignment="Center"
                     VerticalContentAlignment="Center"
@@ -86,6 +89,7 @@
             <StackPanel Margin="0,5" Orientation="Horizontal">
                 <Label
                     Width="200"
+                    VerticalAlignment="Center"
                     Content="{DynamicResource MeasurementSpeedLabel}"
                     Foreground="{DynamicResource AppTextPrimary}" />
                 <ComboBox
@@ -99,6 +103,7 @@
             <StackPanel Margin="0,5" Orientation="Horizontal">
                 <Label
                     Width="200"
+                    VerticalAlignment="Center"
                     Content="{DynamicResource SyncModeLabel}"
                     Foreground="{DynamicResource AppTextPrimary}" />
                 <ComboBox
@@ -111,7 +116,7 @@
                     SelectedValuePath="Mode" />
                 <StackPanel Orientation="Horizontal" Visibility="{Binding IsSyncFrequencyVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TextBox
-                    Style="{StaticResource UnderlinedTextBoxStyle}"
+                        Style="{StaticResource UnderlinedTextBoxStyle}"
                         MinWidth="50"
                         Margin="10,5,0,5"
                         VerticalAlignment="Center"
@@ -128,7 +133,7 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Visibility="{Binding IsIntegrationTimeVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TextBox
-                    Style="{StaticResource UnderlinedTextBoxStyle}"
+                        Style="{StaticResource UnderlinedTextBoxStyle}"
                         MinWidth="50"
                         Margin="10,5,0,5"
                         VerticalAlignment="Center"
