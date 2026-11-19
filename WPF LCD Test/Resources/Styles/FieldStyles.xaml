@@ -268,9 +268,15 @@
                             </Border.RenderTransform>
                         </Border>
                         <ToggleButton
+                            MinWidth="0"
+                            MinHeight="0"
+                            Margin="0"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
                             Background="Transparent"
                             ClickMode="Press"
                             Focusable="False"
+                            Style="{x:Null}"
                             IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
                             <ToggleButton.Template>
                                 <ControlTemplate TargetType="ToggleButton">

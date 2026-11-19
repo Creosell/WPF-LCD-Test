@@ -275,6 +275,32 @@ namespace WPF_LCD_Test.UnitTests.ViewsTests
                 });
             }
 
+        [TestCase(3)]
+        [TestCase(40)]
+        [TestCase(100)]
+        [TestCase(160)]
+        [TestCase(197)]
+        public void ComboBox_EveryPointOfTheFieldOpensTheList(double x)
+            {
+            Ui(() =>
+                {
+                var combo = NewComboBox();
+                var window = Show(combo);
+
+                var hit = VisualTreeHelper.HitTest(combo, new Point(x, combo.ActualHeight / 2))?.VisualHit;
+                bool onToggle = false;
+                for (var current = hit; current != null && !ReferenceEquals(current, combo); current = VisualTreeHelper.GetParent(current))
+                    {
+                    onToggle |= current is System.Windows.Controls.Primitives.ToggleButton;
+                    }
+                var toggle = Descendants<System.Windows.Controls.Primitives.ToggleButton>(combo).First();
+                var size = (toggle.ActualWidth, toggle.ActualHeight, combo.ActualWidth, combo.ActualHeight);
+                window.Close();
+
+                Assert.That(onToggle, $"a click at x={x} reaches the toggle that opens the list (toggle, combo sizes: {size}); it hit {hit?.GetType().Name}");
+                });
+            }
+
         [Test]
         public void ComboBox_TheGrowingLineHasTheThicknessOfTheUnderline()
             {

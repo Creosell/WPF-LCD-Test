@@ -18,6 +18,7 @@ namespace WPF_LCD_Test.DebugTools
         private const int MaxLabelLength = 40;
         private static readonly ConditionalWeakTable<object, object> Hooked = new();
         private static bool _installed;
+        private static RoutedEventArgs? _lastEvent;
 
         /// <summary>
         /// Starts tracing the user interface events of the application, the errors that nobody handles and the failed bindings.
@@ -28,10 +29,13 @@ namespace WPF_LCD_Test.DebugTools
             _installed = true;
 
             Handle<UIElement>(Mouse.PreviewMouseDownEvent, new MouseButtonEventHandler((_, e) =>
-                DebugTrace.Write("ui", $"mouse {e.ChangedButton} down on {Describe(Target(e.OriginalSource))} (hit {e.OriginalSource.GetType().Name}){(e.ClickCount > 1 ? $" x{e.ClickCount}" : "")}")));
+                {
+                if (!First(e)) return;
+                DebugTrace.Write("ui", $"mouse {e.ChangedButton} down on {Describe(Target(e.OriginalSource))} (hit {e.OriginalSource.GetType().Name}){(e.ClickCount > 1 ? $" x{e.ClickCount}" : "")}");
+                }));
             Handle<UIElement>(Keyboard.PreviewKeyDownEvent, new KeyEventHandler((_, e) =>
                 {
-                if (e.IsRepeat) return;
+                if (e.IsRepeat || !First(e)) return;
                 DebugTrace.Write("ui", $"key {Modifiers()}{(e.Key == Key.System ? e.SystemKey : e.Key)} in {Describe(Keyboard.FocusedElement)}");
                 }));
             Handle<ButtonBase>(ButtonBase.ClickEvent, new RoutedEventHandler((s, _) => DebugTrace.Write("ui", $"click {Describe(s)}")));
@@ -60,6 +64,17 @@ namespace WPF_LCD_Test.DebugTools
             PresentationTraceSources.Refresh();
             PresentationTraceSources.DataBindingSource.Listeners.Add(new BindingErrorListener());
             PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Warning;
+            }
+
+        /// <summary>
+        /// A class handler runs for every element on the route of an event; true only for the first of them.
+        /// </summary>
+        private static bool First(RoutedEventArgs e)
+            {
+            if (ReferenceEquals(_lastEvent, e)) return false;
+
+            _lastEvent = e;
+            return true;
             }
 
         private static void Handle<T>(RoutedEvent routedEvent, Delegate handler) =>
