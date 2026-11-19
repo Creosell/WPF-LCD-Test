@@ -479,6 +479,21 @@ namespace WPF_LCD_Test.UnitTests.ViewsTests
             }
 
         [Test]
+        public void ActionButton_HasNoOutline()
+            {
+            Ui(() =>
+                {
+                var button = new Button { Style = (Style)_resources["ActionButtonStyle"], Content = "Save" };
+                var window = Show(button);
+
+                var thickness = button.BorderThickness;
+                window.Close();
+
+                Assert.That(thickness, Is.EqualTo(new Thickness(0)), "the border of Material is purple and would frame the breathing green fill");
+                });
+            }
+
+        [Test]
         public void ComboBox_TheGrowingLineHasTheThicknessOfTheUnderline()
             {
             Ui(() =>

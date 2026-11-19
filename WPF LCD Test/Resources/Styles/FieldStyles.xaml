@@ -17,12 +17,13 @@
     <!--  The text size of the pages  -->
     <sys:Double x:Key="AppFontSize">15</sys:Double>
 
-    <!--  A rounded button of an action (Save, Create report, ...)  -->
+    <!--  A rounded button of an action (Save, Create report, ...): no outline, so the breathing fill is not framed by the purple border of Material  -->
     <Style
         x:Key="ActionButtonStyle"
         BasedOn="{StaticResource {x:Type Button}}"
         TargetType="Button">
         <Setter Property="Margin" Value="5" />
+        <Setter Property="BorderThickness" Value="0" />
         <Setter Property="MaterialDesign:ButtonAssist.CornerRadius" Value="15" />
     </Style>
 
