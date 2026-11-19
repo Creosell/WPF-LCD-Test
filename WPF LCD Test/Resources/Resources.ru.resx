@@ -118,28 +118,28 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="BadConnection" xml:space="preserve">
-    <value>Не удалось подключиться. Перезапустите цветовой анализатор</value>
+    <value>Нет связи. Перезапустите анализатор</value>
   </data>
   <data name="CalibratingZeroCA" xml:space="preserve">
     <value>Калибровка нуля...</value>
   </data>
   <data name="CheckConnectionCA" xml:space="preserve">
-    <value>Проверьте подключение цветового анализатора. Перезагрузите его и повторите калибровку нуля</value>
+    <value>Проверьте анализатор: перезагрузите его и повторите калибровку нуля</value>
   </data>
   <data name="CheckProbe" xml:space="preserve">
-    <value>Проверьте зонд! Возможно, нужно переключить режим с 0-CAL на MEAS</value>
+    <value>Проверьте зонд: переключите режим с 0-CAL на MEAS</value>
   </data>
   <data name="CleanFieldWarning" xml:space="preserve">
-    <value>Вы уверены, что хотите очистить все поля?</value>
+    <value>Очистить все поля?</value>
   </data>
   <data name="CleanFieldWarningAfterSave" xml:space="preserve">
-    <value>Результаты сохранены. Очистить все поля?</value>
+    <value>Результаты сохранены. Очистить поля?</value>
   </data>
   <data name="ConnectedCA" xml:space="preserve">
     <value>Подключено</value>
   </data>
   <data name="ConnectingCA" xml:space="preserve">
-    <value>Подключение к цветовому анализатору...</value>
+    <value>Подключение...</value>
   </data>
   <data name="CurrentSN" xml:space="preserve">
     <value>Текущий SN: {0}</value>
@@ -157,16 +157,16 @@
     <value>Не удалось сменить язык</value>
   </data>
   <data name="ErrorAtMeasuringIteration" xml:space="preserve">
-    <value>Ошибка измерения на итерации </value>
+    <value>Ошибка на итерации </value>
   </data>
   <data name="ErrUnexpected" xml:space="preserve">
-    <value>Произошла непредвиденная ошибка: {0}</value>
+    <value>Непредвиденная ошибка: {0}</value>
   </data>
   <data name="FillSN" xml:space="preserve">
-    <value>Сначала введите SN!</value>
+    <value>Введите SN!</value>
   </data>
   <data name="MakeZeroCalibration" xml:space="preserve">
-    <value>Сначала выполните калибровку нуля!</value>
+    <value>Сначала калибровка нуля!</value>
   </data>
   <data name="Measuring" xml:space="preserve">
     <value>Измерение...</value>
@@ -196,10 +196,10 @@
     <value>Калибровка нуля</value>
   </data>
   <data name="MeasurementTimeSec" xml:space="preserve">
-    <value>Время измерения (с):</value>
+    <value>Время (с):</value>
   </data>
   <data name="SerialNumber" xml:space="preserve">
-    <value>Серийный номер:</value>
+    <value>Серийный №:</value>
   </data>
   <data name="TopLeftPoint" xml:space="preserve">
     <value>1. Верхняя левая</value>
@@ -244,19 +244,19 @@
     <value>0. Чёрная</value>
   </data>
   <data name="SaveResultsButton" xml:space="preserve">
-    <value>Сохранить результаты</value>
+    <value>Сохранить</value>
   </data>
   <data name="ClearFieldsButton" xml:space="preserve">
-    <value>Очистить поля</value>
+    <value>Очистить</value>
   </data>
   <data name="ConnectionError" xml:space="preserve">
-    <value>Не удалось подключиться или подключение завершилось ошибкой</value>
+    <value>Ошибка подключения</value>
   </data>
   <data name="DisconnectedCA" xml:space="preserve">
     <value>Отключено</value>
   </data>
   <data name="MeasureWihoutConnectionError" xml:space="preserve">
-    <value>Сначала подключите цветовой анализатор</value>
+    <value>Сначала подключите анализатор</value>
   </data>
   <data name="LocalizationServiceResErr" xml:space="preserve">
     <value>Предупреждение службы локализации: ресурс с ключом не найден в .resx для культуры</value>
@@ -316,7 +316,7 @@
     <value>Непредвиденная ошибка измерения</value>
   </data>
   <data name="IncorrectFormatForSNErr" xml:space="preserve">
-    <value>Введите корректный серийный номер: латинские буквы и цифры</value>
+    <value>Серийный номер: только латиница и цифры</value>
   </data>
   <data name="AlreadyActivated" xml:space="preserve">
     <value>уже применён</value>
@@ -364,10 +364,10 @@
     <value>Выберите…</value>
   </data>
   <data name="LvIsTooHigh" xml:space="preserve">
-    <value>Яркость чёрного неожиданно высокая, проверьте положение цветового анализатора</value>
+    <value>Яркость чёрного слишком высокая, проверьте положение анализатора</value>
   </data>
   <data name="ErrMeasurementOutOfRange" xml:space="preserve">
-    <value>Измерение вне ожидаемого диапазона для этого цвета</value>
+    <value>Значение вне допустимого диапазона</value>
   </data>
   <data name="MeasurementValidationPassed" xml:space="preserve">
     <value>Проверка измерения пройдена</value>
@@ -376,7 +376,7 @@
     <value>Повторите измерение</value>
   </data>
   <data name="SaveNotCorrectResultQuestion" xml:space="preserve">
-    <value>Результат для этой точки по-прежнему выглядит некорректным. Сохранить его всё равно?</value>
+    <value>Результат по-прежнему некорректен. Сохранить?</value>
   </data>
   <data name="FailedMeasurementForLocation" xml:space="preserve">
     <value>Неудачное измерение точки</value>
@@ -421,7 +421,7 @@
     <value>Ошибка в фоновой задаче: {0}</value>
   </data>
   <data name="CantStartUpload" xml:space="preserve">
-    <value>Не удаётся начать выгрузку: неизвестно название устройства</value>
+    <value>Не удаётся начать выгрузку: неизвестно устройство</value>
   </data>
   <data name="ReportGenerationCanceled" xml:space="preserve">
     <value>Создание отчёта отменено</value>
@@ -442,16 +442,16 @@
     <value>Предупреждение: не удалось очистить {0}. Ошибка: {1}</value>
   </data>
   <data name="StartingParallelUploadOf" xml:space="preserve">
-    <value>Запуск параллельной выгрузки: {0} файлов</value>
+    <value>Параллельная выгрузка: {0} файлов</value>
   </data>
   <data name="UploadedSuccessfully" xml:space="preserve">
-    <value>Выгрузка завершена. Выгружено файлов: {0}</value>
+    <value>Выгружено файлов: {0}</value>
   </data>
   <data name="CopyOfUploadedArchivesInFolder" xml:space="preserve">
     <value>Копия выгруженных архивов отчётов в папке: {0}</value>
   </data>
   <data name="UploadFinishedWithFail" xml:space="preserve">
-    <value>Выгрузка завершена с ошибками. Файлов с ошибкой: {0}</value>
+    <value>Выгрузка с ошибками, файлов: {0}</value>
   </data>
   <data name="ArchiveFolderNotFound" xml:space="preserve">
     <value>Папка архивов не найдена в {0}</value>
@@ -487,16 +487,16 @@
     <value>Несовпадение канала</value>
   </data>
   <data name="ChannelMismatchMessage" xml:space="preserve">
-    <value>В прошлый раз этот зонд использовался на канале {0}, а сейчас в устройстве выбран канал {1}.</value>
+    <value>Зонд работал на канале {0}, в приборе выбран {1}.</value>
   </data>
   <data name="UseProbeChannel" xml:space="preserve">
-    <value>Использовать канал {0} зонда</value>
+    <value>Канал зонда {0}</value>
   </data>
   <data name="SyncSettingNotSupported" xml:space="preserve">
-    <value>Выбранная настройка синхронизации не поддерживается {0}, используется универсальная синхронизация</value>
+    <value>Синхронизация не поддерживается {0}, используется универсальная</value>
   </data>
   <data name="UseLastChannel" xml:space="preserve">
-    <value>Использовать прошлый канал {0}</value>
+    <value>Прошлый канал {0}</value>
   </data>
   <data name="ProbeSerialNumberLabel" xml:space="preserve">
     <value>S/N {0}</value>
@@ -505,13 +505,13 @@
     <value>Не подключён</value>
   </data>
   <data name="DeviceStateConnectedNotCalibrated" xml:space="preserve">
-    <value>Подключён (без калибровки)</value>
+    <value>Без калибровки</value>
   </data>
   <data name="DeviceStateConnectedCalibrated" xml:space="preserve">
-    <value>Подключён (откалиброван)</value>
+    <value>Откалиброван</value>
   </data>
   <data name="SpecVerdictFormat" xml:space="preserve">
-    <value>Спецификация: {0}</value>
+    <value>Спец.: {0}</value>
   </data>
   <data name="SpecVerdictPass" xml:space="preserve">
     <value>ПРОЙДЕНА</value>
@@ -520,22 +520,22 @@
     <value>ВНИМАНИЕ</value>
   </data>
   <data name="SpecVerdictFail" xml:space="preserve">
-    <value>НЕ ПРОЙДЕНА</value>
+    <value>ПРОВАЛ</value>
   </data>
   <data name="SpecNoIssuesYet" xml:space="preserve">
-    <value>замечаний пока нет</value>
+    <value>замечаний нет</value>
   </data>
   <data name="SpecPointsProgress" xml:space="preserve">
-    <value>{0} из {1} точек</value>
+    <value>{0} из {1}</value>
   </data>
   <data name="SpecWaitingFor" xml:space="preserve">
-    <value>Ожидаются: {0}</value>
+    <value>Ждём: {0}</value>
   </data>
   <data name="SpecSelectConfig" xml:space="preserve">
-    <value>Выберите конфигурацию устройства, чтобы сверять измерения с её спецификацией</value>
+    <value>Выберите конфигурацию для проверки по спецификации</value>
   </data>
   <data name="SpecUnavailable" xml:space="preserve">
-    <value>Проверка по спецификации недоступна: {0}</value>
+    <value>Проверка недоступна: {0}</value>
   </data>
   <data name="SpecBound_min" xml:space="preserve">
     <value>мин</value>
@@ -547,25 +547,25 @@
     <value>макс</value>
   </data>
   <data name="SpecGamutArea" xml:space="preserve">
-    <value>Площадь охвата {0} ({1})</value>
+    <value>Охват {0} ({1})</value>
   </data>
   <data name="SpecGamutCoverage" xml:space="preserve">
-    <value>Покрытие охвата {0} ({1})</value>
+    <value>Покрытие {0} ({1})</value>
   </data>
   <data name="SpecMetric_Brightness" xml:space="preserve">
     <value>Яркость (кд/м²)</value>
   </data>
   <data name="SpecMetric_Black_luminance" xml:space="preserve">
-    <value>Яркость чёрного (кд/м²)</value>
+    <value>Чёрный (кд/м²)</value>
   </data>
   <data name="SpecMetric_Brightness_uniformity" xml:space="preserve">
-    <value>Равномерность яркости (%)</value>
+    <value>Равномерность (%)</value>
   </data>
   <data name="SpecMetric_Contrast" xml:space="preserve">
     <value>Контрастность</value>
   </data>
   <data name="SpecMetric_Temperature" xml:space="preserve">
-    <value>Цветовая температура (К)</value>
+    <value>Температура (К)</value>
   </data>
   <data name="SpecMetric_Delta_e" xml:space="preserve">
     <value>ΔE</value>
@@ -646,36 +646,36 @@
     <value>попытка {0}</value>
   </data>
   <data name="SpecRepeatRecommended" xml:space="preserve">
-    <value>Повторите измерение</value>
+    <value>Повторите</value>
   </data>
   <data name="SaveSpecHeader" xml:space="preserve">
-    <value>Некоторые значения не соответствуют спецификации:</value>
+    <value>Есть отклонения от спецификации:</value>
   </data>
   <data name="SaveSpecHeaderFewAttempts" xml:space="preserve">
-    <value>Некоторые значения не соответствуют спецификации, а часть точек измерена меньше 3 раз:</value>
+    <value>Есть отклонения, часть точек измерена менее 3 раз:</value>
   </data>
   <data name="SaveSpecRemeasureHint" xml:space="preserve">
-    <value>Измерьте эти точки ещё раз, чтобы получить более надёжный результат.</value>
+    <value>Измерьте их повторно.</value>
   </data>
   <data name="SaveNotFullNote" xml:space="preserve">
-    <value>Выполнены не все измерения.</value>
+    <value>Измерены не все точки.</value>
   </data>
   <data name="CloseUnsavedQuestion" xml:space="preserve">
-    <value>Измерения текущего устройства не сохранены.
+    <value>Измерения не сохранены.
 
-Всё равно закрыть приложение?</value>
+Закрыть приложение?</value>
   </data>
   <data name="SaveProblemBelowMin" xml:space="preserve">
-    <value>{0} — {1}, ниже минимума {2}</value>
+    <value>{0} — {1}, ниже мин. {2}</value>
   </data>
   <data name="SaveProblemAboveMax" xml:space="preserve">
-    <value>{0} — {1}, выше максимума {2}</value>
+    <value>{0} — {1}, выше макс. {2}</value>
   </data>
   <data name="SaveProblemBelowTyp" xml:space="preserve">
-    <value>{0} — {1}, ниже рекомендуемого {2}</value>
+    <value>{0} — {1}, ниже типового {2}</value>
   </data>
   <data name="SaveProblemAboveTyp" xml:space="preserve">
-    <value>{0} — {1}, выше рекомендуемого {2}</value>
+    <value>{0} — {1}, выше типового {2}</value>
   </data>
   <data name="SaveProblemPoint" xml:space="preserve">
     <value>{0}: {1} ({2})</value>
@@ -684,7 +684,7 @@
     <value>измерена один раз</value>
   </data>
   <data name="SaveProblemMeasuredTimes" xml:space="preserve">
-    <value>измерений: {0}</value>
+    <value>{0} изм.</value>
   </data>
   <data name="ThemeDark" xml:space="preserve">
     <value>Тёмная</value>
@@ -693,19 +693,19 @@
     <value>Светлая</value>
   </data>
   <data name="ThemeSystem" xml:space="preserve">
-    <value>Системная (Windows)</value>
+    <value>Системная</value>
   </data>
   <data name="SaveSpecQuestion" xml:space="preserve">
-    <value>Всё равно сохранить результаты?</value>
+    <value>Всё равно сохранить?</value>
   </data>
   <data name="AllowedRange" xml:space="preserve">
-    <value>Допустимый диапазон: {0}</value>
+    <value>Диапазон: {0}</value>
   </data>
   <data name="InvalidChannelFormat" xml:space="preserve">
-    <value>Неверный формат канала</value>
+    <value>Неверный канал</value>
   </data>
   <data name="AvailableChannels" xml:space="preserve">
-    <value>Доступные каналы: {0}-{1}</value>
+    <value>Каналы: {0}-{1}</value>
   </data>
   <data name="NotAvailable" xml:space="preserve">
     <value>н/д</value>

@@ -8,16 +8,16 @@
 
     <!--  MeasurementView keys  -->
     <system:String x:Key="TV">ТВ</system:String>
-    <system:String x:Key="DeviceConfiguration">Конфигурация устройства</system:String>
-    <system:String x:Key="BadConnection">Не удалось подключиться. Перезапустите цветовой анализатор</system:String>
+    <system:String x:Key="DeviceConfiguration">Конфигурация</system:String>
+    <system:String x:Key="BadConnection">Нет связи. Перезапустите анализатор</system:String>
     <system:String x:Key="English">English</system:String>
     <system:String x:Key="Chinese">中文</system:String>
     <system:String x:Key="ZeroCalibration">Калибровка нуля</system:String>
     <system:String x:Key="DeviceCardNoAnalyzer">Нет анализатора</system:String>
-    <system:String x:Key="DeviceCardPressCalibration">Нажмите «Калибровка нуля»</system:String>
+    <system:String x:Key="DeviceCardPressCalibration">Откалибруйте ноль</system:String>
     <system:String x:Key="DeviceCardCalibrating">Калибровка…</system:String>
-    <system:String x:Key="MeasurementTimeSec">Время измерения (с):</system:String>
-    <system:String x:Key="SerialNumber">Серийный номер:</system:String>
+    <system:String x:Key="MeasurementTimeSec">Время (с):</system:String>
+    <system:String x:Key="SerialNumber">Серийный №:</system:String>
     <system:String x:Key="TopLeftPoint">1. Верхняя левая</system:String>
     <system:String x:Key="TopCenterPoint">2. Верхняя центр.</system:String>
     <system:String x:Key="TopRightPoint">3. Верхняя правая</system:String>
@@ -34,14 +34,14 @@
     <system:String x:Key="BluePoint">B. Синяя</system:String>
     <system:String x:Key="WhitePoint">W. Белая</system:String>
     <system:String x:Key="BlackPoint">0. Чёрная</system:String>
-    <system:String x:Key="SaveResultsButton">Сохранить результаты</system:String>
-    <system:String x:Key="ClearFieldsButton">Очистить результаты</system:String>
-    <system:String x:Key="NewDeviceUnderTestButton">Сохранить результаты</system:String>
-    <system:String x:Key="CopyLogWindow">Копировать журнал</system:String>
-    <system:String x:Key="ClearLogWindow">Очистить журнал</system:String>
+    <system:String x:Key="SaveResultsButton">Сохранить</system:String>
+    <system:String x:Key="ClearFieldsButton">Очистить</system:String>
+    <system:String x:Key="NewDeviceUnderTestButton">Сохранить</system:String>
+    <system:String x:Key="CopyLogWindow">Копировать</system:String>
+    <system:String x:Key="ClearLogWindow">Очистить</system:String>
     <system:String x:Key="ReportButtonBusy">Создание...</system:String>
     <system:String x:Key="UploadButtonBusy">Выгрузка...</system:String>
-    <system:String x:Key="CancelOnClickToolTip">Нажмите ещё раз, чтобы отменить</system:String>
+    <system:String x:Key="CancelOnClickToolTip">Нажмите ещё раз для отмены</system:String>
     <system:String x:Key="FeedbackReset">Сброшено</system:String>
     <system:String x:Key="FeedbackSaved">Сохранено</system:String>
     <system:String x:Key="FeedbackCleared">Очищено</system:String>
@@ -54,7 +54,7 @@
     <system:String x:Key="DialogNo">Нет</system:String>
     <system:String x:Key="DialogOk">OK</system:String>
     <system:String x:Key="ReportButton">Создать отчёт</system:String>
-    <system:String x:Key="UploadButton">Выгрузить отчёты</system:String>
+    <system:String x:Key="UploadButton">Выгрузить</system:String>
 
     <system:String x:Key="ResultsTab">Результаты</system:String>
     <system:String x:Key="LogTab">Журнал</system:String>
@@ -62,17 +62,17 @@
     <system:String x:Key="ResultsColumnPoint">Точка</system:String>
 
     <!--  Device info panel  -->
-    <system:String x:Key="SpecPanelTitle">Данные устройства</system:String>
+    <system:String x:Key="SpecPanelTitle">Устройство</system:String>
     <system:String x:Key="SpecColumnParameter">Параметр</system:String>
     <system:String x:Key="SpecColumnValue">Значение</system:String>
     <system:String x:Key="SpecColumnSpec">Спец.</system:String>
 
     <!--  SettingsView keys  -->
-    <system:String x:Key="ColorAnalyzerChannel">Канал анализатора</system:String>
-    <system:String x:Key="MeasurementSpeedLabel">Скорость измерения</system:String>
-    <system:String x:Key="SyncModeLabel">Режим синхронизации</system:String>
+    <system:String x:Key="ColorAnalyzerChannel">Канал</system:String>
+    <system:String x:Key="MeasurementSpeedLabel">Скорость</system:String>
+    <system:String x:Key="SyncModeLabel">Синхронизация</system:String>
     <system:String x:Key="SaveButton">Сохранить</system:String>
-    <system:String x:Key="ResetToDefaultButton">Сбросить по умолчанию</system:String>
+    <system:String x:Key="ResetToDefaultButton">Сбросить</system:String>
 
     <!--  Window buttons, units  -->
     <system:String x:Key="WindowMinimize">Свернуть</system:String>
