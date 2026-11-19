@@ -131,6 +131,81 @@ namespace WPF_LCD_Test.UnitTests.ViewsTests
             Assert.That(uncentered, Is.Empty, "the shown text of a template with reserved room needs HorizontalAlignment=\"Center\"");
             }
 
+        /// <summary>The resource keys of the invisible texts a template reserves room for.</summary>
+        private static HashSet<string> ReservedKeys(XElement template) =>
+            template.Descendants()
+                .Where(e => (string?)e.Attribute("Visibility") == "Hidden")
+                .SelectMany(e => e.DescendantsAndSelf().Select(x => (string?)x.Attribute("Text")))
+                .Select(text => System.Text.RegularExpressions.Regex.Match(text ?? "", @"^\{DynamicResource (\w+)\}$"))
+                .Where(m => m.Success)
+                .Select(m => m.Groups[1].Value)
+                .ToHashSet();
+
+        /// <summary>The content template a button uses: its own, or the one of its style.</summary>
+        private static XElement? ContentTemplateOf(XDocument page, XElement button)
+            {
+            static string? Key(string? reference) =>
+                System.Text.RegularExpressions.Regex.Match(reference ?? "", @"^\{StaticResource (\w+)\}$") is { Success: true } m ? m.Groups[1].Value : null;
+
+            XElement? Resource(string? key) => key == null ? null : page.Descendants().FirstOrDefault(e => e.Attributes().Any(a => a.Name.LocalName == "Key" && a.Value == key));
+
+            if (Resource(Key((string?)button.Attribute("ContentTemplate"))) is { } own) return own;
+
+            var style = Resource(Key((string?)button.Attribute("Style")));
+            return style?.Descendants().FirstOrDefault(e => e.Name.LocalName == "Setter" && (string?)e.Attribute("Property") == "ContentTemplate")
+                ?.Descendants().FirstOrDefault(e => e.Name.LocalName == "DataTemplate");
+            }
+
+        [Test]
+        public void ButtonsThatShowAnOutcome_ReserveRoomForEveryTextTheyCanShow()
+            {
+            // The label, the outcome that follows a success and the failure and the cancel texts: the width of the button must not change
+            // when the text does, so the button is as wide as the longest of them.
+            var missing = new List<string>();
+            foreach (var (file, document) in Pages())
+                {
+                foreach (var button in document.Descendants().Where(e => e.Name.LocalName == "Button" && e.Attributes().Any(a => a.Name.LocalName == "ActionFeedbackBehavior.SuccessText")))
+                    {
+                    string success = button.Attributes().First(a => a.Name.LocalName == "ActionFeedbackBehavior.SuccessText").Value;
+                    string name = (string?)button.Attributes().FirstOrDefault(a => a.Name.LocalName == "Name") ?? success;
+                    var template = ContentTemplateOf(document, button);
+                    var reserved = template == null ? [] : ReservedKeys(template);
+
+                    var expected = new List<string> { success, "FeedbackFailed", "FeedbackCanceled" };
+                    string? label = System.Text.RegularExpressions.Regex.Match((string?)button.Attribute("Content") ?? "", @"^\{DynamicResource (\w+)\}$") is { Success: true } m ? m.Groups[1].Value : null;
+                    if (label != null) expected.Add(label);
+
+                    missing.AddRange(expected.Where(key => !reserved.Contains(key)).Select(key => $"{file}: {name} does not reserve room for {key}"));
+                    }
+                }
+
+            Assert.That(missing, Is.Empty, "give the button a ContentTemplate with an invisible copy of every text it can show");
+            }
+
+        [Test]
+        public void LabelsOfFields_ShareOneColumnWidthPerPanel()
+            {
+            // The fields of a panel start at one x: its labels sit in a column whose width is shared, so it is as wide as the widest label.
+            var loose = Pages()
+                .SelectMany(p => p.Document.Descendants().Where(e => e.Name.LocalName == "Label").Select(e => (p.File, Element: e)))
+                .Where(l => ((string?)l.Element.Attribute("Content") ?? "").StartsWith('{'))
+                .Where(l => l.Element.Parent is not { Name.LocalName: "Grid" } grid
+                    || !grid.Descendants().Any(d => d.Name.LocalName == "ColumnDefinition" && d.Attribute("SharedSizeGroup") != null))
+                .Select(l => $"{l.File}: {l.Element.Attribute("Content")?.Value}");
+
+            Assert.That(loose, Is.Empty, "wrap the label in a Grid with a ColumnDefinition SharedSizeGroup (and Grid.IsSharedSizeScope on the panel)");
+            }
+
+        [Test]
+        public void DropDownLists_AreNotSizedByAFixedWidth()
+            {
+            var fixedWidth = Pages()
+                .SelectMany(p => p.Document.Descendants().Where(e => e.Name.LocalName == "ComboBox" && e.Attribute("Width") != null).Select(e => (p.File, Element: e)))
+                .Select(l => $"{l.File}: {l.Element.Attribute("ItemsSource")?.Value}");
+
+            Assert.That(fixedWidth, Is.Empty, "a drop-down list is as wide as its widest item: leave its Width alone");
+            }
+
         [Test]
         public void FieldsOfThePages_UseTheSharedStyles()
             {

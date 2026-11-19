@@ -25,6 +25,26 @@
     </UserControl.InputBindings>
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+        <!--  The labels of an action button and the outcomes it shows: the button is as wide as the longest of them (see TextStyleRulesTests)  -->
+        <DataTemplate x:Key="SaveSettingsContent">
+            <Grid>
+                <TextBlock Text="{DynamicResource SaveButton}" Visibility="Hidden" />
+                <TextBlock Text="{DynamicResource FeedbackSaved}" Visibility="Hidden" />
+                <TextBlock Text="{DynamicResource FeedbackFailed}" Visibility="Hidden" />
+                <TextBlock Text="{DynamicResource FeedbackCanceled}" Visibility="Hidden" />
+                <TextBlock HorizontalAlignment="Center" Text="{Binding}" />
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="ResetSettingsContent">
+            <Grid>
+                <TextBlock Text="{DynamicResource ResetToDefaultButton}" Visibility="Hidden" />
+                <TextBlock Text="{DynamicResource FeedbackReset}" Visibility="Hidden" />
+                <TextBlock Text="{DynamicResource FeedbackFailed}" Visibility="Hidden" />
+                <TextBlock Text="{DynamicResource FeedbackCanceled}" Visibility="Hidden" />
+                <TextBlock HorizontalAlignment="Center" Text="{Binding}" />
+            </Grid>
+        </DataTemplate>
     </UserControl.Resources>
     <Grid>
         <StackPanel Margin="20" Grid.IsSharedSizeScope="True">
@@ -155,12 +175,14 @@
                     behaviors:ActionFeedbackBehavior.SuccessText="FeedbackSaved"
                     Command="{Binding SaveSettingsCommand}"
                     Content="{DynamicResource SaveButton}"
+                    ContentTemplate="{StaticResource SaveSettingsContent}"
                     Style="{StaticResource ActionButtonStyle}" />
                 <Button
                     behaviors:ActionFeedbackBehavior.Signal="{Binding ResetFeedback}"
                     behaviors:ActionFeedbackBehavior.SuccessText="FeedbackReset"
                     Command="{Binding ResetToDefaultCommand}"
                     Content="{DynamicResource ResetToDefaultButton}"
+                    ContentTemplate="{StaticResource ResetSettingsContent}"
                     Style="{StaticResource ActionButtonStyle}" />
             </StackPanel>
         </StackPanel>
