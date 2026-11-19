@@ -76,7 +76,7 @@
                                             Storyboard.TargetName="HoverAccent"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
                                             To="1"
-                                            Duration="0:0:0.25">
+                                            Duration="0:0:0.5">
                                             <DoubleAnimation.EasingFunction>
                                                 <CubicEase EasingMode="EaseOut" />
                                             </DoubleAnimation.EasingFunction>
@@ -91,7 +91,7 @@
                                             Storyboard.TargetName="HoverAccent"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
                                             To="0"
-                                            Duration="0:0:0.2">
+                                            Duration="0:0:0.35">
                                             <DoubleAnimation.EasingFunction>
                                                 <CubicEase EasingMode="EaseIn" />
                                             </DoubleAnimation.EasingFunction>
@@ -108,7 +108,7 @@
                                             Storyboard.TargetName="FocusAccent"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
                                             To="1"
-                                            Duration="0:0:0.25">
+                                            Duration="0:0:0.5">
                                             <DoubleAnimation.EasingFunction>
                                                 <CubicEase EasingMode="EaseOut" />
                                             </DoubleAnimation.EasingFunction>
@@ -123,7 +123,7 @@
                                             Storyboard.TargetName="FocusAccent"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
                                             To="0"
-                                            Duration="0:0:0.2">
+                                            Duration="0:0:0.35">
                                             <DoubleAnimation.EasingFunction>
                                                 <CubicEase EasingMode="EaseIn" />
                                             </DoubleAnimation.EasingFunction>
@@ -178,7 +178,7 @@
                                             Storyboard.TargetName="HoverAccent"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
                                             To="1"
-                                            Duration="0:0:0.25">
+                                            Duration="0:0:0.5">
                                             <DoubleAnimation.EasingFunction>
                                                 <CubicEase EasingMode="EaseOut" />
                                             </DoubleAnimation.EasingFunction>
@@ -193,7 +193,7 @@
                                             Storyboard.TargetName="HoverAccent"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
                                             To="0"
-                                            Duration="0:0:0.2">
+                                            Duration="0:0:0.35">
                                             <DoubleAnimation.EasingFunction>
                                                 <CubicEase EasingMode="EaseIn" />
                                             </DoubleAnimation.EasingFunction>
@@ -310,7 +310,7 @@
                                             Storyboard.TargetName="HoverAccent"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
                                             To="1"
-                                            Duration="0:0:0.25">
+                                            Duration="0:0:0.5">
                                             <DoubleAnimation.EasingFunction>
                                                 <CubicEase EasingMode="EaseOut" />
                                             </DoubleAnimation.EasingFunction>
@@ -325,7 +325,7 @@
                                             Storyboard.TargetName="HoverAccent"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
                                             To="0"
-                                            Duration="0:0:0.2">
+                                            Duration="0:0:0.35">
                                             <DoubleAnimation.EasingFunction>
                                                 <CubicEase EasingMode="EaseIn" />
                                             </DoubleAnimation.EasingFunction>
@@ -342,7 +342,7 @@
                                             Storyboard.TargetName="FocusAccent"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
                                             To="1"
-                                            Duration="0:0:0.25">
+                                            Duration="0:0:0.5">
                                             <DoubleAnimation.EasingFunction>
                                                 <CubicEase EasingMode="EaseOut" />
                                             </DoubleAnimation.EasingFunction>
@@ -357,7 +357,7 @@
                                             Storyboard.TargetName="FocusAccent"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
                                             To="0"
-                                            Duration="0:0:0.2">
+                                            Duration="0:0:0.35">
                                             <DoubleAnimation.EasingFunction>
                                                 <CubicEase EasingMode="EaseIn" />
                                             </DoubleAnimation.EasingFunction>
