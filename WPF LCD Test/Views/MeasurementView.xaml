@@ -476,7 +476,7 @@
             <Setter Property="Foreground" Value="White" />
             <Setter Property="Padding" Value="5" />
             <Setter Property="Margin" Value="5" />
-            <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
+            <Setter Property="BorderThickness" Value="0" />
             <Setter Property="MaterialDesign:ButtonAssist.CornerRadius" Value="15" />
         </Style>
     </UserControl.Resources>
