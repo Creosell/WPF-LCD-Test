@@ -106,6 +106,16 @@ namespace WPF_LCD_Test.UnitTests.ViewsTests
             }
 
         [Test]
+        public void Labels_AreNotSizedByAFixedWidth()
+            {
+            var labels = Pages()
+                .SelectMany(p => p.Document.Descendants().Where(e => e.Name.LocalName == "Label" && e.Attribute("Width") != null).Select(e => (p.File, Element: e)))
+                .Select(l => $"{l.File}: {l.Element.Attribute("Content")?.Value}");
+
+            Assert.That(labels, Is.Empty, "a label column is as wide as its widest label: put the labels into one SharedSizeGroup instead of a fixed Width");
+            }
+
+        [Test]
         public void FieldsOfThePages_UseTheSharedStyles()
             {
             var fields = Pages()

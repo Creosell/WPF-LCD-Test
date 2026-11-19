@@ -27,7 +27,7 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
     <Grid>
-        <StackPanel Margin="20">
+        <StackPanel Margin="20" Grid.IsSharedSizeScope="True">
             <TextBlock
                 Margin="0,0,0,20"
                 FontSize="20"
@@ -36,10 +36,12 @@
 
 
             <StackPanel Margin="0,5" Orientation="Horizontal">
-                <Label
-                    Width="200"
-                    VerticalAlignment="Center"
-                    Content="{DynamicResource LanguageMenu}" />
+                <Grid VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="SettingsLabel" />
+                    </Grid.ColumnDefinitions>
+                    <Label Padding="5,0,15,0" Content="{DynamicResource LanguageMenu}" />
+                </Grid>
                 <ComboBox
                     Style="{StaticResource UnderlinedComboBoxStyle}"
                     DropDownClosed="ComboBox_DropDownClosed"
@@ -51,10 +53,12 @@
             </StackPanel>
 
             <StackPanel Margin="0,5" Orientation="Horizontal">
-                <Label
-                    Width="200"
-                    VerticalAlignment="Center"
-                    Content="{DynamicResource ThemeLabel}" />
+                <Grid VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="SettingsLabel" />
+                    </Grid.ColumnDefinitions>
+                    <Label Padding="5,0,15,0" Content="{DynamicResource ThemeLabel}" />
+                </Grid>
                 <ComboBox
                     Style="{StaticResource UnderlinedComboBoxStyle}"
                     DisplayMemberPath="DisplayName"
@@ -64,10 +68,12 @@
             </StackPanel>
 
             <StackPanel Margin="0,5" Orientation="Horizontal">
-                <Label
-                    Width="200"
-                    VerticalAlignment="Center"
-                    Content="{DynamicResource ColorAnalyzerChannel}" />
+                <Grid VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="SettingsLabel" />
+                    </Grid.ColumnDefinitions>
+                    <Label Padding="5,0,15,0" Content="{DynamicResource ColorAnalyzerChannel}" />
+                </Grid>
                 <TextBox
                     Style="{StaticResource UnderlinedTextBoxStyle}"
                     x:Name="ColorAnalyzerChannelTextBox"
@@ -81,10 +87,12 @@
             </StackPanel>
 
             <StackPanel Margin="0,5" Orientation="Horizontal">
-                <Label
-                    Width="200"
-                    VerticalAlignment="Center"
-                    Content="{DynamicResource MeasurementSpeedLabel}" />
+                <Grid VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="SettingsLabel" />
+                    </Grid.ColumnDefinitions>
+                    <Label Padding="5,0,15,0" Content="{DynamicResource MeasurementSpeedLabel}" />
+                </Grid>
                 <ComboBox
                     Style="{StaticResource UnderlinedComboBoxStyle}"
                     DropDownClosed="ComboBox_DropDownClosed"
@@ -93,10 +101,12 @@
             </StackPanel>
 
             <StackPanel Margin="0,5" Orientation="Horizontal">
-                <Label
-                    Width="200"
-                    VerticalAlignment="Center"
-                    Content="{DynamicResource SyncModeLabel}" />
+                <Grid VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="SettingsLabel" />
+                    </Grid.ColumnDefinitions>
+                    <Label Padding="5,0,15,0" Content="{DynamicResource SyncModeLabel}" />
+                </Grid>
                 <ComboBox
                     Style="{StaticResource UnderlinedComboBoxStyle}"
                     DropDownClosed="ComboBox_DropDownClosed"
