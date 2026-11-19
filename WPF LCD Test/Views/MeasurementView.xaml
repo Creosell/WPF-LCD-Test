@@ -638,7 +638,7 @@
                         <Label
                             VerticalAlignment="Center"
                             Content="{DynamicResource SerialNumber}"
-                            Foreground="{DynamicResource AppTextLabel}" />
+                            Foreground="{DynamicResource AppTextPrimary}" />
                         <Grid Margin="5" VerticalAlignment="Center">
                             <TextBox
                                 x:Name="SerialNumberTextBox"

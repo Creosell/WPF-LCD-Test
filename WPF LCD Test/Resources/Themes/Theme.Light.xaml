@@ -15,7 +15,6 @@
     <SolidColorBrush x:Key="AppCardBackground" Color="#0F000000" />
     <SolidColorBrush x:Key="AppCardBorder" Color="#33000000" />
     <SolidColorBrush x:Key="AppTextPrimary" Color="#FF212121" />
-    <SolidColorBrush x:Key="AppTextLabel" Color="#E0212121" />
     <SolidColorBrush x:Key="AppTextSecondary" Color="#99212121" />
     <SolidColorBrush x:Key="AppTextMuted" Color="#FF6B6B6B" />
     <SolidColorBrush x:Key="AppLogText" Color="#FF212121" />
