@@ -416,6 +416,8 @@ namespace WPF_LCD_Test.UnitTests.ViewsTests
         [TestCase("CreateReportButtonStyle", "Processing...")]
         [TestCase("UploadReportsButtonStyle", "Uploading...")]
         [TestCase("UploadReportsButtonStyle", "Uploaded")]
+        [TestCase("ZeroCalibrationButtonStyle", "Calibrated")]
+        [TestCase("ZeroCalibrationButtonStyle", "Failed")]
         public void ButtonWithReservedRoom_CentersAShorterText(string styleKey, string shown)
             {
             Ui(() =>
@@ -425,7 +427,11 @@ namespace WPF_LCD_Test.UnitTests.ViewsTests
                     ["ReportButton"] = "Create report",
                     ["ReportButtonBusy"] = "Processing...",
                     ["UploadButton"] = "Upload reports",
-                    ["UploadButtonBusy"] = "Uploading..."
+                    ["UploadButtonBusy"] = "Uploading...",
+                    ["ZeroCalibration"] = "Zero Calibration",
+                    ["FeedbackCalibrated"] = "Calibrated",
+                    ["FeedbackFailed"] = "Failed",
+                    ["FeedbackCanceled"] = "Canceled"
                     };
                 var button = new Button { Style = (Style)_resources["ActionButtonStyle"], ContentTemplate = ContentTemplateOf(styleKey), Content = shown, HorizontalAlignment = HorizontalAlignment.Left };
                 var host = new StackPanel { Resources = resources, Children = { button } };

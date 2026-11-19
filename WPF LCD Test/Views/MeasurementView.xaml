@@ -36,6 +36,26 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
+        <!--  The Zero Calibration button is as wide as the longest text it can show: its label or the outcome of the calibration  -->
+        <Style
+            x:Key="ZeroCalibrationButtonStyle"
+            BasedOn="{StaticResource ActionButtonStyle}"
+            TargetType="Button">
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <Grid>
+                            <TextBlock Text="{DynamicResource ZeroCalibration}" Visibility="Hidden" />
+                            <TextBlock Text="{DynamicResource FeedbackCalibrated}" Visibility="Hidden" />
+                            <TextBlock Text="{DynamicResource FeedbackFailed}" Visibility="Hidden" />
+                            <TextBlock Text="{DynamicResource FeedbackCanceled}" Visibility="Hidden" />
+                            <TextBlock HorizontalAlignment="Center" Text="{Binding}" />
+                        </Grid>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!--  A button of a cancelable action: while the action runs its label tells so and a second click cancels it  -->
         <Style
             x:Key="CreateReportButtonStyle"
@@ -505,7 +525,7 @@
                         behaviors:ActionFeedbackBehavior.SuccessText="FeedbackCalibrated"
                         Command="{Binding DataContext.ZeroCalibrationCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                         Content="{DynamicResource ZeroCalibration}"
-                        Style="{StaticResource ActionButtonStyle}" />
+                        Style="{StaticResource ZeroCalibrationButtonStyle}" />
                     <Border
                         x:Name="DeviceCard"
                         Height="52"
