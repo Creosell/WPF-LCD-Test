@@ -440,6 +440,38 @@ namespace WPF_LCD_Test.UnitTests.ViewsTests
                 });
             }
 
+        [TestCase(true)]
+        [TestCase(false)]
+        public void ActionButton_GlowsGreenOrRedWhileItBreathesAndTheGlowGoesAway(bool success)
+            {
+            Ui(() =>
+                {
+                var signal = new WPF_LCD_Test.Models.ActionFeedbackSignal();
+                var button = new Button { Style = (Style)_resources["ActionButtonStyle"], Content = "Save" };
+                WPF_LCD_Test.Views.Behaviors.ActionFeedbackBehavior.SetSignal(button, signal);
+                var window = Show(button);
+                var atRest = button.Effect;
+
+                if (success) signal.Succeed(); else signal.Fail();
+                Pump(250);
+                var glow = button.Effect as System.Windows.Media.Effects.DropShadowEffect;
+                var color = glow?.Color;
+                double radius = glow?.BlurRadius ?? 0;
+
+                Pump(2000);
+                var afterwards = button.Effect;
+                window.Close();
+
+                Assert.Multiple(() =>
+                    {
+                    Assert.That(glow, Is.Not.Null, "a glow is drawn around the button");
+                    Assert.That(radius, Is.GreaterThan(0));
+                    Assert.That(success ? color?.G > color?.R : color?.R > color?.G, Is.True, $"the glow is {(success ? "green" : "red")}, it is {color}");
+                    Assert.That(afterwards, Is.EqualTo(atRest), "the glow goes away and the button gets its own look back");
+                    });
+                });
+            }
+
         [Test]
         public void ComboBox_TheGrowingLineHasTheThicknessOfTheUnderline()
             {

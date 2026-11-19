@@ -14,7 +14,7 @@ namespace WPF_LCD_Test.Views.Behaviors
     /// </summary>
     public enum ActionFeedbackMode
     {
-        /// <summary>The background of a button breathes and its label names the outcome.</summary>
+        /// <summary>The background of a button breathes, a glow pulses around it and its label names the outcome.</summary>
         Fill,
 
         /// <summary>The border brush (the underline) of a control breathes.</summary>
@@ -94,6 +94,7 @@ namespace WPF_LCD_Test.Views.Behaviors
                     break;
                 case ActionFeedbackMode.Fill when element is Control control:
                     ActionFeedbackBreathing.Play(control, feedback, GetSuccessText(element));
+                    GlowBreathing.Play(control, feedback);
                     break;
             }
         }
