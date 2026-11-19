@@ -25,8 +25,9 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
             {
             var defined = Keys("Dark");
             var viewFolder = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(ThemeFile("Dark"))!, "..", "..", "Views"));
-            var used = Directory.GetFiles(viewFolder, "*.xaml")
-                .SelectMany(file => System.Text.RegularExpressions.Regex.Matches(File.ReadAllText(file), @"DynamicResource (App(?:Page|Panel|Inset|Card|Text|Log|Tab|Control|Hover)\w*|Status(?:Ok|Warn|Err)\w+|Result(?:Ok|Warn)Dot|Log(?:Warn|Err)\w+|LogBarThickness)").Select(m => m.Groups[1].Value))
+            var styleFolder = Path.Combine(viewFolder, "..", "Resources", "Styles");
+            var used = Directory.GetFiles(viewFolder, "*.xaml").Concat(Directory.GetFiles(styleFolder, "*.xaml"))
+                .SelectMany(file => System.Text.RegularExpressions.Regex.Matches(File.ReadAllText(file), @"DynamicResource (App(?:Page|Panel|Inset|Card|Text|Log|Tab|Control|Hover|Field|Nav|Window)\w*|Status(?:Ok|Warn|Err)\w+|Result(?:Ok|Warn)Dot|Log(?:Warn|Err)\w+|LogBarThickness)").Select(m => m.Groups[1].Value))
                 .ToHashSet();
 
             Assert.That(used.Except(defined), Is.Empty, "keys used by the views but missing in the theme dictionaries");

@@ -11,7 +11,7 @@
     <SolidColorBrush x:Key="AppPageBackground" Color="#FFFAFAFA" />
     <SolidColorBrush x:Key="AppPanelBackground" Color="#FFFFFFFF" />
     <SolidColorBrush x:Key="AppInsetBackground" Color="#FFFFFFFF" />
-    <SolidColorBrush x:Key="AppPanelBorder" Color="#FFD6D6D6" />
+    <SolidColorBrush x:Key="AppPanelBorder" Color="#FFBDBDBD" />
     <SolidColorBrush x:Key="AppCardBackground" Color="#0F000000" />
     <SolidColorBrush x:Key="AppCardBorder" Color="#33000000" />
     <SolidColorBrush x:Key="AppTextPrimary" Color="#FF212121" />
@@ -19,8 +19,9 @@
     <SolidColorBrush x:Key="AppTextSecondary" Color="#99212121" />
     <SolidColorBrush x:Key="AppTextMuted" Color="#FF6B6B6B" />
     <SolidColorBrush x:Key="AppLogText" Color="#FF212121" />
-    <SolidColorBrush x:Key="AppTabLine" Color="#FF9E9E9E" />
-    <SolidColorBrush x:Key="AppControlBorder" Color="#FF9E9E9E" />
+    <SolidColorBrush x:Key="AppTabLine" Color="#FF757575" />
+    <SolidColorBrush x:Key="AppFieldLine" Color="#FF616161" />
+    <SolidColorBrush x:Key="AppControlBorder" Color="#FF757575" />
     <SolidColorBrush x:Key="AppHoverOverlay" Color="#14000000" />
     <SolidColorBrush x:Key="StatusOkText" Color="#FF1B5E20" />
     <SolidColorBrush x:Key="StatusWarnText" Color="#FF6B4400" />
