@@ -613,10 +613,13 @@
                                     ItemsSource="{Binding DeviceConfigurationTree}"
                                     Placement="Bottom" />
                             </Button.ContextMenu>
-                            <StackPanel Orientation="Horizontal">
+                            <Grid>
                                 <TextBlock
                                     MinWidth="160"
+                                    Margin="24,0"
+                                    HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
+                                    TextAlignment="Center"
                                     Text="{Binding SelectedDeviceConfigurationDisplayName}">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
@@ -630,10 +633,10 @@
                                     </TextBlock.Style>
                                 </TextBlock>
                                 <MaterialDesign:PackIcon
-                                    Margin="4,0,0,0"
+                                    HorizontalAlignment="Right"
                                     VerticalAlignment="Center"
                                     Kind="ChevronDown" />
-                            </StackPanel>
+                            </Grid>
                         </Button>
 
 
