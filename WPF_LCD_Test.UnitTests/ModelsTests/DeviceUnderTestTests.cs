@@ -64,17 +64,17 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
         }
 
         [Test]
-        public void RecordAttempt_AnotherAttemptOfALocationKeepsBothAndHoldsTheBrightest()
+        public void RecordAttempt_AnotherAttemptOfALocationKeepsBothAndHoldsTheLatest()
         {
             DeviceUnderTest dut = new DeviceUnderTest("SN003");
             dut.RecordAttempt(new Measurement("Center", 1, 2, 100, 25));
             dut.RecordAttempt(new Measurement("Edge", 5, 6, 7, 8));
 
-            dut.RecordAttempt(new Measurement("Center", 1.1, 2.2, 101.1, 25.1));
+            dut.RecordAttempt(new Measurement("Center", 1.1, 2.2, 90.1, 25.1));
 
             Assert.That(dut.Measurements, Has.Count.EqualTo(2), "one entry per location");
             var center = dut.Measurements.Single(m => m.Location == "Center");
-            Assert.That((center.x, center.Lv, dut.AttemptCount("Center")), Is.EqualTo((1.1, 101.1, 2)));
+            Assert.That((center.x, center.Lv, dut.AttemptCount("Center")), Is.EqualTo((1.1, 90.1, 2)), "the latest, even if it is dimmer: the generator ranks the attempts");
             Assert.That(dut.AttemptCount("Edge"), Is.EqualTo(1), "the other locations are not touched");
         }
 

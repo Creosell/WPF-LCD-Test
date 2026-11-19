@@ -57,10 +57,11 @@ namespace WPF_LCD_Test.Models
 
         /// <summary>
         /// Records an accepted measurement of a point as one more attempt. The point keeps all its attempts and its
-        /// measurement holds the best one; until the specification check chooses, the best is the highest luminance.
+        /// measurement holds the latest one until the report generator (the only place that ranks the attempts)
+        /// answers with the best one, see <see cref="SelectBestAttempt"/>.
         /// </summary>
         /// <param name="attempt">The accepted measurement.</param>
-        /// <returns>The measurement entry of the point holding the best attempt.</returns>
+        /// <returns>The measurement entry of the point.</returns>
         public Measurement RecordAttempt(Measurement attempt)
             {
             ArgumentNullException.ThrowIfNull(attempt);
@@ -70,12 +71,7 @@ namespace WPF_LCD_Test.Models
                 : existing.Attempts.Count > 0 ? [.. existing.Attempts, attempt]
                 : [existing, attempt];
 
-            int best = 0;
-            for (int i = 1; i < attempts.Count; i++)
-                {
-                if (attempts[i].Lv >= attempts[best].Lv) best = i;
-                }
-            return StoreAttempts(attempts, best);
+            return StoreAttempts(attempts, attempts.Count - 1);
             }
 
         /// <summary>

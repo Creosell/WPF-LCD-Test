@@ -1175,8 +1175,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
 
             var device = _viewModel.CurrentDevice;
             Assert.That(device.AttemptCount(location), Is.EqualTo(3));
-            Assert.That(device.Measurements.Single().Lv, Is.EqualTo(180), "until the specification check chooses, the best is the brightest");
-            Assert.That(_viewModel.Results.Single(r => r.Location == location).Lv, Is.EqualTo("180.0"));
+            Assert.That(device.Measurements.Single().Lv, Is.EqualTo(170), "until the generator chooses, the latest attempt is shown");
+            Assert.That(_viewModel.Results.Single(r => r.Location == location).Lv, Is.EqualTo("170.0"));
             }
 
         [Test]

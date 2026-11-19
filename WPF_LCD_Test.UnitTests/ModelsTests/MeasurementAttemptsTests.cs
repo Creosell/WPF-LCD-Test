@@ -21,7 +21,7 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
             }
 
         [Test]
-        public void RecordAttempt_KeepsEveryAttemptAndTheBrightestIsBestUntilTheCheckChooses()
+        public void RecordAttempt_KeepsEveryAttemptAndHoldsTheLatestUntilTheGeneratorChooses()
             {
             var device = new DeviceUnderTest("SN1");
 
@@ -31,7 +31,7 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
 
             var entry = device.Measurements.Single();
             Assert.That(entry.Attempts.Select(a => a.Lv), Is.EqualTo(new[] { 150.0, 180.0, 170.0 }));
-            Assert.That((entry.Lv, entry.BestAttemptIndex), Is.EqualTo((180.0, 1)));
+            Assert.That((entry.Lv, entry.BestAttemptIndex), Is.EqualTo((170.0, 2)), "the app does not rank the attempts: the generator does");
             }
 
         [Test]
