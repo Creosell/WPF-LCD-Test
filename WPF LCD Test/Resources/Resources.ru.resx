@@ -532,7 +532,7 @@
     <value>Ждём: {0}</value>
   </data>
   <data name="SpecSelectConfig" xml:space="preserve">
-    <value>Выберите конфигурацию для проверки по спецификации</value>
+    <value>Выберите конфигурацию</value>
   </data>
   <data name="SpecUnavailable" xml:space="preserve">
     <value>Проверка недоступна: {0}</value>
