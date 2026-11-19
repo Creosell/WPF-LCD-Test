@@ -105,6 +105,7 @@
     <system:String x:Key="FeedbackCleared">Cleared</system:String>
     <system:String x:Key="FeedbackDone">Done</system:String>
     <system:String x:Key="FeedbackUploaded">Uploaded</system:String>
+    <system:String x:Key="FeedbackCalibrated">Calibrated</system:String>
     <system:String x:Key="FeedbackFailed">Failed</system:String>
     <system:String x:Key="FeedbackCanceled">Canceled</system:String>
     <system:String x:Key="DialogYes">Yes</system:String>

@@ -394,6 +394,44 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             }
 
         [Test]
+        public async Task ExecuteZeroCalibrationAsync_Calibrated_SignalsSuccessToTheButton()
+            {
+            _mockDispatcher.Setup(d => d.CheckAccess()).Returns(true);
+            SetupCalibratedProbe("81026182", 2);
+
+            await ((RelayCommand)_viewModel.ZeroCalibrationCommand).ExecuteAsync(null);
+
+            Assert.That(_viewModel.ZeroCalibrationFeedback.Feedback, Is.EqualTo(ActionFeedback.Success));
+            }
+
+        [Test]
+        public async Task ExecuteZeroCalibrationAsync_CalibrationFails_SignalsFailureToTheButton()
+            {
+            _mockDispatcher.Setup(d => d.CheckAccess()).Returns(true);
+            _mockColorMeasurementService.SetupGet(s => s.IsDeviceConnected).Returns(true);
+            _mockColorMeasurementService.Setup(s => s.CalibrateZeroAsync()).ReturnsAsync(false);
+
+            await ((RelayCommand)_viewModel.ZeroCalibrationCommand).ExecuteAsync(null);
+
+            Assert.That(_viewModel.ZeroCalibrationFeedback.Feedback, Is.EqualTo(ActionFeedback.Failure));
+            }
+
+        [Test]
+        public async Task ExecuteZeroCalibrationAsync_ChannelDialogDismissed_SignalsCancelToTheButton()
+            {
+            _mockDispatcher.Setup(d => d.CheckAccess()).Returns(true);
+            SetupCalibratedProbe("81026182", 2);
+            _mockAnalyzerRegistryService.Setup(r => r.GetLastChannel("81026182")).Returns(5);
+            _mockDialogService
+                .Setup(d => d.ShowChoice(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Returns((int?)null);
+
+            await ((RelayCommand)_viewModel.ZeroCalibrationCommand).ExecuteAsync(null);
+
+            Assert.That(_viewModel.ZeroCalibrationFeedback.Feedback, Is.EqualTo(ActionFeedback.Canceled));
+            }
+
+        [Test]
         public async Task ExecuteZeroCalibrationAsync_CalibrationFails_ShowsDialog()
             {
             // Arrange

@@ -47,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The underline of the device configuration selector uses the same border and hover colors as the serial number field (it was black)
 - The Language label in Settings reads "Language / 语言" in both languages, so it can be found which language is active
 - The Settings page behaves like the Measurement page: Save and Reset to default breathe (green: saved or reset, red: a value was rejected or saving failed) with the outcome on the label, have the same rounded look, and Ctrl+S saves the settings
+- The action buttons glow like the measurement buttons while they breathe, and Zero Calibration breathes too: green with "Calibrated" when the probe is calibrated and its channel confirmed, red when the connection or the calibration failed, a cancel when the channel dialog is dismissed
 - The feedback animations are an attached behavior (`ActionFeedbackBehavior`, `Views/Behaviors`) that any element enables from XAML with a signal binding, so a page needs no code-behind for it; `ActionFeedbackSignal` moved to `Models`
 - The save confirmation describes the problems in plain words: bullets like "White: Brightness (cd/m²) is 268, below the minimum 290 (measured once)" instead of "Brightness (cd/m²) 268 < min 290 (White, 1 of 3)", and simpler headers and hint
 - The measurement buttons of the points glow green when a measurement is accepted and red when it is rejected (a colored glow around the button, so it works on the green, red and gray status colors of the buttons themselves)

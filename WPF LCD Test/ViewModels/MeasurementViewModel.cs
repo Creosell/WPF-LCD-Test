@@ -125,6 +125,12 @@ namespace WPF_LCD_Test.ViewModels
         public ActionFeedbackSignal SerialFeedback { get; } = new();
 
         /// <summary>
+        /// Gets the signal the Zero Calibration button breathes on when the calibration ends: green when the probe is calibrated and its
+        /// channel confirmed, red when the connection or the calibration failed, canceled when the inspector dismissed the channel dialog.
+        /// </summary>
+        public ActionFeedbackSignal ZeroCalibrationFeedback { get; } = new();
+
+        /// <summary>
         /// Gets the signal the device configuration selector breathes on when a configuration is chosen.
         /// </summary>
         public ActionFeedbackSignal ConfigFeedback { get; } = new();
@@ -693,14 +699,21 @@ namespace WPF_LCD_Test.ViewModels
                     if (!await _colorMeasurementService.CalibrateZeroAsync())
                         {
                         ExecuteDisconnect(force: true);
+                        Flash(ZeroCalibrationFeedback, false);
                         _dialogService.ShowMessage($"{ErrAtCalibration}", $"{Err}");
                         return;
                         }
                     if (!ConfirmActiveChannel())
                         {
                         ExecuteDisconnect(force: true);
+                        FlashCanceled(ZeroCalibrationFeedback);
                         return;
                         }
+                    Flash(ZeroCalibrationFeedback, true);
+                    }
+                else
+                    {
+                    Flash(ZeroCalibrationFeedback, false);
                     }
                 }
             catch
@@ -708,6 +721,7 @@ namespace WPF_LCD_Test.ViewModels
                 // Force disconnect on error to cleanup COM objects
                 if (_colorMeasurementService.IsDeviceConnected)
                     ExecuteDisconnect(force: true);
+                Flash(ZeroCalibrationFeedback, false);
                 _dialogService.ShowMessage($"{ErrAtCalibration}", $"{Err}");
                 }
             finally

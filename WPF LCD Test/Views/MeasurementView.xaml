@@ -501,6 +501,8 @@
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0" Orientation="Horizontal">
                     <Button
+                        behaviors:ActionFeedbackBehavior.Signal="{Binding ZeroCalibrationFeedback}"
+                        behaviors:ActionFeedbackBehavior.SuccessText="FeedbackCalibrated"
                         Command="{Binding DataContext.ZeroCalibrationCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                         Content="{DynamicResource ZeroCalibration}"
                         Style="{StaticResource ActionButtonStyle}" />
