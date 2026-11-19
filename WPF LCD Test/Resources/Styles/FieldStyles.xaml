@@ -122,12 +122,12 @@
                             </ToggleButton.Template>
                         </ToggleButton>
                         <Popup
+                            x:Name="PART_Popup"
                             AllowsTransparency="True"
                             IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"
                             Placement="Bottom"
                             PlacementTarget="{Binding ElementName=Line}"
-                            PopupAnimation="Fade"
-                            StaysOpen="False">
+                            PopupAnimation="Fade">
                             <Border
                                 MinWidth="{Binding ActualWidth, ElementName=Line}"
                                 MaxHeight="{TemplateBinding MaxDropDownHeight}"
