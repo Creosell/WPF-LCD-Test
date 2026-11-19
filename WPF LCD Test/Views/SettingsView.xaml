@@ -44,7 +44,6 @@
                 <ComboBox
                     Style="{StaticResource UnderlinedComboBoxStyle}"
                     DropDownClosed="ComboBox_DropDownClosed"
-                    Width="200"
                     DisplayMemberPath="DisplayName"
                     ItemsSource="{Binding AvailableLanguages}"
                     SelectedItem="{Binding SelectedLanguage}"
@@ -60,7 +59,6 @@
                     Foreground="{DynamicResource AppTextPrimary}" />
                 <ComboBox
                     Style="{StaticResource UnderlinedComboBoxStyle}"
-                    Width="200"
                     DisplayMemberPath="DisplayName"
                     DropDownClosed="ComboBox_DropDownClosed"
                     ItemsSource="{Binding AvailableThemes}"
@@ -95,7 +93,6 @@
                 <ComboBox
                     Style="{StaticResource UnderlinedComboBoxStyle}"
                     DropDownClosed="ComboBox_DropDownClosed"
-                    Width="120"
                     ItemsSource="{Binding AvailableMeasurementSpeeds}"
                     SelectedItem="{Binding MeasurementSpeed}" />
             </StackPanel>
@@ -109,7 +106,6 @@
                 <ComboBox
                     Style="{StaticResource UnderlinedComboBoxStyle}"
                     DropDownClosed="ComboBox_DropDownClosed"
-                    Width="120"
                     DisplayMemberPath="Name"
                     ItemsSource="{Binding AvailableSyncModes}"
                     SelectedValue="{Binding SelectedSyncMode}"

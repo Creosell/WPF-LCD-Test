@@ -213,7 +213,7 @@
         </Style.Triggers>
     </Style>
 
-    <!--  A drop-down list on an underline: the chosen item is centered in the field and the arrow is pinned to the right edge  -->
+    <!--  A drop-down list on an underline as wide as its widest item (a fixed Width overrides it; the items come from ItemsSource and DisplayMemberPath)  -->
     <Style x:Key="UnderlinedComboBoxStyle" TargetType="ComboBox">
         <Setter Property="FontFamily" Value="Segoe UI" />
         <Setter Property="Foreground" Value="{DynamicResource AppTextPrimary}" />
@@ -230,6 +230,23 @@
                             BorderBrush="{DynamicResource AppFieldLine}"
                             BorderThickness="0,0,0,1">
                             <Grid>
+                                <!--  Invisible copy of all items in one cell: it makes the field as wide as its widest item, whatever the language and the scale are  -->
+                                <ItemsControl
+                                    Height="0"
+                                    Margin="0,0,24,0"
+                                    DisplayMemberPath="{TemplateBinding DisplayMemberPath}"
+                                    Focusable="False"
+                                    IsHitTestVisible="False"
+                                    IsTabStop="False"
+                                    ItemStringFormat="{TemplateBinding ItemStringFormat}"
+                                    ItemsSource="{TemplateBinding ItemsSource}"
+                                    Visibility="Hidden">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Grid />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
                                 <ContentPresenter
                                     Margin="0,0,24,0"
                                     VerticalAlignment="Center"

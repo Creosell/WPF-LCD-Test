@@ -301,6 +301,83 @@ namespace WPF_LCD_Test.UnitTests.ViewsTests
                 });
             }
 
+        private ComboBox NewFitComboBox(params string[] names)
+            {
+            var combo = NewComboBox();
+            combo.Width = double.NaN;
+            combo.HorizontalAlignment = HorizontalAlignment.Left;
+            combo.ItemsSource = names.Select(n => new Option(n)).ToArray();
+            combo.SelectedIndex = 0;
+            return combo;
+            }
+
+        private static double TextWidth(Control owner, string text) =>
+            new FormattedText(text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
+                new Typeface(owner.FontFamily, owner.FontStyle, owner.FontWeight, owner.FontStretch), owner.FontSize, Brushes.Black,
+                VisualTreeHelper.GetDpi(owner).PixelsPerDip).Width;
+
+        [Test]
+        public void ComboBox_IsAsWideAsItsWidestItemWhateverIsChosen()
+            {
+            Ui(() =>
+                {
+                var combo = NewFitComboBox("UNIV", "Internal synchronization", "NTSC");
+                var window = Show(combo);
+
+                double shortChosen = combo.ActualWidth;
+                combo.SelectedIndex = 1;
+                Pump(100);
+                double longChosen = combo.ActualWidth;
+                double widest = TextWidth(combo, "Internal synchronization");
+                window.Close();
+
+                Assert.Multiple(() =>
+                    {
+                    Assert.That(shortChosen, Is.EqualTo(longChosen).Within(0.5), "the width does not jump when another item is chosen");
+                    Assert.That(shortChosen, Is.GreaterThanOrEqualTo(widest), "the widest item fits");
+                    Assert.That(shortChosen, Is.LessThan(widest + 40), "and nothing much more than that (the arrow and a gap)");
+                    });
+                });
+            }
+
+        [Test]
+        public void ComboBox_FollowsTheWidestItemWhenItsNameChanges()
+            {
+            Ui(() =>
+                {
+                var chosen = new LiveOption("Dark");
+                var combo = NewFitComboBox("Dark");
+                combo.ItemsSource = new[] { chosen, new LiveOption("Light") };
+                combo.SelectedIndex = 0;
+                var window = Show(combo);
+
+                double before = combo.ActualWidth;
+                chosen.Name = "System (Windows), follows the theme of the system";
+                Pump(200);
+                double after = combo.ActualWidth;
+                window.Close();
+
+                Assert.That(after, Is.GreaterThan(before + 100), "the list grows with the longest name (the names follow the language of the interface)");
+                });
+            }
+
+        [Test]
+        public void ComboBox_FitsInsideTheWindowWhenTheListIsLong()
+            {
+            Ui(() =>
+                {
+                var combo = NewFitComboBox("short", "a rather long name of the mode", "x");
+                var window = Show(combo);
+
+                var host = (FrameworkElement)combo.Parent;
+                double width = combo.ActualWidth;
+                double room = host.ActualWidth;
+                window.Close();
+
+                Assert.That(width, Is.LessThanOrEqualTo(room));
+                });
+            }
+
         [Test]
         public void ComboBox_TheGrowingLineHasTheThicknessOfTheUnderline()
             {
