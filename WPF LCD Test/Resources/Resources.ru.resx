@@ -1,0 +1,719 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="BadConnection" xml:space="preserve">
+    <value>Не удалось подключиться. Перезапустите цветовой анализатор</value>
+  </data>
+  <data name="CalibratingZeroCA" xml:space="preserve">
+    <value>Калибровка нуля...</value>
+  </data>
+  <data name="CheckConnectionCA" xml:space="preserve">
+    <value>Проверьте подключение цветового анализатора. Перезагрузите его и повторите калибровку нуля</value>
+  </data>
+  <data name="CheckProbe" xml:space="preserve">
+    <value>Проверьте зонд! Возможно, нужно переключить режим с 0-CAL на MEAS</value>
+  </data>
+  <data name="CleanFieldWarning" xml:space="preserve">
+    <value>Вы уверены, что хотите очистить все поля?</value>
+  </data>
+  <data name="CleanFieldWarningAfterSave" xml:space="preserve">
+    <value>Результаты сохранены. Очистить все поля?</value>
+  </data>
+  <data name="ConnectedCA" xml:space="preserve">
+    <value>Подключено</value>
+  </data>
+  <data name="ConnectingCA" xml:space="preserve">
+    <value>Подключение к цветовому анализатору...</value>
+  </data>
+  <data name="CurrentSN" xml:space="preserve">
+    <value>Текущий SN: {0}</value>
+  </data>
+  <data name="Err" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="ErrAtCalibration" xml:space="preserve">
+    <value>Ошибка при калибровке</value>
+  </data>
+  <data name="ErrCSV" xml:space="preserve">
+    <value>Ошибка сохранения в CSV</value>
+  </data>
+  <data name="ErrMsgLangSwitchFailed" xml:space="preserve">
+    <value>Не удалось сменить язык</value>
+  </data>
+  <data name="ErrorAtMeasuringIteration" xml:space="preserve">
+    <value>Ошибка измерения на итерации </value>
+  </data>
+  <data name="ErrUnexpected" xml:space="preserve">
+    <value>Произошла непредвиденная ошибка: {0}</value>
+  </data>
+  <data name="FillSN" xml:space="preserve">
+    <value>Сначала введите SN!</value>
+  </data>
+  <data name="MakeZeroCalibration" xml:space="preserve">
+    <value>Сначала выполните калибровку нуля!</value>
+  </data>
+  <data name="Measuring" xml:space="preserve">
+    <value>Измерение...</value>
+  </data>
+  <data name="ResultsForSN" xml:space="preserve">
+    <value>Результаты для SN</value>
+  </data>
+  <data name="SavedToJSON" xml:space="preserve">
+    <value>сохранены в JSON в</value>
+  </data>
+  <data name="Warning" xml:space="preserve">
+    <value>Предупреждение</value>
+  </data>
+  <data name="ZeroCalibratedCA" xml:space="preserve">
+    <value>Ноль откалиброван</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="Chinese" xml:space="preserve">
+    <value>中文</value>
+  </data>
+  <data name="Russian" xml:space="preserve">
+    <value>Русский</value>
+  </data>
+  <data name="ZeroCalibration" xml:space="preserve">
+    <value>Калибровка нуля</value>
+  </data>
+  <data name="MeasurementTimeSec" xml:space="preserve">
+    <value>Время измерения (с):</value>
+  </data>
+  <data name="SerialNumber" xml:space="preserve">
+    <value>Серийный номер:</value>
+  </data>
+  <data name="TopLeftPoint" xml:space="preserve">
+    <value>1. Верхняя левая</value>
+  </data>
+  <data name="TopCenterPoint" xml:space="preserve">
+    <value>2. Верхняя центральная</value>
+  </data>
+  <data name="TopRightPoint" xml:space="preserve">
+    <value>3. Верхняя правая</value>
+  </data>
+  <data name="MiddleLeftPoint" xml:space="preserve">
+    <value>4. Средняя левая</value>
+  </data>
+  <data name="CenterPoint" xml:space="preserve">
+    <value>5. Центральная</value>
+  </data>
+  <data name="MiddleRightPoint" xml:space="preserve">
+    <value>6. Средняя правая</value>
+  </data>
+  <data name="BottomLeftPoint" xml:space="preserve">
+    <value>7. Нижняя левая</value>
+  </data>
+  <data name="BottomCenterPoint" xml:space="preserve">
+    <value>8. Нижняя центральная</value>
+  </data>
+  <data name="BottomRightPoint" xml:space="preserve">
+    <value>9. Нижняя правая</value>
+  </data>
+  <data name="LanguageMenu" xml:space="preserve">
+    <value>Язык</value>
+  </data>
+  <data name="RedPoint" xml:space="preserve">
+    <value>R. Красная</value>
+  </data>
+  <data name="GreenPoint" xml:space="preserve">
+    <value>G. Зелёная</value>
+  </data>
+  <data name="BluePoint" xml:space="preserve">
+    <value>B. Синяя</value>
+  </data>
+  <data name="BlackPoint" xml:space="preserve">
+    <value>0. Чёрная</value>
+  </data>
+  <data name="SaveResultsButton" xml:space="preserve">
+    <value>Сохранить результаты</value>
+  </data>
+  <data name="ClearFieldsButton" xml:space="preserve">
+    <value>Очистить поля</value>
+  </data>
+  <data name="ConnectionError" xml:space="preserve">
+    <value>Не удалось подключиться или подключение завершилось ошибкой</value>
+  </data>
+  <data name="DisconnectedCA" xml:space="preserve">
+    <value>Отключено</value>
+  </data>
+  <data name="MeasureWihoutConnectionError" xml:space="preserve">
+    <value>Сначала подключите цветовой анализатор</value>
+  </data>
+  <data name="LocalizationServiceResErr" xml:space="preserve">
+    <value>Предупреждение службы локализации: ресурс с ключом не найден в .resx для культуры</value>
+  </data>
+  <data name="LocalizationServiceFormatErr" xml:space="preserve">
+    <value>Ошибка службы локализации: форматирование строки для ключа</value>
+  </data>
+  <data name="CultureNotFoundErr" xml:space="preserve">
+    <value>Ошибка службы локализации: культура для языка не найдена</value>
+  </data>
+  <data name="WorkFolderCreated" xml:space="preserve">
+    <value>Создана рабочая папка для хранения результатов</value>
+  </data>
+  <data name="WorkingFolderInitErr" xml:space="preserve">
+    <value>Ошибка при инициализации рабочих папок</value>
+  </data>
+  <data name="SaveJSONErrDeviceIsEmpty" xml:space="preserve">
+    <value>Ошибка сохранения: нет данных об устройстве</value>
+  </data>
+  <data name="SaveJSONErrForSN" xml:space="preserve">
+    <value>Ошибка при сохранении в JSON для SN</value>
+  </data>
+  <data name="CsvSnErr" xml:space="preserve">
+    <value>Ошибка сохранения в CSV: серийный номер не указан.</value>
+  </data>
+  <data name="CsvDataErr" xml:space="preserve">
+    <value>Ошибка сохранения в CSV: нет данных для сохранения</value>
+  </data>
+  <data name="CsvLocationErr" xml:space="preserve">
+    <value>Ошибка сохранения в CSV: не указано название точки</value>
+  </data>
+  <data name="WorkFolderCreatedForSN" xml:space="preserve">
+    <value>Создана папка для устройства с SN</value>
+  </data>
+  <data name="TestStartInfo" xml:space="preserve">
+    <value>Начато тестирование устройства с SN: {0}</value>
+  </data>
+  <data name="NoSNErr" xml:space="preserve">
+    <value>Нет SN</value>
+  </data>
+  <data name="NoData" xml:space="preserve">
+    <value>Нет данных</value>
+  </data>
+  <data name="LvIsTooLow" xml:space="preserve">
+    <value>Внимание: измеренная яркость Lv слишком низкая</value>
+  </data>
+  <data name="InvalidResultErr" xml:space="preserve">
+    <value>Некорректный результат</value>
+  </data>
+  <data name="ColorServiceErr" xml:space="preserve">
+    <value>Ошибка: служба не вернула результат измерения для {0}</value>
+  </data>
+  <data name="ColorAnalyzerErr" xml:space="preserve">
+    <value>Ошибка цветового анализатора :(</value>
+  </data>
+  <data name="UnexpectedMeasurementErr" xml:space="preserve">
+    <value>Непредвиденная ошибка измерения</value>
+  </data>
+  <data name="IncorrectFormatForSNErr" xml:space="preserve">
+    <value>Введите корректный серийный номер: латинские буквы и цифры</value>
+  </data>
+  <data name="AlreadyActivated" xml:space="preserve">
+    <value>уже применён</value>
+  </data>
+  <data name="MeasButStatusErr" xml:space="preserve">
+    <value>Ошибка: не найден статус точки измерения для обновления</value>
+  </data>
+  <data name="ClearFieldsDone" xml:space="preserve">
+    <value>Поля и результаты измерений очищены</value>
+  </data>
+  <data name="ViewModelClearing" xml:space="preserve">
+    <value>Очистка ресурсов ViewModel...</value>
+  </data>
+  <data name="ViewModelCleared" xml:space="preserve">
+    <value>Очистка ресурсов ViewModel завершена</value>
+  </data>
+  <data name="ResultsSaved" xml:space="preserve">
+    <value>Результаты успешно сохранены</value>
+  </data>
+  <data name="Saved" xml:space="preserve">
+    <value>Сохранено</value>
+  </data>
+  <data name="SaveCanceled" xml:space="preserve">
+    <value>Сохранение отменено пользователем</value>
+  </data>
+  <data name="Saving" xml:space="preserve">
+    <value>Сохранение...</value>
+  </data>
+  <data name="SnCantBeEmpty" xml:space="preserve">
+    <value>Серийный номер не может быть пустым</value>
+  </data>
+  <data name="RunExternalAppNotFoundErr" xml:space="preserve">
+    <value>Ошибка: внешняя программа не найдена в {0}</value>
+  </data>
+  <data name="RunExternalAppUnexpectedErr" xml:space="preserve">
+    <value>Ошибка при запуске внешней программы: {0}</value>
+  </data>
+  <data name="TestFormatString" xml:space="preserve">
+    <value>Это тест с числом: {0}</value>
+  </data>
+  <data name="ConfigDirNotFound" xml:space="preserve">
+    <value>Папка конфигураций не найдена: {0}</value>
+  </data>
+  <data name="ChooseConfiguration" xml:space="preserve">
+    <value>Выберите конфигурацию…</value>
+  </data>
+  <data name="LvIsTooHigh" xml:space="preserve">
+    <value>Яркость чёрного неожиданно высокая, проверьте положение цветового анализатора</value>
+  </data>
+  <data name="ErrMeasurementOutOfRange" xml:space="preserve">
+    <value>Измерение вне ожидаемого диапазона для этого цвета</value>
+  </data>
+  <data name="MeasurementValidationPassed" xml:space="preserve">
+    <value>Проверка измерения пройдена</value>
+  </data>
+  <data name="PleaseTryToMeasureAgain" xml:space="preserve">
+    <value>Повторите измерение</value>
+  </data>
+  <data name="SaveNotCorrectResultQuestion" xml:space="preserve">
+    <value>Результат для этой точки по-прежнему выглядит некорректным. Сохранить его всё равно?</value>
+  </data>
+  <data name="FailedMeasurementForLocation" xml:space="preserve">
+    <value>Неудачное измерение точки</value>
+  </data>
+  <data name="Attempt" xml:space="preserve">
+    <value>Попытка</value>
+  </data>
+  <data name="ValidationMessage" xml:space="preserve">
+    <value>Сообщение проверки</value>
+  </data>
+  <data name="Actual" xml:space="preserve">
+    <value>Фактически</value>
+  </data>
+  <data name="Brightness" xml:space="preserve">
+    <value>Яркость</value>
+  </data>
+  <data name="NoReportsFoundForUpload" xml:space="preserve">
+    <value>Отчёты для выгрузки не найдены.</value>
+  </data>
+  <data name="Files" xml:space="preserve">
+    <value>файлов</value>
+  </data>
+  <data name="Code" xml:space="preserve">
+    <value>Код</value>
+  </data>
+  <data name="StartingReportGeneration" xml:space="preserve">
+    <value>Создание отчёта...</value>
+  </data>
+  <data name="ReportGeneratedSuccessfully" xml:space="preserve">
+    <value>Отчёт успешно создан</value>
+  </data>
+  <data name="NoDataFoundForReportGenerator" xml:space="preserve">
+    <value>Нет данных для создания отчёта</value>
+  </data>
+  <data name="InvalidReportConfiguration" xml:space="preserve">
+    <value>Некорректная конфигурация отчёта</value>
+  </data>
+  <data name="ReportGenerationFailed" xml:space="preserve">
+    <value>Не удалось создать отчёт</value>
+  </data>
+  <data name="ErrorInBackgroundTask" xml:space="preserve">
+    <value>Ошибка в фоновой задаче: {0}</value>
+  </data>
+  <data name="CantStartUpload" xml:space="preserve">
+    <value>Не удаётся начать выгрузку: неизвестно название устройства</value>
+  </data>
+  <data name="ReportGenerationCanceled" xml:space="preserve">
+    <value>Создание отчёта отменено</value>
+  </data>
+  <data name="UploadCanceled" xml:space="preserve">
+    <value>Выгрузка отчётов отменена</value>
+  </data>
+  <data name="StartingReportUploading" xml:space="preserve">
+    <value>Выгрузка отчётов...</value>
+  </data>
+  <data name="UploadFailed" xml:space="preserve">
+    <value>Не удалось выполнить выгрузку</value>
+  </data>
+  <data name="ErrWithArg" xml:space="preserve">
+    <value>Ошибка: {0}</value>
+  </data>
+  <data name="WarningFailedToCleanup" xml:space="preserve">
+    <value>Предупреждение: не удалось очистить {0}. Ошибка: {1}</value>
+  </data>
+  <data name="StartingParallelUploadOf" xml:space="preserve">
+    <value>Запуск параллельной выгрузки: {0} файлов</value>
+  </data>
+  <data name="UploadedSuccessfully" xml:space="preserve">
+    <value>Выгрузка завершена. Выгружено файлов: {0}</value>
+  </data>
+  <data name="CopyOfUploadedArchivesInFolder" xml:space="preserve">
+    <value>Копия выгруженных архивов отчётов в папке: {0}</value>
+  </data>
+  <data name="UploadFinishedWithFail" xml:space="preserve">
+    <value>Выгрузка завершена с ошибками. Файлов с ошибкой: {0}</value>
+  </data>
+  <data name="ArchiveFolderNotFound" xml:space="preserve">
+    <value>Папка архивов не найдена в {0}</value>
+  </data>
+  <data name="CreatedBatchFor" xml:space="preserve">
+    <value>Создан пакет для {0}</value>
+  </data>
+  <data name="ReadyToUpload" xml:space="preserve">
+    <value>Готово к выгрузке: {0}</value>
+  </data>
+  <data name="StartingUploadOf" xml:space="preserve">
+    <value>Начало выгрузки {0}</value>
+  </data>
+  <data name="UploadSuccessfulFor" xml:space="preserve">
+    <value>Выгрузка выполнена для {0}</value>
+  </data>
+  <data name="CLI_ErrorFor" xml:space="preserve">
+    <value>Ошибка выгрузки через CLI для файла: {0}. Код выхода: {1}. Ошибка: {2}</value>
+  </data>
+  <data name="FailedToExecuteCLI" xml:space="preserve">
+    <value>Не удалось запустить CLI для {0}. Ошибка: {1}</value>
+  </data>
+  <data name="ChannelChanged" xml:space="preserve">
+    <value>Канал устройства успешно изменён на {0}</value>
+  </data>
+  <data name="ErrAtChangeChannel" xml:space="preserve">
+    <value>Ошибка при смене канала анализатора: {0}</value>
+  </data>
+  <data name="ActiveChannelStatus" xml:space="preserve">
+    <value>Канал {0}</value>
+  </data>
+  <data name="ChannelMismatchTitle" xml:space="preserve">
+    <value>Несовпадение канала</value>
+  </data>
+  <data name="ChannelMismatchMessage" xml:space="preserve">
+    <value>В прошлый раз этот зонд использовался на канале {0}, а сейчас в устройстве выбран канал {1}.</value>
+  </data>
+  <data name="UseProbeChannel" xml:space="preserve">
+    <value>Использовать канал {0} зонда</value>
+  </data>
+  <data name="SyncSettingNotSupported" xml:space="preserve">
+    <value>Выбранная настройка синхронизации не поддерживается {0}, используется универсальная синхронизация</value>
+  </data>
+  <data name="UseLastChannel" xml:space="preserve">
+    <value>Использовать прошлый канал {0}</value>
+  </data>
+  <data name="ProbeSerialNumberLabel" xml:space="preserve">
+    <value>S/N {0}</value>
+  </data>
+  <data name="DeviceStateNotConnected" xml:space="preserve">
+    <value>Не подключён</value>
+  </data>
+  <data name="DeviceStateConnectedNotCalibrated" xml:space="preserve">
+    <value>Подключён (без калибровки)</value>
+  </data>
+  <data name="DeviceStateConnectedCalibrated" xml:space="preserve">
+    <value>Подключён (откалиброван)</value>
+  </data>
+  <data name="SpecVerdictFormat" xml:space="preserve">
+    <value>Спецификация: {0}</value>
+  </data>
+  <data name="SpecVerdictPass" xml:space="preserve">
+    <value>ПРОЙДЕНА</value>
+  </data>
+  <data name="SpecVerdictWarn" xml:space="preserve">
+    <value>ВНИМАНИЕ</value>
+  </data>
+  <data name="SpecVerdictFail" xml:space="preserve">
+    <value>НЕ ПРОЙДЕНА</value>
+  </data>
+  <data name="SpecNoIssuesYet" xml:space="preserve">
+    <value>замечаний пока нет</value>
+  </data>
+  <data name="SpecPointsProgress" xml:space="preserve">
+    <value>{0} из {1} точек</value>
+  </data>
+  <data name="SpecWaitingFor" xml:space="preserve">
+    <value>Ожидаются: {0}</value>
+  </data>
+  <data name="SpecSelectConfig" xml:space="preserve">
+    <value>Выберите конфигурацию устройства, чтобы сверять измерения с её спецификацией</value>
+  </data>
+  <data name="SpecUnavailable" xml:space="preserve">
+    <value>Проверка по спецификации недоступна: {0}</value>
+  </data>
+  <data name="SpecBound_min" xml:space="preserve">
+    <value>мин</value>
+  </data>
+  <data name="SpecBound_typ" xml:space="preserve">
+    <value>тип</value>
+  </data>
+  <data name="SpecBound_max" xml:space="preserve">
+    <value>макс</value>
+  </data>
+  <data name="SpecGamutArea" xml:space="preserve">
+    <value>Площадь охвата {0} ({1})</value>
+  </data>
+  <data name="SpecGamutCoverage" xml:space="preserve">
+    <value>Покрытие охвата {0} ({1})</value>
+  </data>
+  <data name="SpecMetric_Brightness" xml:space="preserve">
+    <value>Яркость (кд/м²)</value>
+  </data>
+  <data name="SpecMetric_Black_luminance" xml:space="preserve">
+    <value>Яркость чёрного (кд/м²)</value>
+  </data>
+  <data name="SpecMetric_Brightness_uniformity" xml:space="preserve">
+    <value>Равномерность яркости (%)</value>
+  </data>
+  <data name="SpecMetric_Contrast" xml:space="preserve">
+    <value>Контрастность</value>
+  </data>
+  <data name="SpecMetric_Temperature" xml:space="preserve">
+    <value>Цветовая температура (К)</value>
+  </data>
+  <data name="SpecMetric_Delta_e" xml:space="preserve">
+    <value>ΔE</value>
+  </data>
+  <data name="SpecMetric_Red_x" xml:space="preserve">
+    <value>Красный (x)</value>
+  </data>
+  <data name="SpecMetric_Red_y" xml:space="preserve">
+    <value>Красный (y)</value>
+  </data>
+  <data name="SpecMetric_Green_x" xml:space="preserve">
+    <value>Зелёный (x)</value>
+  </data>
+  <data name="SpecMetric_Green_y" xml:space="preserve">
+    <value>Зелёный (y)</value>
+  </data>
+  <data name="SpecMetric_Blue_x" xml:space="preserve">
+    <value>Синий (x)</value>
+  </data>
+  <data name="SpecMetric_Blue_y" xml:space="preserve">
+    <value>Синий (y)</value>
+  </data>
+  <data name="SpecMetric_White_x" xml:space="preserve">
+    <value>Белый (x)</value>
+  </data>
+  <data name="SpecMetric_White_y" xml:space="preserve">
+    <value>Белый (y)</value>
+  </data>
+  <data name="SpecMetric_Center_x" xml:space="preserve">
+    <value>Центр (x)</value>
+  </data>
+  <data name="SpecMetric_Center_y" xml:space="preserve">
+    <value>Центр (y)</value>
+  </data>
+  <data name="SpecLocation_TopLeft" xml:space="preserve">
+    <value>Верхняя левая</value>
+  </data>
+  <data name="SpecLocation_TopCenter" xml:space="preserve">
+    <value>Верхняя центральная</value>
+  </data>
+  <data name="SpecLocation_TopRight" xml:space="preserve">
+    <value>Верхняя правая</value>
+  </data>
+  <data name="SpecLocation_MiddleLeft" xml:space="preserve">
+    <value>Средняя левая</value>
+  </data>
+  <data name="SpecLocation_Center" xml:space="preserve">
+    <value>Центральная</value>
+  </data>
+  <data name="SpecLocation_MiddleRight" xml:space="preserve">
+    <value>Средняя правая</value>
+  </data>
+  <data name="SpecLocation_BottomLeft" xml:space="preserve">
+    <value>Нижняя левая</value>
+  </data>
+  <data name="SpecLocation_BottomCenter" xml:space="preserve">
+    <value>Нижняя центральная</value>
+  </data>
+  <data name="SpecLocation_BottomRight" xml:space="preserve">
+    <value>Нижняя правая</value>
+  </data>
+  <data name="SpecLocation_RedColor" xml:space="preserve">
+    <value>Красная</value>
+  </data>
+  <data name="SpecLocation_GreenColor" xml:space="preserve">
+    <value>Зелёная</value>
+  </data>
+  <data name="SpecLocation_BlueColor" xml:space="preserve">
+    <value>Синяя</value>
+  </data>
+  <data name="SpecLocation_WhiteColor" xml:space="preserve">
+    <value>Белая</value>
+  </data>
+  <data name="SpecLocation_BlackColor" xml:space="preserve">
+    <value>Чёрная</value>
+  </data>
+  <data name="SpecAttemptSuffix" xml:space="preserve">
+    <value>попытка {0}</value>
+  </data>
+  <data name="SpecRepeatRecommended" xml:space="preserve">
+    <value>Повторите измерение</value>
+  </data>
+  <data name="SaveSpecHeader" xml:space="preserve">
+    <value>Некоторые значения не соответствуют спецификации:</value>
+  </data>
+  <data name="SaveSpecHeaderFewAttempts" xml:space="preserve">
+    <value>Некоторые значения не соответствуют спецификации, а часть точек измерена меньше 3 раз:</value>
+  </data>
+  <data name="SaveSpecRemeasureHint" xml:space="preserve">
+    <value>Измерьте эти точки ещё раз, чтобы получить более надёжный результат.</value>
+  </data>
+  <data name="SaveNotFullNote" xml:space="preserve">
+    <value>Выполнены не все измерения.</value>
+  </data>
+  <data name="CloseUnsavedQuestion" xml:space="preserve">
+    <value>Измерения текущего устройства не сохранены.
+
+Всё равно закрыть приложение?</value>
+  </data>
+  <data name="SaveProblemBelowMin" xml:space="preserve">
+    <value>{0} — {1}, ниже минимума {2}</value>
+  </data>
+  <data name="SaveProblemAboveMax" xml:space="preserve">
+    <value>{0} — {1}, выше максимума {2}</value>
+  </data>
+  <data name="SaveProblemBelowTyp" xml:space="preserve">
+    <value>{0} — {1}, ниже рекомендуемого {2}</value>
+  </data>
+  <data name="SaveProblemAboveTyp" xml:space="preserve">
+    <value>{0} — {1}, выше рекомендуемого {2}</value>
+  </data>
+  <data name="SaveProblemPoint" xml:space="preserve">
+    <value>{0}: {1} ({2})</value>
+  </data>
+  <data name="SaveProblemMeasuredOnce" xml:space="preserve">
+    <value>измерена один раз</value>
+  </data>
+  <data name="SaveProblemMeasuredTimes" xml:space="preserve">
+    <value>измерений: {0}</value>
+  </data>
+  <data name="ThemeDark" xml:space="preserve">
+    <value>Тёмная</value>
+  </data>
+  <data name="ThemeLight" xml:space="preserve">
+    <value>Светлая</value>
+  </data>
+  <data name="ThemeSystem" xml:space="preserve">
+    <value>Системная (Windows)</value>
+  </data>
+  <data name="SaveSpecQuestion" xml:space="preserve">
+    <value>Всё равно сохранить результаты?</value>
+  </data>
+  <data name="AllowedRange" xml:space="preserve">
+    <value>Допустимый диапазон: {0}</value>
+  </data>
+  <data name="InvalidChannelFormat" xml:space="preserve">
+    <value>Неверный формат канала</value>
+  </data>
+  <data name="AvailableChannels" xml:space="preserve">
+    <value>Доступные каналы: {0}-{1}</value>
+  </data>
+  <data name="NotAvailable" xml:space="preserve">
+    <value>н/д</value>
+  </data>
+  <data name="UnitHz" xml:space="preserve">
+    <value>Гц</value>
+  </data>
+  <data name="UnitMs" xml:space="preserve">
+    <value>мс</value>
+  </data>
+</root>

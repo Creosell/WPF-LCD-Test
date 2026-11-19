@@ -182,7 +182,7 @@
                     Cursor="Hand"
                     PreviewMouseLeftButtonDown="MinimizeImage_PreviewMouseLeftButtonDown"
                     Source="/Images/WindowsHeaderButtons/window-minimize.png"
-                    ToolTip="Свернуть" />
+                    ToolTip="{DynamicResource WindowMinimize}" />
 
                 <Image
                     x:Name="MaximizeRestoreImage"
@@ -192,7 +192,7 @@
                     Cursor="Hand"
                     PreviewMouseLeftButtonDown="MaximizeRestoreImage_PreviewMouseLeftButtonDown"
                     Source="/Images/WindowsHeaderButtons/window-maximize.png"
-                    ToolTip="Развернуть" />
+                    ToolTip="{DynamicResource WindowMaximize}" />
 
                 <Image
                     x:Name="CloseImage"
@@ -202,7 +202,7 @@
                     Cursor="Hand"
                     PreviewMouseLeftButtonDown="CloseImage_PreviewMouseLeftButtonDown"
                     Source="/Images/WindowsHeaderButtons/close-thick.png"
-                    ToolTip="Закрыть" />
+                    ToolTip="{DynamicResource WindowClose}" />
             </StackPanel>
         </Grid>
 

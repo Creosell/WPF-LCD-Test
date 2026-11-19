@@ -161,6 +161,7 @@ namespace WPF_LCD_Test
                 {
                     "" => "/Resources/StringResources.xaml",
                     "zh-Hans" => "/Resources/StringResources.zh-Hans.xaml",
+                    "ru" => "/Resources/StringResources.ru.xaml",
                     _ => defaultResourcePath
                     };
 

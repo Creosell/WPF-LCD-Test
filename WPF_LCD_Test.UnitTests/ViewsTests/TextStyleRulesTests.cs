@@ -188,7 +188,7 @@ namespace WPF_LCD_Test.UnitTests.ViewsTests
             // The fields of a panel start at one x: its labels sit in a column whose width is shared, so it is as wide as the widest label.
             var loose = Pages()
                 .SelectMany(p => p.Document.Descendants().Where(e => e.Name.LocalName == "Label").Select(e => (p.File, Element: e)))
-                .Where(l => ((string?)l.Element.Attribute("Content") ?? "").StartsWith('{'))
+                .Where(l => ((string?)l.Element.Attribute("Content") ?? "").StartsWith('{') && !((string?)l.Element.Attribute("Content"))!.Contains("DynamicResource Unit"))  // a unit after a field is not a label
                 .Where(l => l.Element.Parent is not { Name.LocalName: "Grid" } grid
                     || !grid.Descendants().Any(d => d.Name.LocalName == "ColumnDefinition" && d.Attribute("SharedSizeGroup") != null))
                 .Select(l => $"{l.File}: {l.Element.Attribute("Content")?.Value}");

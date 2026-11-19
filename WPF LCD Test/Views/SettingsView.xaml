@@ -147,7 +147,7 @@
                         ToolTip="{Binding SyncFrequencyHint}" />
                     <Label
                         VerticalAlignment="Center"
-                        Content="Hz" />
+                        Content="{DynamicResource UnitHz}" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Visibility="{Binding IsIntegrationTimeVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TextBox
@@ -162,7 +162,7 @@
                         ToolTip="{Binding IntegrationTimeHint}" />
                     <Label
                         VerticalAlignment="Center"
-                        Content="ms" />
+                        Content="{DynamicResource UnitMs}" />
                 </StackPanel>
             </StackPanel>
 

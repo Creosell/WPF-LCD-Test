@@ -93,7 +93,7 @@ Current version: **1.4.0** (set in `WPF LCD Test\Screen Checker.csproj` — `Ass
 
 ## Localization
 
-Supports English (default) and Chinese Simplified. Resources in `WPF LCD Test/Resources/StringResources.xaml` and `StringResources.zh-Hans.xaml`. Language can be switched at runtime.
+Supports English (default), Chinese Simplified and Russian. Resources in `WPF LCD Test/Resources/StringResources.xaml` and `StringResources.zh-Hans.xaml`. Language can be switched at runtime.
 
 ## Testing
 

@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.4.0] - 2026-11-17
 
 ### Added
+- **Russian** as the third interface language (`StringResources.ru.xaml`, `Resources.ru.resx`); the names of the measurement points agree with the word "point". Texts of the interface that were written into the pages (window buttons, units, range messages, "n/a") are resources now, and `LocalizationResourcesTests` keeps the keys and format placeholders of all languages in step
 - **Konica Minolta CA-410 support** through CA-SDK2 (`CASDK2Net.dll`, x64): connection, zero calibration, channel selection and measurements. The CA-410 is connected directly to the measuring probe, so only the probe serial number is available. The legacy CA-310 (COM) driver is kept as a fallback; the device family is detected automatically during zero calibration (CA-410 first, then CA-310)
 - Zero calibration reads the active channel from the probe instead of overwriting it with the Settings value; the confirmed channel is saved to the settings
 - `analyzers.json` next to the executable remembers the last confirmed channel per probe serial number. When the probe channel differs from the remembered one, a dialog lets the inspector pick either of the two; closing it cancels the calibration

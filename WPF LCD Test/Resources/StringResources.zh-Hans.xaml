@@ -143,4 +143,12 @@
     <system:String x:Key="ResetToDefaultButton">
         恢复默认
     </system:String>
+
+    <!--  Window buttons, units  -->
+    <system:String x:Key="WindowMinimize">最小化</system:String>
+    <system:String x:Key="WindowMaximize">最大化</system:String>
+    <system:String x:Key="WindowClose">关闭</system:String>
+    <system:String x:Key="UnitHz">Hz</system:String>
+    <system:String x:Key="UnitMs">ms</system:String>
+    <system:String x:Key="BadConnection">连接失败。请尝试重启色彩分析仪</system:String>
 </ResourceDictionary>

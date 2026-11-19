@@ -145,4 +145,11 @@
     <system:String x:Key="ResetToDefaultButton">
         Reset to default
     </system:String>
+
+    <!--  Window buttons, units  -->
+    <system:String x:Key="WindowMinimize">Minimize</system:String>
+    <system:String x:Key="WindowMaximize">Maximize</system:String>
+    <system:String x:Key="WindowClose">Close</system:String>
+    <system:String x:Key="UnitHz">Hz</system:String>
+    <system:String x:Key="UnitMs">ms</system:String>
 </ResourceDictionary>

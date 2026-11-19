@@ -138,9 +138,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModels
         [Test]
         public void Constructor_PopulatesAvailableLanguages()
             {
-            Assert.That(_viewModel.AvailableLanguages.Count, Is.EqualTo(2));
-            Assert.That(_viewModel.AvailableLanguages.Any(l => l.CultureCode == ""), Is.True);
-            Assert.That(_viewModel.AvailableLanguages.Any(l => l.CultureCode == "zh-Hans"), Is.True);
+            Assert.That(_viewModel.AvailableLanguages.Select(l => l.CultureCode), Is.EqualTo(new[] { "", "zh-Hans", "ru" }));
             }
 
         [Test]

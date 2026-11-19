@@ -189,6 +189,9 @@
   <data name="Chinese" xml:space="preserve">
     <value>中文</value>
   </data>
+  <data name="Russian" xml:space="preserve">
+    <value>Русский</value>
+  </data>
   <data name="ZeroCalibration" xml:space="preserve">
     <value>零校准</value>
   </data>
@@ -226,7 +229,7 @@
     <value>9。右下</value>
   </data>
   <data name="LanguageMenu" xml:space="preserve">
-    <value>Language</value>
+    <value>语言</value>
   </data>
   <data name="RedPoint" xml:space="preserve">
     <value>R. 红色</value>
@@ -694,5 +697,23 @@
   </data>
   <data name="SaveSpecQuestion" xml:space="preserve">
     <value>仍要保存结果吗？</value>
+  </data>
+  <data name="AllowedRange" xml:space="preserve">
+    <value>允许范围：{0}</value>
+  </data>
+  <data name="InvalidChannelFormat" xml:space="preserve">
+    <value>通道格式无效</value>
+  </data>
+  <data name="AvailableChannels" xml:space="preserve">
+    <value>可用通道：{0}-{1}</value>
+  </data>
+  <data name="NotAvailable" xml:space="preserve">
+    <value>无</value>
+  </data>
+  <data name="UnitHz" xml:space="preserve">
+    <value>Hz</value>
+  </data>
+  <data name="UnitMs" xml:space="preserve">
+    <value>ms</value>
   </data>
 </root>

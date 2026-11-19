@@ -189,6 +189,9 @@
   <data name="Chinese" xml:space="preserve">
     <value>中文</value>
   </data>
+  <data name="Russian" xml:space="preserve">
+    <value>Русский</value>
+  </data>
   <data name="ZeroCalibration" xml:space="preserve">
     <value>Zero Calibration</value>
   </data>
@@ -694,5 +697,23 @@ Close the application anyway?</value>
   </data>
   <data name="SaveSpecQuestion" xml:space="preserve">
     <value>Save the results anyway?</value>
+  </data>
+  <data name="AllowedRange" xml:space="preserve">
+    <value>Allowed range: {0}</value>
+  </data>
+  <data name="InvalidChannelFormat" xml:space="preserve">
+    <value>Invalid channel format</value>
+  </data>
+  <data name="AvailableChannels" xml:space="preserve">
+    <value>Available channels: {0}-{1}</value>
+  </data>
+  <data name="NotAvailable" xml:space="preserve">
+    <value>n/a</value>
+  </data>
+  <data name="UnitHz" xml:space="preserve">
+    <value>Hz</value>
+  </data>
+  <data name="UnitMs" xml:space="preserve">
+    <value>ms</value>
   </data>
 </root>

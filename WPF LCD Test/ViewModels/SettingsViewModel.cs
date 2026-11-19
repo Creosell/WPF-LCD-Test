@@ -102,8 +102,8 @@ namespace WPF_LCD_Test.ViewModels
                     }
                 }
             }
-        public string SyncFrequencyHint => FormatRange(AnalyzerCapabilities.GetFrequencyRange(_colorMeasurementService.Model), "Hz");
-        public string IntegrationTimeHint => FormatRange(AnalyzerCapabilities.GetIntegrationTimeRange(), "ms");
+        public string SyncFrequencyHint => FormatRange(AnalyzerCapabilities.GetFrequencyRange(_colorMeasurementService.Model), UnitHz);
+        public string IntegrationTimeHint => FormatRange(AnalyzerCapabilities.GetIntegrationTimeRange(), UnitMs);
         private string _languageCultureCode;
         public string LanguageCultureCode
             {
@@ -235,6 +235,7 @@ namespace WPF_LCD_Test.ViewModels
             {
             AvailableLanguages.Add(new() { DisplayName = English, CultureCode = "" });
             AvailableLanguages.Add(new() { DisplayName = Chinese, CultureCode = "zh-Hans" });
+            AvailableLanguages.Add(new() { DisplayName = Russian, CultureCode = "ru" });
             }
 
         // Обновляет отображаемые названия языков при смене языка
@@ -242,6 +243,8 @@ namespace WPF_LCD_Test.ViewModels
             {
             Debug.WriteLine("SettingsViewModel: Получено событие LanguageChanged.");
             foreach (var option in AvailableThemes) option.Refresh();
+            OnPropertyChanged(nameof(SyncFrequencyHint));
+            OnPropertyChanged(nameof(IntegrationTimeHint));
             }
 
         private void ColorMeasurementService_CurrentChannelChanged(object sender, int e)
@@ -329,10 +332,10 @@ namespace WPF_LCD_Test.ViewModels
                 MeasurementSpeed = MeasurementSpeed,
                 SyncMode = SyncMode,
                 SyncFrequency = IsSyncFrequencyVisible
-                    ? GetRangedValue(SyncFrequency, AnalyzerCapabilities.GetFrequencyRange(_colorMeasurementService.Model), saved.SyncFrequency, AnalyzerCapabilities.DefaultFrequency, "Hz", value => SyncFrequency = value)
+                    ? GetRangedValue(SyncFrequency, AnalyzerCapabilities.GetFrequencyRange(_colorMeasurementService.Model), saved.SyncFrequency, AnalyzerCapabilities.DefaultFrequency, UnitHz, value => SyncFrequency = value)
                     : saved.SyncFrequency,
                 IntegrationTime = IsIntegrationTimeVisible
-                    ? GetRangedValue(IntegrationTime, AnalyzerCapabilities.GetIntegrationTimeRange(), saved.IntegrationTime, AnalyzerCapabilities.DefaultIntegrationTime, "ms", value => IntegrationTime = value)
+                    ? GetRangedValue(IntegrationTime, AnalyzerCapabilities.GetIntegrationTimeRange(), saved.IntegrationTime, AnalyzerCapabilities.DefaultIntegrationTime, UnitMs, value => IntegrationTime = value)
                     : saved.IntegrationTime
                 };
             bool written = SaveSettings(settingsToSave);
@@ -363,7 +366,7 @@ namespace WPF_LCD_Test.ViewModels
                 }
 
             _validationFailed = true;
-            _dialogService.ShowMessage($"Allowed range: {FormatRange(range, unit)}", Err);
+            _dialogService.ShowMessage(string.Format(AllowedRange, FormatRange(range, unit)), Err);
             result = saved is double previous && previous >= range.Min && previous <= range.Max ? previous : defaultValue;
             setText(FormatValue(result));
             return result;
@@ -381,8 +384,8 @@ namespace WPF_LCD_Test.ViewModels
                 _validationFailed = true;
                 _dialogService.ShowMessage(
                     !int.TryParse(channel, out _)
-                        ? "Invalid channel format"
-                        : $"Available channels: {AppConstants.ColorAnalyzer.MinChannel}-{AppConstants.ColorAnalyzer.MaxChannel}",
+                        ? InvalidChannelFormat
+                        : string.Format(AvailableChannels, AppConstants.ColorAnalyzer.MinChannel, AppConstants.ColorAnalyzer.MaxChannel),
                     Err);
 
                 return int.TryParse(_settingsService.LoadSettings().ColorAnalyzerChannel, out int fallback)

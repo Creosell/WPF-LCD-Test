@@ -79,6 +79,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Allowed range: {0}.
+        /// </summary>
+        public static string AllowedRange {
+            get {
+                return ResourceManager.GetString("AllowedRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to already activated.
         /// </summary>
         public static string AlreadyActivated {
@@ -102,6 +111,15 @@ namespace WPF_LCD_Test.Resources {
         public static string Attempt {
             get {
                 return ResourceManager.GetString("Attempt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Available channels: {0}-{1}.
+        /// </summary>
+        public static string AvailableChannels {
+            get {
+                return ResourceManager.GetString("AvailableChannels", resourceCulture);
             }
         }
         
@@ -630,6 +648,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid channel format.
+        /// </summary>
+        public static string InvalidChannelFormat {
+            get {
+                return ResourceManager.GetString("InvalidChannelFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid report configuration.
         /// </summary>
         public static string InvalidReportConfiguration {
@@ -801,6 +828,15 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to n/a.
+        /// </summary>
+        public static string NotAvailable {
+            get {
+                return ResourceManager.GetString("NotAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please, try to measure again.
         /// </summary>
         public static string PleaseTryToMeasureAgain {
@@ -896,6 +932,15 @@ namespace WPF_LCD_Test.Resources {
         public static string RunExternalAppUnexpectedErr {
             get {
                 return ResourceManager.GetString("RunExternalAppUnexpectedErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Русский.
+        /// </summary>
+        public static string Russian {
+            get {
+                return ResourceManager.GetString("Russian", resourceCulture);
             }
         }
         
@@ -1634,6 +1679,24 @@ namespace WPF_LCD_Test.Resources {
         public static string UnexpectedMeasurementErr {
             get {
                 return ResourceManager.GetString("UnexpectedMeasurementErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hz.
+        /// </summary>
+        public static string UnitHz {
+            get {
+                return ResourceManager.GetString("UnitHz", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ms.
+        /// </summary>
+        public static string UnitMs {
+            get {
+                return ResourceManager.GetString("UnitMs", resourceCulture);
             }
         }
         

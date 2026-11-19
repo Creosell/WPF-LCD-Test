@@ -1,0 +1,83 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    <!--  MainWindow keys  -->
+    <system:String x:Key="MeasurementTitle">Измерение</system:String>
+    <system:String x:Key="SettingsTitle">Настройки</system:String>
+
+    <!--  MeasurementView keys  -->
+    <system:String x:Key="TV">ТВ</system:String>
+    <system:String x:Key="DeviceConfiguration">Конфигурация устройства</system:String>
+    <system:String x:Key="BadConnection">Не удалось подключиться. Перезапустите цветовой анализатор</system:String>
+    <system:String x:Key="English">English</system:String>
+    <system:String x:Key="Chinese">中文</system:String>
+    <system:String x:Key="ZeroCalibration">Калибровка нуля</system:String>
+    <system:String x:Key="DeviceCardNoAnalyzer">Нет анализатора</system:String>
+    <system:String x:Key="DeviceCardPressCalibration">Нажмите «Калибровка нуля»</system:String>
+    <system:String x:Key="DeviceCardCalibrating">Калибровка…</system:String>
+    <system:String x:Key="MeasurementTimeSec">Время измерения (с):</system:String>
+    <system:String x:Key="SerialNumber">Серийный номер:</system:String>
+    <system:String x:Key="TopLeftPoint">1. Верхняя левая</system:String>
+    <system:String x:Key="TopCenterPoint">2. Верхняя центр.</system:String>
+    <system:String x:Key="TopRightPoint">3. Верхняя правая</system:String>
+    <system:String x:Key="MiddleLeftPoint">4. Средняя левая</system:String>
+    <system:String x:Key="CenterPoint">5. Центральная</system:String>
+    <system:String x:Key="MiddleRightPoint">6. Средняя правая</system:String>
+    <system:String x:Key="BottomLeftPoint">7. Нижняя левая</system:String>
+    <system:String x:Key="BottomCenterPoint">8. Нижняя центр.</system:String>
+    <system:String x:Key="BottomRightPoint">9. Нижняя правая</system:String>
+    <system:String x:Key="ThemeLabel">Тема</system:String>
+    <system:String x:Key="LanguageMenu">Language / 语言 / Язык</system:String>
+    <system:String x:Key="RedPoint">R. Красная</system:String>
+    <system:String x:Key="GreenPoint">G. Зелёная</system:String>
+    <system:String x:Key="BluePoint">B. Синяя</system:String>
+    <system:String x:Key="WhitePoint">W. Белая</system:String>
+    <system:String x:Key="BlackPoint">0. Чёрная</system:String>
+    <system:String x:Key="SaveResultsButton">Сохранить результаты</system:String>
+    <system:String x:Key="ClearFieldsButton">Очистить результаты</system:String>
+    <system:String x:Key="NewDeviceUnderTestButton">Сохранить результаты</system:String>
+    <system:String x:Key="CopyLogWindow">Копировать журнал</system:String>
+    <system:String x:Key="ClearLogWindow">Очистить журнал</system:String>
+    <system:String x:Key="ReportButtonBusy">Создание...</system:String>
+    <system:String x:Key="UploadButtonBusy">Выгрузка...</system:String>
+    <system:String x:Key="CancelOnClickToolTip">Нажмите ещё раз, чтобы отменить</system:String>
+    <system:String x:Key="FeedbackReset">Сброшено</system:String>
+    <system:String x:Key="FeedbackSaved">Сохранено</system:String>
+    <system:String x:Key="FeedbackCleared">Очищено</system:String>
+    <system:String x:Key="FeedbackDone">Готово</system:String>
+    <system:String x:Key="FeedbackUploaded">Выгружено</system:String>
+    <system:String x:Key="FeedbackCalibrated">Откалибровано</system:String>
+    <system:String x:Key="FeedbackFailed">Ошибка</system:String>
+    <system:String x:Key="FeedbackCanceled">Отменено</system:String>
+    <system:String x:Key="DialogYes">Да</system:String>
+    <system:String x:Key="DialogNo">Нет</system:String>
+    <system:String x:Key="DialogOk">OK</system:String>
+    <system:String x:Key="ReportButton">Создать отчёт</system:String>
+    <system:String x:Key="UploadButton">Выгрузить отчёты</system:String>
+
+    <system:String x:Key="ResultsTab">Результаты</system:String>
+    <system:String x:Key="LogTab">Журнал</system:String>
+    <system:String x:Key="ResultsColumnTries">Попыт.</system:String>
+    <system:String x:Key="ResultsColumnPoint">Точка</system:String>
+
+    <!--  Device info panel  -->
+    <system:String x:Key="SpecPanelTitle">Данные устройства</system:String>
+    <system:String x:Key="SpecColumnParameter">Параметр</system:String>
+    <system:String x:Key="SpecColumnValue">Значение</system:String>
+    <system:String x:Key="SpecColumnSpec">Спец.</system:String>
+
+    <!--  SettingsView keys  -->
+    <system:String x:Key="ColorAnalyzerChannel">Канал анализатора</system:String>
+    <system:String x:Key="MeasurementSpeedLabel">Скорость измерения</system:String>
+    <system:String x:Key="SyncModeLabel">Режим синхронизации</system:String>
+    <system:String x:Key="SaveButton">Сохранить</system:String>
+    <system:String x:Key="ResetToDefaultButton">Сбросить по умолчанию</system:String>
+
+    <!--  Window buttons, units  -->
+    <system:String x:Key="WindowMinimize">Свернуть</system:String>
+    <system:String x:Key="WindowMaximize">Развернуть</system:String>
+    <system:String x:Key="WindowClose">Закрыть</system:String>
+    <system:String x:Key="UnitHz">Гц</system:String>
+    <system:String x:Key="UnitMs">мс</system:String>
+</ResourceDictionary>
