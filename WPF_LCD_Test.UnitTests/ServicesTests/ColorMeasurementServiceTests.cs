@@ -351,6 +351,42 @@ namespace WPF_LCD_Test.Tests
             // Для данного теста, мы проверяем, что сервис не падает и логирует ошибку.
             }
 
+        [TestCase(-3200.0, 6500.0)]
+        [TestCase(0.0, 6500.0)]
+        [TestCase(double.PositiveInfinity, 6500.0)]
+        [TestCase(double.NaN, 6500.0)]
+        public async Task MeasureAsync_AColorTemperatureThatIsNotPositiveIsUndefined(double reported, double other)
+            {
+            _mockCa200.Setup(m => m.AutoConnect()).Verifiable();
+            await _service.ConnectAsync();
+            await _service.CalibrateZeroAsync();
+            _mockProbe.Setup(p => p.sx).Returns(0.3);
+            _mockProbe.Setup(p => p.sy).Returns(0.3);
+            _mockProbe.Setup(p => p.Lv).Returns(100.0);
+            _mockProbe.SetupSequence(p => p.T).Returns(other).Returns(reported);
+
+            var measurement = await _service.MeasureAsync(2);
+
+            Assert.That(measurement.IsValid, Is.True);
+            Assert.That(double.IsPositiveInfinity(measurement.T), Is.True, "undefined, so the table shows n/a and the file null");
+            }
+
+        [Test]
+        public async Task MeasureAsync_PositiveColorTemperaturesAreAveraged()
+            {
+            _mockCa200.Setup(m => m.AutoConnect()).Verifiable();
+            await _service.ConnectAsync();
+            await _service.CalibrateZeroAsync();
+            _mockProbe.Setup(p => p.sx).Returns(0.3);
+            _mockProbe.Setup(p => p.sy).Returns(0.3);
+            _mockProbe.Setup(p => p.Lv).Returns(100.0);
+            _mockProbe.SetupSequence(p => p.T).Returns(6000.0).Returns(6200.0);
+
+            var measurement = await _service.MeasureAsync(2);
+
+            Assert.That(measurement.T, Is.EqualTo(6100.0));
+            }
+
         // --- Тесты для Disconnect / Dispose ---
 
         [Test]

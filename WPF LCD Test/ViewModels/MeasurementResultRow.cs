@@ -148,14 +148,15 @@ namespace WPF_LCD_Test.ViewModels
             }
 
         /// <summary>
-        /// Shows the attempts counter: only for a point that had a remark against the specification in any attempt.
+        /// Shows the attempts counter: for a point that had a remark against the specification in any attempt, or that takes part
+        /// in a check with a remark now (the white and black points of the contrast, the points of the gamut).
         /// It is green when the point has enough attempts or its accepted attempt has no remark any more.
         /// </summary>
         /// <param name="info">What the specification check found out about the attempts of the point, if anything.</param>
         /// <param name="isClean">True when no check of the specification has a remark about the point.</param>
         public void ShowAttempts(SpecAttemptInfo? info, bool isClean = false)
             {
-            if (info is not { Deviated: true })
+            if (info == null || (!info.Deviated && isClean))
                 {
                 (Tries, TriesLevel) = (Dash, TriesLevel.None);
                 return;

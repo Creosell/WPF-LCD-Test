@@ -1209,6 +1209,40 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             Assert.That((row.Tries, row.TriesLevel), Is.EqualTo(("2/3", TriesLevel.Few)));
             }
 
+        [TestCase(1, 1, "1/3", TriesLevel.Few)]
+        [TestCase(2, 1, "2/3", TriesLevel.Few)]
+        [TestCase(3, 1, "3/3", TriesLevel.Enough)]
+        public async Task ExecuteMeasureAsync_ThePointsOfACheckWithARemarkShowTheirAttemptsEvenWhenNoAttemptDeviatedOnItsOwn(int white, int black, string expectedWhite, TriesLevel level)
+            {
+            _mockDispatcher.Setup(d => d.CheckAccess()).Returns(true);
+            _mockFileService.Setup(f => f.SerializeDevice(It.IsAny<DeviceUnderTest>())).Returns("{}");
+            var evaluation = new SpecEvaluation(SpecVerdict.Fail, false,
+                [new SpecCheck("Contrast", 3000, 4125, 5500, null, SpecStatus.Fail, ["WhiteColor", "BlackColor"], [])])
+                {
+                Attempts = new Dictionary<string, SpecAttemptInfo> { ["WhiteColor"] = new(white, 0, false), ["BlackColor"] = new(black, 0, false) }
+                };
+            _mockSpecEvaluationService.Setup(s => s.EvaluateAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new SpecEvaluationOutcome(evaluation, null));
+            _viewModel.SelectedDeviceConfiguration = "TestConfig";
+            _viewModel.ExecuteApplySerialNumber("SN12345");
+            _viewModel.IsDeviceConnected = true;
+            _viewModel.IsDeviceCalibrated = true;
+            var location = MeasurementLocation.BlackColor.ToString();
+            _mockColorMeasurementService.Setup(s => s.MeasureAsync(It.IsAny<int>()))
+                .ReturnsAsync(new Measurement { Location = location, x = 0.3127, y = 0.3290, Lv = 0.02, T = 6500, IsValid = true });
+
+            await ((RelayCommand)_viewModel.MeasureCommand).ExecuteAsync(location);
+            await Task.Delay(50);
+
+            var whiteRow = _viewModel.Results.Single(r => r.Location == nameof(MeasurementLocation.WhiteColor));
+            var blackRow = _viewModel.Results.Single(r => r.Location == location);
+            Assert.Multiple(() =>
+                {
+                Assert.That((whiteRow.Tries, whiteRow.TriesLevel), Is.EqualTo((expectedWhite, level)), "a point of the contrast has a counter, though no attempt of its own failed");
+                Assert.That(blackRow.Tries, Is.EqualTo("1/3"));
+                });
+            }
+
         [Test]
         public async Task ExecuteMeasureAsync_TheCounterIsGreenWhenTheAcceptedAttemptHasNoRemarks()
             {

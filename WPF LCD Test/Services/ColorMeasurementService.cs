@@ -341,7 +341,7 @@ namespace WPF_LCD_Test.Services
                     var xValues = new double[measurementTime];
                     var yValues = new double[measurementTime];
                     var LvValues = new double[measurementTime];
-                    var TValues = new double[measurementTime];
+                    var temperatures = new List<double>(measurementTime);
 
                     for (var i = 0; i < measurementTime; i++)
                         {
@@ -354,7 +354,7 @@ namespace WPF_LCD_Test.Services
                                 xValues[i] = probe.sx;
                                 yValues[i] = probe.sy;
                                 LvValues[i] = probe.Lv;
-                                TValues[i] = probe.T;
+                                temperatures.Add(probe.T);
                                 }
                             MeasurementProgress?.Invoke(this, (double)( i + 1 ) / measurementTime * 100);
                             }
@@ -378,7 +378,7 @@ namespace WPF_LCD_Test.Services
                     result.x = xValues.Average();
                     result.y = yValues.Average();
                     result.Lv = LvValues.Average();
-                    result.T = TValues.Average();
+                    result.T = AverageTemperature(temperatures);
                     result.IsValid = true;
                     }
                 catch (Exception ex)
@@ -390,6 +390,16 @@ namespace WPF_LCD_Test.Services
 
             return result;
             }
+
+        /// <summary>
+        /// Averages the color temperature samples of a measurement. A color temperature is never negative or zero: an analyzer reports
+        /// such a value (CA-310) or infinity (CA-410) when the color has none, so a measurement with a sample like that has no color
+        /// temperature at all and gets infinity, which the table shows as "n/a" and the saved file as null.
+        /// </summary>
+        /// <param name="samples">The temperatures of the successful iterations.</param>
+        /// <returns>The average, or <see cref="double.PositiveInfinity"/> when the temperature is undefined.</returns>
+        private static double AverageTemperature(IReadOnlyCollection<double> samples) =>
+            samples.Count == 0 || samples.Any(sample => !double.IsFinite(sample) || sample <= 0) ? double.PositiveInfinity : samples.Average();
 
         /// <summary>
         /// Releases all resources used by ColorMeasurementService.
