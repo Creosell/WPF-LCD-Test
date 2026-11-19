@@ -66,6 +66,8 @@ dotnet test --filter "FullyQualifiedName~TestClassName.TestMethodName"
 
 **Themes:** `IThemeService` (singleton) resolves `ThemeMode` (Dark, Light, System), applies it through `IThemeApplier` (`WpfThemeApplier`: Material Design base theme plus the dictionary `Resources/Themes/Theme.{Dark|Light}.xaml`) and stores it via `ISettingsService.UpdateTheme`. Views use `{DynamicResource App...|Status...|Log...}` keys, never hardcoded page colors; both theme files must define the same keys (a unit test checks it).
 
+**Shared control styles:** `Resources/Styles/FieldStyles.xaml` (merged in `App.xaml`) holds the look of the input controls of every page: `UnderlinedTextBoxStyle`, `UnderlinedComboBoxStyle`, `UnderlinedDropdownButtonStyle` (a one pixel underline of the same thickness in every state, only the hover recolors it) and `ActionButtonStyle` (rounded action button). Pages take these styles and do not restyle the controls on their own.
+
 **Commands:** ViewModels use `RelayCommand` (in `Commands/`) for ICommand implementation binding to UI actions.
 
 ## Project Map (graphify)

@@ -39,7 +39,7 @@
         <!--  A button of a cancelable action: while the action runs its label tells so and a second click cancels it  -->
         <Style
             x:Key="CreateReportButtonStyle"
-            BasedOn="{StaticResource {x:Type Button}}"
+            BasedOn="{StaticResource ActionButtonStyle}"
             TargetType="Button">
             <Setter Property="Content" Value="{DynamicResource ReportButton}" />
             <Style.Triggers>
@@ -51,7 +51,7 @@
         </Style>
         <Style
             x:Key="UploadReportsButtonStyle"
-            BasedOn="{StaticResource {x:Type Button}}"
+            BasedOn="{StaticResource ActionButtonStyle}"
             TargetType="Button">
             <Setter Property="Content" Value="{DynamicResource UploadButton}" />
             <Setter Property="ContentTemplate">
@@ -219,63 +219,6 @@
                     <Setter Property="IsCheckable" Value="True" />
                     <Setter Property="IsChecked" Value="{Binding IsSelected}" />
                 </DataTrigger>
-            </Style.Triggers>
-        </Style>
-
-        <!--
-            MaterialDesignFlatButton fills the entire button area on hover (a ripple-style highlight),
-            which reads as inconsistent next to the plain underline hover of the SN TextBox. This template
-            keeps only a bottom underline that brightens on hover, matching the TextBox's affordance.
-        -->
-        <!--  Plain field with a one pixel underline: the line looks like the underline of the device configuration button: the same thickness and color in every state, only the hover recolors it  -->
-        <Style x:Key="SerialNumberTextBoxStyle" TargetType="TextBox">
-            <Setter Property="FontFamily" Value="Segoe UI" />
-            <Setter Property="Padding" Value="0,4" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="CaretBrush" Value="{DynamicResource AppTextPrimary}" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TextBox">
-                        <Border
-                            x:Name="Line"
-                            Padding="{TemplateBinding Padding}"
-                            Background="Transparent"
-                            BorderBrush="{DynamicResource MaterialDesign.Brush.TextBox.Border}"
-                            BorderThickness="0,0,0,1">
-                            <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center" Focusable="False" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Line" Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.TextBox.HoverBorder}" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="DeviceConfigDropdownButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.TextBox.Border}" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="FontFamily" Value="Segoe UI" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border
-                            x:Name="Underline"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="0,0,0,1">
-                            <ContentPresenter Margin="0,0,0,4" />
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <!--  Hover is a style trigger on the button's own BorderBrush, so the local brush of the feedback breathing wins over it  -->
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.TextBox.HoverBorder}" />
-                </Trigger>
             </Style.Triggers>
         </Style>
 
@@ -530,10 +473,9 @@
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0" Orientation="Horizontal">
                     <Button
-                        Margin="5"
-                        MaterialDesign:ButtonAssist.CornerRadius="15"
                         Command="{Binding DataContext.ZeroCalibrationCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
-                        Content="{DynamicResource ZeroCalibration}" />
+                        Content="{DynamicResource ZeroCalibration}"
+                        Style="{StaticResource ActionButtonStyle}" />
                     <Border
                         x:Name="DeviceCard"
                         Height="52"
@@ -631,7 +573,7 @@
                             VerticalAlignment="Center"
                             Click="DeviceConfigurationButton_Click"
                             Foreground="{DynamicResource AppTextPrimary}"
-                            Style="{StaticResource DeviceConfigDropdownButtonStyle}"
+                            Style="{StaticResource UnderlinedDropdownButtonStyle}"
                             Tag="{Binding}">
                             <Button.ContextMenu>
                                 <ContextMenu
@@ -685,7 +627,7 @@
                                 VerticalAlignment="Center"
                                 Foreground="{DynamicResource AppTextPrimary}"
                                 LostFocus="SerialNumberTextBox_LostFocus"
-                                Style="{StaticResource SerialNumberTextBoxStyle}"
+                                Style="{StaticResource UnderlinedTextBoxStyle}"
                                 Text="{Binding SerialNumber, UpdateSourceTrigger=Explicit}">
                                 <TextBox.InputBindings>
                                     <KeyBinding
@@ -1348,9 +1290,7 @@
                     x:Name="CreateReportButton"
                     behaviors:ActionFeedbackBehavior.Signal="{Binding ReportFeedback}"
                     behaviors:ActionFeedbackBehavior.SuccessText="FeedbackDone"
-                    Margin="5"
                     HorizontalAlignment="Left"
-                    MaterialDesign:ButtonAssist.CornerRadius="15"
                     Command="{Binding DataContext.ReportGenerateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                     CommandParameter="ReportGenerator.exe"
                     Style="{StaticResource CreateReportButtonStyle}" />
@@ -1358,9 +1298,7 @@
                     x:Name="UploadReportsButton"
                     behaviors:ActionFeedbackBehavior.Signal="{Binding UploadFeedback}"
                     behaviors:ActionFeedbackBehavior.SuccessText="FeedbackUploaded"
-                    Margin="5"
                     HorizontalAlignment="Left"
-                    MaterialDesign:ButtonAssist.CornerRadius="15"
                     Command="{Binding DataContext.UploadReportsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                     Style="{StaticResource UploadReportsButtonStyle}" />
             </StackPanel>
@@ -1374,18 +1312,16 @@
                     x:Name="SaveResultsButton"
                     behaviors:ActionFeedbackBehavior.Signal="{Binding SaveFeedback}"
                     behaviors:ActionFeedbackBehavior.SuccessText="FeedbackSaved"
-                    Margin="5"
-                    MaterialDesign:ButtonAssist.CornerRadius="15"
                     Command="{Binding DataContext.NewDeviceUnderTestCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                    Content="{DynamicResource NewDeviceUnderTestButton}" />
+                    Content="{DynamicResource NewDeviceUnderTestButton}"
+                    Style="{StaticResource ActionButtonStyle}" />
                 <Button
                     x:Name="ClearResultsButton"
                     behaviors:ActionFeedbackBehavior.Signal="{Binding ClearFeedback}"
                     behaviors:ActionFeedbackBehavior.SuccessText="FeedbackCleared"
-                    Margin="5"
-                    MaterialDesign:ButtonAssist.CornerRadius="15"
                     Command="{Binding DataContext.ClearFieldsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                    Content="{DynamicResource ClearFieldsButton}" />
+                    Content="{DynamicResource ClearFieldsButton}"
+                    Style="{StaticResource ActionButtonStyle}" />
             </StackPanel>
         </Grid>
     </Grid>

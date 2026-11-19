@@ -40,6 +40,7 @@
                     Content="{DynamicResource LanguageMenu}"
                     Foreground="{DynamicResource AppTextPrimary}" />
                 <ComboBox
+                    Style="{StaticResource UnderlinedComboBoxStyle}"
                     DropDownClosed="ComboBox_DropDownClosed"
                     Width="200"
                     DisplayMemberPath="DisplayName"
@@ -55,6 +56,7 @@
                     Content="{DynamicResource ThemeLabel}"
                     Foreground="{DynamicResource AppTextPrimary}" />
                 <ComboBox
+                    Style="{StaticResource UnderlinedComboBoxStyle}"
                     Width="200"
                     DisplayMemberPath="DisplayName"
                     DropDownClosed="ComboBox_DropDownClosed"
@@ -68,6 +70,7 @@
                     Content="{DynamicResource ColorAnalyzerChannel}"
                     Foreground="{DynamicResource AppTextPrimary}" />
                 <TextBox
+                    Style="{StaticResource UnderlinedTextBoxStyle}"
                     x:Name="ColorAnalyzerChannelTextBox"
                     MinWidth="30"
                     Margin="5"
@@ -85,6 +88,7 @@
                     Content="{DynamicResource MeasurementSpeedLabel}"
                     Foreground="{DynamicResource AppTextPrimary}" />
                 <ComboBox
+                    Style="{StaticResource UnderlinedComboBoxStyle}"
                     DropDownClosed="ComboBox_DropDownClosed"
                     Width="120"
                     ItemsSource="{Binding AvailableMeasurementSpeeds}"
@@ -97,6 +101,7 @@
                     Content="{DynamicResource SyncModeLabel}"
                     Foreground="{DynamicResource AppTextPrimary}" />
                 <ComboBox
+                    Style="{StaticResource UnderlinedComboBoxStyle}"
                     DropDownClosed="ComboBox_DropDownClosed"
                     Width="120"
                     DisplayMemberPath="Name"
@@ -105,6 +110,7 @@
                     SelectedValuePath="Mode" />
                 <StackPanel Orientation="Horizontal" Visibility="{Binding IsSyncFrequencyVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TextBox
+                    Style="{StaticResource UnderlinedTextBoxStyle}"
                         MinWidth="50"
                         Margin="10,5,0,5"
                         VerticalAlignment="Center"
@@ -121,6 +127,7 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Visibility="{Binding IsIntegrationTimeVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <TextBox
+                    Style="{StaticResource UnderlinedTextBoxStyle}"
                         MinWidth="50"
                         Margin="10,5,0,5"
                         VerticalAlignment="Center"
@@ -142,19 +149,17 @@
                 HorizontalAlignment="Right"
                 Orientation="Horizontal">
                 <Button
-                    Margin="5"
-                    MaterialDesign:ButtonAssist.CornerRadius="15"
                     behaviors:ActionFeedbackBehavior.Signal="{Binding SaveFeedback}"
                     behaviors:ActionFeedbackBehavior.SuccessText="FeedbackSaved"
                     Command="{Binding SaveSettingsCommand}"
-                    Content="{DynamicResource SaveButton}" />
+                    Content="{DynamicResource SaveButton}"
+                    Style="{StaticResource ActionButtonStyle}" />
                 <Button
-                    Margin="5"
-                    MaterialDesign:ButtonAssist.CornerRadius="15"
                     behaviors:ActionFeedbackBehavior.Signal="{Binding ResetFeedback}"
                     behaviors:ActionFeedbackBehavior.SuccessText="FeedbackReset"
                     Command="{Binding ResetToDefaultCommand}"
-                    Content="{DynamicResource ResetToDefaultButton}" />
+                    Content="{DynamicResource ResetToDefaultButton}"
+                    Style="{StaticResource ActionButtonStyle}" />
             </StackPanel>
         </StackPanel>
     </Grid>
