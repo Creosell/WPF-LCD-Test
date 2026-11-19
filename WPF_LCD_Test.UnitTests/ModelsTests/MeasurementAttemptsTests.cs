@@ -38,7 +38,7 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
         public void RecordAttempt_AfterALegacyMeasurementCountsItAsTheFirstAttempt()
             {
             var device = new DeviceUnderTest("SN1");
-            device.AddMeasurement(Attempt("Center", 100));
+            device.Measurements.Add(Attempt("Center", 100));
 
             device.RecordAttempt(Attempt("Center", 90));
 

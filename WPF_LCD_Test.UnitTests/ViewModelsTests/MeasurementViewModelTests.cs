@@ -108,7 +108,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             foreach (var status in allStatuses)
                 {
                 // Добавляем измерение для каждой требуемой точки
-                _viewModel.CurrentDevice.AddMeasurement(new Measurement { Location = status.Location, IsValid = true });
+                _viewModel.CurrentDevice.RecordAttempt(new Measurement { Location = status.Location, IsValid = true });
                 }
 
             // Act
@@ -126,7 +126,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             Assert.That(_viewModel.CurrentDevice, Is.Not.Null);
 
             // Добавляем только одно измерение
-            _viewModel.CurrentDevice.AddMeasurement(new Measurement { Location = "TopLeft", IsValid = true });
+            _viewModel.CurrentDevice.RecordAttempt(new Measurement { Location = "TopLeft", IsValid = true });
 
             // Act
             bool result = _viewModel.AreAllStatusesRepresentedInMeasurements();
@@ -611,7 +611,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             // Arrange
             _viewModel.ExecuteApplySerialNumber("SN12345");
             _viewModel.SelectedDeviceConfiguration = "TestConfig";
-            _viewModel.CurrentDevice!.AddMeasurement(new Measurement { Location = MeasurementLocation.RedColor.ToString(), IsValid = true });
+            _viewModel.CurrentDevice!.RecordAttempt(new Measurement { Location = MeasurementLocation.RedColor.ToString(), IsValid = true });
             _mockDialogService.Setup(d => d.ShowQuestion(It.IsAny<string>(), It.IsAny<string>())).Returns(true); // User accepts
 
             // Act
@@ -628,7 +628,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             // Arrange
             _viewModel.ExecuteApplySerialNumber("SN12345");
             _viewModel.SelectedDeviceConfiguration = "TestConfig";
-            _viewModel.CurrentDevice!.AddMeasurement(new Measurement { Location = MeasurementLocation.RedColor.ToString(), IsValid = true, x = 0.3, y = 0.3, Lv = 100, T = 6500 });
+            _viewModel.CurrentDevice!.RecordAttempt(new Measurement { Location = MeasurementLocation.RedColor.ToString(), IsValid = true, x = 0.3, y = 0.3, Lv = 100, T = 6500 });
 
             // Verify that not all statuses are represented (this should trigger ShowQuestion)
             var allStatusesRepresented = _viewModel.AreAllStatusesRepresentedInMeasurements();
@@ -664,7 +664,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             var allStatuses = _mockMeasurementStatusService.Object.AllMeasurementButtonStatuses;
             foreach (var status in allStatuses)
                 {
-                _viewModel.CurrentDevice!.AddMeasurement(new Measurement { Location = status.Location, IsValid = true, x = 0.3, y = 0.3, Lv = 100, T = 6500 });
+                _viewModel.CurrentDevice!.RecordAttempt(new Measurement { Location = status.Location, IsValid = true, x = 0.3, y = 0.3, Lv = 100, T = 6500 });
                 }
             _mockFileService.Setup(f => f.SaveDeviceDataToJsonAsync(It.IsAny<DeviceUnderTest>())).ReturnsAsync(true);
 
@@ -686,7 +686,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             var allStatuses = _mockMeasurementStatusService.Object.AllMeasurementButtonStatuses;
             foreach (var status in allStatuses)
                 {
-                _viewModel.CurrentDevice!.AddMeasurement(new Measurement { Location = status.Location, IsValid = true, x = 0.3, y = 0.3, Lv = 100, T = 6500 });
+                _viewModel.CurrentDevice!.RecordAttempt(new Measurement { Location = status.Location, IsValid = true, x = 0.3, y = 0.3, Lv = 100, T = 6500 });
                 }
             _mockFileService.Setup(f => f.SaveDeviceDataToJsonAsync(It.IsAny<DeviceUnderTest>())).ReturnsAsync(true);
 

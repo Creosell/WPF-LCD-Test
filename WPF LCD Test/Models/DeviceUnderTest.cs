@@ -56,18 +56,6 @@ namespace WPF_LCD_Test.Models
             }
 
         /// <summary>
-        /// Adds or replaces measurement for specific location.
-        /// </summary>
-        /// <param name="newMeasurement">Measurement to add.</param>
-        /// <exception cref="ArgumentNullException">Thrown when measurement is null.</exception>
-        public void AddMeasurement(Measurement newMeasurement)
-            {
-            ArgumentNullException.ThrowIfNull(newMeasurement);
-            Measurements.RemoveAll(m => m.Location == newMeasurement.Location);
-            Measurements.Add(newMeasurement);
-            }
-
-        /// <summary>
         /// Records an accepted measurement of a point as one more attempt. The point keeps all its attempts and its
         /// measurement holds the best one; until the specification check chooses, the best is the highest luminance.
         /// </summary>

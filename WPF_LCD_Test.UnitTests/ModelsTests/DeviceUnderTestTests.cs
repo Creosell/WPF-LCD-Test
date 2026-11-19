@@ -40,77 +40,50 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
             Assert.That(ex.Message, Does.Contain(SnCantBeEmpty), $"Exception message should contain '{SnCantBeEmpty}'.");
         }
 
-        // Тест для AddMeasurement - добавление в пустой список
         [Test]
-        public void AddMeasurement_AddsNewMeasurementToEmptyList()
+        public void RecordAttempt_AddsTheFirstMeasurementOfALocation()
         {
-            // Arrange
             DeviceUnderTest dut = new DeviceUnderTest("SN001");
-            Measurement newMeasurement = new Measurement("Center", 1, 2, 3, 4);
 
-            // Act
-            dut.AddMeasurement(newMeasurement);
+            var entry = dut.RecordAttempt(new Measurement("Center", 1, 2, 3, 4));
 
-            // Assert
             Assert.That(dut.Measurements, Has.Count.EqualTo(1), "Measurements list should contain one item.");
-            Assert.That(dut.Measurements[0], Is.SameAs(newMeasurement), "The added measurement should be the same instance.");
+            Assert.That(dut.Measurements[0], Is.SameAs(entry), "The returned entry is the one the device holds.");
+            Assert.That((entry.Location, entry.x, entry.y, entry.Lv, entry.T), Is.EqualTo(("Center", 1.0, 2.0, 3.0, 4.0)));
         }
 
-        // Тест для AddMeasurement - добавление в непустой список
         [Test]
-        public void AddMeasurement_AddsNewMeasurementToNonEmptyList()
+        public void RecordAttempt_KeepsTheMeasurementsOfOtherLocations()
         {
-            // Arrange
             DeviceUnderTest dut = new DeviceUnderTest("SN002");
-            Measurement existingMeasurement = new Measurement("Corner", 10, 20, 30, 40);
-            dut.AddMeasurement(existingMeasurement); // Добавим существующее измерение
+            dut.RecordAttempt(new Measurement("Corner", 10, 20, 30, 40));
 
-            Measurement newMeasurement = new Measurement("Edge", 5, 6, 7, 8);
+            dut.RecordAttempt(new Measurement("Edge", 5, 6, 7, 8));
 
-            // Act
-            dut.AddMeasurement(newMeasurement);
-
-            // Assert
-            Assert.That(dut.Measurements, Has.Count.EqualTo(2), "Measurements list should contain two items.");
-            Assert.That(dut.Measurements.Contains(existingMeasurement), Is.True, "Existing measurement should still be in the list.");
-            Assert.That(dut.Measurements.Contains(newMeasurement), Is.True, "New measurement should be added to the list.");
+            Assert.That(dut.Measurements.Select(m => m.Location), Is.EquivalentTo(new[] { "Corner", "Edge" }));
         }
 
-        // Тест для AddMeasurement - замена существующего измерения
         [Test]
-        public void AddMeasurement_ReplacesExistingMeasurementByLocation()
+        public void RecordAttempt_AnotherAttemptOfALocationKeepsBothAndHoldsTheBrightest()
         {
-            // Arrange
             DeviceUnderTest dut = new DeviceUnderTest("SN003");
-            Measurement originalCenterMeasurement = new Measurement("Center", 1, 2, 100, 25);
-            dut.AddMeasurement(originalCenterMeasurement);
-            dut.AddMeasurement(new Measurement("Edge", 5, 6, 7, 8)); // Добавим еще одно, чтобы проверить, что другие не затрагиваются
+            dut.RecordAttempt(new Measurement("Center", 1, 2, 100, 25));
+            dut.RecordAttempt(new Measurement("Edge", 5, 6, 7, 8));
 
-            Measurement updatedCenterMeasurement = new Measurement("Center", 1.1, 2.2, 101.1, 25.1); // То же Location, но другие данные
+            dut.RecordAttempt(new Measurement("Center", 1.1, 2.2, 101.1, 25.1));
 
-            // Act
-            dut.AddMeasurement(updatedCenterMeasurement);
-
-            // Assert
-            Assert.That(dut.Measurements, Has.Count.EqualTo(2), "Measurements list count should remain the same (original Center removed, new added).");
-            Assert.That(dut.Measurements.Contains(originalCenterMeasurement), Is.False, "Original Center measurement should be removed.");
-            Assert.That(dut.Measurements.Contains(updatedCenterMeasurement), Is.True, "Updated Center measurement should be added.");
-
-            // Проверяем, что в списке есть только одна запись с Location="Center" и это обновленная запись
-            Measurement foundMeasurement = dut.Measurements.Find(m => m.Location == "Center");
-            Assert.That(foundMeasurement, Is.SameAs(updatedCenterMeasurement), "The found 'Center' measurement should be the updated one.");
-            Assert.That(foundMeasurement.x, Is.EqualTo(1.1), "Updated measurement's x value is incorrect.");
+            Assert.That(dut.Measurements, Has.Count.EqualTo(2), "one entry per location");
+            var center = dut.Measurements.Single(m => m.Location == "Center");
+            Assert.That((center.x, center.Lv, dut.AttemptCount("Center")), Is.EqualTo((1.1, 101.1, 2)));
+            Assert.That(dut.AttemptCount("Edge"), Is.EqualTo(1), "the other locations are not touched");
         }
 
-        // Тест для AddMeasurement - обработка null аргумента
         [Test]
-        public void AddMeasurement_WithNullMeasurement_ThrowsArgumentNullException()
+        public void RecordAttempt_WithNullMeasurement_ThrowsArgumentNullException()
         {
-            // Arrange
             DeviceUnderTest dut = new DeviceUnderTest("SN004");
 
-            // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => dut.AddMeasurement(null), "AddMeasurement should throw ArgumentNullException for null input.");
+            Assert.Throws<ArgumentNullException>(() => dut.RecordAttempt(null!));
         }
 
         // Тест для проверки, что MeasurementDateTime можно изменить
@@ -157,7 +130,7 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
         public void ToString_ReturnsMeasurementString_WhenOneMeasurement()
         {
             var device = new DeviceUnderTest("SN123");
-            device.AddMeasurement(new Measurement(MeasurementLocation.WhiteColor.ToString(), 0.1, 0.2, 100, 5000));
+            device.RecordAttempt(new Measurement(MeasurementLocation.WhiteColor.ToString(), 0.1, 0.2, 100, 5000));
             var result = device.ToString();
             StringAssert.Contains("Location: WhiteColor", result);
             StringAssert.DoesNotContain("None", result);
@@ -167,8 +140,8 @@ namespace WPF_LCD_Test.UnitTests.ModelsTests
         public void ToString_ReturnsAllMeasurements_WhenMultipleMeasurements()
         {
             var device = new DeviceUnderTest("SN123");
-            device.AddMeasurement(new Measurement(MeasurementLocation.WhiteColor.ToString(), 0.1, 0.2, 100, 5000));
-            device.AddMeasurement(new Measurement(MeasurementLocation.BlackColor.ToString(), 0.3, 0.4, 50, 6000));
+            device.RecordAttempt(new Measurement(MeasurementLocation.WhiteColor.ToString(), 0.1, 0.2, 100, 5000));
+            device.RecordAttempt(new Measurement(MeasurementLocation.BlackColor.ToString(), 0.3, 0.4, 50, 6000));
             var result = device.ToString();
             StringAssert.Contains("Location: WhiteColor", result);
             StringAssert.Contains("Location: BlackColor", result);
