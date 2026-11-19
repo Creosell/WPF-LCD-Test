@@ -1155,7 +1155,8 @@ namespace WPF_LCD_Test.ViewModels
                 string retryMsg = $"{validationMessage} \n{PleaseTryToMeasureAgain}";
                 _dialogService.ShowMessage(retryMsg, $"{Warning}");
                 message = $"{FailedMeasurementForLocation}: {measurement.Location}.\n ({Attempt} {currentAttempt + 1}). {PleaseTryToMeasureAgain}";
-                string logMessage = $"{FailedMeasurementForLocation}: {measurement.Location}. {validationMessage.Replace('\n', ' ')}";
+                string reason = System.Text.RegularExpressions.Regex.Replace(validationMessage, @"\s+", " ").Trim();
+                string logMessage = $"{FailedMeasurementForLocation}: {LocalizedLocation(measurement.Location)} ({Attempt} {currentAttempt + 1}). {reason}";
                 Log(logMessage, severity: LogSeverity.Warning);
                 }
             else
@@ -1227,15 +1228,21 @@ namespace WPF_LCD_Test.ViewModels
             {
             Flash(ReportFeedback, exitCode == ReportExitCode.Success);
             ExecuteThreadInUI(RefreshPendingReports);
-            string message = exitCode switch
+            var (message, severity) = exitCode switch
                 {
-                    ReportExitCode.Success => $"{ReportGeneratedSuccessfully}",
-                    ReportExitCode.NoDataFound => $"{Warning}: {NoDataFoundForReportGenerator}",
-                    ReportExitCode.ConfigError => $"{Err}: {InvalidReportConfiguration}",
-                    _ => $"{ReportGenerationFailed} ({Code}: {(int)exitCode})."
+                    ReportExitCode.Success => ($"{ReportGeneratedSuccessfully}", LogSeverity.Info),
+                    ReportExitCode.NoDataFound => ($"{NoDataFoundForReportGenerator}", LogSeverity.Warning),
+                    ReportExitCode.ConfigError => ($"{InvalidReportConfiguration}", LogSeverity.Error),
+                    _ => ($"{ReportGenerationFailed} ({Code}: {(int)exitCode})", LogSeverity.Error)
                     };
-            Log(message);
+            Log(message, severity: severity);
             }
+
+        /// <summary>
+        /// Returns the name of a measurement point in the language of the interface (the identifier when it has no name).
+        /// </summary>
+        private static string LocalizedLocation(string location) =>
+            Resources.Resources.ResourceManager.GetString($"SpecLocation_{location}") is { Length: > 0 } name ? name : location;
 
         private static int GetAttemptCount(string location)
             {

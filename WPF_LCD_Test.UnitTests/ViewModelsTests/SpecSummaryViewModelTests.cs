@@ -84,7 +84,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
                 Check("Cg_rgb_area", 104.4, SpecStatus.Pass, 98, 100, null, "RedColor", "GreenColor", "BlueColor"),
                 Check("Cg_dcip3_uv", 90, SpecStatus.Pass, 88, null, null, "RedColor", "GreenColor", "BlueColor")), 3, 13);
 
-            Assert.That(_summary.Rows.Select(r => r.Name), Is.EqualTo(new[] { "sRGB gamut area, CIE 1931", "DCI-P3 gamut coverage, CIE 1976" }));
+            Assert.That(_summary.Rows.Select(r => r.Name), Is.EqualTo(new[] { "sRGB gamut area (CIE 1931)", "DCI-P3 gamut coverage (CIE 1976)" }));
             }
 
         [Test]
@@ -162,7 +162,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             _summary.Show(warning, 2, 13);
             _summary.Show(failure, 2, 13);
 
-            Assert.That(_log, Is.EqualTo(new[] { "Spec: Brightness (cd/m²) 348 < typ 360", "Spec: Brightness (cd/m²) 300 < min 320. Repeating the measurement is recommended" }));
+            Assert.That(_log, Is.EqualTo(new[] { "Brightness (cd/m²) 348 < typ 360", "Brightness (cd/m²) 300 < min 320. Repeat the measurement" }));
             }
 
         [Test]
@@ -259,7 +259,7 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
                 Attempts = new Dictionary<string, SpecAttemptInfo> { ["Center"] = new(1, 0, true) }
                 }, 1, 13);
 
-            Assert.That(_log.Single(), Is.EqualTo("Spec: Center: Brightness (cd/m²) 251 < min 290 (attempt 1). Repeating the measurement is recommended"));
+            Assert.That(_log.Single(), Is.EqualTo("Center: Brightness (cd/m²) 251 < min 290 (attempt 1). Repeat the measurement"));
             }
 
         [Test]
@@ -280,8 +280,8 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
 
             Assert.That(_log, Is.EqualTo(new[]
                 {
-                "Spec: Center: Brightness (cd/m²) 280 < typ 300 (attempt 1)",
-                "Spec: Center: Brightness (cd/m²) 285 < typ 300 (attempt 2)"
+                "Center: Brightness (cd/m²) 280 < typ 300 (attempt 1)",
+                "Center: Brightness (cd/m²) 285 < typ 300 (attempt 2)"
                 }));
             }
 
@@ -290,7 +290,80 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             {
             _summary.Show(Evaluation(SpecVerdict.Warn, true, Check("Delta_e", 3.5, SpecStatus.Warning, null, 3, 4, "Center")), 1, 13);
 
-            Assert.That(_log.Single(), Is.EqualTo("Spec: ΔE 3.5 > typ 3"));
+            Assert.That(_log.Single(), Is.EqualTo("ΔE 3.5 > typ 3"));
+            }
+
+        private static readonly (string Key, string[] Locations, double Value, double? Min, double? Typ, double? Max, SpecStatus Status)[] AllRemarks =
+            [
+            ("Brightness", ["Center"], 251, 290, 300, null, SpecStatus.Fail),
+            ("Brightness", ["Center"], 295, 290, 300, null, SpecStatus.Warning),
+            ("Brightness", ["WhiteColor"], 251, 290, 300, null, SpecStatus.Fail),
+            ("Black_luminance", ["BlackColor"], 0.4, null, 0.2, 0.3, SpecStatus.Fail),
+            ("Brightness_uniformity", ["TopLeft", "TopCenter", "TopRight", "MiddleLeft", "Center", "MiddleRight", "BottomLeft", "BottomCenter", "BottomRight"], 70, 80, 85, null, SpecStatus.Fail),
+            ("Contrast", ["WhiteColor", "BlackColor"], 3000, 4125, 5500, null, SpecStatus.Fail),
+            ("Temperature", ["Center"], 6000, 7300, 8000, 11300, SpecStatus.Fail),
+            ("Delta_e", ["Center"], 3.5, null, 3, 4, SpecStatus.Warning),
+            ("Delta_e", ["Center"], 4.5, null, 3, 4, SpecStatus.Fail),
+            ("Red_x", ["RedColor"], 0.6, 0.612, 0.672, 0.732, SpecStatus.Fail),
+            ("Green_y", ["GreenColor"], 0.3, 0.32, 0.33, 0.34, SpecStatus.Warning),
+            ("Blue_x", ["BlueColor"], 0.1, 0.12, 0.15, 0.16, SpecStatus.Fail),
+            ("White_x", ["WhiteColor"], 0.4, 0.28, 0.3, 0.32, SpecStatus.Fail),
+            ("Center_y", ["Center"], 0.4, 0.28, 0.3, 0.32, SpecStatus.Fail),
+            ("Cg_rgb_area", ["RedColor", "GreenColor", "BlueColor"], 90, 95, 99, null, SpecStatus.Fail),
+            ("Cg_ntsc_uv", ["RedColor", "GreenColor", "BlueColor"], 70, 72, 75, null, SpecStatus.Warning)
+            ];
+
+        /// <summary>The log line of every remark, with no attempt info and with one and three attempts, in both languages.</summary>
+        private IEnumerable<(string Culture, string Key, int Attempts, string Line)> RenderAllLogLines()
+            {
+            foreach (var culture in new[] { "", "zh-Hans" })
+                {
+                CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo(culture);
+                foreach (var remark in AllRemarks)
+                    {
+                    foreach (int attempts in new[] { 0, 1, 3 })
+                        {
+                        var lines = new List<string>();
+                        var summary = new SpecSummaryViewModel(_statuses, (message, _) => lines.Add(message));
+                        summary.Show(Evaluation(remark.Status == SpecStatus.Fail ? SpecVerdict.Fail : SpecVerdict.Warn, true,
+                            Check(remark.Key, remark.Value, remark.Status, remark.Min, remark.Typ, remark.Max, remark.Locations)) with
+                            {
+                            Attempts = attempts == 0 ? new Dictionary<string, SpecAttemptInfo>() : new Dictionary<string, SpecAttemptInfo> { [remark.Locations[0]] = new(attempts, 0, true) }
+                            }, 1, 13);
+                        yield return (culture, remark.Key, attempts, lines.Single());
+                        }
+                    }
+                }
+            }
+
+        [Test]
+        public void LogLines_OfEveryRemarkAreFlatAndWithoutRepeats()
+            {
+            var bad = new List<string>();
+            foreach (var (culture, key, attempts, line) in RenderAllLogLines())
+                {
+                var problems = new List<string>();
+                if (line.StartsWith("Spec", StringComparison.Ordinal) || line.StartsWith("规格", StringComparison.Ordinal)) problems.Add("a category prefix");
+                if (line.Count(c => c == ':') > 1) problems.Add("nested colons");
+                if (System.Text.RegularExpressions.Regex.IsMatch(line, @"^(\S+): ")) problems.Add("the point is repeated by the metric");
+                if (!line.Contains('<') && !line.Contains('>')) problems.Add("no comparison with the specification");
+                if (line.Length > 90) problems.Add($"too long ({line.Length})");
+                if (problems.Count > 0) bad.Add($"[{(culture == "" ? "en" : "zh")}] {key}/{attempts}: {line}  <- {string.Join(", ", problems)}");
+                }
+
+            Assert.That(bad, Is.Empty);
+            }
+
+        [TestCase("Brightness", 1, "Center: Brightness (cd/m²) 251 < min 290 (attempt 1). Repeat the measurement")]
+        [TestCase("Red_x", 3, "Red (x) 0.6 < min 0.612 (attempt 3). Repeat the measurement")]
+        [TestCase("Center_y", 1, "Center (y) 0.4 > max 0.32 (attempt 1). Repeat the measurement")]
+        [TestCase("Cg_rgb_area", 0, "sRGB gamut area (CIE 1931) 90 < min 95. Repeat the measurement")]
+        [TestCase("Brightness_uniformity", 0, "Brightness uniformity (%) 70 < min 80. Repeat the measurement")]
+        public void LogLine_ReadsInOneBreath(string key, int attempts, string expected)
+            {
+            var line = RenderAllLogLines().First(l => l.Culture == "" && l.Key == key && l.Attempts == attempts).Line;
+
+            Assert.That(line, Is.EqualTo(expected));
             }
         }
     }

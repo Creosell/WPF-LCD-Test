@@ -534,9 +534,6 @@
   <data name="SpecUnavailable" xml:space="preserve">
     <value>Specification check is unavailable: {0}</value>
   </data>
-  <data name="SpecLogLine" xml:space="preserve">
-    <value>Spec: {0}</value>
-  </data>
   <data name="SpecBound_min" xml:space="preserve">
     <value>min</value>
   </data>
@@ -547,10 +544,10 @@
     <value>max</value>
   </data>
   <data name="SpecGamutArea" xml:space="preserve">
-    <value>{0} gamut area, {1}</value>
+    <value>{0} gamut area ({1})</value>
   </data>
   <data name="SpecGamutCoverage" xml:space="preserve">
-    <value>{0} gamut coverage, {1}</value>
+    <value>{0} gamut coverage ({1})</value>
   </data>
   <data name="SpecMetric_Brightness" xml:space="preserve">
     <value>Brightness (cd/m²)</value>
@@ -646,7 +643,7 @@
     <value>attempt {0}</value>
   </data>
   <data name="SpecRepeatRecommended" xml:space="preserve">
-    <value>Repeating the measurement is recommended</value>
+    <value>Repeat the measurement</value>
   </data>
   <data name="SaveSpecHeader" xml:space="preserve">
     <value>Some values do not meet the specification:</value>

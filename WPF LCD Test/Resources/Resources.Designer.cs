@@ -1134,7 +1134,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} gamut area, {1}.
+        ///   Looks up a localized string similar to {0} gamut area ({1}).
         /// </summary>
         public static string SpecGamutArea {
             get {
@@ -1143,7 +1143,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} gamut coverage, {1}.
+        ///   Looks up a localized string similar to {0} gamut coverage ({1}).
         /// </summary>
         public static string SpecGamutCoverage {
             get {
@@ -1274,15 +1274,6 @@ namespace WPF_LCD_Test.Resources {
         public static string SpecLocation_WhiteColor {
             get {
                 return ResourceManager.GetString("SpecLocation_WhiteColor", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Spec: {0}.
-        /// </summary>
-        public static string SpecLogLine {
-            get {
-                return ResourceManager.GetString("SpecLogLine", resourceCulture);
             }
         }
         
@@ -1449,7 +1440,7 @@ namespace WPF_LCD_Test.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Repeating the measurement is recommended.
+        ///   Looks up a localized string similar to Repeat the measurement.
         /// </summary>
         public static string SpecRepeatRecommended {
             get {

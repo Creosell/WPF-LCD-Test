@@ -250,20 +250,20 @@ namespace WPF_LCD_Test.ViewModels
             }
 
         /// <summary>
-        /// Builds the log line of a remark: the point, the description, the attempt and, outside min/max, the advice to repeat.
+        /// Builds the log line of a remark: the point (when the name of the metric does not already carry it), what is wrong,
+        /// the attempt and, outside min/max, the advice to repeat, e.g. "Center: Brightness (cd/m²) 251 &lt; min 290 (attempt 1). Repeat the measurement".
         /// </summary>
         private string LogLine(SpecCheck check, int attempts)
             {
-            string body = Describe(check);
+            string line = Describe(check);
             if (attempts > 0)
                 {
-                body = $"{LocationName(check.Locations[0])}: {body} ({string.Format(Text("SpecAttemptSuffix"), attempts)})";
+                string point = LocationName(check.Locations[0]);
+                string name = NameOf(check.Key);
+                line = name.StartsWith(point, StringComparison.Ordinal) ? line : $"{point}: {line}";
+                line = $"{line} ({string.Format(Text("SpecAttemptSuffix"), attempts)})";
                 }
-            if (check.Status == SpecStatus.Fail)
-                {
-                body = $"{body}. {Text("SpecRepeatRecommended")}";
-                }
-            return string.Format(Text("SpecLogLine"), body);
+            return check.Status == SpecStatus.Fail ? $"{line}. {Text("SpecRepeatRecommended")}" : line;
             }
 
         /// <summary>

@@ -534,9 +534,6 @@
   <data name="SpecUnavailable" xml:space="preserve">
     <value>规格检查不可用: {0}</value>
   </data>
-  <data name="SpecLogLine" xml:space="preserve">
-    <value>规格: {0}</value>
-  </data>
   <data name="SpecBound_min" xml:space="preserve">
     <value>最小</value>
   </data>
@@ -547,10 +544,10 @@
     <value>最大</value>
   </data>
   <data name="SpecGamutArea" xml:space="preserve">
-    <value>{0} 色域面积比, {1}</value>
+    <value>{0} 色域面积比 ({1})</value>
   </data>
   <data name="SpecGamutCoverage" xml:space="preserve">
-    <value>{0} 色域覆盖率, {1}</value>
+    <value>{0} 色域覆盖率 ({1})</value>
   </data>
   <data name="SpecMetric_Brightness" xml:space="preserve">
     <value>亮度 (cd/m²)</value>
