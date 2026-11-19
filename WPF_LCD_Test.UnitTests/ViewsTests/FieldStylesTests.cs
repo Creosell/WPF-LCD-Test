@@ -32,11 +32,7 @@ namespace WPF_LCD_Test.UnitTests.ViewsTests
                 _dispatcher = Dispatcher.CurrentDispatcher;
                 if (Application.Current == null) _ = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
 
-                _resources = new ResourceDictionary();
-                _resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("pack://application:,,,/Screen Checker;component/Resources/Themes/Theme.Dark.xaml") });
-                _resources.MergedDictionaries.Add(new BundledTheme { BaseTheme = BaseTheme.Dark, PrimaryColor = MaterialDesignColors.PrimaryColor.DeepPurple, SecondaryColor = MaterialDesignColors.SecondaryColor.Lime });
-                _resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml") });
-                _resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("pack://application:,,,/Screen Checker;component/Resources/Styles/FieldStyles.xaml") });
+                _resources = BuildResources("Dark");
 
                 started.Set();
                 Dispatcher.Run();
@@ -44,6 +40,17 @@ namespace WPF_LCD_Test.UnitTests.ViewsTests
             _uiThread.SetApartmentState(ApartmentState.STA);
             _uiThread.Start();
             started.Wait();
+            }
+
+        /// <summary>The resources of the application drawn with a theme, built like <c>App.xaml</c> does.</summary>
+        private static ResourceDictionary BuildResources(string theme)
+            {
+            var resources = new ResourceDictionary();
+            resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri($"pack://application:,,,/Screen Checker;component/Resources/Themes/Theme.{theme}.xaml") });
+            resources.MergedDictionaries.Add(new BundledTheme { BaseTheme = theme == "Dark" ? BaseTheme.Dark : BaseTheme.Light, PrimaryColor = MaterialDesignColors.PrimaryColor.DeepPurple, SecondaryColor = MaterialDesignColors.SecondaryColor.Lime });
+            resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml") });
+            resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri("pack://application:,,,/Screen Checker;component/Resources/Styles/FieldStyles.xaml") });
+            return resources;
             }
 
         [OneTimeTearDown]
@@ -71,11 +78,11 @@ namespace WPF_LCD_Test.UnitTests.ViewsTests
             Dispatcher.PushFrame(frame);
             }
 
-        private Window Show(FrameworkElement content)
+        private Window Show(FrameworkElement content, ResourceDictionary? resources = null)
             {
             var window = new Window
                 {
-                Resources = _resources,
+                Resources = resources ?? _resources,
                 Content = new StackPanel { Margin = new Thickness(20), Children = { content } },
                 Left = -10000,
                 Top = -10000,
@@ -475,6 +482,29 @@ namespace WPF_LCD_Test.UnitTests.ViewsTests
                     Assert.That(success ? color?.G > color?.R : color?.R > color?.G, Is.True, $"the glow is {(success ? "green" : "red")}, it is {color}");
                     Assert.That(afterwards, Is.EqualTo(atRest), "the glow goes away and the button gets its own look back");
                     });
+                });
+            }
+
+        [TestCase("Dark", true, 0x2E, 0xD1, 0x5C)]
+        [TestCase("Dark", false, 0xFF, 0x45, 0x3A)]
+        [TestCase("Light", true, 0x00, 0xA6, 0x3E)]
+        [TestCase("Light", false, 0xE0, 0x23, 0x1B)]
+        public void ActionButton_GlowTakesItsColorFromTheTheme(string theme, bool success, byte r, byte g, byte b)
+            {
+            Ui(() =>
+                {
+                var resources = BuildResources(theme);
+                var signal = new WPF_LCD_Test.Models.ActionFeedbackSignal();
+                var button = new Button { Style = (Style)resources["ActionButtonStyle"], Content = "Save" };
+                WPF_LCD_Test.Views.Behaviors.ActionFeedbackBehavior.SetSignal(button, signal);
+                var window = Show(button, resources);
+
+                if (success) signal.Succeed(); else signal.Fail();
+                Pump(250);
+                var color = (button.Effect as System.Windows.Media.Effects.DropShadowEffect)?.Color;
+                window.Close();
+
+                Assert.That(color, Is.EqualTo(Color.FromRgb(r, g, b)), $"the glow of the {theme} theme");
                 });
             }
 

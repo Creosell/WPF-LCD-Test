@@ -22,6 +22,11 @@
     <SolidColorBrush x:Key="AppFieldLine" Color="#FF9E9E9E" />
     <SolidColorBrush x:Key="AppControlBorder" Color="#FFAAAAAA" />
     <SolidColorBrush x:Key="AppHoverOverlay" Color="#22000000" />
+    <!--  Feedback animations: the line and fill colors, the glow colors  -->
+    <SolidColorBrush x:Key="FeedbackOk" Color="#FF43A047" />
+    <SolidColorBrush x:Key="FeedbackErr" Color="#FFE53935" />
+    <SolidColorBrush x:Key="FeedbackGlowOk" Color="#FF2ED15C" />
+    <SolidColorBrush x:Key="FeedbackGlowErr" Color="#FFFF453A" />
     <SolidColorBrush x:Key="StatusOkText" Color="#FF4CAF50" />
     <SolidColorBrush x:Key="StatusWarnText" Color="#FFFFC107" />
     <SolidColorBrush x:Key="StatusErrText" Color="#FFFF5252" />

@@ -106,8 +106,6 @@ namespace WPF_LCD_Test.Views.Behaviors
     /// </summary>
     internal static class UnderlineBreathing
     {
-        private static readonly Color SuccessColor = Color.FromRgb(0x43, 0xA0, 0x47);
-        private static readonly Color FailureColor = Color.FromRgb(0xE5, 0x39, 0x35);
         private static readonly TimeSpan InhaleEnd = TimeSpan.FromMilliseconds(220);
         private static readonly TimeSpan HoldEnd = TimeSpan.FromMilliseconds(600);
         private static readonly TimeSpan ExhaleEnd = TimeSpan.FromMilliseconds(1300);
@@ -121,7 +119,7 @@ namespace WPF_LCD_Test.Views.Behaviors
         {
             if (feedback == ActionFeedback.None) return;
 
-            var target = feedback == ActionFeedback.Success ? SuccessColor : FailureColor;
+            var target = FeedbackPalette.Line(line, feedback);
             var rest = Color.FromArgb(0, target.R, target.G, target.B);
             var brush = new SolidColorBrush(rest);
             line.Background = brush;
@@ -148,7 +146,7 @@ namespace WPF_LCD_Test.Views.Behaviors
 
             field.ClearValue(Control.BorderBrushProperty);
             var rest = (field.BorderBrush as SolidColorBrush)?.Color ?? Colors.Gray;
-            var target = feedback == ActionFeedback.Success ? SuccessColor : FailureColor;
+            var target = FeedbackPalette.Line(field, feedback);
             var brush = new SolidColorBrush(rest);
             field.BorderBrush = brush;
 
@@ -171,8 +169,6 @@ namespace WPF_LCD_Test.Views.Behaviors
     /// </summary>
     internal static class ActionFeedbackBreathing
     {
-        private static readonly Color SuccessColor = Color.FromRgb(0x43, 0xA0, 0x47);
-        private static readonly Color FailureColor = Color.FromRgb(0xE5, 0x39, 0x35);
         private static readonly TimeSpan InhaleEnd = TimeSpan.FromMilliseconds(450);
         private static readonly TimeSpan HoldEnd = TimeSpan.FromMilliseconds(1700);
         private static readonly TimeSpan ExhaleEnd = TimeSpan.FromMilliseconds(3400);
@@ -192,7 +188,7 @@ namespace WPF_LCD_Test.Views.Behaviors
             button.BeginAnimation(ContentControl.ContentProperty, null);
             button.ClearValue(Control.ForegroundProperty);
             button.ClearValue(Control.BackgroundProperty);
-            var target = feedback == ActionFeedback.Success ? SuccessColor : FailureColor;
+            var target = FeedbackPalette.Line(button, feedback);
             var baseColor = (button.Background as SolidColorBrush)?.Color ?? Colors.Transparent;
             if (baseColor.A == 0) baseColor = Color.FromArgb(0, target.R, target.G, target.B);
             var brush = new SolidColorBrush(baseColor);
@@ -250,8 +246,6 @@ namespace WPF_LCD_Test.Views.Behaviors
     /// </summary>
     internal static class GlowBreathing
     {
-        private static readonly Color SuccessColor = Color.FromRgb(0x2E, 0xD1, 0x5C);
-        private static readonly Color FailureColor = Color.FromRgb(0xFF, 0x45, 0x3A);
         private static readonly TimeSpan InhaleEnd = TimeSpan.FromMilliseconds(200);
         private static readonly TimeSpan HoldEnd = TimeSpan.FromMilliseconds(450);
         private static readonly TimeSpan ExhaleEnd = TimeSpan.FromMilliseconds(1300);
@@ -269,7 +263,7 @@ namespace WPF_LCD_Test.Views.Behaviors
 
             var glow = new DropShadowEffect
             {
-                Color = feedback == ActionFeedback.Success ? SuccessColor : FailureColor,
+                Color = FeedbackPalette.Glow(element, feedback),
                 ShadowDepth = 0,
                 BlurRadius = 0,
                 Opacity = 0
