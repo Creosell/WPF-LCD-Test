@@ -562,51 +562,57 @@
                             VerticalAlignment="Center"
                             Content="{DynamicResource DeviceConfiguration}"
                             Foreground="{DynamicResource AppTextPrimary}" />
-                        <Button
-                            x:Name="DeviceConfigurationButton"
-                            behaviors:ActionFeedbackBehavior.Mode="Underline"
-                            behaviors:ActionFeedbackBehavior.Signal="{Binding ConfigFeedback}"
-                            MinWidth="200"
-                            MinHeight="20"
-                            Margin="5"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Click="DeviceConfigurationButton_Click"
-                            Foreground="{DynamicResource AppTextPrimary}"
-                            Style="{StaticResource UnderlinedDropdownButtonStyle}"
-                            Tag="{Binding}">
-                            <Button.ContextMenu>
-                                <ContextMenu
-                                    DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}"
-                                    ItemContainerStyle="{StaticResource DeviceConfigMenuItemStyle}"
-                                    ItemsSource="{Binding DeviceConfigurationTree}"
-                                    Placement="Bottom" />
-                            </Button.ContextMenu>
-                            <Grid>
-                                <TextBlock
-                                    MinWidth="160"
-                                    Margin="24,0"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    TextAlignment="Center"
-                                    Text="{Binding SelectedDeviceConfigurationDisplayName}">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding HasSelectedDeviceConfiguration}" Value="False">
-                                                    <Setter Property="Opacity" Value="0.6" />
-                                                    <Setter Property="FontStyle" Value="Italic" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                                <MaterialDesign:PackIcon
-                                    HorizontalAlignment="Right"
-                                    VerticalAlignment="Center"
-                                    Kind="ChevronDown" />
-                            </Grid>
-                        </Button>
+                        <Grid Margin="5" VerticalAlignment="Center">
+                            <Button
+                                x:Name="DeviceConfigurationButton"
+                                MinWidth="200"
+                                MinHeight="20"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Click="DeviceConfigurationButton_Click"
+                                Foreground="{DynamicResource AppTextPrimary}"
+                                Style="{StaticResource UnderlinedDropdownButtonStyle}"
+                                Tag="{Binding}">
+                                <Button.ContextMenu>
+                                    <ContextMenu
+                                        DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}"
+                                        ItemContainerStyle="{StaticResource DeviceConfigMenuItemStyle}"
+                                        ItemsSource="{Binding DeviceConfigurationTree}"
+                                        Placement="Bottom" />
+                                </Button.ContextMenu>
+                                <Grid>
+                                    <TextBlock
+                                        MinWidth="160"
+                                        Margin="24,0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        TextAlignment="Center"
+                                        Text="{Binding SelectedDeviceConfigurationDisplayName}">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding HasSelectedDeviceConfiguration}" Value="False">
+                                                        <Setter Property="Opacity" Value="0.6" />
+                                                        <Setter Property="FontStyle" Value="Italic" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <MaterialDesign:PackIcon
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        Kind="ChevronDown" />
+                                </Grid>
+                            </Button>
+                            <!--  The feedback line lies over the underline of the field so the hover line of the field cannot hide it  -->
+                            <Border
+                                Height="1"
+                                VerticalAlignment="Bottom"
+                                behaviors:ActionFeedbackBehavior.Mode="Overlay"
+                                behaviors:ActionFeedbackBehavior.Signal="{Binding ConfigFeedback}"
+                                IsHitTestVisible="False" />
+                        </Grid>
 
 
 
