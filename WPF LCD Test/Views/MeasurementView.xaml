@@ -565,7 +565,6 @@
                         <Grid Margin="5" VerticalAlignment="Center">
                             <Button
                                 x:Name="DeviceConfigurationButton"
-                                MinWidth="200"
                                 MinHeight="20"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
@@ -581,8 +580,23 @@
                                         Placement="Bottom" />
                                 </Button.ContextMenu>
                                 <Grid>
+                                    <!--  Invisible copy of every text the button can show: it makes the button as wide as the longest of them  -->
+                                    <ItemsControl
+                                        Height="0"
+                                        Margin="24,0"
+                                        Focusable="False"
+                                        FontStyle="Italic"
+                                        IsHitTestVisible="False"
+                                        IsTabStop="False"
+                                        ItemsSource="{Binding DeviceConfigurationCaptions}"
+                                        Visibility="Hidden">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <Grid />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
                                     <TextBlock
-                                        MinWidth="160"
                                         Margin="24,0"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"

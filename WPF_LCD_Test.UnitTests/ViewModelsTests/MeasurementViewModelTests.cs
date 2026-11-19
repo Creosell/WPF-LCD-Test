@@ -1771,6 +1771,21 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             }
 
         [Test]
+        public void DeviceConfigurationCaptions_ListThePlaceholderAndEveryConfigurationNameOfEveryFolder()
+            {
+            // Arrange & Act
+            using var viewModel = CreateViewModelWithConfigDirectory(dir =>
+                {
+                File.WriteAllText(Path.Combine(dir, "RootConfig.yaml"), string.Empty);
+                var orderFolder = Directory.CreateDirectory(Path.Combine(dir, "OrderA")).FullName;
+                File.WriteAllText(Path.Combine(orderFolder, "Nested.yaml"), string.Empty);
+                });
+
+            // Assert - the button must fit the widest of them; a folder name is never shown on the button
+            Assert.That(viewModel.DeviceConfigurationCaptions, Is.EquivalentTo(new[] { viewModel.SelectedDeviceConfigurationDisplayName, "RootConfig", "Nested" }));
+            }
+
+        [Test]
         public void InitializeDeviceConfigurations_NestedFolders_SubfoldersOrderedBeforeFiles()
             {
             // Arrange & Act

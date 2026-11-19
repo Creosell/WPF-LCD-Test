@@ -171,6 +171,13 @@ namespace WPF_LCD_Test.ViewModels
             string.IsNullOrEmpty(_selectedDeviceConfiguration) ? ChooseConfiguration : Path.GetFileName(_selectedDeviceConfiguration);
 
         /// <summary>
+        /// Gets every text the configuration button can show: the placeholder and the name of every configuration.
+        /// The button is as wide as the widest of them, so it does not change its width when another configuration is chosen.
+        /// </summary>
+        public IReadOnlyList<string> DeviceConfigurationCaptions =>
+            [ChooseConfiguration, .. _configNodesByPath.Values.Select(node => node.DisplayName).Distinct()];
+
+        /// <summary>
         /// Gets whether a device configuration is currently selected, used to dim the
         /// configuration button text while it shows the "choose configuration" placeholder.
         /// </summary>
@@ -494,6 +501,7 @@ namespace WPF_LCD_Test.ViewModels
                 _selectedConfigNode = null;
                 foreach (var node in BuildDeviceConfigurationTree(_pathProvider.ConfigDirectory))
                     DeviceConfigurationTree.Add(node);
+                OnPropertyChanged(nameof(DeviceConfigurationCaptions));
 
                 if (FindFirstConfiguration(DeviceConfigurationTree) == null)
                     Log(ConfigDirNotFound, [_pathProvider.ConfigDirectory], LogSeverity.Error);
@@ -1433,6 +1441,8 @@ namespace WPF_LCD_Test.ViewModels
 
         private void LocalizationService_LanguageChanged(object? sender, EventArgs e)
             {
+            OnPropertyChanged(nameof(SelectedDeviceConfigurationDisplayName));
+            OnPropertyChanged(nameof(DeviceConfigurationCaptions));
             Spec.Refresh();
             RefreshResults();
             }
