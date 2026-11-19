@@ -1396,7 +1396,8 @@ namespace WPF_LCD_Test.ViewModels
             RefreshResults();
             foreach (var row in Results)
                 {
-                row.ShowAttempts(evaluation.Attempts.GetValueOrDefault(row.Location));
+                bool isClean = !evaluation.Checks.Any(check => check.Status is SpecStatus.Warning or SpecStatus.Fail && check.Locations.Contains(row.Location));
+                row.ShowAttempts(evaluation.Attempts.GetValueOrDefault(row.Location), isClean);
                 }
             }
 

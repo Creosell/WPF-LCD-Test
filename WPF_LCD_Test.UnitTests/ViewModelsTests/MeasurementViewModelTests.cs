@@ -1172,6 +1172,36 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             }
 
         [Test]
+        public async Task ExecuteMeasureAsync_TheCounterIsGreenWhenTheAcceptedAttemptHasNoRemarks()
+            {
+            _mockDispatcher.Setup(d => d.CheckAccess()).Returns(true);
+            _mockFileService.Setup(f => f.SerializeDevice(It.IsAny<DeviceUnderTest>())).Returns("{}");
+            var evaluation = new SpecEvaluation(SpecVerdict.Pass, false,
+                [new SpecCheck("Brightness", 150, 160, 190, null, SpecStatus.Pass, ["WhiteColor"], [])])
+                {
+                Attempts = new Dictionary<string, SpecAttemptInfo> { ["WhiteColor"] = new(2, 0, true) }
+                };
+            _mockSpecEvaluationService.Setup(s => s.EvaluateAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new SpecEvaluationOutcome(evaluation, null));
+            _viewModel.SelectedDeviceConfiguration = "TestConfig";
+            _viewModel.ExecuteApplySerialNumber("SN12345");
+            _viewModel.IsDeviceConnected = true;
+            _viewModel.IsDeviceCalibrated = true;
+            var location = MeasurementLocation.WhiteColor.ToString();
+            Measurement Attempt(double lv) => new() { Location = location, x = 0.3127, y = 0.3290, Lv = lv, T = 6500, IsValid = true };
+            _mockColorMeasurementService.SetupSequence(s => s.MeasureAsync(It.IsAny<int>())).ReturnsAsync(Attempt(150)).ReturnsAsync(Attempt(180));
+
+            await ((RelayCommand)_viewModel.MeasureCommand).ExecuteAsync(location);
+            await ((RelayCommand)_viewModel.MeasureCommand).ExecuteAsync(location);
+            await Task.Delay(50);
+
+            var row = _viewModel.Results.Single(r => r.Location == location);
+            Assert.That(_viewModel.CurrentDevice.Measurements.Single().BestAttemptIndex, Is.EqualTo(0), "the check chose the first attempt");
+            Assert.That(row.Lv, Is.EqualTo("150.0"));
+            Assert.That((row.Tries, row.TriesLevel), Is.EqualTo(("2/3", TriesLevel.Enough)));
+            }
+
+        [Test]
         public async Task ExecuteMeasureAsync_ACheckResultForAnOlderStateOfThePointIsNotApplied()
             {
             _mockDispatcher.Setup(d => d.CheckAccess()).Returns(true);
