@@ -68,6 +68,8 @@ dotnet test --filter "FullyQualifiedName~TestClassName.TestMethodName"
 
 **Shared control styles:** `Resources/Styles/FieldStyles.xaml` (merged in `App.xaml`) holds the look of the input controls of every page: `UnderlinedTextBoxStyle`, `UnderlinedComboBoxStyle`, `UnderlinedDropdownButtonStyle` (a one pixel underline of the same thickness in every state, only the hover recolors it) and `ActionButtonStyle` (rounded action button); the text size of the pages is the resource `AppFontSize`. Pages take these styles and do not restyle the controls on their own.
 
+**Debug trace:** in the Debug configuration only (`#if DEBUG`, nothing of it is in a Release build) `DebugTools/` writes one timestamped line per event to `logs/debug_yyyyMMdd_HHmmss.log` next to the exe (the last 10 runs are kept) and to the debugger output: user input and interface events (`UiEventTracer`: mouse, keys, clicks, selections, typed text, opened lists and menus, windows, failed bindings, unhandled exceptions), every `RelayCommand` run (`RelayCommandTrace`), every call of a service interface with arguments, result and time (`TracingProxy`, wrapped in `App.AddService`) and every property change of a view model (`ViewModelTracer`, in `App.AddViewModel`). New code needs no log calls of its own; register services through `AddService` and view models through `AddViewModel`.
+
 **Commands:** ViewModels use `RelayCommand` (in `Commands/`) for ICommand implementation binding to UI actions.
 
 ## Project Map (graphify)

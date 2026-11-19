@@ -3,6 +3,9 @@ using System.IO.Abstractions;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Extensions.DependencyInjection;
+#if DEBUG
+using WPF_LCD_Test.DebugTools;
+#endif
 using WPF_LCD_Test.Interfaces;
 using WPF_LCD_Test.Models;
 using WPF_LCD_Test.Services;
@@ -30,27 +33,54 @@ namespace WPF_LCD_Test
             services.AddSingleton<IProcessRunner, ProcessRunner>();
 
             // Core services
-            services.AddSingleton<ISettingsService, SettingsService>();
-            services.AddSingleton<ILocalizationService, LocalizationService>();
+            AddService<ISettingsService, SettingsService>(services);
+            AddService<ILocalizationService, LocalizationService>(services);
             services.AddSingleton<ISystemThemeProvider, WindowsSystemThemeProvider>();
-            services.AddSingleton<IThemeApplier, WpfThemeApplier>();
-            services.AddSingleton<IThemeService, ThemeService>();
-            services.AddSingleton<IMeasurementStatusService, MeasurementStatusService>();
-            services.AddSingleton<IAnalyzerRegistryService, AnalyzerRegistryService>();
+            AddService<IThemeApplier, WpfThemeApplier>(services);
+            AddService<IThemeService, ThemeService>(services);
+            AddService<IMeasurementStatusService, MeasurementStatusService>(services);
+            AddService<IAnalyzerRegistryService, AnalyzerRegistryService>(services);
 
             // Application services
-            services.AddSingleton<IColorMeasurementService, ColorMeasurementService>();
-            services.AddSingleton<IFileService, FileService>();
-            services.AddSingleton<IDialogService, DialogService>();
-            services.AddSingleton<IUploadService, UploadService>();
-            services.AddSingleton<ISpecEvaluationService, SpecEvaluationService>();
+            AddService<IColorMeasurementService, ColorMeasurementService>(services);
+            AddService<IFileService, FileService>(services);
+            AddService<IDialogService, DialogService>(services);
+            AddService<IUploadService, UploadService>(services);
+            AddService<ISpecEvaluationService, SpecEvaluationService>(services);
 
             // ViewModels
-            services.AddTransient<MainWindowViewModel>();
-            services.AddTransient<MeasurementViewModel>();
-            services.AddTransient<SettingsViewModel>();
+            AddViewModel<MainWindowViewModel>(services);
+            AddViewModel<MeasurementViewModel>(services);
+            AddViewModel<SettingsViewModel>(services);
 
             _serviceProvider = services.BuildServiceProvider();
+            }
+
+        /// <summary>
+        /// Registers a singleton service. In the Debug configuration every call of the service is traced.
+        /// </summary>
+        private static void AddService<TService, TImplementation>(IServiceCollection services)
+            where TService : class
+            where TImplementation : class, TService
+            {
+#if DEBUG
+            services.AddSingleton<TService>(provider => TracingProxy.Wrap<TService>(ActivatorUtilities.CreateInstance<TImplementation>(provider)));
+#else
+            services.AddSingleton<TService, TImplementation>();
+#endif
+            }
+
+        /// <summary>
+        /// Registers a transient view model. In the Debug configuration every property change of the view model is traced.
+        /// </summary>
+        private static void AddViewModel<TViewModel>(IServiceCollection services)
+            where TViewModel : class, System.ComponentModel.INotifyPropertyChanged
+            {
+#if DEBUG
+            services.AddTransient<TViewModel>(provider => ViewModelTracer.Watch(ActivatorUtilities.CreateInstance<TViewModel>(provider)));
+#else
+            services.AddTransient<TViewModel>();
+#endif
             }
 
         /// <summary>
@@ -81,6 +111,11 @@ namespace WPF_LCD_Test
         /// <param name="e">Startup event arguments.</param>
         private void Application_Startup(object sender, StartupEventArgs e)
             {
+#if DEBUG
+            DebugTrace.Start();
+            UiEventTracer.Install();
+            DebugTrace.Write("app", $"Screen Checker {typeof(App).Assembly.GetName().Version}, {Environment.OSVersion}, {Environment.ProcessorCount} cores, base directory {AppContext.BaseDirectory}");
+#endif
             HideFocusVisuals();
             ConfigureServices();
 
