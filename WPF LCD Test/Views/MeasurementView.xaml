@@ -583,7 +583,7 @@
                                     <!--  Invisible copy of every text the button can show: it makes the button as wide as the longest of them  -->
                                     <ItemsControl
                                         Height="0"
-                                        Margin="24,0"
+                                        Margin="0,0,24,0"
                                         Focusable="False"
                                         FontStyle="Italic"
                                         IsHitTestVisible="False"
@@ -597,7 +597,7 @@
                                         </ItemsControl.ItemsPanel>
                                     </ItemsControl>
                                     <TextBlock
-                                        Margin="24,0"
+                                        Margin="0,0,24,0"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
                                         TextAlignment="Center"
