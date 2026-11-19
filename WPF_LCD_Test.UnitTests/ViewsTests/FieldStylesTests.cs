@@ -508,6 +508,46 @@ namespace WPF_LCD_Test.UnitTests.ViewsTests
                 });
             }
 
+        /// <summary>The navigation tab style of MainWindow.xaml, taken from the file as it is.</summary>
+        private static Style NavigationStyle([System.Runtime.CompilerServices.CallerFilePath] string testFile = "")
+            {
+            var file = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(testFile)!, "..", "..", "WPF LCD Test", "Views", "MainWindow.xaml"));
+            var style = System.Xml.Linq.XDocument.Load(file).Descendants()
+                .First(e => e.Name.LocalName == "Style" && e.Attributes().Any(a => a.Name.LocalName == "Key" && a.Value == "NavigationButtonStyle"));
+            var dictionary = new System.Xml.Linq.XElement(style.Name.Namespace + "ResourceDictionary", style);
+            var parsed = (ResourceDictionary)System.Windows.Markup.XamlReader.Parse(dictionary.ToString());
+            return (Style)parsed["NavigationButtonStyle"];
+            }
+
+        private static void SetMouseOver(UIElement element, bool value)
+            {
+            var key = (DependencyPropertyKey)typeof(UIElement).GetField("IsMouseOverPropertyKey", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!.GetValue(null)!;
+            element.SetValue(key, value);
+            }
+
+        [TestCase(false, 1.0)]
+        [TestCase(true, 0.0)]
+        public void NavigationTab_GrowsTheLineOnHoverExceptWhenSelected(bool selected, double expected)
+            {
+            Ui(() =>
+                {
+                var tab = new RadioButton { Style = NavigationStyle(), Content = "Settings", IsChecked = selected };
+                var window = Show(tab);
+                double atRest = Scale(tab, "HoverAccent");
+
+                SetMouseOver(tab, true);
+                Pump(700);
+                double hovered = Scale(tab, "HoverAccent");
+
+                SetMouseOver(tab, false);
+                Pump(700);
+                double left = Scale(tab, "HoverAccent");
+                window.Close();
+
+                Assert.That((atRest, hovered, left), Is.EqualTo((0.0, expected, 0.0)).Within(0.001), selected ? "the selected tab is purple already" : "the line grows on hover and goes back");
+                });
+            }
+
         [Test]
         public void ActionButton_HasNoOutline()
             {
