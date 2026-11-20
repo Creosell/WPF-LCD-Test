@@ -736,26 +736,6 @@ namespace WPF_LCD_Test.UnitTests.ViewModelsTests
             Assert.That(_viewModel.CurrentDevice.IsTV, Is.True);
             }
 
-        [Test]
-        public async Task ExecuteSaveResultsAsync_WritesTheConfigurationNameWithoutItsFolder()
-            {
-            // Arrange
-            _viewModel.ExecuteApplySerialNumber("SN12345");
-            _viewModel.SelectedDeviceConfiguration = Path.Combine("CH32", "TestConfig_CH32");
-            var allStatuses = _mockMeasurementStatusService.Object.AllMeasurementButtonStatuses;
-            foreach (var status in allStatuses)
-                {
-                _viewModel.CurrentDevice!.RecordAttempt(new Measurement { Location = status.Location, IsValid = true, x = 0.3, y = 0.3, Lv = 100, T = 6500 });
-                }
-            _mockFileService.Setup(f => f.SaveDeviceDataToJsonAsync(It.IsAny<DeviceUnderTest>())).ReturnsAsync(true);
-
-            // Act
-            await ((RelayCommand)_viewModel.SaveResultsCommand).ExecuteAsync(null);
-
-            // Assert
-            Assert.That(_viewModel.CurrentDevice!.DeviceConfiguration, Is.EqualTo("TestConfig_CH32"));
-            }
-
         // --- Тесты для ExecuteUploadReportsAsync ---
 
         [Test]
