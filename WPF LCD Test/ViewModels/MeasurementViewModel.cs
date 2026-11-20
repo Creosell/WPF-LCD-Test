@@ -174,7 +174,13 @@ namespace WPF_LCD_Test.ViewModels
         /// shown on the closed cascading configuration menu button, or a placeholder when none is selected.
         /// </summary>
         public string SelectedDeviceConfigurationDisplayName =>
-            string.IsNullOrEmpty(_selectedDeviceConfiguration) ? ChooseConfiguration : Path.GetFileName(_selectedDeviceConfiguration);
+            string.IsNullOrEmpty(_selectedDeviceConfiguration) ? ChooseConfiguration : SelectedDeviceConfigurationName;
+
+        /// <summary>
+        /// Gets the name of the selected device configuration without the folder it lies in; this is the value
+        /// written into the measurement file, so the report generator finds the configuration by its name alone.
+        /// </summary>
+        private string SelectedDeviceConfigurationName => Path.GetFileName(_selectedDeviceConfiguration);
 
         /// <summary>
         /// Gets every text the configuration button can show: the placeholder and the name of every configuration.
@@ -785,7 +791,7 @@ namespace WPF_LCD_Test.ViewModels
                     return false;
                     }
 
-                _currentDevice.DeviceConfiguration = SelectedDeviceConfiguration;
+                _currentDevice.DeviceConfiguration = SelectedDeviceConfigurationName;
                 _currentDevice.IsTV = IsTvCheckboxChecked;
 
                 await _specTask;
@@ -1372,7 +1378,7 @@ namespace WPF_LCD_Test.ViewModels
                 }
 
             var device = _currentDevice ?? new DeviceUnderTest(PreviewSerialNumber);
-            device.DeviceConfiguration = SelectedDeviceConfiguration;
+            device.DeviceConfiguration = SelectedDeviceConfigurationName;
             device.IsTV = IsTvCheckboxChecked;
             string deviceJson = _fileService.SerializeDevice(device);
             int measuredPoints = device.Measurements.Count;
